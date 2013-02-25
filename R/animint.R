@@ -23,6 +23,8 @@ gg2animint <- function
       g$classed <- g.name
       g$geom <- l$geom$objname
       g$aes <- as.character(l$mapping)
+      g$subset <- as.list(c(g$aes[grepl("showSelected|time",names(g$aes))],
+                            g$aes[names(g$aes)=="group"]))
       ## Figure out ranges (duplicated with ggplot2).
       for(aesname in names(range.map)){
         if(aesname %in% names(g$aes)){

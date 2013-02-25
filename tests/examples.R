@@ -36,8 +36,8 @@ examples <-
          loci=ggplot()+
          geom_vline(aes(xintercept=locus,clickSelects=locus),
                     data=loci,alpha=1/2)+
-         geom_point(aes(locus,frequency,group=population,
-                        showSelected=generation),data=generation.loci))
+         geom_point(aes(locus,frequency,showSelected=generation),
+                    data=generation.loci))
   },one.selector.not.animated={
     list(ts=ggplot()+
          geom_line(aes(generation,frequency,group=population,
