@@ -56,7 +56,9 @@ examples <-
          geom_line(aes(position,signal),
                    data=breakpoints$imprecision)+
          geom_segment(aes(first.base,mean,xend=last.base,yend=mean,
-                          showSelected=segments),data=breakpoints$segments)+
+                          showSelected=segments,
+                          showSelected2=bases.per.probe),
+                      data=breakpoints$segments)+
          geom_vline(aes(xintercept=base,showSelected=segments),
                     data=breakpoints$breaks),
          error=ggplot()+

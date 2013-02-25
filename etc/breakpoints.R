@@ -45,25 +45,27 @@ for(sig.i in 1:n.signals){
   sig <- sample.signal(d)
   bases.per.probe <- factor(round(max(sig$position)/length(sig$signal)))
 
-  details <- sig$details[[1]]
-  get.imp <- function(position,signal){
-    data.frame(position,signal)
-  }
-  imp.df <- with(details,{
-    rbind(get.imp(left,max(sig$signal)),
-          get.imp(right,max(sig$signal)),
-          get.imp(breaks,min(sig$signal)))
-  })
   these <- list(error=sig$components,
                 signals=with(sig,data.frame(position,signal)),
                 breaks=sig$break.df,
-                segments=sig$segments,
-                imprecision=imp.df[order(imp.df$pos),])
+                segments=sig$segments)
   for(N in names(these)){
     breakpoints[[N]] <- rbind(breakpoints[[N]],{
       data.frame(these[[N]],bases.per.probe)
     })
   }
 }
+
+yrange <- range(breakpoints$signals$signal)
+details <- sig$details[[1]]
+get.imp <- function(position,signal){
+  data.frame(position,signal)
+}
+imp.df <- with(details,{
+  rbind(get.imp(left,yrange[2]),
+        get.imp(right,yrange[2]),
+        get.imp(breaks,yrange[1]))
+})
+breakpoints$imprecision <- imp.df[order(imp.df$pos),]
 
 save(breakpoints,file=file.path("..","data","breakpoints.RData"),compress="xz")
