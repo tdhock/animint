@@ -64,5 +64,7 @@ gg2animint <- function
   json <- RJSONIO::toJSON(result)
   ## TODO: open web browser.
   cat(json,file=file.path(out.dir,"plot.json"))
-### Nothing.
+  result
+### The R representation of the exported JSON, so we can easily do
+### checks.
 }
