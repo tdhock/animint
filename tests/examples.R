@@ -21,6 +21,11 @@ generation.pop$ancestral <- ancestral$ancestral[generation.pop$locus]
 generation.loci.last <- subset(generation.loci,generation==max(generation))
 generation.pop.last <- subset(generation.pop,generation==max(generation))
 
+## only breakpointError.
+data(breakpoints)
+only.error <- subset(breakpoints$error,type=="E")
+only.segments <- subset(only.error,bases.per.probe==bases.per.probe[1])
+
 examples <-
   list(two.selectors.not.animated={
     list(ts=ggplot()+
@@ -44,11 +49,29 @@ examples <-
          geom_vline(aes(xintercept=locus,clickSelects=locus),
                     data=loci,alpha=1/2)+
          geom_point(aes(locus,frequency),data=generation.loci.last))
+  },breakpointError={
+    list(signal=ggplot()+
+         geom_point(aes(position,signal,showSelected=bases.per.probe),
+                    data=breakpoints$signals)+
+         geom_line(aes(position,signal),
+                   data=breakpoints$imprecision)+
+         geom_segment(aes(first.base,mean,xend=last.base,yend=mean,
+                          showSelected=segments),data=breakpoints$segments)+
+         geom_vline(aes(xintercept=base,showSelected=segments),
+                    data=breakpoints$breaks),
+         error=ggplot()+
+         geom_line(aes(segments,error,group=bases.per.probe),
+                   data=only.error)+
+         geom_vline(aes(xintercept=segments,clickSelects=segments),
+                    data=only.segments))
   })
 
-## we should be able to print these as regular, overplotted ggplots.
 for(plot.list in examples){
   for(p in plot.list){
+    ## we should be able to print these as regular, overplotted
+    ## ggplots.
     print(p)
   }
+  ## Attempt conversion.
+  gg2animint(plot.list)
 }

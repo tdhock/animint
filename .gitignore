@@ -1,5 +1,8 @@
 # History files
 .Rhistory
 
+# emacs autosave
+*~
+
 # Example code in package build process
 *-Ex.R

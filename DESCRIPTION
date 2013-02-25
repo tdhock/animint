@@ -1,0 +1,9 @@
+Package: animint
+Maintainer: Toby Dylan Hocking <toby@sg.cs.titech.ac.jp>
+Author: Toby Dylan Hocking
+Version: 1.0
+License: GPL-3
+Title: Interactive animations
+Description: Interactive animations can be defined using the
+ time, clickSelects, and showSelected aesthetics.
+Depends: RJSONIO, ggplot2, R (>= 2.10)

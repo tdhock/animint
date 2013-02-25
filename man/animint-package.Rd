@@ -1,0 +1,21 @@
+\name{animint-package}
+\alias{animint-package}
+\alias{animint}
+\docType{package}
+\title{Interactive animations}
+\description{Interactive animations can be defined using the
+time, clickSelects, and showSelected aesthetics.}
+\details{
+\tabular{ll}{Package: \tab animint\cr
+Maintainer: \tab Toby Dylan Hocking <toby@sg.cs.titech.ac.jp>\cr
+Author: \tab Toby Dylan Hocking\cr
+Version: \tab 1.0\cr
+License: \tab GPL-3\cr
+Title: \tab Interactive animations\cr
+Depends: \tab RJSONIO, ggplot2\cr}
+}
+\author{Toby Dylan Hocking}
+
+\keyword{ package }
+
+

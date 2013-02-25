@@ -13,5 +13,5 @@ for(pkg in names(funs)){
   cat(funs[[pkg]](L))
 }
 
-## RJSONIO::rjson is easier to read.
+## RJSONIO::toJSON is easier to read.
 
