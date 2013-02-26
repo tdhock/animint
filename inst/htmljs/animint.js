@@ -85,6 +85,10 @@ var animint = function(to_select, json_file){
 	    return svg.y(d[aes.y]);
 	}
 	var elements = svg.selectAll("."+g_info.classed);
+	var base_opacity = 1;
+	if(g_info.params.alpha){
+	    base_opacity = g_info.params.alpha;
+	}
 	if(g_info.geom == "line"){
 	    // we need to use a path.
 	    var kv = d3.entries(d3.keys(data));
@@ -123,20 +127,31 @@ var animint = function(to_select, json_file){
 		.attr("y2",svg.y.range()[1])
 		.style("stroke-width",4)
 		.style("stroke","black")
+		.on("mouseover",function(d){
+		    d3.select(this).style("opacity",function(d){
+			return selectedOpacity(d, g_info.aes.clickSelects,
+					       base_opacity, base_opacity);
+		    })
+		})
+		.on("mouseout",function(d){
+		    d3.select(this).style("opacity",function(d){
+			return selectedOpacity(d, g_info.aes.clickSelects,
+					       base_opacity, base_opacity-1/2);
+		    })
+		})
 	    ;
-	}
-	var base_opacity = 1;
-	if(g_info.params.alpha){
-	    base_opacity = g_info.params.alpha;
+	    elements
+		.append("svg:title")
+		.text(function(d){
+		    var v_name = g_info.aes.clickSelects;
+		    return v_name+" "+d[v_name];
+		})
+	    ;
 	}
 	if(g_info.aes.hasOwnProperty("clickSelects")){
 	    elements.style("opacity",function(d){
-		var v_name = g_info.aes.clickSelects;
-		if(d[v_name] == Selectors[v_name].selected){
-		    return base_opacity;
-		}else{
-		    return base_opacity-1/2;
-		}
+		return selectedOpacity(d, g_info.aes.clickSelects, 
+				       base_opacity, base_opacity-1/2);
 	    });
 	}else{
 	    elements.style("opacity",base_opacity);
@@ -146,6 +161,13 @@ var animint = function(to_select, json_file){
 	Selectors[v_name].selected = value;
 	Selectors[v_name].hilite.forEach(update_geom);
 	Selectors[v_name].subset.forEach(update_geom);
+    }
+    var selectedOpacity = function(d, v_name, selected, others){
+	if(d[v_name] == Selectors[v_name].selected){
+	    return selected;
+	}else{
+	    return others;
+	}
     }
     
     // Download the main description of the interactive plot.
