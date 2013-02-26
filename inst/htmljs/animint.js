@@ -111,15 +111,14 @@ var animint = function(to_select, json_file){
 	    eAppend = "path";
 	}
 	if(g_info.geom == "point"){
-	    return;
 	    elements = elements.data(data);
 	    eActions = function(e){
 		e.attr("cx",toX)
 		    .attr("cy",toY)
 		    .attr("r",3)
 		;
-		eAppend = "circle";
 	    }
+	    eAppend = "circle";
 	}
 	if(g_info.geom == "vline"){
 	    elements = elements.data(data);
@@ -139,22 +138,19 @@ var animint = function(to_select, json_file){
 	    eActions(e);
 	    e.classed(g_info.classed, 1);
 	    if(g_info.aes.hasOwnProperty("clickSelects")){
-		e.style("opacity",function(d){
+		var notOver = function(d){
 		    return selectedOpacity(d, g_info.aes.clickSelects, 
 					   base_opacity, base_opacity-1/2);
-		})
+		}
+		e.style("opacity",notOver)
 		    .on("mouseover",function(d){
 			d3.select(this).style("opacity",function(d){
 			    return selectedOpacity(d, g_info.aes.clickSelects,
 						   base_opacity, base_opacity);
-			})
+			});
 		    })
 		    .on("mouseout",function(d){
-			d3.select(this).style("opacity",function(d){
-			    return selectedOpacity(d, g_info.aes.clickSelects,
-						   base_opacity, 
-						   base_opacity-1/2);
-			})
+			d3.select(this).style("opacity",notOver);
 		    })
 		    .on("click",function(d){
 			var v_name = g_info.aes.clickSelects;
