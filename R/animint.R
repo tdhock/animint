@@ -22,6 +22,7 @@ gg2animint <- function
       g.name <- sprintf("geom%d",i)
       g$classed <- g.name
       g$geom <- l$geom$objname
+      g$params <- l$geom_params
       g$aes <- as.character(l$mapping)
       subset.vars <- c(g$aes[grepl("showSelected|time",names(g$aes))],
                        g$aes[names(g$aes)=="group"])

@@ -92,7 +92,7 @@ var animint = function(to_select, json_file){
 		.x(toX)
 		.y(toY)
 	    ;
-	    elements.data(kv)
+	    elements = elements.data(kv)
 		.enter()
 		.append("path")
 		.attr("d",function(d){
@@ -103,6 +103,43 @@ var animint = function(to_select, json_file){
 		.style("stroke-width",2)
 		.style("stroke","black")
 	    ;
+	}
+	if(g_info.geom == "point"){
+	    elements = elements.data(data)
+		.enter()
+		.append("circle")
+		.attr("cx",toX)
+		.attr("cy",toY)
+		.attr("r",3)
+	    ;
+	}
+	if(g_info.geom == "vline"){
+	    elements = elements.data(data)
+		.enter()
+		.append("line")
+		.attr("x1",function(d){return svg.x(d[aes.xintercept]);})
+		.attr("x2",function(d){return svg.x(d[aes.xintercept]);})
+		.attr("y1",svg.y.range()[0])
+		.attr("y2",svg.y.range()[1])
+		.style("stroke-width",4)
+		.style("stroke","black")
+	    ;
+	}
+	var base_opacity = 1;
+	if(g_info.params.alpha){
+	    base_opacity = g_info.params.alpha;
+	}
+	if(g_info.aes.hasOwnProperty("clickSelects")){
+	    elements.style("opacity",function(d){
+		var v_name = g_info.aes.clickSelects;
+		if(d[v_name] == Selectors[v_name].selected){
+		    return base_opacity;
+		}else{
+		    return base_opacity-1/2;
+		}
+	    });
+	}else{
+	    elements.style("opacity",base_opacity);
 	}
     }
     var update_selector = function(v_name, value){
