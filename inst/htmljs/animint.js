@@ -170,8 +170,10 @@ var animint = function(to_select, json_file){
 	    enter.style("opacity",base_opacity);
 	}
 	eActions(enter);
-	// TODO: configurable duration.
-	eActions(elements.transition().duration(1000));
+	if(g_info.aes.duration){
+	    elements = elements.transition().duration(1000);
+	}
+	eActions(elements);
     }
     var update_selector = function(v_name, value){
 	Selectors[v_name].selected = value;
