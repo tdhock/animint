@@ -25,6 +25,8 @@ generation.pop.last <- subset(generation.pop,generation==max(generation))
 data(breakpoints)
 only.error <- subset(breakpoints$error,type=="E")
 only.segments <- subset(only.error,bases.per.probe==bases.per.probe[1])
+signal.colors <- c(estimate="#0adb0a",
+                   latent="#0098ef")
 
 examples <-
   list(two.selectors.not.animated={
@@ -50,19 +52,39 @@ examples <-
          geom_vline(aes(xintercept=locus, clickSelects=locus),
                     data=loci, alpha=1/2, lwd=4)+
          geom_point(aes(locus, frequency), data=generation.loci.last))
+  },two.selectors.animated={
+    list(ts=ggplot()+
+         geom_vline(aes(xintercept=generation,
+                        clickSelects=generation),
+                    data=generations, alpha=1/2, lwd=4)+
+         geom_line(aes(generation, frequency, group=population,
+                       showSelected=locus), data=generation.loci),
+         predictions=ggplot()+
+         geom_point(aes(ancestral, estimated, time=generation,
+                        clickSelects=locus),
+                    data=generation.pop, size=4, alpha=3/4),
+         loci=ggplot()+
+         geom_vline(aes(xintercept=locus, clickSelects=locus),
+                    data=loci, alpha=1/2, lwd=4)+
+         geom_point(aes(locus, frequency, showSelected=generation),
+                    data=generation.loci),
+         duration=list(generation=1000))
   },breakpointError={
     list(signal=ggplot()+
          geom_point(aes(position, signal, showSelected=bases.per.probe),
                     data=breakpoints$signals)+
-         geom_line(aes(position, signal),
+         geom_line(aes(position, signal), colour=signal.colors[["latent"]],
                    data=breakpoints$imprecision)+
          geom_segment(aes(first.base, mean, xend=last.base, yend=mean,
                           showSelected=segments,
                           showSelected2=bases.per.probe),
+                      colour=signal.colors[["estimate"]],
                       data=breakpoints$segments)+
          geom_vline(aes(xintercept=base,
                         showSelected=segments,
                         showSelected2=bases.per.probe),
+                    colour=signal.colors[["estimate"]],
+                    linetype="dashed",
                     data=breakpoints$breaks),
          error=ggplot()+
          geom_vline(aes(xintercept=segments, clickSelects=segments),

@@ -1,1 +1,7 @@
 [[http://www.omegahat.org/SVGAnnotation/SVGAnnotationPaper/SVGAnnotationPaper.html][SVGAnnotation]]
+
+[[http://www.rstudio.com/shiny/][Shiny]]
+
+[[http://rapache.net/][RApache]]
+
+[[https://github.com/yihui/animation][Animation]]
