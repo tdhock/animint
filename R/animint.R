@@ -15,7 +15,6 @@ gg2animint <- structure(function
   
   dir.create(out.dir,showWarnings=FALSE)
   i <- 1
-  special <- c(showSelected="subset",time="subset",clickSelects="subset")
   result <- list(geoms=list(),selectors=list(),plots=list())
   olist <- list() ## for options.
 
@@ -38,8 +37,9 @@ gg2animint <- structure(function
           str(x)
           stop("dont know how to convert")
         })
-        subset.vars <- c(g$aes[grepl("showSelected|time",names(g$aes))],
-                         g$aes[names(g$aes)=="group"])
+        some.vars <- c(g$aes[grepl("showSelected|time",names(g$aes))])
+        update.vars <- c(some.vars, g$aes[names(g$aes)=="clickSelects"])
+        subset.vars <- c(some.vars, g$aes[names(g$aes)=="group"])
         g$subord <- as.list(names(subset.vars))
         g$subvars <- as.list(subset.vars)
         ## Figure out ranges (duplicated with ggplot2).
@@ -59,20 +59,13 @@ gg2animint <- structure(function
                   quote=FALSE,row.names=FALSE)
 
         ## Construct the selector.
-        for(s in names(special)){
-          if(s %in% names(g$aes)){
-            v.name <- g$aes[[s]]
-            l.name <- special[[s]]
-            if(!v.name %in% names(result$selectors)){
-              ## select the first one. TODO: customize.
-              result$selectors[[v.name]] <- list(selected=l$data[[v.name]][1])
-            }
-            if(!l.name %in% names(result$selectors[[v.name]])){
-              result$selectors[[v.name]][[l.name]] <- list()
-            }
-            result$selectors[[v.name]][[l.name]] <-
-              c(result$selectors[[v.name]][[l.name]],g.name)
+        for(v.name in update.vars){
+          if(!v.name %in% names(result$selectors)){
+            ## select the first one. TODO: customize.
+            result$selectors[[v.name]] <- list(selected=l$data[[v.name]][1])
           }
+          result$selectors[[v.name]]$subset <-
+            c(result$selectors[[v.name]]$subset, g.name)
         }
         result$geoms[[g.name]] <- g
         result$plots[[plot.name]]$geoms <-
