@@ -90,6 +90,10 @@ var animint = function(to_select, json_file){
 	if(g_info.params.alpha){
 	    base_opacity = g_info.params.alpha;
 	}
+	var size = 2;
+	if(g_info.params.size){
+	    size = g_info.params.size;
+	}
 
 	var eActions, eAppend;
 	if(g_info.geom == "line"){
@@ -106,7 +110,7 @@ var animint = function(to_select, json_file){
 		    return lineThing(one_group);
 		})
 		    .style("fill","none")
-		    .style("stroke-width",2)
+		    .style("stroke-width",size)
 		    .style("stroke","black")
 		;
 	    }
@@ -117,7 +121,7 @@ var animint = function(to_select, json_file){
 	    eActions = function(e){
 		e.attr("cx",toX)
 		    .attr("cy",toY)
-		    .attr("r",3)
+		    .attr("r",size)
 		;
 	    }
 	    eAppend = "circle";
@@ -129,7 +133,7 @@ var animint = function(to_select, json_file){
 		    .attr("x2",function(d){return svg.x(d[aes.xintercept]);})
 		    .attr("y1",svg.y.range()[0])
 		    .attr("y2",svg.y.range()[1])
-		    .style("stroke-width",4)
+		    .style("stroke-width",size)
 		    .style("stroke","black")
 	    }
 	    eAppend = "line";

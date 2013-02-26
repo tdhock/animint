@@ -12,7 +12,7 @@ Author: \tab Toby Dylan Hocking\cr
 Version: \tab 1.0\cr
 License: \tab GPL-3\cr
 Title: \tab Interactive animations\cr
-Depends: \tab RJSONIO, ggplot2\cr}
+Depends: \tab RJSONIO, ggplot2, R (>= 2.10)\cr}
 }
 \author{Toby Dylan Hocking}
 

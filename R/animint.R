@@ -2,8 +2,10 @@ gg2animint <- function
 ### Convert a list of ggplots to an interactive animation.
 (plot.list,
 ### List of ggplots with showSelected, time, and/or clickSelects aes.
- out.dir=tempfile()
+ out.dir=tempfile(),
 ### Directory to store html/js/csv files.
+ open.browser=interactive()
+### Open a web browser?
  ){
   stopifnot(is.list(plot.list))
   dir.create(out.dir,showWarnings=FALSE)
@@ -68,10 +70,15 @@ gg2animint <- function
     result$plots[[plot.name]]$ranges <- lapply(ranges,range)
     result$plots[[plot.name]]$options <- list(width=300,height=300)
   }
-  ## TODO: copy files.
+  src.dir <- system.file("htmljs",package="animint")
+  to.copy <- Sys.glob(file.path(src.dir, "*"))
+  file.copy(to.copy, out.dir)
   json <- RJSONIO::toJSON(result)
   ## TODO: open web browser.
   cat(json,file=file.path(out.dir,"plot.json"))
+  if(open.browser){
+    browseURL(sprintf("%s/index.html",out.dir))
+  }
   result
 ### The R representation of the exported JSON, so we can easily do
 ### checks.
