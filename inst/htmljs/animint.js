@@ -89,6 +89,7 @@ var animint = function(to_select, json_file){
 	if(g_info.params.alpha){
 	    base_opacity = g_info.params.alpha;
 	}
+	var eActions, eAppend;
 	if(g_info.geom == "line"){
 	    // we need to use a path.
 	    var kv = d3.entries(d3.keys(data));
@@ -96,66 +97,78 @@ var animint = function(to_select, json_file){
 		.x(toX)
 		.y(toY)
 	    ;
-	    elements = elements.data(kv)
-		.enter()
-		.append("path")
-		.attr("d",function(d){
+	    elements = elements.data(kv);
+	    eActions = function(e){
+		e.attr("d",function(d){
 		    var one_group = data[d.value];
 		    return lineThing(one_group);
 		})
-		.style("fill","none")
-		.style("stroke-width",2)
-		.style("stroke","black")
-	    ;
+		    .style("fill","none")
+		    .style("stroke-width",2)
+		    .style("stroke","black")
+		;
+	    }
+	    eAppend = "path";
 	}
 	if(g_info.geom == "point"){
-	    elements = elements.data(data)
-		.enter()
-		.append("circle")
-		.attr("cx",toX)
-		.attr("cy",toY)
-		.attr("r",3)
-	    ;
+	    return;
+	    elements = elements.data(data);
+	    eActions = function(e){
+		e.attr("cx",toX)
+		    .attr("cy",toY)
+		    .attr("r",3)
+		;
+		eAppend = "circle";
+	    }
 	}
 	if(g_info.geom == "vline"){
-	    elements = elements.data(data)
-		.enter()
-		.append("line")
-		.attr("x1",function(d){return svg.x(d[aes.xintercept]);})
-		.attr("x2",function(d){return svg.x(d[aes.xintercept]);})
-		.attr("y1",svg.y.range()[0])
-		.attr("y2",svg.y.range()[1])
-		.style("stroke-width",4)
-		.style("stroke","black")
-		.on("mouseover",function(d){
-		    d3.select(this).style("opacity",function(d){
-			return selectedOpacity(d, g_info.aes.clickSelects,
-					       base_opacity, base_opacity);
-		    })
-		})
-		.on("mouseout",function(d){
-		    d3.select(this).style("opacity",function(d){
-			return selectedOpacity(d, g_info.aes.clickSelects,
-					       base_opacity, base_opacity-1/2);
-		    })
-		})
-	    ;
-	    elements
-		.append("svg:title")
-		.text(function(d){
-		    var v_name = g_info.aes.clickSelects;
-		    return v_name+" "+d[v_name];
-		})
-	    ;
+	    elements = elements.data(data);
+	    eActions = function(e){
+		e.attr("x1",function(d){return svg.x(d[aes.xintercept]);})
+		    .attr("x2",function(d){return svg.x(d[aes.xintercept]);})
+		    .attr("y1",svg.y.range()[0])
+		    .attr("y2",svg.y.range()[1])
+		    .style("stroke-width",4)
+		    .style("stroke","black")
+	    }
+	    eAppend = "line";
 	}
-	if(g_info.aes.hasOwnProperty("clickSelects")){
-	    elements.style("opacity",function(d){
-		return selectedOpacity(d, g_info.aes.clickSelects, 
-				       base_opacity, base_opacity-1/2);
-	    });
-	}else{
-	    elements.style("opacity",base_opacity);
-	}
+	elements.exit().remove();
+	var enter = elements.enter().append(eAppend);
+	[enter, elements].forEach(function(e){
+	    eActions(e);
+	    e.classed(g_info.classed, 1);
+	    if(g_info.aes.hasOwnProperty("clickSelects")){
+		e.style("opacity",function(d){
+		    return selectedOpacity(d, g_info.aes.clickSelects, 
+					   base_opacity, base_opacity-1/2);
+		})
+		    .on("mouseover",function(d){
+			d3.select(this).style("opacity",function(d){
+			    return selectedOpacity(d, g_info.aes.clickSelects,
+						   base_opacity, base_opacity);
+			})
+		    })
+		    .on("mouseout",function(d){
+			d3.select(this).style("opacity",function(d){
+			    return selectedOpacity(d, g_info.aes.clickSelects,
+						   base_opacity, 
+						   base_opacity-1/2);
+			})
+		    })
+		    .on("click",function(d){
+			var v_name = g_info.aes.clickSelects;
+			update_selector(v_name, d[v_name]);
+		    })
+		    .append("svg:title")
+		    .text(function(d){
+			var v_name = g_info.aes.clickSelects;
+			return v_name+" "+d[v_name];
+		    });
+	    }else{
+		e.style("opacity",base_opacity);
+	    }
+	});
     }
     var update_selector = function(v_name, value){
 	Selectors[v_name].selected = value;
