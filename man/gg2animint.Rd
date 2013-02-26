@@ -4,7 +4,7 @@
 \description{Convert a list of ggplots to an interactive animation.}
 \usage{gg2animint(plot.list, out.dir = tempfile(), open.browser = interactive())}
 \arguments{
-  \item{plot.list}{List of named ggplots with showSelected, time, and/or clickSelects
+  \item{plot.list}{List of named ggplots with showSelected and clickSelects
 aesthetics.}
   \item{out.dir}{Directory to store html/js/csv files.}
   \item{open.browser}{Open a web browser?}
@@ -99,4 +99,26 @@ breakpointError <- {
                  data=only.error, lwd=4))
 }
 gg2animint(breakpointError)
+
+## Example: animated time series with 3 plots and 2 selectors.
+two.selectors.animated <- {
+  list(ts=ggplot()+
+       geom_vline(aes(xintercept=generation,
+                      clickSelects=generation),
+                  data=generations, alpha=1/2, lwd=4)+
+       geom_line(aes(generation, frequency, group=population,
+                     showSelected=locus), data=generation.loci),
+       predictions=ggplot()+
+       geom_point(aes(ancestral, estimated, showSelected=generation,
+                      clickSelects=locus),
+                  data=generation.pop, size=4, alpha=3/4),
+       loci=ggplot()+
+       geom_vline(aes(xintercept=locus, clickSelects=locus),
+                  data=loci, alpha=1/2, lwd=4)+
+       geom_point(aes(locus, frequency, showSelected=generation),
+                  data=generation.loci),
+       duration=list(generation=1000),
+       time=list(variable="generation",ms=2000))
+}
+gg2animint(two.selectors.animated)
 }

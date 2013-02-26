@@ -1,7 +1,7 @@
 gg2animint <- structure(function
 ### Convert a list of ggplots to an interactive animation.
 (plot.list,
-### List of named ggplots with showSelected, time, and/or clickSelects
+### List of named ggplots with showSelected and clickSelects
 ### aesthetics.
  out.dir=tempfile(),
 ### Directory to store html/js/csv files.
@@ -17,6 +17,8 @@ gg2animint <- structure(function
   i <- 1
   result <- list(geoms=list(),selectors=list(),plots=list())
   olist <- list() ## for options.
+  df.list <- list() ## for data.frames so we can look at their values
+                    ## to create an animation.
 
   ## TODO: make this simpler!
   for(plot.name in names(plot.list)){
@@ -28,6 +30,7 @@ gg2animint <- structure(function
       for(l in p$layers){
         g <- list()
         g.name <- sprintf("geom%d",i)
+        df.list[[g.name]] <- l$data
         g$nextgeom <- sprintf("geom%d",i+1)
         g$classed <- g.name
         g$geom <- l$geom$objname
@@ -37,7 +40,7 @@ gg2animint <- structure(function
           str(x)
           stop("dont know how to convert")
         })
-        some.vars <- c(g$aes[grepl("showSelected|time",names(g$aes))])
+        some.vars <- c(g$aes[grepl("showSelected",names(g$aes))])
         update.vars <- c(some.vars, g$aes[names(g$aes)=="clickSelects"])
         subset.vars <- c(some.vars, g$aes[names(g$aes)=="group"])
         g$subord <- as.list(names(subset.vars))
@@ -85,6 +88,15 @@ gg2animint <- structure(function
     for(g.name in result$selectors[[v.name]]$subset){
       result$geoms[[g.name]]$duration <- olist$duration[[v.name]]
     }
+  }
+  if(is.list(olist$time)){
+    v.name <- olist$time$variable
+    geom.names <- result$selectors[[v.name]]$subset
+    u.list <- lapply(geom.names,function(g)unique(df.list[[g]][,v.name]))
+    olist$time$sequence <- sort(unique(unlist(u.list)))
+    ##t.next <- c(t.vals[-1],t.vals[1])
+    ##names(t.next) <- t.vals
+    result$time <- olist$time
   }
   src.dir <- system.file("htmljs",package="animint")
   to.copy <- Sys.glob(file.path(src.dir, "*"))
@@ -179,4 +191,26 @@ gg2animint <- structure(function
                    data=only.error, lwd=4))
   }
   gg2animint(breakpointError)
+
+  ## Example: animated time series with 3 plots and 2 selectors.
+  two.selectors.animated <- {
+    list(ts=ggplot()+
+         geom_vline(aes(xintercept=generation,
+                        clickSelects=generation),
+                    data=generations, alpha=1/2, lwd=4)+
+         geom_line(aes(generation, frequency, group=population,
+                       showSelected=locus), data=generation.loci),
+         predictions=ggplot()+
+         geom_point(aes(ancestral, estimated, showSelected=generation,
+                        clickSelects=locus),
+                    data=generation.pop, size=4, alpha=3/4),
+         loci=ggplot()+
+         geom_vline(aes(xintercept=locus, clickSelects=locus),
+                    data=loci, alpha=1/2, lwd=4)+
+         geom_point(aes(locus, frequency, showSelected=generation),
+                    data=generation.loci),
+         duration=list(generation=1000),
+         time=list(variable="generation",ms=2000))
+  }
+  gg2animint(two.selectors.animated)
 })

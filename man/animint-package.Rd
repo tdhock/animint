@@ -4,7 +4,7 @@
 \docType{package}
 \title{Interactive animations}
 \description{Interactive animations can be defined using the
-time, clickSelects, and showSelected aesthetics.}
+clickSelects and showSelected aesthetics.}
 \details{
 \tabular{ll}{Package: \tab animint\cr
 Maintainer: \tab Toby Dylan Hocking <toby@sg.cs.titech.ac.jp>\cr

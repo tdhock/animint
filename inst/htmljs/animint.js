@@ -18,6 +18,8 @@ var animint = function(to_select, json_file){
     this.Geoms = Geoms;
     var SVGs = {};
     this.SVGs = SVGs;
+    var Animation = {};
+    this.Animation = Animation;
     var getcol = function(v_name){
 	return function(d){return d[v_name];};
     }
@@ -229,6 +231,13 @@ var animint = function(to_select, json_file){
 	    return others;
 	}
     }
+    var animateIfInactive = function(){
+	var v_name = Animation.variable;
+	var cur = Selectors[v_name].selected;
+	var next = Animation.next[cur];
+	update_selector(v_name, next);
+	d3.timer(animateIfInactive, Animation.ms);
+    }
     
     // Download the main description of the interactive plot.
     d3.json(json_file,function(error, response){
@@ -243,6 +252,23 @@ var animint = function(to_select, json_file){
 	// Add geoms and construct nest operators.
 	for(var g_name in response.geoms){
 	    add_geom(g_name, response.geoms[g_name]);
+	}
+	// Start timer if necessary.
+	if(response.time){
+ 	    Animation.next = {};
+	    Animation.ms = response.time.ms;
+	    Animation.variable = response.time.variable;
+	    var i, prev, cur, seq = response.time.sequence;
+	    for(i=0; i < seq.length; i++){
+		if(i==0){
+		    prev = seq.length;
+		}else{
+		    prev = seq[i-1];
+		}
+		cur = seq[i];
+		Animation.next[prev] = cur;
+	    }
+	    d3.timer(animateIfInactive, Animation.ms);
 	}
     });
 }

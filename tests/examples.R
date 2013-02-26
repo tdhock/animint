@@ -60,7 +60,7 @@ examples <-
          geom_line(aes(generation, frequency, group=population,
                        showSelected=locus), data=generation.loci),
          predictions=ggplot()+
-         geom_point(aes(ancestral, estimated, time=generation,
+         geom_point(aes(ancestral, estimated, showSelected=generation,
                         clickSelects=locus),
                     data=generation.pop, size=4, alpha=3/4),
          loci=ggplot()+
@@ -68,7 +68,8 @@ examples <-
                     data=loci, alpha=1/2, lwd=4)+
          geom_point(aes(locus, frequency, showSelected=generation),
                     data=generation.loci),
-         duration=list(generation=1000))
+         duration=list(generation=1000),
+         time=list(variable="generation",ms=2000))
   },breakpointError={
     list(signal=ggplot()+
          geom_point(aes(position, signal, showSelected=bases.per.probe),
