@@ -1,79 +1,97 @@
 gg2animint <- structure(function
 ### Convert a list of ggplots to an interactive animation.
 (plot.list,
-### List of ggplots with showSelected, time, and/or clickSelects aes.
+### List of named ggplots with showSelected, time, and/or clickSelects
+### aesthetics.
  out.dir=tempfile(),
 ### Directory to store html/js/csv files.
  open.browser=interactive()
 ### Open a web browser?
  ){
+  ## Check that it is a list and every element is named.
   stopifnot(is.list(plot.list))
+  stopifnot(!is.null(names(plot.list)))
+  stopifnot(all(names(plot.list)!=""))
+  
   dir.create(out.dir,showWarnings=FALSE)
   i <- 1
-  special <- c(showSelected="subset",time="subset",clickSelects="hilite")
+  special <- c(showSelected="subset",time="subset",clickSelects="subset")
   result <- list(geoms=list(),selectors=list(),plots=list())
+  olist <- list() ## for options.
+
+  ## TODO: make this simpler!
   for(plot.name in names(plot.list)){
     p <- plot.list[[plot.name]]
-    result$plots[[plot.name]] <- list(geoms=list())
-    stopifnot(is.ggplot(p))
-    ##print(p) ## to catch any bugs.
-    ranges <- list(x=c(),y=c())
-    range.map <- c(xintercept="x",x="x",y="y")
-    for(l in p$layers){
-      g <- list()
-      g.name <- sprintf("geom%d",i)
-      g$classed <- g.name
-      g$geom <- l$geom$objname
-      g$params <- l$geom_params
-      g$aes <- lapply(l$mapping,function(x){
-        if(is.symbol(x))return(as.character(x))
-        if(is.numeric(x))return(x)
-        str(x)
-        stop("dont know how to convert")
-      })
-      subset.vars <- c(g$aes[grepl("showSelected|time",names(g$aes))],
-                       g$aes[names(g$aes)=="group"])
-      g$subord <- as.list(names(subset.vars))
-      g$subvars <- as.list(subset.vars)
-      ## Figure out ranges (duplicated with ggplot2).
-      for(aesname in names(range.map)){
-        if(aesname %in% names(g$aes)){
-          var.name <- g$aes[[aesname]]
-          ax.name <- range.map[[aesname]]
-          r <- range(l$data[[var.name]])
-          ranges[[ax.name]] <- rbind(ranges[[ax.name]],r)
+    if(is.ggplot(p)){
+      result$plots[[plot.name]] <- list(geoms=list())
+      ranges <- list(x=c(),y=c())
+      range.map <- c(xintercept="x",x="x",y="y")
+      for(l in p$layers){
+        g <- list()
+        g.name <- sprintf("geom%d",i)
+        g$nextgeom <- sprintf("geom%d",i+1)
+        g$classed <- g.name
+        g$geom <- l$geom$objname
+        g$params <- l$geom_params
+        g$aes <- lapply(l$mapping,function(x){
+          if(is.symbol(x))return(as.character(x))
+          str(x)
+          stop("dont know how to convert")
+        })
+        subset.vars <- c(g$aes[grepl("showSelected|time",names(g$aes))],
+                         g$aes[names(g$aes)=="group"])
+        g$subord <- as.list(names(subset.vars))
+        g$subvars <- as.list(subset.vars)
+        ## Figure out ranges (duplicated with ggplot2).
+        for(aesname in names(range.map)){
+          if(aesname %in% names(g$aes)){
+            var.name <- g$aes[[aesname]]
+            ax.name <- range.map[[aesname]]
+            r <- range(l$data[[var.name]])
+            ranges[[ax.name]] <- rbind(ranges[[ax.name]],r)
+          }
         }
-      }
-      ## Output data to csv.
-      csv.name <- sprintf("%s.csv",g.name)
-      g$data <- csv.name
-      g$types <- sapply(l$data,class)
-      write.csv(l$data,file.path(out.dir,csv.name),
-                quote=FALSE,row.names=FALSE)
+        ## Output data to csv.
+        csv.name <- sprintf("%s.csv",g.name)
+        g$data <- csv.name
+        g$types <- sapply(l$data,class)
+        write.csv(l$data,file.path(out.dir,csv.name),
+                  quote=FALSE,row.names=FALSE)
 
-      ## Construct the selector.
-      for(s in names(special)){
-        if(s %in% names(g$aes)){
-          v.name <- g$aes[[s]]
-          l.name <- special[[s]]
-          if(!v.name %in% names(result$selectors)){
-            ## select the first one. TODO: customize.
-            result$selectors[[v.name]] <- list(selected=l$data[[v.name]][1])
+        ## Construct the selector.
+        for(s in names(special)){
+          if(s %in% names(g$aes)){
+            v.name <- g$aes[[s]]
+            l.name <- special[[s]]
+            if(!v.name %in% names(result$selectors)){
+              ## select the first one. TODO: customize.
+              result$selectors[[v.name]] <- list(selected=l$data[[v.name]][1])
+            }
+            if(!l.name %in% names(result$selectors[[v.name]])){
+              result$selectors[[v.name]][[l.name]] <- list()
+            }
+            result$selectors[[v.name]][[l.name]] <-
+              c(result$selectors[[v.name]][[l.name]],g.name)
           }
-          if(!l.name %in% names(result$selectors[[v.name]])){
-            result$selectors[[v.name]][[l.name]] <- list()
-          }
-          result$selectors[[v.name]][[l.name]] <-
-            c(result$selectors[[v.name]][[l.name]],g.name)
         }
+        result$geoms[[g.name]] <- g
+        result$plots[[plot.name]]$geoms <-
+          c(result$plots[[plot.name]]$geoms,g.name)
+        i <- i+1
       }
-      result$geoms[[g.name]] <- g
-      result$plots[[plot.name]]$geoms <-
-        c(result$plots[[plot.name]]$geoms,g.name)
-      i <- i+1
+      result$plots[[plot.name]]$ranges <- lapply(ranges,range)
+      result$plots[[plot.name]]$options <- list(width=300,height=300)
+    }else if(is.list(p)){ ## for options.
+      olist[[plot.name]] <- p
+    }else{
+      stop("list items must be ggplots or option lists")
     }
-    result$plots[[plot.name]]$ranges <- lapply(ranges,range)
-    result$plots[[plot.name]]$options <- list(width=300,height=300)
+  }
+  ## Second pass, adding options to the list.
+  for(v.name in names(olist$duration)){
+    for(g.name in result$selectors[[v.name]]$subset){
+      result$geoms[[g.name]]$duration <- olist$duration[[v.name]]
+    }
   }
   src.dir <- system.file("htmljs",package="animint")
   to.copy <- Sys.glob(file.path(src.dir, "*"))
@@ -85,8 +103,7 @@ gg2animint <- structure(function
     browseURL(sprintf("%s/index.html",out.dir))
   }
   invisible(result)
-### The R representation of the exported JSON, so we can easily do
-### checks.
+### An invisible copy of the R list that was exported to JSON.
 },ex=function(){
   data(generation.loci)
   ## Example: 2 plots, 2 selectors.
@@ -101,9 +118,9 @@ gg2animint <- structure(function
          loci=ggplot()+
          geom_vline(aes(xintercept=locus, clickSelects=locus),
                     data=loci, alpha=1/2, size=4)+
-         geom_point(aes(locus, frequency, showSelected=generation,
-                        duration=1000),
-                    data=generation.loci)
+         geom_point(aes(locus, frequency, showSelected=generation),
+                    data=generation.loci),
+         duration=list(generation=1000)
          )}
   gg2animint(two.selectors.not.animated)
 
@@ -113,7 +130,8 @@ gg2animint <- structure(function
     stopifnot(all(frequency==frequency[1]))
     data.frame(locus=locus[1],ancestral=frequency[1])
   }))
-  gl.list <- split(generation.loci,with(generation.loci,list(generation,locus)))
+  gl.list <- split(generation.loci,
+                   with(generation.loci,list(generation,locus)))
   generation.pop <- do.call(rbind,lapply(gl.list,with,{
     data.frame(generation=generation[1], locus=locus[1],
                estimated=mean(frequency))
@@ -136,4 +154,36 @@ gg2animint <- structure(function
          geom_point(aes(locus, frequency), data=generation.loci.last)
          )}
   gg2animint(one.selector.not.animated)
+
+  ## Example: 2 plots, 2 selectors, but only interacting with 1 plot.
+  data(breakpoints)
+  only.error <- subset(breakpoints$error,type=="E")
+  only.segments <- subset(only.error,bases.per.probe==bases.per.probe[1])
+  signal.colors <- c(estimate="#0adb0a",
+                     latent="#0098ef")
+  breakpointError <- {
+    list(signal=ggplot()+
+         geom_point(aes(position, signal, showSelected=bases.per.probe),
+                    data=breakpoints$signals)+
+         geom_line(aes(position, signal), colour=signal.colors[["latent"]],
+                   data=breakpoints$imprecision)+
+         geom_segment(aes(first.base, mean, xend=last.base, yend=mean,
+                          showSelected=segments,
+                          showSelected2=bases.per.probe),
+                      colour=signal.colors[["estimate"]],
+                      data=breakpoints$segments)+
+         geom_vline(aes(xintercept=base,
+                        showSelected=segments,
+                        showSelected2=bases.per.probe),
+                    colour=signal.colors[["estimate"]],
+                    linetype="dashed",
+                    data=breakpoints$breaks),
+         error=ggplot()+
+         geom_vline(aes(xintercept=segments, clickSelects=segments),
+                    data=only.segments, lwd=17, alpha=1/2)+
+         geom_line(aes(segments, error, group=bases.per.probe,
+                       clickSelects=bases.per.probe),
+                   data=only.error, lwd=4))
+  }
+  gg2animint(breakpointError)
 })

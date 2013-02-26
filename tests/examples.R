@@ -34,10 +34,11 @@ examples <-
          geom_line(aes(generation, frequency, group=population,
                        showSelected=locus), data=generation.loci),
          loci=ggplot()+
-         geom_vline(aes(xintercept=locus, clickSelects=locus, duration=1000),
+         geom_vline(aes(xintercept=locus, clickSelects=locus),
                     data=loci, alpha=1/2, size=4)+
          geom_point(aes(locus, frequency, showSelected=generation),
-                    data=generation.loci))
+                    data=generation.loci),
+         duration=list(generation=1000))
   },one.selector.not.animated={
     list(ts=ggplot()+
          geom_line(aes(generation, frequency, group=population,
@@ -59,13 +60,16 @@ examples <-
                           showSelected=segments,
                           showSelected2=bases.per.probe),
                       data=breakpoints$segments)+
-         geom_vline(aes(xintercept=base, showSelected=segments),
+         geom_vline(aes(xintercept=base,
+                        showSelected=segments,
+                        showSelected2=bases.per.probe),
                     data=breakpoints$breaks),
          error=ggplot()+
-         geom_line(aes(segments, error, group=bases.per.probe),
-                   data=only.error)+
          geom_vline(aes(xintercept=segments, clickSelects=segments),
-                    data=only.segments, lwd=10))
+                    data=only.segments, lwd=17, alpha=1/2)+
+         geom_line(aes(segments, error, group=bases.per.probe,
+                       clickSelects=bases.per.probe),
+                   data=only.error, lwd=4))
   })
 
 for(plot.list in examples){

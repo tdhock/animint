@@ -4,13 +4,13 @@
 \description{Convert a list of ggplots to an interactive animation.}
 \usage{gg2animint(plot.list, out.dir = tempfile(), open.browser = interactive())}
 \arguments{
-  \item{plot.list}{List of ggplots with showSelected, time, and/or clickSelects aes.}
+  \item{plot.list}{List of named ggplots with showSelected, time, and/or clickSelects
+aesthetics.}
   \item{out.dir}{Directory to store html/js/csv files.}
   \item{open.browser}{Open a web browser?}
 }
 
-\value{The R representation of the exported JSON, so we can easily do
-checks.}
+\value{An invisible copy of the R list that was exported to JSON.}
 
 \author{Toby Dylan Hocking}
 
@@ -31,9 +31,9 @@ two.selectors.not.animated <- {
        loci=ggplot()+
        geom_vline(aes(xintercept=locus, clickSelects=locus),
                   data=loci, alpha=1/2, size=4)+
-       geom_point(aes(locus, frequency, showSelected=generation,
-                      duration=1000),
-                  data=generation.loci)
+       geom_point(aes(locus, frequency, showSelected=generation),
+                  data=generation.loci),
+       duration=list(generation=1000)
        )}
 gg2animint(two.selectors.not.animated)
 
@@ -43,7 +43,8 @@ ancestral <- do.call(rbind,lapply(split(first,first$locus),with,{
   stopifnot(all(frequency==frequency[1]))
   data.frame(locus=locus[1],ancestral=frequency[1])
 }))
-gl.list <- split(generation.loci,with(generation.loci,list(generation,locus)))
+gl.list <- split(generation.loci,
+                 with(generation.loci,list(generation,locus)))
 generation.pop <- do.call(rbind,lapply(gl.list,with,{
   data.frame(generation=generation[1], locus=locus[1],
              estimated=mean(frequency))
@@ -66,4 +67,36 @@ one.selector.not.animated <- {
        geom_point(aes(locus, frequency), data=generation.loci.last)
        )}
 gg2animint(one.selector.not.animated)
+
+## Example: 2 plots, 2 selectors, but only interacting with 1 plot.
+data(breakpoints)
+only.error <- subset(breakpoints$error,type=="E")
+only.segments <- subset(only.error,bases.per.probe==bases.per.probe[1])
+signal.colors <- c(estimate="#0adb0a",
+                   latent="#0098ef")
+breakpointError <- {
+  list(signal=ggplot()+
+       geom_point(aes(position, signal, showSelected=bases.per.probe),
+                  data=breakpoints$signals)+
+       geom_line(aes(position, signal), colour=signal.colors[["latent"]],
+                 data=breakpoints$imprecision)+
+       geom_segment(aes(first.base, mean, xend=last.base, yend=mean,
+                        showSelected=segments,
+                        showSelected2=bases.per.probe),
+                    colour=signal.colors[["estimate"]],
+                    data=breakpoints$segments)+
+       geom_vline(aes(xintercept=base,
+                      showSelected=segments,
+                      showSelected2=bases.per.probe),
+                  colour=signal.colors[["estimate"]],
+                  linetype="dashed",
+                  data=breakpoints$breaks),
+       error=ggplot()+
+       geom_vline(aes(xintercept=segments, clickSelects=segments),
+                  data=only.segments, lwd=17, alpha=1/2)+
+       geom_line(aes(segments, error, group=bases.per.probe,
+                     clickSelects=bases.per.probe),
+                 data=only.error, lwd=4))
+}
+gg2animint(breakpointError)
 }

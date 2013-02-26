@@ -29,9 +29,12 @@ var animint = function(to_select, json_file){
 		    var r_type = g_info.types[v_name];
 		    if(r_type == "integer"){
 			d[v_name] = parseInt(d[v_name]);
-		    }
-		    if(r_type == "numeric"){
+		    }else if(r_type == "numeric"){
 			d[v_name] = parseFloat(d[v_name]);
+		    }else if(r_type == "factor"){
+			//keep it as a character.
+		    }else{
+			throw "unsupported R type "+r_type;
 		    }
 		}
 	    });
@@ -74,18 +77,23 @@ var animint = function(to_select, json_file){
 	    if(aes_name != "group"){
 		var v_name = g_info.subvars[aes_name];
 		var value = Selectors[v_name].selected;
-		data = data[value];
+		if(data.hasOwnProperty(value)){
+		    data = data[value];
+		}else{
+		    data = [];
+		}
 	    }
 	});
 	var aes = g_info.aes;
-	var toX = function(d){
-	    return svg.x(d[aes.x]);
-	}
-	var toY = function(d){
-	    return svg.y(d[aes.y]);
+	var toXY = function(xy, a){
+	    return function(d){
+		return svg[xy](d[ aes[a] ]);
+	    }
 	}
 	var elements = svg.selectAll("."+g_info.classed);
 
+	// TODO: set these on a per-item basis. Currently we can only
+	// do a per-geom basis.
 	var base_opacity = 1;
 	if(g_info.params.alpha){
 	    base_opacity = g_info.params.alpha;
@@ -94,14 +102,32 @@ var animint = function(to_select, json_file){
 	if(g_info.params.size){
 	    size = g_info.params.size;
 	}
+	var colour = "black";
+	if(g_info.params.colour){
+	    colour = g_info.params.colour;
+	}
+	var dasharray = null;
+	if(g_info.params.linetype == "dashed"){
+	    dasharray = "10,10";
+	}
 
 	var eActions, eAppend;
 	if(g_info.geom == "line"){
-	    // we need to use a path.
-	    var kv = d3.entries(d3.keys(data));
+	    // case of only 1 line and no groups.
+	    if(!aes.hasOwnProperty("group")){
+		kv = [{"key":0,"value":0}];
+		data = {0:data};
+	    }else{
+		// we need to use a path for each group.
+		var kv = d3.entries(d3.keys(data));
+		kv = kv.map(function(d){
+		    d[aes.group] = d.value;
+		    return d;
+		});
+	    }
 	    var lineThing = d3.svg.line()
-		.x(toX)
-		.y(toY)
+		.x(toXY("x","x"))
+		.y(toXY("y","y"))
 	    ;
 	    elements = elements.data(kv);
 	    eActions = function(e){
@@ -111,35 +137,51 @@ var animint = function(to_select, json_file){
 		})
 		    .style("fill","none")
 		    .style("stroke-width",size)
-		    .style("stroke","black")
+		    .style("stroke-dasharray",dasharray)
+		    .style("stroke",colour)
 		;
 	    }
 	    eAppend = "path";
-	}
-	if(g_info.geom == "point"){
+	}else if(g_info.geom == "point"){
 	    elements = elements.data(data);
 	    eActions = function(e){
-		e.attr("cx",toX)
-		    .attr("cy",toY)
+		e.attr("cx",toXY("x","x"))
+		    .attr("cy",toXY("y","y"))
 		    .attr("r",size)
 		;
 	    }
 	    eAppend = "circle";
-	}
-	if(g_info.geom == "vline"){
+	}else if(g_info.geom == "vline"){
 	    elements = elements.data(data);
 	    eActions = function(e){
-		e.attr("x1",function(d){return svg.x(d[aes.xintercept]);})
-		    .attr("x2",function(d){return svg.x(d[aes.xintercept]);})
+		e.attr("x1",toXY("x","xintercept"))
+		    .attr("x2",toXY("x","xintercept"))
 		    .attr("y1",svg.y.range()[0])
 		    .attr("y2",svg.y.range()[1])
+		    .style("stroke-dasharray",dasharray)
 		    .style("stroke-width",size)
-		    .style("stroke","black")
+		    .style("stroke",colour)
+		;
 	    }
 	    eAppend = "line";
+	}else if(g_info.geom == "segment"){
+	    elements = elements.data(data);
+	    eAppend = "line";
+	    eActions = function(e){
+		e.attr("x1",toXY("x","x"))
+		    .attr("y1",toXY("y","y"))
+		    .attr("y2",toXY("y","yend"))
+		    .attr("x2",toXY("x","xend"))
+		    .style("stroke-width",size)
+		    .style("stroke-dasharray",dasharray)
+		    .style("stroke",colour)
+		;
+	    }
+	}else{
+	    throw "unsupported geom "+g_info.geom;
 	}
 	elements.exit().remove();
-	var enter = elements.enter().append(eAppend);
+	var enter = elements.enter().insert(eAppend, "."+g_info.nextgeom);
 	enter.classed(g_info.classed, 1);
 	if(g_info.aes.hasOwnProperty("clickSelects")){
 	    var notOver = function(d){
@@ -170,15 +212,15 @@ var animint = function(to_select, json_file){
 	    enter.style("opacity",base_opacity);
 	}
 	eActions(enter);
-	if(g_info.aes.duration){
-	    elements = elements.transition().duration(1000);
+	if(g_info.duration){
+	    elements = elements.transition().duration(g_info.duration);
 	}
 	eActions(elements);
     }
     var update_selector = function(v_name, value){
 	Selectors[v_name].selected = value;
-	Selectors[v_name].hilite.forEach(update_geom);
 	Selectors[v_name].subset.forEach(update_geom);
+	//Selectors[v_name].hilite.forEach(update_geom);
     }
     var selectedOpacity = function(d, v_name, selected, others){
 	if(d[v_name] == Selectors[v_name].selected){
