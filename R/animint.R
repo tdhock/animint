@@ -23,8 +23,10 @@ gg2animint <- function
       g$classed <- g.name
       g$geom <- l$geom$objname
       g$aes <- as.character(l$mapping)
-      g$subset <- as.list(c(g$aes[grepl("showSelected|time",names(g$aes))],
-                            g$aes[names(g$aes)=="group"]))
+      subset.vars <- c(g$aes[grepl("showSelected|time",names(g$aes))],
+                       g$aes[names(g$aes)=="group"])
+      g$subord <- as.list(names(subset.vars))
+      g$subvars <- as.list(subset.vars)
       ## Figure out ranges (duplicated with ggplot2).
       for(aesname in names(range.map)){
         if(aesname %in% names(g$aes)){
@@ -37,8 +39,10 @@ gg2animint <- function
       ## Output data to csv.
       csv.name <- sprintf("%s.csv",g.name)
       g$data <- csv.name
+      g$types <- sapply(l$data,class)
       write.csv(l$data,file.path(out.dir,csv.name),
                 quote=FALSE,row.names=FALSE)
+
       ## Construct the selector.
       for(s in names(special)){
         if(s %in% names(g$aes)){
@@ -61,6 +65,7 @@ gg2animint <- function
       i <- i+1
     }
     result$plots[[plot.name]]$ranges <- lapply(ranges,range)
+    result$plots[[plot.name]]$options <- list(width=300,height=300)
   }
   ## TODO: copy files.
   json <- RJSONIO::toJSON(result)

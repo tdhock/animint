@@ -7,7 +7,7 @@
 
 
 // Constructor for animint Object.
-function animint(to_select, json_file, svg_width, svg_height){
+var animint = function(to_select, json_file){
     var element = d3.select(to_select);
     this.element = element;
     var Selectors = {};
@@ -23,12 +23,24 @@ function animint(to_select, json_file, svg_width, svg_height){
     }
     var add_geom = function(g_name, g_info){
 	d3.csv(g_info.data, function(error, response){
+	    // First convert to correct types.
+	    response.forEach(function(d){
+		for(var v_name in g_info.types){
+		    var r_type = g_info.types[v_name];
+		    if(r_type == "integer"){
+			d[v_name] = parseInt(d[v_name]);
+		    }
+		    if(r_type == "numeric"){
+			d[v_name] = parseFloat(d[v_name]);
+		    }
+		}
+	    });
 	    var nest = d3.nest();
-	    for(var aes_name in g_info.subset){
-		var v_name = g_info.subset[aes_name];
+	    g_info.subord.forEach(function(aes_name){
+		var v_name = g_info.subvars[aes_name];
 		//alert(aes_name+" "+g_info.classed+" "+v_name);
 		nest.key(getcol(v_name));
-	    }
+	    });
 	    g_info.data = nest.map(response);
 	    Geoms[g_name] = g_info;
 	    update_geom(g_name);
@@ -37,8 +49,8 @@ function animint(to_select, json_file, svg_width, svg_height){
     var add_plot = function(p_name, p_info){
 	var svg = element.append("svg")
 	    .attr("id",p_name)
-	    .attr("height",svg_height)
-	    .attr("width",svg_width)
+	    .attr("height",p_info.options.height)
+	    .attr("width",p_info.options.width)
 	;
 	svg.x = d3.scale.linear()
 	    .domain(p_info.ranges.x)
@@ -58,13 +70,13 @@ function animint(to_select, json_file, svg_width, svg_height){
 	var svg = SVGs[g_name];
 	var g_info = Geoms[g_name];
 	var data = g_info.data;
-	for(aes_name in g_info.subset){
+	g_info.subord.forEach(function(aes_name){
 	    if(aes_name != "group"){
-		var v_name = g_info.subset[aes_name];
+		var v_name = g_info.subvars[aes_name];
 		var value = Selectors[v_name].selected;
 		data = data[value];
 	    }
-	}
+	});
 	var aes = g_info.aes;
 	var toX = function(d){
 	    return svg.x(d[aes.x]);
@@ -87,6 +99,9 @@ function animint(to_select, json_file, svg_width, svg_height){
 		    var one_group = data[d.value];
 		    return lineThing(one_group);
 		})
+		.style("fill","none")
+		.style("stroke-width",2)
+		.style("stroke","black")
 	    ;
 	}
     }
