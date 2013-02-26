@@ -85,10 +85,12 @@ var animint = function(to_select, json_file){
 	    return svg.y(d[aes.y]);
 	}
 	var elements = svg.selectAll("."+g_info.classed);
+
 	var base_opacity = 1;
 	if(g_info.params.alpha){
 	    base_opacity = g_info.params.alpha;
 	}
+
 	var eActions, eAppend;
 	if(g_info.geom == "line"){
 	    // we need to use a path.
@@ -134,37 +136,38 @@ var animint = function(to_select, json_file){
 	}
 	elements.exit().remove();
 	var enter = elements.enter().append(eAppend);
-	[enter, elements].forEach(function(e){
-	    eActions(e);
-	    e.classed(g_info.classed, 1);
-	    if(g_info.aes.hasOwnProperty("clickSelects")){
-		var notOver = function(d){
-		    return selectedOpacity(d, g_info.aes.clickSelects, 
-					   base_opacity, base_opacity-1/2);
-		}
-		e.style("opacity",notOver)
-		    .on("mouseover",function(d){
-			d3.select(this).style("opacity",function(d){
-			    return selectedOpacity(d, g_info.aes.clickSelects,
-						   base_opacity, base_opacity);
-			});
-		    })
-		    .on("mouseout",function(d){
-			d3.select(this).style("opacity",notOver);
-		    })
-		    .on("click",function(d){
-			var v_name = g_info.aes.clickSelects;
-			update_selector(v_name, d[v_name]);
-		    })
-		    .append("svg:title")
-		    .text(function(d){
-			var v_name = g_info.aes.clickSelects;
-			return v_name+" "+d[v_name];
-		    });
-	    }else{
-		e.style("opacity",base_opacity);
+	enter.classed(g_info.classed, 1);
+	if(g_info.aes.hasOwnProperty("clickSelects")){
+	    var notOver = function(d){
+		return selectedOpacity(d, g_info.aes.clickSelects, 
+				       base_opacity, base_opacity-1/2);
 	    }
-	});
+	    elements.style("opacity",notOver);
+	    enter.style("opacity",notOver)
+		.on("mouseover",function(d){
+		    d3.select(this).style("opacity",function(d){
+			return selectedOpacity(d, g_info.aes.clickSelects,
+					       base_opacity, base_opacity);
+		    });
+		})
+		.on("mouseout",function(d){
+		    d3.select(this).style("opacity",notOver);
+		})
+		.on("click",function(d){
+		    var v_name = g_info.aes.clickSelects;
+		    update_selector(v_name, d[v_name]);
+		})
+		.append("svg:title")
+		.text(function(d){
+		    var v_name = g_info.aes.clickSelects;
+		    return v_name+" "+d[v_name];
+		});
+	}else{
+	    enter.style("opacity",base_opacity);
+	}
+	eActions(enter);
+	// TODO: configurable duration.
+	eActions(elements.transition().duration(1000));
     }
     var update_selector = function(v_name, value){
 	Selectors[v_name].selected = value;
