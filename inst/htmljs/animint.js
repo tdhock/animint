@@ -117,7 +117,7 @@ var animint = function(to_select, json_file){
 	if(g_info.params.hjust == 0){
 	    text_anchor = "start";
 	}
-	if(g_info.params.vjust == 1){
+	if(g_info.params.hjust == 1){
 	    text_anchor = "end";
 	}
 
