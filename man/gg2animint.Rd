@@ -22,7 +22,7 @@ data(generation.loci)
 ## Example: 2 plots, 2 selectors.
 generations <- data.frame(generation=unique(generation.loci$generation))
 loci <- data.frame(locus=unique(generation.loci$locus))
-two.selectors.not.animated <- {
+two.selectors.not.animated <- 
   list(ts=ggplot()+
        geom_vline(aes(xintercept=generation, clickSelects=generation),
                   data=generations, alpha=1/2, lwd=4)+
@@ -34,7 +34,7 @@ two.selectors.not.animated <- {
        geom_point(aes(locus, frequency, showSelected=generation),
                   data=generation.loci),
        duration=list(generation=1000)
-       )}
+       )
 gg2animint(two.selectors.not.animated)
 
 ## Example: 3 plots, 1 selector.
@@ -54,7 +54,7 @@ generation.pop$ancestral <- ancestral$ancestral[generation.pop$locus]
 ## Calculate the subset for just the last generation, to plot.
 generation.loci.last <- subset(generation.loci,generation==max(generation))
 generation.pop.last <- subset(generation.pop,generation==max(generation))
-one.selector.not.animated <- {
+one.selector.not.animated <- 
   list(ts=ggplot()+
        geom_line(aes(generation, frequency, group=population,
                      showSelected=locus), data=generation.loci),
@@ -65,7 +65,7 @@ one.selector.not.animated <- {
        geom_vline(aes(xintercept=locus, clickSelects=locus),
                   data=loci, alpha=1/2, lwd=4)+
        geom_point(aes(locus, frequency), data=generation.loci.last)
-       )}
+       )
 gg2animint(one.selector.not.animated)
 
 ## Example: 2 plots, 2 selectors, but only interacting with 1 plot.
@@ -74,7 +74,7 @@ only.error <- subset(breakpoints$error,type=="E")
 only.segments <- subset(only.error,bases.per.probe==bases.per.probe[1])
 signal.colors <- c(estimate="#0adb0a",
                    latent="#0098ef")
-breakpointError <- {
+breakpointError <- 
   list(signal=ggplot()+
        geom_point(aes(position, signal, showSelected=bases.per.probe),
                   data=breakpoints$signals)+
@@ -97,11 +97,10 @@ breakpointError <- {
        geom_line(aes(segments, error, group=bases.per.probe,
                      clickSelects=bases.per.probe),
                  data=only.error, lwd=4))
-}
 gg2animint(breakpointError)
 
 ## Example: animated time series with 3 plots and 2 selectors.
-two.selectors.animated <- {
+two.selectors.animated <- 
   list(ts=ggplot()+
        geom_vline(aes(xintercept=generation,
                       clickSelects=generation),
@@ -119,6 +118,5 @@ two.selectors.animated <- {
                   data=generation.loci),
        duration=list(generation=1000),
        time=list(variable="generation",ms=2000))
-}
 gg2animint(two.selectors.animated)
 }
