@@ -112,6 +112,17 @@ var animint = function(to_select, json_file){
 	if(g_info.params.linetype == "dashed"){
 	    dasharray = "10,10";
 	}
+	var text_anchor = "middle";
+	if(g_info.params.hjust == 0){
+	    text_anchor = "start";
+	}else{
+	    text_anchor = "end";
+	}
+	// TODO: use a color key specified in R code.
+	var color_key = {
+	    "1breakpoint":"#ff7d7d",
+	    "0breakpoints":'#f6f4bf',
+	};
 
 	var eActions, eAppend;
 	if(g_info.geom == "line"){
@@ -144,6 +155,19 @@ var animint = function(to_select, json_file){
 		;
 	    }
 	    eAppend = "path";
+	}else if(g_info.geom == "text"){
+	    elements = elements.data(data);
+	    // TODO: how to support vjust? firefox doensn't support
+	    // baseline-shift... use paths?
+	    // http://commons.oreilly.com/wiki/index.php/SVG_Essentials/Text
+	    eActions = function(e){
+		e.attr("x",toXY("x","x"))
+		    .attr("y",toXY("y","y"))
+		    .text(function(d){ return d[aes.label]; })
+		    .style("text-anchor",text_anchor)
+		;
+	    }
+	    eAppend = "text";
 	}else if(g_info.geom == "point"){
 	    elements = elements.data(data);
 	    eActions = function(e){
@@ -153,6 +177,21 @@ var animint = function(to_select, json_file){
 		;
 	    }
 	    eAppend = "circle";
+	}else if(g_info.geom == "tallrect"){
+	    elements = elements.data(data);
+	    eActions = function(e){
+		e.attr("x",toXY("x","xmin"))
+		    .attr("width",function(d){
+			return svg.x(d[ aes.xmax ])-svg.x(d[ aes.xmin ]);
+		    })
+		    .attr("y", svg.y.range()[1])
+		    .attr("height", svg.y.range()[0])
+		    .style("fill",function(d){
+			return color_key[ d[aes.fill] ];
+		    })
+		;
+	    }
+	    eAppend = "rect";
 	}else if(g_info.geom == "vline"){
 	    elements = elements.data(data);
 	    eActions = function(e){
