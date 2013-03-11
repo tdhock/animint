@@ -124,7 +124,7 @@ gg2animint <- structure(function
   }
   src.dir <- system.file("htmljs",package="animint")
   to.copy <- Sys.glob(file.path(src.dir, "*"))
-  file.copy(to.copy, out.dir)
+  file.copy(to.copy, out.dir, overwrite=TRUE)
   json <- RJSONIO::toJSON(result)
   ## TODO: open web browser.
   cat(json,file=file.path(out.dir,"plot.json"))
