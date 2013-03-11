@@ -63,6 +63,7 @@ var animint = function(to_select, json_file){
 	svg.y = d3.scale.linear()
 	    .domain(p_info.ranges.y)
 	    .range([svg.attr("height"),0]);
+	svg.plot = p_info;
 	p_info.geoms.forEach(function(g_name){
 	    SVGs[g_name] = svg;
 	});
@@ -118,11 +119,6 @@ var animint = function(to_select, json_file){
 	}else{
 	    text_anchor = "end";
 	}
-	// TODO: use a color key specified in R code.
-	var color_key = {
-	    "1breakpoint":"#ff7d7d",
-	    "0breakpoints":'#f6f4bf',
-	};
 
 	var eActions, eAppend;
 	if(g_info.geom == "line"){
@@ -187,7 +183,7 @@ var animint = function(to_select, json_file){
 		    .attr("y", svg.y.range()[1])
 		    .attr("height", svg.y.range()[0])
 		    .style("fill",function(d){
-			return color_key[ d[aes.fill] ];
+			return svg.plot.scales.fill[ d[aes.fill] ];
 		    })
 		;
 	    }

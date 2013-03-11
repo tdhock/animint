@@ -25,6 +25,15 @@ gg2animint <- structure(function
     p <- plot.list[[plot.name]]
     if(is.ggplot(p)){
       result$plots[[plot.name]] <- list(geoms=list())
+      for(sc in p$scales$scales){
+        ## TODO: make use of other scales than manual.
+        if(sc$scale_name == "manual"){
+          if(sc$aesthetics == "fill"){
+            result$plots[[plot.name]]$scales$fill <- sc$palette(0)
+          }
+        }
+      }
+      ## TODO: use actual ggplot2 x and y scales instead of this hack!
       ranges <- list(x=c(),y=c())
       range.map <- c(xintercept="x",x="x",y="y")
       for(l in p$layers){
@@ -34,7 +43,7 @@ gg2animint <- structure(function
         g$classed <- g.name
         g$geom <- l$geom$objname
         ## use un-named parameters so that they will not be exported
-        ## to JSON as array, since that causes problems with
+        ## to JSON as a named object, since that causes problems with
         ## e.g. colour.
         g$params <- l$geom_params
         for(p.name in names(g$params)){
