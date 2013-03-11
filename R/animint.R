@@ -30,16 +30,31 @@ gg2animint <- structure(function
       for(l in p$layers){
         g <- list()
         g.name <- sprintf("geom%d",i)
-        df.list[[g.name]] <- l$data
         g$nextgeom <- sprintf("geom%d",i+1)
         g$classed <- g.name
         g$geom <- l$geom$objname
+        ## use un-named parameters so that they will not be exported
+        ## to JSON as array, since that causes problems with
+        ## e.g. colour.
         g$params <- l$geom_params
-        g$aes <- lapply(l$mapping,function(x){
-          if(is.symbol(x))return(as.character(x))
-          str(x)
-          stop("dont know how to convert")
-        })
+        for(p.name in names(g$params)){
+          names(g$params[[p.name]]) <- NULL
+        }
+        g$aes <- list()
+        for(aes.name in names(l$mapping)){
+          x <- l$mapping[[aes.name]]
+          g$aes[[aes.name]] <- if(is.symbol(x)){
+            as.character(x)
+          }else if(is.language(x)){
+            newcol <- as.character(as.expression(x))
+            l$data[[newcol]] <- eval(x,l$data)
+            newcol
+          }else{
+            str(x)
+            stop("don't know how to convert")
+          }
+        }
+        df.list[[g.name]] <- l$data
         some.vars <- c(g$aes[grepl("showSelected",names(g$aes))])
         update.vars <- c(some.vars, g$aes[names(g$aes)=="clickSelects"])
         subset.vars <- c(some.vars, g$aes[names(g$aes)=="group"])

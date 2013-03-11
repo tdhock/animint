@@ -180,7 +180,7 @@ var animint = function(to_select, json_file){
 		;
 	    }
 	}else{
-	    throw "unsupported geom "+g_info.geom;
+	    return "unsupported geom "+g_info.geom;
 	}
 	elements.exit().remove();
 	var enter = elements.enter().insert(eAppend, "."+g_info.nextgeom);
