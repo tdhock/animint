@@ -33,15 +33,15 @@ gg2animint <- structure(function
           }
         }
       }
-      ## TODO: use actual ggplot2 x and y scales instead of this hack!
+      ## TODO: use actual ggplot2 x and y scales! How?
       ranges <- list(x=c(),y=c())
-      range.map <- c(xintercept="x",x="x",y="y")
+      range.map <- c(xintercept="x",x="x",xend="x",
+                     yintercept="y",y="y",yend="y")
       for(l in p$layers){
-        g <- list()
-        g.name <- sprintf("geom%d",i)
+        g <- list(geom=l$geom$objname)
+        g.name <- sprintf("geom%d_%s_%s",i,g$geom,plot.name)
         g$nextgeom <- sprintf("geom%d",i+1)
         g$classed <- g.name
-        g$geom <- l$geom$objname
         ## use un-named parameters so that they will not be exported
         ## to JSON as a named object, since that causes problems with
         ## e.g. colour.
@@ -69,13 +69,17 @@ gg2animint <- structure(function
         subset.vars <- c(some.vars, g$aes[names(g$aes)=="group"])
         g$subord <- as.list(names(subset.vars))
         g$subvars <- as.list(subset.vars)
-        ## Figure out ranges (duplicated with ggplot2).
+        ## Figure out ranges (TODO: remove duplication with ggplot2).
         for(aesname in names(range.map)){
           if(aesname %in% names(g$aes)){
             var.name <- g$aes[[aesname]]
             ax.name <- range.map[[aesname]]
-            r <- range(l$data[[var.name]])
+            r <- range(l$data[[var.name]], na.rm=TRUE, finite=TRUE)
             ranges[[ax.name]] <- rbind(ranges[[ax.name]],r)
+            ## TODO: handle Inf like in ggplot2.
+            size <- r[2]-r[1]
+            l$data[[var.name]][l$data[[var.name]]==Inf] <- r[2]+size
+            l$data[[var.name]][l$data[[var.name]]==-Inf] <- r[1]-size
           }
         }
         ## Output data to csv.
@@ -118,15 +122,12 @@ gg2animint <- structure(function
     geom.names <- result$selectors[[v.name]]$subset
     u.list <- lapply(geom.names,function(g)unique(df.list[[g]][,v.name]))
     olist$time$sequence <- sort(unique(unlist(u.list)))
-    ##t.next <- c(t.vals[-1],t.vals[1])
-    ##names(t.next) <- t.vals
     result$time <- olist$time
   }
   src.dir <- system.file("htmljs",package="animint")
   to.copy <- Sys.glob(file.path(src.dir, "*"))
   file.copy(to.copy, out.dir, overwrite=TRUE)
   json <- RJSONIO::toJSON(result)
-  ## TODO: open web browser.
   cat(json,file=file.path(out.dir,"plot.json"))
   if(open.browser){
     browseURL(sprintf("%s/index.html",out.dir))
