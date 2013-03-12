@@ -150,6 +150,8 @@ for(N in names(blank.items)){
 
 mmir.plot <- 
   list(signal=ggplot()+
+       scale_x_continuous("position on chromosome (mega base pairs)",
+                          breaks=c(100,200))+
        geom_tallrect(aes(xmin=first.base/1e6, xmax=last.base/1e6,
                          fill=annotation,
                          showSelected=signal),
@@ -200,5 +202,54 @@ mmir.plot <-
                      alpha=1/2),
        width=list(800),
        height=list(signal=300,regression=150,error=50,segments=100))
+## This is a normal ggplot of all the data, subsets of which can be
+## shown by clicking the plots.
+sig.facets <- mmir.plot$sig+
+  facet_grid(segments~signal, scales="free", space="free_x")+
+  theme_bw()+
+  theme(panel.margin=unit(0,"cm"))
+print(sig.facets)
 gg2animint(mmir.plot)
+
+## TODO: mmir.plot is way too complicated, since facets are not yet
+## implemented in animint. The easier facetted version would look
+## like this:
+mmir.facet <- 
+  list(signal=mmir.plot$signal,
+       penalty=ggplot()+
+       geom_segment(aes(min.L, feature, xend=max.L, yend=feature,
+                        clickSelects=signal),
+                    size=5,
+                    data=data.frame(intreg$int, what="regression"))+
+       geom_segment(aes(min.L, min.feature, xend=max.L, yend=max.feature,
+                        linetype=line),
+                    colour="red",
+                    size=3,
+                    data=data.frame(intreg$model, what="regression"))+
+       scale_linetype_manual(values=model.linetypes)+
+       geom_segment(aes(min.L, cost, xend=max.L, yend=cost,
+                        showSelected=signal),
+                    data=data.frame(intreg$selection, what="error"))+
+       geom_segment(aes(min.L, segments, xend=max.L, yend=segments,
+                        showSelected=signal),
+                    data=data.frame(intreg$selection, what="segments"))+
+       geom_tallrect(aes(xmin=min.L, xmax=max.L,
+                         showSelected=signal,
+                         clickSelects=segments),
+                     data=data.frame(intreg$selection, what="segments"),
+                     alpha=1/2)+
+       ylab("")+
+       xlab("penalty value $L=f(x)$")+ # TODO: mathjax.
+       facet_grid(what~.,scales="free"),
+       width=list(800),
+       height=list(signal=300,regression=150,error=50,segments=100))
+gg2animint(mmir.facet) # doesn't work yet.
+## This plot has an additional facet for signal, which would not be
+## present in the interactive plot, but is useful here to see all
+## the data in regular ggplot2.
+too.many.facets <- mmir.facet$penalty+
+  facet_grid(what~signal, scales="free")+
+  theme_bw()+
+  theme(panel.margin=unit(0, "cm"))
+print(too.many.facets)
 }
