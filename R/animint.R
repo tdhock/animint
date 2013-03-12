@@ -4,9 +4,7 @@ gg2list <- function(p){
   for(sc in p$scales$scales){
     ## TODO: make use of other scales than manual.
     if(sc$scale_name == "manual"){
-      if(sc$aesthetics == "fill"){
-        plist$scales$fill <- sc$palette(0)
-      }
+      plist$scales[[sc$aesthetics]] <- sc$palette(0)
     }
   }
   for(i in seq_along(p$layers)){
@@ -136,6 +134,7 @@ gg2animint <- structure(function
       result$geoms[[g$classed]] <- g
       i <- i+1
     }
+    result$plots[[plot.name]]$scales <- p$scales
     result$plots[[plot.name]]$options <- p$options
     result$plots[[plot.name]]$ranges <- p$ranges
   }

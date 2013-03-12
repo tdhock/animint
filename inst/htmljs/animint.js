@@ -95,8 +95,9 @@ var animint = function(to_select, json_file){
 	}
 	var elements = svg.selectAll("."+g_info.classed);
 
-	// TODO: set these on a per-item basis. Currently we can only
-	// do a per-geom basis.
+	// TODO: set all of these on a per-item basis. Currently, only
+	// linetype and fill have some support for manual scales. This
+	// needs to be standardized!
 	var base_opacity = 1;
 	if(g_info.params.alpha){
 	    base_opacity = g_info.params.alpha;
@@ -105,13 +106,31 @@ var animint = function(to_select, json_file){
 	if(g_info.params.size){
 	    size = g_info.params.size;
 	}
+	var get_size = function(d){
+	    if(aes.hasOwnProperty("size") && d.hasOwnProperty(aes.size)){
+		return d[ aes.size ];
+	    }
+	    return size;
+	}
+	var linetypesize2dasharray = function(linetype, size){
+	    return {
+		"dashed":size*4+","+size*4,
+		"solid":null,
+		"dotted":size+","+size*2,
+	    }[linetype];
+	}
+	var get_dasharray = function(d){
+	    try{
+		var value = d[aes.linetype];
+		var lt = svg.plot.scales.linetype[value];
+		return linetypesize2dasharray(lt, get_size(d));
+	    }catch(err){
+		return null;
+	    }
+	}
 	var colour = "black";
 	if(g_info.params.colour){
 	    colour = g_info.params.colour;
-	}
-	var dasharray = null;
-	if(g_info.params.linetype == "dashed"){
-	    dasharray = "10,10";
 	}
 	var text_anchor = "middle";
 	if(g_info.params.hjust == 0){
@@ -147,7 +166,7 @@ var animint = function(to_select, json_file){
 		})
 		    .style("fill","none")
 		    .style("stroke-width",size)
-		    .style("stroke-dasharray",dasharray)
+		    .style("stroke-dasharray",get_dasharray)
 		    .style("stroke",colour)
 		;
 	    }
@@ -196,7 +215,7 @@ var animint = function(to_select, json_file){
 		    .attr("x2",toXY("x","xintercept"))
 		    .attr("y1",svg.y.range()[0])
 		    .attr("y2",svg.y.range()[1])
-		    .style("stroke-dasharray",dasharray)
+		    .style("stroke-dasharray",get_dasharray)
 		    .style("stroke-width",size)
 		    .style("stroke",colour)
 		;
@@ -211,7 +230,7 @@ var animint = function(to_select, json_file){
 		    .attr("y2",toXY("y","yend"))
 		    .attr("x2",toXY("x","xend"))
 		    .style("stroke-width",size)
-		    .style("stroke-dasharray",dasharray)
+		    .style("stroke-dasharray",get_dasharray)
 		    .style("stroke",colour)
 		;
 	    }
