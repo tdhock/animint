@@ -6,4 +6,4 @@ License: GPL-3
 Title: Interactive animations
 Description: Interactive animations can be defined using the
  clickSelects and showSelected aesthetics.
-Depends: RJSONIO, ggplot2, R (>= 2.10)
+Depends: RJSONIO, ggplot2, R (>= 2.10), proto, grid
