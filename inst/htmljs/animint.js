@@ -129,6 +129,13 @@ var animint = function(to_select, json_file){
 	    }
 	    return linetypesize2dasharray(lt, get_size(d));
 	}
+	var get_fill = function(d){
+	    try{
+		return svg.plot.scales.fill[ d[aes.fill] ];
+	    }catch(err){
+		return g_info.params.fill;
+	    }
+	}
 	var colour = "black";
 	if(g_info.params.colour){
 	    colour = g_info.params.colour;
@@ -203,9 +210,7 @@ var animint = function(to_select, json_file){
 		    })
 		    .attr("y", svg.y.range()[1])
 		    .attr("height", svg.y.range()[0])
-		    .style("fill",function(d){
-			return svg.plot.scales.fill[ d[aes.fill] ];
-		    })
+		    .style("fill",get_fill)
 		;
 	    }
 	    eAppend = "rect";

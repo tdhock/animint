@@ -54,8 +54,8 @@ layer2list <- function(l){
   g$subvars <- as.list(subset.vars)
   ## TODO: use actual ggplot2 x and y scales! How?
   g$ranges <- matrix(NA,2,2,dimnames=list(axis=c("x","y"),limit=c("min","max")))
-  range.map <- c(xintercept="x",x="x",xend="x",
-                 yintercept="y",y="y",yend="y")
+  range.map <- c(xintercept="x",x="x",xend="x",xmin="x",xmax="x",
+                 yintercept="y",y="y",yend="y",ymin="y",ymax="y")
   for(aesname in names(range.map)){
     if(aesname %in% names(g$aes)){
       var.name <- g$aes[[aesname]]
@@ -153,7 +153,7 @@ gg2animint <- structure(function
     if(is.list(olist[[d]])){
       if(is.null(names(olist[[d]]))){ #use this size for all plots.
         for(plot.name in names(result$plots)){
-          result$plots[[plot.name]]$options[[d]] <- olist[[d]]
+          result$plots[[plot.name]]$options[[d]] <- olist[[d]][[1]]
         }
       }else{ #use the size specified for the named plot.
         for(plot.name in names(olist[[d]])){
