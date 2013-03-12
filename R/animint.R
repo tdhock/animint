@@ -148,6 +148,20 @@ gg2animint <- structure(function
       result$geoms[[g.name]]$duration <- olist$duration[[v.name]]
     }
   }
+  ## Set plot sizes.
+  for(d in c("width","height")){
+    if(is.list(olist[[d]])){
+      if(is.null(names(olist[[d]]))){ #use this size for all plots.
+        for(plot.name in names(result$plots)){
+          result$plots[[plot.name]]$options[[d]] <- olist[[d]]
+        }
+      }else{ #use the size specified for the named plot.
+        for(plot.name in names(olist[[d]])){
+          result$plots[[plot.name]]$options[[d]] <- olist[[d]][[plot.name]]
+        }
+      }
+    }
+  }
   if(is.list(olist$time)){
     v.name <- olist$time$variable
     geom.names <- result$selectors[[v.name]]$subset
