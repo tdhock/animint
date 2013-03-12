@@ -251,8 +251,8 @@ var animint = function(to_select, json_file){
 		return selectedOpacity(d, g_info.aes.clickSelects, 
 				       base_opacity, base_opacity-1/2);
 	    }
-	    elements.style("opacity",notOver);
-	    enter.style("opacity",notOver)
+	    //elements.style("opacity",notOver);
+	    elements.style("opacity",notOver)
 		.on("mouseover",function(d){
 		    d3.select(this).style("opacity",function(d){
 			return selectedOpacity(d, g_info.aes.clickSelects,
@@ -266,6 +266,7 @@ var animint = function(to_select, json_file){
 		    var v_name = g_info.aes.clickSelects;
 		    update_selector(v_name, d[v_name]);
 		})
+		.text("")
 		.append("svg:title")
 		.text(function(d){
 		    var v_name = g_info.aes.clickSelects;
