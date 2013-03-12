@@ -120,13 +120,14 @@ var animint = function(to_select, json_file){
 	    }[linetype];
 	}
 	var get_dasharray = function(d){
+	    var value, lt;
 	    try{
-		var value = d[aes.linetype];
-		var lt = svg.plot.scales.linetype[value];
-		return linetypesize2dasharray(lt, get_size(d));
+		value = d[aes.linetype];
+		lt = svg.plot.scales.linetype[value];
 	    }catch(err){
-		return null;
+		lt = g_info.params.linetype;
 	    }
+	    return linetypesize2dasharray(lt, get_size(d));
 	}
 	var colour = "black";
 	if(g_info.params.colour){
