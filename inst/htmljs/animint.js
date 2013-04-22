@@ -215,6 +215,8 @@ var animint = function(to_select, json_file){
 	    }
 	    eAppend = "rect";
 	}else if(g_info.geom == "rect"){
+    // works for one and multiple rectangles, but may need to be extended to 
+    // be similar to geom_line() so that an array of rects can be individually selected
       elements = elements.data(data);
 	    eActions = function(e){
 		   e.attr("x",toXY("x","xmin"))
@@ -240,7 +242,8 @@ var animint = function(to_select, json_file){
 		;
 	    }
 	    eAppend = "line";
-  }else if(g_info.geom == "hline"){
+  }else if(g_info.geom == "hline"){  
+    //pretty much a copy of geom_vline with obvious modifications
       elements = elements.data(data);
 	    eActions = function(e){
 		e.attr("y1",toXY("y","yintercept"))
