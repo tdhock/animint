@@ -35,37 +35,45 @@ attemptanimation <- {
 gg2animint(attemptanimation, out.dir="./junk/", open.browser=FALSE)
 
 
-data <- expand.grid(width=seq(1, 3, 1), height=seq(1, 3, 1))
+data <- expand.grid(width=seq(1, 3, 1)+rnorm(3, 0, .5), height=seq(1, 3, 1)+rnorm(3, 0, .5))
+
 data$idx <- 1:nrow(data)
-data$xstart <- rnorm(nrow(data), -5:5, .5)
+data$xstart <- runif(nrow(data), -10, 10)
 data$ystart <- runif(nrow(data), -10, 10)
 data$xend <- data$width+data$xstart
 data$yend <- data$height+data$ystart
 data$area <- data$width*data$height
 
+bigdata <- expand.grid(width=abs(seq(0, 3, .1) + rnorm(31, 0, .5)), height=abs(seq(0, 3, .1) + rnorm(31, 0, .5)))
+bigdata$xstart <- runif(nrow(bigdata), -10, 10)
+bigdata$ystart <- runif(nrow(bigdata), -10, 10)
+bigdata$xend <- bigdata$width+bigdata$xstart
+bigdata$yend <- bigdata$height+bigdata$ystart
+bigdata$area <- bigdata$width*bigdata$height
 
 # This version works (no interactivity)
 
-areadens <- data.frame(area=seq(0, 15, 1))
-areadens$p <- predict(loess(sapply(areadens$area, function(i) sum(data$area<=i)/length(data$area))~areadens$area))
-ggplot() + geom_rect(data=data, aes(xmin=xstart, ymin=ystart, xmax=xend, ymax=yend), alpha=.2, colour="blue", fill="white")
-ggplot() + geom_line(data=areadens, aes(x=area, y=p)) + geom_vline(data=data, aes(xintercept=area))
-attemptanimation <- {
-  list(ts=ggplot() + geom_rect(data=data, aes(xmin=xstart, ymin=ystart, xmax=xend, ymax=yend), alpha=.2, color="blue", fill="lightblue"),
-       cdf = ggplot() + geom_line(data=areadens, aes(x=area, y=p)) + geom_vline(data=data, aes(xintercept=area))
-  )
-}
-gg2animint(attemptanimation, out.dir="./junk/", open.browser=FALSE)
+# areadens <- data.frame(area=seq(0, 15, 1))
+# areadens$p <- predict(loess(sapply(areadens$area, function(i) sum(data$area<=i)/length(data$area))~areadens$area))
+# ggplot() + geom_rect(data=data, aes(xmin=xstart, ymin=ystart, xmax=xend, ymax=yend), alpha=.5, colour="blue", fill="white")
+# ggplot() + geom_line(data=areadens, aes(x=area, y=p)) + geom_vline(data=data, aes(xintercept=area))
+# attemptanimation <- {
+#   list(ts=ggplot() + geom_rect(data=data, aes(xmin=xstart, ymin=ystart, xmax=xend, ymax=yend), alpha=.2, color="blue", fill="lightblue"),
+#        cdf = ggplot() + geom_line(data=areadens, aes(x=area, y=p)) + geom_vline(data=data, aes(xintercept=area))
+#   )
+# }
+# gg2animint(attemptanimation, out.dir="./junk/", open.browser=FALSE)
 
 # This version doesn't work (attempt at interactivity)
 
-areadens <- data.frame(area=seq(0, 15, 1))
-areadens$p <- predict(loess(sapply(areadens$area, function(i) sum(data$area<=i)/length(data$area))~areadens$area))
-ggplot() + geom_rect(data=data, aes(xmin=xstart, ymin=ystart, xmax=xend, ymax=yend), alpha=.2, colour="blue", fill="white")
+areadens <- data.frame(area=seq(0, 15, .1))
+areamodel <- loess(sapply(areadens$area, function(i) sum(bigdata$area<=i)/length(bigdata$area))~areadens$area)
+data$areaprob <- sapply(predict(areamodel, newdata=data$area), function(x) min(1, x)) # prevent cdf from going over 1
+areadens$p <- sapply(predict(areamodel), function(x) min(1, x))
+ggplot() + geom_rect(data=data, aes(xmin=xstart, ymin=ystart, xmax=xend, ymax=yend, group=area), alpha=.5, colour="blue", fill="white")
 ggplot() + geom_line(data=areadens, aes(x=area, y=p)) + geom_vline(data=data, aes(xintercept=area))
+
 attemptanimation <- {
-  list(ts=ggplot() + geom_rect(data=data, aes(xmin=xstart, ymin=ystart, xmax=xend, ymax=yend, clickSelects=area), alpha=.2, color="blue", fill="lightblue"),
-       cdf = ggplot() + geom_line(data=areadens, aes(x=area, y=p)) + geom_vline(data=data, aes(xintercept=area, onSelected=area))
   )
 }
 gg2animint(attemptanimation, out.dir="./junk/", open.browser=FALSE)
