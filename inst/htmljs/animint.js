@@ -240,6 +240,19 @@ var animint = function(to_select, json_file){
 		;
 	    }
 	    eAppend = "line";
+  }else if(g_info.geom == "segment"){
+      elements = elements.data(data);
+	    eActions = function(e){
+		e.attr("x1",toXY("x","x"))
+		    .attr("x2",toXY("x","xend"))
+		    .attr("y1",toXY("y", "y"))
+		    .attr("y2",toXY("y", "yend"))
+		    .style("stroke-dasharray",get_dasharray)
+		    .style("stroke-width",size)
+		    .style("stroke",colour)
+		;
+	    }
+	    eAppend = "line";
   }else if(g_info.geom == "hline"){  
     //pretty much a copy of geom_vline with obvious modifications
       elements = elements.data(data);

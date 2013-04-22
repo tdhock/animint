@@ -64,16 +64,18 @@ bigdata$area <- bigdata$width*bigdata$height
 # }
 # gg2animint(attemptanimation, out.dir="./junk/", open.browser=FALSE)
 
-# This version doesn't work (attempt at interactivity)
+# This version works now... woot woot!!
 
 areadens <- data.frame(area=seq(0, 15, .1))
 areamodel <- loess(sapply(areadens$area, function(i) sum(bigdata$area<=i)/length(bigdata$area))~areadens$area)
 data$areaprob <- sapply(predict(areamodel, newdata=data$area), function(x) min(1, x)) # prevent cdf from going over 1
 areadens$p <- sapply(predict(areamodel), function(x) min(1, x))
-ggplot() + geom_rect(data=data, aes(xmin=xstart, ymin=ystart, xmax=xend, ymax=yend, group=area), alpha=.5, colour="blue", fill="white")
+ggplot() + geom_rect(data=data, aes(xmin=xstart, ymin=ystart, xmax=xend, ymax=yend, group=area), colour="blue", fill="lightblue")
 ggplot() + geom_line(data=areadens, aes(x=area, y=p)) + geom_vline(data=data, aes(xintercept=area))
 
 attemptanimation <- {
+  list(ts=ggplot() + geom_rect(data=data, aes(xmin=xstart, ymin=ystart, xmax=xend, ymax=yend, clickSelects=area, onSelected=area), color="blue", fill="lightblue"),
+       cdf = ggplot() + geom_line(data=areadens, aes(x=area, y=p)) + geom_vline(data=data, aes(xintercept=area, onSelected=area, clickSelects=area))
   )
 }
 gg2animint(attemptanimation, out.dir="./junk/", open.browser=FALSE)
