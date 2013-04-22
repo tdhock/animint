@@ -202,7 +202,7 @@ var animint = function(to_select, json_file){
 	    }
 	    eAppend = "circle";
 	}else if(g_info.geom == "tallrect"){
-	    elements = elements.data(data);
+      elements = elements.data(data);
 	    eActions = function(e){
 		e.attr("x",toXY("x","xmin"))
 		    .attr("width",function(d){
@@ -214,6 +214,19 @@ var animint = function(to_select, json_file){
 		;
 	    }
 	    eAppend = "rect";
+	}else if(g_info.geom == "rect"){
+      elements = elements.data(data);
+	    eActions = function(e){
+		   e.attr("x",toXY("x","xmin"))
+		    .attr("width",function(d) {return svg.x(d[aes.xmax])-svg.x(d[aes.xmin]);})
+		    .attr("y",toXY("y","ymin"))
+		    .attr("height",function(d) {return svg.y(d[aes.ymin])-svg.y(d[aes.ymax]);})
+		    .style("stroke-dasharray",get_dasharray)
+		    .style("stroke-width",size)
+		    .style("stroke",colour)
+		;
+	    }
+	    eAppend = "rect";
 	}else if(g_info.geom == "vline"){
 	    elements = elements.data(data);
 	    eActions = function(e){
@@ -221,6 +234,19 @@ var animint = function(to_select, json_file){
 		    .attr("x2",toXY("x","xintercept"))
 		    .attr("y1",svg.y.range()[0])
 		    .attr("y2",svg.y.range()[1])
+		    .style("stroke-dasharray",get_dasharray)
+		    .style("stroke-width",size)
+		    .style("stroke",colour)
+		;
+	    }
+	    eAppend = "line";
+  }else if(g_info.geom == "hline"){
+      elements = elements.data(data);
+	    eActions = function(e){
+		e.attr("y1",toXY("y","yintercept"))
+		    .attr("y2",toXY("y","yintercept"))
+		    .attr("x1",svg.x.range()[0])
+		    .attr("x2",svg.x.range()[1])
 		    .style("stroke-dasharray",get_dasharray)
 		    .style("stroke-width",size)
 		    .style("stroke",colour)
