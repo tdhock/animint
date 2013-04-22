@@ -65,17 +65,40 @@ bigdata$area <- bigdata$width*bigdata$height
 # gg2animint(attemptanimation, out.dir="./junk/", open.browser=FALSE)
 
 # This version works now... woot woot!!
+# I also implemented geom_segment...
 
 areadens <- data.frame(area=seq(0, 15, .1))
 areamodel <- loess(sapply(areadens$area, function(i) sum(bigdata$area<=i)/length(bigdata$area))~areadens$area)
 data$areaprob <- sapply(predict(areamodel, newdata=data$area), function(x) min(1, x)) # prevent cdf from going over 1
 areadens$p <- sapply(predict(areamodel), function(x) min(1, x))
-ggplot() + geom_rect(data=data, aes(xmin=xstart, ymin=ystart, xmax=xend, ymax=yend, group=area), colour="blue", fill="lightblue")
+areadens$p[which(areadens$p>=1)[1]:nrow(areadens)] <- 1
+ggplot() + geom_rect(data=data, aes(xmin=xstart, ymin=ystart, xmax=xend, ymax=yend, group=area), color="blue", fill="lightblue")
 ggplot() + geom_line(data=areadens, aes(x=area, y=p)) + geom_vline(data=data, aes(xintercept=area))
 
 attemptanimation <- {
-  list(ts=ggplot() + geom_rect(data=data, aes(xmin=xstart, ymin=ystart, xmax=xend, ymax=yend, clickSelects=area, onSelected=area), color="blue", fill="lightblue"),
-       cdf = ggplot() + geom_line(data=areadens, aes(x=area, y=p)) + geom_vline(data=data, aes(xintercept=area, onSelected=area, clickSelects=area))
+  list(ts=ggplot() + geom_rect(data=data, aes(xmin=xstart, ymin=ystart, xmax=xend, ymax=yend, clickSelects=area, onSelected=area)),
+       cdf = ggplot() + geom_line(data=areadens, aes(x=area, y=p)) + geom_vline(data=data, aes(xintercept=area, onSelected=area, clickSelects=area)),
+       cdf2 = ggplot() + geom_line(data=areadens, aes(x=area, y=p)) + 
+         geom_segment(data=data, aes(x=area, xend=area, y=0*areaprob, yend=areaprob, clickSelects=area, onSelected=area))+
+         geom_segment(data=data, aes(x=0*area, xend=area, y=areaprob, yend=areaprob, clickSelects=area, onSelected=area))
+  )
+}
+gg2animint(attemptanimation, out.dir="./junk/", open.browser=FALSE)
+
+# I can't get geom_text() to work at all :( boohoo. 
+# uncaught exception: unsupported R type character
+#   lt = svg.plot.scales.linetype[value];
+#   animint.js (line 126)
+
+data$arealabel <- paste("lw = ", round(data$area, 1))
+data$areaproblabel <- paste("P(lw <= x) = ", round(data$areaprob, 2))
+
+attemptanimation <- {
+  list(ts=ggplot() + geom_rect(data=data, aes(xmin=xstart, ymin=ystart, xmax=xend, ymax=yend, clickSelects=area, onSelected=area)),
+       cdf = ggplot() + geom_line(data=areadens, aes(x=area, y=p)) + 
+         geom_segment(data=data, aes(x=area, xend=area, y=0*areaprob, yend=areaprob, clickSelects=area, onSelected=area)) +
+         geom_text(data=data, aes(x=area, y=areaprob, label=areaproblabel))
+       
   )
 }
 gg2animint(attemptanimation, out.dir="./junk/", open.browser=FALSE)
