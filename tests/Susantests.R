@@ -1,23 +1,23 @@
-two.selectors.animated <- {
-  list(ts=ggplot()+
-         geom_vline(aes(xintercept=generation,
-                        clickSelects=generation),
-                    data=generations, alpha=1/2, lwd=4)+
-         geom_line(aes(generation, frequency, group=population,
-                       showSelected=locus), data=generation.loci),
-       predictions=ggplot()+
-         geom_point(aes(ancestral, estimated, showSelected=generation,
-                        clickSelects=locus),
-                    data=generation.pop, size=4, alpha=3/4),
-       loci=ggplot()+
-         geom_vline(aes(xintercept=locus, clickSelects=locus),
-                    data=loci, alpha=1/2, lwd=4)+
-         geom_point(aes(locus, frequency, showSelected=generation),
-                    data=generation.loci),
-       duration=list(generation=1000),
-       time=list(variable="generation",ms=2000))
-}
-gg2animint(two.selectors.animated)
+# two.selectors.animated <- {
+#   list(ts=ggplot()+
+#          geom_vline(aes(xintercept=generation,
+#                         clickSelects=generation),
+#                     data=generations, alpha=1/2, lwd=4)+
+#          geom_line(aes(generation, frequency, group=population,
+#                        showSelected=locus), data=generation.loci),
+#        predictions=ggplot()+
+#          geom_point(aes(ancestral, estimated, showSelected=generation,
+#                         clickSelects=locus),
+#                     data=generation.pop, size=4, alpha=3/4),
+#        loci=ggplot()+
+#          geom_vline(aes(xintercept=locus, clickSelects=locus),
+#                     data=loci, alpha=1/2, lwd=4)+
+#          geom_point(aes(locus, frequency, showSelected=generation),
+#                     data=generation.loci),
+#        duration=list(generation=1000),
+#        time=list(variable="generation",ms=2000))
+# }
+# gg2animint(two.selectors.animated)
 
 data <- expand.grid(a=seq(0, 1, .005), b=seq(-10, 0, 1))
 data$anew <- rnorm(2211, data$a, .001)
@@ -43,6 +43,9 @@ data$xend <- data$width+data$xstart
 data$yend <- data$height+data$ystart
 data$area <- data$width*data$height
 
+
+# This version works (no interactivity)
+
 areadens <- data.frame(area=seq(0, 15, 1))
 areadens$p <- predict(loess(sapply(areadens$area, function(i) sum(data$area<=i)/length(data$area))~areadens$area))
 ggplot() + geom_rect(data=data, aes(xmin=xstart, ymin=ystart, xmax=xend, ymax=yend), alpha=.2, colour="blue", fill="white")
@@ -50,6 +53,19 @@ ggplot() + geom_line(data=areadens, aes(x=area, y=p)) + geom_vline(data=data, ae
 attemptanimation <- {
   list(ts=ggplot() + geom_rect(data=data, aes(xmin=xstart, ymin=ystart, xmax=xend, ymax=yend), alpha=.2, color="blue", fill="lightblue"),
        cdf = ggplot() + geom_line(data=areadens, aes(x=area, y=p)) + geom_vline(data=data, aes(xintercept=area))
+  )
+}
+gg2animint(attemptanimation, out.dir="./junk/", open.browser=FALSE)
+
+# This version doesn't work (attempt at interactivity)
+
+areadens <- data.frame(area=seq(0, 15, 1))
+areadens$p <- predict(loess(sapply(areadens$area, function(i) sum(data$area<=i)/length(data$area))~areadens$area))
+ggplot() + geom_rect(data=data, aes(xmin=xstart, ymin=ystart, xmax=xend, ymax=yend), alpha=.2, colour="blue", fill="white")
+ggplot() + geom_line(data=areadens, aes(x=area, y=p)) + geom_vline(data=data, aes(xintercept=area))
+attemptanimation <- {
+  list(ts=ggplot() + geom_rect(data=data, aes(xmin=xstart, ymin=ystart, xmax=xend, ymax=yend, clickSelects=area), alpha=.2, color="blue", fill="lightblue"),
+       cdf = ggplot() + geom_line(data=areadens, aes(x=area, y=p)) + geom_vline(data=data, aes(xintercept=area, onSelected=area))
   )
 }
 gg2animint(attemptanimation, out.dir="./junk/", open.browser=FALSE)

@@ -1,0 +1,142 @@
+{
+ "geoms": {
+ "geom1_rect_ts": {
+ "geom": "rect",
+"data": "geom1_rect_ts.csv",
+"params": {
+ "colour": "blue",
+"fill": "lightblue",
+"alpha":    0.2 
+},
+"aes": {
+ "xmin": "xstart",
+"ymin": "ystart",
+"xmax": "xend",
+"ymax": "yend",
+"group": "area",
+"clickSelects": "area" 
+},
+"update": {
+ "clickSelects": "area" 
+},
+"subord": [
+ "group" 
+],
+"subvars": {
+ "group": "area" 
+},
+"ranges": [ {
+ "min": -4.6759,
+"max": 5.5645 
+},
+{
+ "min": -7.8932,
+"max": 12.946 
+} ],
+"classed": "geom1_rect_ts",
+"types": {
+ "width": "numeric",
+"height": "numeric",
+"idx": "integer",
+"xstart": "numeric",
+"ystart": "numeric",
+"xend": "numeric",
+"yend": "numeric",
+"area": "numeric" 
+},
+"nextgeom": "geom2_line_cdf" 
+},
+"geom2_line_cdf": {
+ "geom": "line",
+"data": "geom2_line_cdf.csv",
+"params": [],
+"aes": {
+ "x": "area",
+"y": "p" 
+},
+"update": [],
+"subord": [],
+"subvars": [],
+"ranges": [ {
+ "min":      0,
+"max":     15 
+},
+{
+ "min": -0.033016,
+"max": 1.0112 
+} ],
+"classed": "geom2_line_cdf",
+"types": {
+ "area": "numeric",
+"p": "numeric" 
+},
+"nextgeom": "geom3_vline_cdf" 
+},
+"geom3_vline_cdf": {
+ "geom": "vline",
+"data": "geom3_vline_cdf.csv",
+"params": {},
+"aes": {
+ "xintercept": "area",
+"onSelected": "area" 
+},
+"update": [],
+"subord": [],
+"subvars": [],
+"ranges": [ {
+ "min":      1,
+"max":      9 
+},
+{
+ "min": null,
+"max": null 
+} ],
+"classed": "geom3_vline_cdf",
+"types": {
+ "width": "numeric",
+"height": "numeric",
+"idx": "integer",
+"xstart": "numeric",
+"ystart": "numeric",
+"xend": "numeric",
+"yend": "numeric",
+"area": "numeric" 
+} 
+} 
+},
+"selectors": {
+ "area": {
+ "selected":      1,
+"subset": "geom1_rect_ts" 
+} 
+},
+"plots": {
+ "ts": {
+ "geoms": [
+ "geom1_rect_ts" 
+],
+"options": {
+ "width":    300,
+"height":    300 
+},
+"ranges": {
+ "x": [ -4.6759, 5.5645 ],
+"y": [ -7.8932, 12.946 ] 
+} 
+},
+"cdf": {
+ "geoms": [
+ "geom2_line_cdf",
+"geom3_vline_cdf" 
+],
+"options": {
+ "width":    300,
+"height":    300 
+},
+"ranges": {
+ "x": [      0,     15 ],
+"y": [ -0.033016, 1.0112 ] 
+} 
+} 
+} 
+}
