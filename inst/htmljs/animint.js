@@ -219,7 +219,7 @@ var animint = function(to_select, json_file){
 	    eActions = function(e){
 		   e.attr("x",toXY("x","xmin"))
 		    .attr("width",function(d) {return svg.x(d[aes.xmax])-svg.x(d[aes.xmin]);})
-		    .attr("y",toXY("y","ymin"))
+		    .attr("y",toXY("y","ymax"))
 		    .attr("height",function(d) {return svg.y(d[aes.ymin])-svg.y(d[aes.ymax]);})
 		    .style("stroke-dasharray",get_dasharray)
 		    .style("stroke-width",size)
