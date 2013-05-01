@@ -130,10 +130,20 @@ var animint = function(to_select, json_file){
 	    return linetypesize2dasharray(lt, get_size(d));
 	}
 	var get_fill = function(d){
+    var value, fl;
 	    try{
-		return svg.plot.scales.fill[ d[aes.fill] ];
+        value = d[aes.fill];
+		    fl = svg.plot.scales.fill[ value ];
 	    }catch(err){
-		return g_info.params.fill;
+		    fl =  g_info.params.fill;
+	    }
+    return fl;
+	}
+  var get_colour = function(d){
+	    try{
+		return svg.plot.scales.colour[ d[aes.colour] ];
+	    }catch(err){
+		return g_info.params.colour;
 	    }
 	}
 	var colour = "black";
@@ -195,9 +205,11 @@ var animint = function(to_select, json_file){
 	}else if(g_info.geom == "point"){
 	    elements = elements.data(data);
 	    eActions = function(e){
-		e.attr("cx",toXY("x","x"))
+		   e.attr("cx",toXY("x","x"))
 		    .attr("cy",toXY("y","y"))
 		    .attr("r",size)
+        .style("fill",get_fill)
+        .style("stroke",get_colour)
 		;
 	    }
 	    eAppend = "circle";
