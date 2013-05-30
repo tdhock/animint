@@ -65,7 +65,7 @@
 % if using A4 paper. (This probably isn't strictly necessary.)
 % If using another size paper, use default 1cm margins.
 \ifthenelse{\lengthtest { \paperwidth = 11in}}
-	{ \geometry{top=.3in,left=.3in,right=.3in,bottom=.3in} }
+	{ \geometry{top=.3in,left=.4in,right=.3in,bottom=.3in} }
 	{\ifthenelse{ \lengthtest{ \paperwidth = 297mm}}
 		{\geometry{top=1cm,left=1cm,right=1cm,bottom=1cm} }
 		{\geometry{top=1cm,left=1cm,right=1cm,bottom=1cm} }
@@ -363,17 +363,17 @@
 \end{thm}\begin{thm} [ d3.scale.quantize ]  construct a linear quantitative scale with a discrete output range.
 \end{thm}\begin{thm} [ quantize ]  get the range val corresp to a given domain val.
 \end{thm}\begin{thm} [ quantize.domain ]  get/set the scale's input domain.
-\end{thm}\begin{thm} [ quantize.range ]  get/set the scale's output range (as discrete values).
+\end{thm}\begin{thm} [ quantize.range ]  get/set the scale's output range (discrete).
 \end{thm}\begin{thm} [ quantize.copy ]  create a new scale from an existing scale.
 \end{thm}\begin{thm} [ d3.scale.threshold ]  construct a threshold scale with a discrete output range.
 \end{thm}\begin{thm} [ threshold ]  get the range val corresp to a given domain val.
 \end{thm}\begin{thm} [ threshold.domain ]  get/set the scale's input domain.
-\end{thm}\begin{thm} [ threshold.range ]  get/set the scale's output range (as discrete values).
+\end{thm}\begin{thm} [ threshold.range ]  get/set the scale's output range (discrete).
 \end{thm}\begin{thm} [ threshold.copy ]  create a new scale from an existing scale.
 \end{thm}\begin{thm} [ d3.scale.quantile ]  construct a quantitative scale mapping to quantiles.
 \end{thm}\begin{thm} [ quantile ]  get the range val corresp to a given domain val.
-\end{thm}\begin{thm} [ quantile.domain ]  get/set the scale's input domain (as discrete values).
-\end{thm}\begin{thm} [ quantile.range ]  get/set the scale's output range (as discrete values).
+\end{thm}\begin{thm} [ quantile.domain ]  get/set the scale's input domain (discrete).
+\end{thm}\begin{thm} [ quantile.range ]  get/set the scale's output range (discrete).
 \end{thm}\begin{thm} [ quantile.quantiles ]  get the scale's quantile bin thresholds.
 \end{thm}\begin{thm} [ quantile.copy ]  create a new scale from an existing scale.
 \end{thm}\begin{thm} [ d3.scale.identity ]  construct a linear identity scale.
@@ -398,13 +398,13 @@
 \end{thm}\begin{thm} [ ordinal.rangeBand ]  get the discrete range band width.
 \end{thm}\begin{thm} [ ordinal.rangeExtent ]  get the min and max values of the output range.
 \end{thm}\begin{thm} [ ordinal.copy ]  create a new scale from an existing scale.
-\end{thm}\begin{thm} [ d3.scale.category10 ]  construct an ordinal scale with ten categ colors.
-\end{thm}\begin{thm} [ d3.scale.category20 ]  construct an ordinal scale with twenty categ colors.
-\end{thm}\begin{thm} [ d3.scale.category20b ]  construct an ordinal scale with twenty categ colors.
-\end{thm}\begin{thm} [ d3.scale.category20c ]  construct an ordinal scale with twenty categ colors.
+\end{thm}\begin{thm} [ d3.scale.category10 ]  constr an ord scale w/ 10 categ cols.
+\end{thm}\begin{thm} [ d3.scale.category20 ]  constr an ord scale w/ 20 categ cols.
+\end{thm}\begin{thm} [ d3.scale.category20b ]  constr an ord scale w/ 20 categ cols.
+\end{thm}\begin{thm} [ d3.scale.category20c ]  constr an ord scale w/ 20 categ cols.
 \end{thm}
 \hrule
-\vspace{16pt}
+\hspace{1pt}\vspace*{2.75in}\\
 \section*{d3.svg (SVG)}
 \hdrule
 \subsection*{Shapes}
