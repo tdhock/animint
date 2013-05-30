@@ -3,35 +3,27 @@
  "geom1_rect_ts": {
  "geom": "rect",
 "data": "geom1_rect_ts.csv",
-"params": {
- "colour": "blue",
-"fill": "lightblue",
-"alpha":    0.2 
-},
+"params": [],
 "aes": {
  "xmin": "xstart",
 "ymin": "ystart",
 "xmax": "xend",
 "ymax": "yend",
-"group": "area",
-"clickSelects": "area" 
+"clickSelects": "area",
+"onSelected": "area" 
 },
 "update": {
  "clickSelects": "area" 
 },
-"subord": [
- "group" 
-],
-"subvars": {
- "group": "area" 
-},
+"subord": [],
+"subvars": [],
 "ranges": [ {
- "min": -4.6759,
-"max": 5.5645 
+ "min": -7.3741,
+"max":  10.28 
 },
 {
- "min": -7.8932,
-"max": 12.946 
+ "min": -6.411,
+"max": 8.3761 
 } ],
 "classed": "geom1_rect_ts",
 "types": {
@@ -42,7 +34,8 @@
 "ystart": "numeric",
 "xend": "numeric",
 "yend": "numeric",
-"area": "numeric" 
+"area": "numeric",
+"areaprob": "numeric" 
 },
 "nextgeom": "geom2_line_cdf" 
 },
@@ -62,8 +55,8 @@
 "max":     15 
 },
 {
- "min": -0.033016,
-"max": 1.0112 
+ "min": 0.15567,
+"max":      1 
 } ],
 "classed": "geom2_line_cdf",
 "types": {
@@ -78,14 +71,17 @@
 "params": {},
 "aes": {
  "xintercept": "area",
-"onSelected": "area" 
+"onSelected": "area",
+"clickSelects": "area" 
 },
-"update": [],
+"update": {
+ "clickSelects": "area" 
+},
 "subord": [],
 "subvars": [],
 "ranges": [ {
- "min":      1,
-"max":      9 
+ "min": 1.9201,
+"max": 7.9105 
 },
 {
  "min": null,
@@ -100,14 +96,127 @@
 "ystart": "numeric",
 "xend": "numeric",
 "yend": "numeric",
-"area": "numeric" 
+"area": "numeric",
+"areaprob": "numeric" 
+},
+"nextgeom": "geom4_line_cdf2" 
+},
+"geom4_line_cdf2": {
+ "geom": "line",
+"data": "geom4_line_cdf2.csv",
+"params": [],
+"aes": {
+ "x": "area",
+"y": "p" 
+},
+"update": [],
+"subord": [],
+"subvars": [],
+"ranges": [ {
+ "min":      0,
+"max":     15 
+},
+{
+ "min": 0.15567,
+"max":      1 
+} ],
+"classed": "geom4_line_cdf2",
+"types": {
+ "area": "numeric",
+"p": "numeric" 
+},
+"nextgeom": "geom5_segment_cdf2" 
+},
+"geom5_segment_cdf2": {
+ "geom": "segment",
+"data": "geom5_segment_cdf2.csv",
+"params": {
+ "lineend": "butt",
+"na.rm": false 
+},
+"aes": {
+ "x": "area",
+"y": "0 * areaprob",
+"xend": "area",
+"yend": "areaprob",
+"clickSelects": "area",
+"onSelected": "area" 
+},
+"update": {
+ "clickSelects": "area" 
+},
+"subord": [],
+"subvars": [],
+"ranges": [ {
+ "min": 1.9201,
+"max": 7.9105 
+},
+{
+ "min":      0,
+"max": 0.97098 
+} ],
+"classed": "geom5_segment_cdf2",
+"types": {
+ "width": "numeric",
+"height": "numeric",
+"idx": "integer",
+"xstart": "numeric",
+"ystart": "numeric",
+"xend": "numeric",
+"yend": "numeric",
+"area": "numeric",
+"areaprob": "numeric",
+"0 * areaprob": "numeric" 
+},
+"nextgeom": "geom6_segment_cdf2" 
+},
+"geom6_segment_cdf2": {
+ "geom": "segment",
+"data": "geom6_segment_cdf2.csv",
+"params": {
+ "lineend": "butt",
+"na.rm": false 
+},
+"aes": {
+ "x": "0 * area",
+"y": "areaprob",
+"xend": "area",
+"yend": "areaprob",
+"clickSelects": "area",
+"onSelected": "area" 
+},
+"update": {
+ "clickSelects": "area" 
+},
+"subord": [],
+"subvars": [],
+"ranges": [ {
+ "min":      0,
+"max": 7.9105 
+},
+{
+ "min":  0.512,
+"max": 0.97098 
+} ],
+"classed": "geom6_segment_cdf2",
+"types": {
+ "width": "numeric",
+"height": "numeric",
+"idx": "integer",
+"xstart": "numeric",
+"ystart": "numeric",
+"xend": "numeric",
+"yend": "numeric",
+"area": "numeric",
+"areaprob": "numeric",
+"0 * area": "numeric" 
 } 
 } 
 },
 "selectors": {
  "area": {
- "selected":      1,
-"subset": "geom1_rect_ts" 
+ "selected": 3.2217,
+"subset": [ "geom1_rect_ts", "geom3_vline_cdf", "geom5_segment_cdf2", "geom6_segment_cdf2" ] 
 } 
 },
 "plots": {
@@ -120,8 +229,8 @@
 "height":    300 
 },
 "ranges": {
- "x": [ -4.6759, 5.5645 ],
-"y": [ -7.8932, 12.946 ] 
+ "x": [ -7.3741,  10.28 ],
+"y": [ -6.411, 8.3761 ] 
 } 
 },
 "cdf": {
@@ -135,7 +244,22 @@
 },
 "ranges": {
  "x": [      0,     15 ],
-"y": [ -0.033016, 1.0112 ] 
+"y": [ 0.15567,      1 ] 
+} 
+},
+"cdf2": {
+ "geoms": [
+ "geom4_line_cdf2",
+"geom5_segment_cdf2",
+"geom6_segment_cdf2" 
+],
+"options": {
+ "width":    300,
+"height":    300 
+},
+"ranges": {
+ "x": [      0,     15 ],
+"y": [      0,      1 ] 
 } 
 } 
 } 

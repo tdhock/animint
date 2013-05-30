@@ -1,0 +1,132 @@
+Students should feel free to expand upon the sections in the template below, but don't skip any sections.  The most successful student applications for R GSoC projects run to 10+ pages, printed, and describe in detail both what and how you intend to accomplish the project during the summer.  Please also make sure to be responsive to mentor comments after submitting your first draft application, all R project mentors will rate all applications, and the best applications from all submitted will be chosen by consultaiton and ranking among the mentors.
+
+ 
+
+Project title: Improve rendering of animated/interactive ggplots in d3 using animint
+
+Project short title (30 characters): animint extensions
+
+Short Description: Implement versions of ggplot2's scales, transformations, and stats for the animint package, which facilitates creation of interactive, animated javascript graphs using R. 
+
+URL of project idea page:http://rwiki.sciviews.org/doku.php?id=developers:projects:gsoc2012:interactive_animations
+
+ 
+
+CONTACT INFORMATION
+
+Student name: Susan VanderPlas
+
+Link_id:  
+
+Student postal address: 802 17th St, Auburn NE, 68305
+
+Telephone(s): 1-515-509-6613
+
+Email(s): srvanderplas@gmail.com
+
+Other communications channels: Skype (srvanderplas), google+ (srvanderplas), gchat
+
+ 
+
+ 
+
+Student affiliation:
+
+Institution: Iowa State University
+
+Program: Statistics
+
+Stage of completion: PhD student; expected to graduate in 2014
+
+Contact to verify: Heike Hofmann (hofmann@iastate.edu)
+
+ 
+
+Bio of Student: I graduated with a BS in applied math and psychology from Texas A&M University in 2009, and moved to Iowa to work on a PhD in Bioinformatics at Iowa State. After the first year, I decided to switch to Statistics because I preferred statistical analysis to bioinformatics-specific topics and didn't want to be pigeonholed into biology-specific topics forever. I have worked in materials informatics, bayesian modeling of vehicle collisions, and more recently, data visualization and graphics under Heike Hofmann and Di Cook. My interests are specifically in perception of graphics, graphical inference, and optical illusions. I'm currently working on estimating the size of the visual distortion due to the sine illusion, as well as more general methods for estimating visual ability and its relation to graphical perception. 
+
+ 
+
+Schedule Conflicts:
+
+Please describe, in detail, any schedule conflicts or other demands on your time for the summer.  GSoC is not a part-time engagement, so you'll be expected to spend 40+ hours per week working on your project.  
+
+I will be going to JSM in August, which should be about 3 days away, and otherwise may be gone on the occasional weekend. The only other ongoing project I have this summer is data collection for a paper, but the time investment should be relatively minimal as the coding should be completed before GSoC starts and the actual collection is online and only needs occasional monitoring.  
+
+MENTORS
+
+(this information is available on the project ideas pages) 
+
+Mentor names: Toby Dylan Hocking , Hadley Wickham, Yihui Xie 
+
+Mentor emails: toby.hocking@inria.fr, h.wickham@gmail.com, xie@yihui.name
+
+Mentor link_ids: 
+
+Have you been in touch with the mentors? When and how?
+Yes, I have been in touch with Toby by email and using skype, between April 17th and April 24th.
+ 
+
+CODING PLAN & METHODS
+
+Describe in detail your plan for completing the work.  What functions will be written, how and when will you do design, how will you verify the results of your coding?  The sub-section headings below are examples only.  Each project is different, please make your application appropriate to the work you propose.  
+
+Main steps:
+1. Convert framework for ggplot2 scales into d3 scale framework, including scales for axes and object attributes such as size, color, etc. I expect there will be a corresponding d3/javascript scale function for each ggplot2 scale type, though it may be possible to consolidate methods for scale generation. 
+
+2. Convert ggplot2 transformations so that the gg2animint() function writes the transformed values to the generated svg file so that they are accessible in javascript. This may overlap somewhat with (1) given that d3 scales seem to also be useable as transformations; it is possible that some of the more common transformations may be implemented in javascript, however, a generic framework is likely to be more easily implemented in R.
+
+3. Write methods to write ggplot2 stat_() method outputs to the svg data files so that javascript can access them without additional computation. I expect this will also involve implementing additional geoms (such as geom_ribbon for stat_smooth error bars) that are currently not implemented. I expect to start with some of the more common stats, such as smooth, boxplot, density and then approach the less commonly used stats (in my opinion) such as binhex and spoke. 
+
+4. If there is additional time remaining, attempt to implement facets. 
+
+I expect that step 1 will be the first and most easily approached, and that steps 2 and 3 will be completed in tandem based on the frequency with which I use (or see others use) certain methods. 4 will require some additional work, as I'm not entirely sure how facets are created in R (other than the obvious use of plyr), and I'm not entirely sure how that method would translate into d3, both in the storage dimension (how to write/read the csv file and if multiple csv files would be necessary) and in the altered structure of the javascript logic that might be required. I expect it will be easier to assess the work required for this step as I become more familiar with the implementation of animint and with d3 itself.
+
+
+Evaluation:
+Evaluation should be reasonably simple, as the primary objective is to effectively implement as many of the methods as possible
+
+Planning:
+
+Implementation:
+
+Testing:
+
+Documentation:
+
+Perceived obstacles and critical objectives:
+
+ 
+
+TIMELINE:
+
+(consult GSOC schedule)
+
+Provide a detailed timeline of how you plan to spend your summer.  Don't leave testing and documentation for last, as that's almost a guarantee of a failed project. 
+
+What is your contingency plan for things not going to schedule?
+
+  
+
+MANAGEMENT OF CODING PROJECT
+
+How do you propose to ensure code is submitted / tested?
+
+What is the communication plan with mentors?
+
+(i.e. contact method, frequency, dealing with timezone issues and work schedules)
+
+Examples of similar coding problems that you have solved.
+
+ 
+
+TEST
+
+Describe the qualification test that you have submitted to you project mentors.  If feasible, include code, details, output, etc here.
+
+ 
+
+Remember, this is a template.  You need to include all of the information requested here, but may need to include additional sections, examples, etc.  Submissions that are simply copies of the project idea pages with minimal effort shown by the applicant will be swiftly ignored, so make yourself stand out by starting your summer effort now.
+
+Good Luck, and thanks for participating in R's GSoC 2013 projects!
+
+ 

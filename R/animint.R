@@ -139,8 +139,11 @@ gg2animint <- structure(function
     result$plots[[plot.name]]$ranges <- p$ranges
   }
   ## add nextgeom so that drawing order is preserved.
-  for(i in 1:(length(result$geoms)-1)){
-    result$geoms[[i]]$nextgeom <- result$geoms[[i+1]]$classed
+  
+  if(length(result$geoms)-1>0){
+    for(i in 1:(length(result$geoms)-1)){
+      result$geoms[[i]]$nextgeom <- result$geoms[[i+1]]$classed
+    }
   }
   ## Go through options and add to the list.
   for(v.name in names(olist$duration)){

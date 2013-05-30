@@ -10,3 +10,8 @@
 *.synctex.gz
 *.Rproj
 .gitignore
+"GSoC application.txt"
+.RData
+.Rbuildignore
+.directory
+animint.Rproj
