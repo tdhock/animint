@@ -65,7 +65,7 @@
 % if using A4 paper. (This probably isn't strictly necessary.)
 % If using another size paper, use default 1cm margins.
 \ifthenelse{\lengthtest { \paperwidth = 11in}}
-	{ \geometry{top=.3in,left=.4in,right=.3in,bottom=.3in} }
+	{ \geometry{top=.3in,left=.4in,right=.3in,bottom=.4in} }
 	{\ifthenelse{ \lengthtest{ \paperwidth = 297mm}}
 		{\geometry{top=1cm,left=1cm,right=1cm,bottom=1cm} }
 		{\geometry{top=1cm,left=1cm,right=1cm,bottom=1cm} }
@@ -216,8 +216,8 @@
 \end{thm}\begin{thm} [ nest.sortKeys ]  sort the current nest level by key.
 \end{thm}\begin{thm} [ nest.sortValues ]  sort the leaf nest level by val.
 \end{thm}\begin{thm} [ nest.rollup ]  specify a rollup fcn for leaf vals.
-\end{thm}\begin{thm} [ nest.map ]  evaluate the nest operator, returning an assoc array.
-\end{thm}\begin{thm} [ nest.entries ]  evaluate the nest operator, returning an array of key-values tuples.
+\end{thm}\begin{thm} [ nest.map ]  evaluate the nest operator, ret an assoc array.
+\end{thm}\begin{thm} [ nest.entries ]  evaluate the nest operator, ret an array of key-values tuples.
 \end{thm}\begin{thm} [ d3.map ]  a shim for ES6 maps, since objects are not hashes!
 \end{thm}\begin{thm} [ map.has ]  returns true if the map contains the specified key.
 \end{thm}\begin{thm} [ map.get ]  returns the value for the specified key.
@@ -236,10 +236,10 @@
 \hdrule
 \subsection*{Math}
 
-\begin{thm} [ d3.random.normal ]  generate a random number with a normal dist.
-\end{thm}\begin{thm} [ d3.random.logNormal ]  generate a random number with a log-normal dist.
-\end{thm}\begin{thm} [ d3.random.irwinHall ]  generate a random number with an Irwin–Hall dist.
-\end{thm}\begin{thm} [ d3.transform ]  compute the standard form of a 2D matrix transform.\end{thm}
+\begin{thm} [ d3.random.normal ]  generate a RV with a normal dist.
+\end{thm}\begin{thm} [ d3.random.logNormal ]  generate a RV with a log-normal dist.
+\end{thm}\begin{thm} [ d3.random.irwinHall ]  generate a RV with an Irwin–Hall dist.
+\end{thm}\begin{thm} [ d3.transform ]  compute the std form of a 2D matrix trans.\end{thm}
 \hdrule
 \subsection*{String Formatting}
 
@@ -404,7 +404,7 @@
 \end{thm}\begin{thm} [ d3.scale.category20c ]  constr an ord scale w/ 20 categ cols.
 \end{thm}
 \hrule
-\hspace{1pt}\vspace*{2.75in}\\
+\hspace{1pt}\vspace*{2.35in}\\
 \section*{d3.svg (SVG)}
 \hdrule
 \subsection*{Shapes}
@@ -726,42 +726,42 @@
 \hdrule
 \subsection*{Projections}
 
-\begin{thm} [ d3.geo.projection ]  create a standard proj from a raw proj.
-\end{thm}\begin{thm} [ projection ]  project the specified location.
-\end{thm}\begin{thm} [ projection.invert ]  invert the proj for the specified point.
-\end{thm}\begin{thm} [ projection.rotate ]  get/set the proj's three-axis rotation.
-\end{thm}\begin{thm} [ projection.center ]  get/set the proj's center location.
-\end{thm}\begin{thm} [ projection.translate ]  get/set the proj's translation position.
-\end{thm}\begin{thm} [ projection.scale ]  get/set the proj's scale factor.
-\end{thm}\begin{thm} [ projection.clipAngle ]  get/set the rad of the proj's clip circle.
-\end{thm}\begin{thm} [ projection.clipExtent ]  get/set the proj viewport clip ext (px)
-\end{thm}\begin{thm} [ projection.precision ]  get/set the precision threshold for adaptive resampling.
-\end{thm}\begin{thm} [ projection.stream ]  wrap the specified stream listener, projecting input geometry.
-\end{thm}\begin{thm} [ d3.geo.projectionMutator ]  create a standard proj from a mutable raw proj.
-\end{thm}\begin{thm} [ d3.geo.albers ]  the Albers equal-area conic proj.
-\end{thm}\begin{thm} [ albers.parallels ]  get/set the proj's two standard parallels.
-\end{thm}\begin{thm} [ d3.geo.albersUsa ]  a composite Albers proj for the US.
-\end{thm}\begin{thm} [ d3.geo.azimuthalEqualArea ]  the azimuthal equal-area proj.
-\end{thm}\begin{thm} [ d3.geo.azimuthalEquidistant ]  the azimuthal equidist proj.
-\end{thm}\begin{thm} [ d3.geo.conicConformal ]  the conic conformal projection.
-\end{thm}\begin{thm} [ d3.geo.conicEquidistant ]  the conic equidist projection.
-\end{thm}\begin{thm} [ d3.geo.conicEqualArea ]  the conic equal-area (Albers) proj.
-\end{thm}\begin{thm} [ d3.geo.equirectangular ]  the equirect(plate carr\`ee) proj.
+\begin{thm} [ d3.geo.projection ]  create a standard proj from a raw proj
+\end{thm}\begin{thm} [ projection ]  project the specified location
+\end{thm}\begin{thm} [ projection.invert ]  invert the proj for the specified point
+\end{thm}\begin{thm} [ projection.rotate ]  get/set the proj's three-axis rotation
+\end{thm}\begin{thm} [ projection.center ]  get/set the proj's center location
+\end{thm}\begin{thm} [ projection.translate ]  get/set the proj's translation pos
+\end{thm}\begin{thm} [ projection.scale ]  get/set the proj's scale factor
+\end{thm}\begin{thm} [ projection.clipAngle ]  get/set the rad of the proj's clip circle
+\end{thm}\begin{thm} [ projection.clipExtent ]  get/set the proj viewport clip ext(px)
+\end{thm}\begin{thm} [ projection.precision ]  get/set the precision threshold for adaptive resampling
+\end{thm}\begin{thm} [ projection.stream ]  wrap the specified stream listener, projecting input geometry
+\end{thm}\begin{thm} [ d3.geo.projectionMutator ]  create a standard proj from a mutable raw proj
+\end{thm}\begin{thm} [ d3.geo.albers ]  the Albers equal-area conic proj
+\end{thm}\begin{thm} [ albers.parallels ]  get/set the proj's two standard parallels
+\end{thm}\begin{thm} [ d3.geo.albersUsa ]  a composite Albers proj for the US
+\end{thm}\begin{thm} [ d3.geo.azimuthalEqualArea ]  the azimuthal equal-area proj
+\end{thm}\begin{thm} [ d3.geo.azimuthalEquidistant ]  the azimuthal equidist proj
+\end{thm}\begin{thm} [ d3.geo.conicConformal ]  the conic conformal projection
+\end{thm}\begin{thm} [ d3.geo.conicEquidistant ]  the conic equidist projection
+\end{thm}\begin{thm} [ d3.geo.conicEqualArea ]  the conic equal-area (Albers) proj
+\end{thm}\begin{thm} [ d3.geo.equirectangular ]  the equirect(plate carr\`ee) proj
 \end{thm}\begin{thm} [ d3.geo.gnomonic ]  the gnomonic proj.
-\end{thm}\begin{thm} [ d3.geo.mercator ]  the spherical Mercator proj.
-\end{thm}\begin{thm} [ d3.geo.orthographic ]  the azimuthal orthographic proj.
-\end{thm}\begin{thm} [ d3.geo.stereographic ]  the azimuthal stereographic proj.
-\end{thm}\begin{thm} [ d3.geo.azimuthalEqualArea.raw ]  the raw azim eq-area proj.
-\end{thm}\begin{thm} [ d3.geo.azimuthalEquidistant.raw ]  the azim equidist proj.
-\end{thm}\begin{thm} [ d3.geo.conicConformal.raw ]  the raw conic conformal proj.
-\end{thm}\begin{thm} [ d3.geo.conicEquidistant.raw ]  the raw conic equidist proj.
-\end{thm}\begin{thm} [ d3.geo.conicEqualArea.raw ]  the raw conic equal-area (Albers) proj.
-\end{thm}\begin{thm} [ d3.geo.equirectangular.raw ]  the raw equirect (plate carr\`ee) proj.
-\end{thm}\begin{thm} [ d3.geo.gnomonic.raw ]  the raw gnomonic proj.
-\end{thm}\begin{thm} [ d3.geo.mercator.raw ]  the raw Mercator proj.
-\end{thm}\begin{thm} [ d3.geo.orthographic.raw ]  the raw azimuthal orthographic proj.
-\end{thm}\begin{thm} [ d3.geo.stereographic.raw ]  the raw azimuthal stereographic proj.
-\end{thm}\begin{thm} [ d3.geo.transverseMercator.raw ]  the raw transverse Mercator proj.\end{thm}
+\end{thm}\begin{thm} [ d3.geo.mercator ]  the spherical Mercator proj
+\end{thm}\begin{thm} [ d3.geo.orthographic ]  the azimuthal orthographic proj
+\end{thm}\begin{thm} [ d3.geo.stereographic ]  the azimuthal stereographic proj
+\end{thm}\begin{thm} [ d3.geo.azimuthalEqualArea.raw ]  the raw azim eq-area proj
+\end{thm}\begin{thm} [ d3.geo.azimuthalEquidistant.raw ]  the azim equidist proj
+\end{thm}\begin{thm} [ d3.geo.conicConformal.raw ]  the raw conic conformal proj
+\end{thm}\begin{thm} [ d3.geo.conicEquidistant.raw ]  the raw conic equidist proj
+\end{thm}\begin{thm} [ d3.geo.conicEqualArea.raw ]  the raw conic equal-area (Albers) proj
+\end{thm}\begin{thm} [ d3.geo.equirectangular.raw ] raw equirect(plate carr\`ee) proj
+\end{thm}\begin{thm} [ d3.geo.gnomonic.raw ]  the raw gnomonic proj
+\end{thm}\begin{thm} [ d3.geo.mercator.raw ]  the raw Mercator proj
+\end{thm}\begin{thm} [ d3.geo.orthographic.raw ]  the raw azimuthal orthog proj
+\end{thm}\begin{thm} [ d3.geo.stereographic.raw ]  the raw azimuthal stereog proj
+\end{thm}\begin{thm} [ d3.geo.transverseMercator.raw ]  the raw transverse Mercator proj\end{thm}
 \hdrule
 \subsection*{Streams}
 
@@ -773,7 +773,7 @@
 \end{thm}\begin{thm} [ stream.polygonEnd ]  indicate the end of a polygon.
 \end{thm}\begin{thm} [ stream.sphere ]  indicate a sphere.\end{thm}
 \hrule
-\vspace{30pt}
+\vspace{55pt}
 \section*{d3.geom (Geometry)}
 \hdrule
 \subsection*{Voronoi}
