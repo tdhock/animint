@@ -5,7 +5,7 @@
 # Example code in package build process
 *-Ex.R
 .Rproj.user
-"GSoC application.txt"
+GSoC application.txt
 .RData
 .Rbuildignore
 .directory
