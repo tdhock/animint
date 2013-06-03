@@ -1,0 +1,824 @@
+\documentclass[10pt,landscape,letterpaper]{article}
+\usepackage{multicol}
+\usepackage{calc}
+\usepackage{ifthen}
+\usepackage[landscape]{geometry}
+\usepackage{soul,color}
+\usepackage{graphicx,float,wrapfig}
+\usepackage{enumerate}
+\usepackage{csquotes}
+\usepackage{amsmath,amssymb,amsthm,amsfonts}
+% \usepackage[scaled=.9]{helvet}
+\usepackage{dashrule}
+\usepackage{cprotect}
+
+\newcounter{thm}
+
+\newcommand{\hdrule}{\vspace{-4pt} \hdashrule[0.25ex]{\fill}{.5pt}{1pt}\vspace{-4pt}}
+
+% \newcounter{thm}
+% \numberwithin{thm}{subsection*}  % add the section number to the equation label
+\setlength{\topsep}{2pt}
+\newtheoremstyle{mytheoremstyle}
+{.25\topsep}
+{.25\topsep}
+{\addtolength{\leftskip}{1em}}
+{-1em}
+{\bfseries}
+{}
+{ }
+{{#3}-\thmnote}
+
+\theoremstyle{mytheoremstyle}
+\newtheorem*{thm}{}
+
+% To make this come out properly in landscape mode, do one of the following
+% 1.
+%  pdflatex latexsheet.tex
+%
+% 2.
+%  latex latexsheet.tex
+%  dvips -P pdf  -t landscape latexsheet.dvi
+%  ps2pdf latexsheet.ps
+
+
+% If you're reading this, be prepared for confusion.  Making this was
+% a learning experience for me, and it shows.  Much of the placement
+% was hacked in; if you make it better, let me know...
+
+
+% 2008-04
+% Changed page margin code to use the geometry package. Also added code for
+% conditional page margins, depending on paper size. Thanks to Uwe Ziegenhagen
+% for the suggestions.
+
+% 2006-08
+% Made changes based on suggestions from Gene Cooperman. <gene at ccs.neu.edu>
+
+
+% To Do:
+% \listoffigures \listoftables
+% \setcounter{secnumdepth}{0}
+
+
+% This sets page margins to .5 inch if using letter paper, and to 1cm
+% if using A4 paper. (This probably isn't strictly necessary.)
+% If using another size paper, use default 1cm margins.
+\ifthenelse{\lengthtest { \paperwidth = 11in}}
+	{ \geometry{top=.3in,left=.4in,right=.3in,bottom=.4in} }
+	{\ifthenelse{ \lengthtest{ \paperwidth = 297mm}}
+		{\geometry{top=1cm,left=1cm,right=1cm,bottom=1cm} }
+		{\geometry{top=1cm,left=1cm,right=1cm,bottom=1cm} }
+	}
+
+% Turn off header and footer
+\pagestyle{empty} 
+
+% Redefine section commands to use less space
+\makeatletter
+\renewcommand{\section}{\@startsection{section}{1}{0mm}%
+                                {-1ex plus -.5ex minus -.3ex}%
+                                {0.25ex plus .1ex}%x
+                                {\normalfont\large\bfseries}}
+\renewcommand{\subsection}{\@startsection{subsection}{2}{0mm}%
+                                {-1explus -.5ex minus -.3ex}%
+                                {0.25ex plus .1ex}%
+                                {\normalfont\normalsize\bfseries}}
+\renewcommand{\subsubsection}{\@startsection{subsubsection}{3}{0mm}%
+                                {-1explus -.5ex minus -.3ex}%
+                                {0.25ex plus .1ex}%
+                                {\normalfont\small\bfseries}}
+\renewcommand{\paragraph}{\@startsection{paragraph}{4}{0mm}%
+                                {-1explus -.5ex minus -.3ex}%
+                                {0.25ex plus .1ex}%
+                                {\normalfont\small\scshape}}
+\makeatother
+
+% Define BibTeX command
+%\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+%    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+% Don't print section numbers
+\setcounter{secnumdepth}{2}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt plus 0.5ex}
+% -----------------------------------------------------------------------
+
+\begin{document}
+\raggedright
+\footnotesize
+\begin{multicols}{3}
+% multicol parameters
+% These lengths are set only within the two main columns
+%\setlength{\columnseprule}{0.25pt}
+\setlength{\premulticols}{1pt}
+\setlength{\postmulticols}{1pt}
+\setlength{\multicolsep}{1pt}
+\setlength{\columnsep}{2pt}
+\hrule
+\section*{d3 (core)}
+\hdrule
+\subsection*{Selections}
+
+\begin{thm} [ d3.select ]  select an element from the current doc.
+\end{thm}\begin{thm} [ d3.selectAll ]  select multiple elements from the current doc.
+\end{thm}\begin{thm} [ selection.attr ]  get/set attr vals.
+\end{thm}\begin{thm} [ selection.classed ]  add/remove CSS classes.
+\end{thm}\begin{thm} [ selection.style ]  get/set style properties.
+\end{thm}\begin{thm} [ selection.property ]  get/set raw properties.
+\end{thm}\begin{thm} [ selection.text ]  get/set text content.
+\end{thm}\begin{thm} [ selection.html ]  get/set inner HTML content.
+\end{thm}\begin{thm} [ selection.append ]  create and append new elements.
+\end{thm}\begin{thm} [ selection.insert ]  create and insert new elements before existing elements.
+\end{thm}\begin{thm} [ selection.remove ]  remove elements from the doc.
+\end{thm}\begin{thm} [ selection.data ]  get/set data for a group of elements, while computing a relational join.
+\end{thm}\begin{thm} [ selection.enter ]  returns placeholders for missing elements.
+\end{thm}\begin{thm} [ selection.exit ]  returns elements that are no longer needed.
+\end{thm}\begin{thm} [ selection.datum ]  get/set data for individual elements, without computing a join.
+\end{thm}\begin{thm} [ selection.filter ]  filter a selection based on data.
+\end{thm}\begin{thm} [ selection.sort ]  sort elements in the doc based on data.
+\end{thm}\begin{thm} [ selection.order ]  reorders elements in the doc to match the selection.
+\end{thm}\begin{thm} [ selection.on ]  add/remove event listeners for interaction.
+\end{thm}\begin{thm} [ selection.transition ]  start a trans. on the selected elements.
+\end{thm}\begin{thm} [ selection.each ]  call a fcn for each selected element.
+\end{thm}\begin{thm} [ selection.call ]  call a fcn passing in the current selection.
+\end{thm}\begin{thm} [ selection.empty ]  returns true if the selection is empty.
+\end{thm}\begin{thm} [ selection.node ]  access the first node in a selection.
+\end{thm}\begin{thm} [ selection.select ]  subselect a descendant element for each selected element.
+\end{thm}\begin{thm} [ selection.selectAll ]  subselect multiple descendants for each selected element.
+\end{thm}\begin{thm} [ d3.selection ]  augment the selection prototype, or test instance types.
+\end{thm}\begin{thm} [ d3.event ]  access the current user event for interaction.
+\end{thm}\begin{thm} [ d3.mouse ]  gets the mouse position relative to a specified container.
+\end{thm}\begin{thm} [ d3.touches ]  gets the touch positions relative to a specified container.\end{thm}
+\hdrule
+\subsection*{Transitions}
+
+\begin{thm} [ d3.transition ]  start an animated trans..
+\end{thm}\begin{thm} [ transition.delay ]  specify per-element delay in ms.
+\end{thm}\begin{thm} [ transition.duration ]  specify per-element duration in ms.
+\end{thm}\begin{thm} [ transition.ease ]  specify trans. easing fcn.
+\end{thm}\begin{thm} [ transition.attr ]  smoothly trans to the new attr val.
+\end{thm}\begin{thm} [ transition.attrTween ]  smoothly trans b/w two attr vals.
+\end{thm}\begin{thm} [ transition.style ]  smoothly trans to the new style property val.
+\end{thm}\begin{thm} [ transition.styleTween ]  smoothly trans b/w two style property vals.
+\end{thm}\begin{thm} [ transition.text ]  set the text content when the trans starts.
+\end{thm}\begin{thm} [ transition.tween ]  specify a custom tween operator to run as part of the trans.
+\end{thm}\begin{thm} [ transition.select ]  start a trans on a descendant element for each selected element.
+\end{thm}\begin{thm} [ transition.selectAll ]  start a trans on multiple descendants for each selected element.
+\end{thm}\begin{thm} [ transition.filter ]  filter a trans based on data.
+\end{thm}\begin{thm} [ transition.transition ]  when this trans ends, start another one on the same elements.
+\end{thm}\begin{thm} [ transition.remove ]  remove sel. elements at the end of a trans.
+\end{thm}\begin{thm} [ transition.each ]  add a listener for transition end events.
+\end{thm}\begin{thm} [ transition.call ]  call a fcn passing in the current trans.
+\end{thm}\begin{thm} [ d3.ease ]  customize trans timing.
+\end{thm}\begin{thm} [ ease ]  a parametric easing fcn.
+\end{thm}\begin{thm} [ d3.timer ]  start a custom animation timer.
+\end{thm}\begin{thm} [ d3.timer.flush ]  immediately execute any zero-delay timers.
+\end{thm}\begin{thm} [ d3.interpolate ]  interpolate two vals.
+\end{thm}\begin{thm} [ interpolate ]  a parametric interpolation fcn.
+\end{thm}\begin{thm} [ d3.interpolateNumber ]  interpolate two numbers.
+\end{thm}\begin{thm} [ d3.interpolateRound ]  interpolate two integers.
+\end{thm}\begin{thm} [ d3.interpolateString ]  interpolate two strings.
+\end{thm}\begin{thm} [ d3.interpolateRgb ]  interpolate two RGB colors.
+\end{thm}\begin{thm} [ d3.interpolateHsl ]  interpolate two HSL colors.
+\end{thm}\begin{thm} [ d3.interpolateLab ]  interpolate two L*a*b* colors.
+\end{thm}\begin{thm} [ d3.interpolateHcl ]  interpolate two HCL colors.
+\end{thm}\begin{thm} [ d3.interpolateArray ]  interpolate two arrays of vals.
+\end{thm}\begin{thm} [ d3.interpolateObject ]  interpolate two arbitrary objects.
+\end{thm}\begin{thm} [ d3.interpolateTransform ]  interpolate two 2D matrix trans.
+\end{thm}\begin{thm} [ d3.interpolators ]  register a custom interpolator.\end{thm}
+\hdrule
+\subsection*{Working with Arrays}
+\begin{thm} [ d3.ascending ]  compare two values for sorting.
+\end{thm}\begin{thm} [ d3.descending ]  compare two values for sorting.
+\end{thm}\begin{thm} [ d3.min ]  find the min value in an array.
+\end{thm}\begin{thm} [ d3.max ]  find the max value in an array.
+\end{thm}\begin{thm} [ d3.extent ]  find the min and max value in an array.
+\end{thm}\begin{thm} [ d3.sum ]  compute the sum of an array. 
+\end{thm}\begin{thm} [ d3.mean ]  compute the arithmetic mean of an array. 
+\end{thm}\begin{thm} [ d3.median ]  compute the median of an array (the 0.5-quantile).
+\end{thm}\begin{thm} [ d3.quantile ]  compute a quantile for a sorted array. 
+\end{thm}\begin{thm} [ d3.bisect ]  search for a value in a sorted array.
+\end{thm}\begin{thm} [ d3.bisectRight ]  search for a value in a sorted array.
+\end{thm}\begin{thm} [ d3.bisectLeft ]  search for a value in a sorted array.
+\end{thm}\begin{thm} [ d3.bisector ]  bisect using an accessor.
+\end{thm}\begin{thm} [ d3.shuffle ]  randomize the order of an array.
+\end{thm}\begin{thm} [ d3.permute ]  reorder an array of elements according to an array of indexes.
+\end{thm}\begin{thm} [ d3.zip ]  transpose a variable number of arrays.
+\end{thm}\begin{thm} [ d3.transpose ]  transpose an array of arrays.
+\end{thm}\begin{thm} [ d3.keys ]  list the keys of an assoc array.
+\end{thm}\begin{thm} [ d3.values ]  list the values of an associated array.
+\end{thm}\begin{thm} [ d3.entries ]  list the key-value entries of an assoc array.
+\end{thm}\begin{thm} [ d3.merge ]  merge multiple arrays into one array.
+\end{thm}\begin{thm} [ d3.range ]  generate a range of numeric vals.
+\end{thm}\begin{thm} [ d3.nest ]  group array elements hierarchically.
+\end{thm}\begin{thm} [ nest.key ]  add a level to the nest hierarchy.
+\end{thm}\begin{thm} [ nest.sortKeys ]  sort the current nest level by key.
+\end{thm}\begin{thm} [ nest.sortValues ]  sort the leaf nest level by val.
+\end{thm}\begin{thm} [ nest.rollup ]  specify a rollup fcn for leaf vals.
+\end{thm}\begin{thm} [ nest.map ]  evaluate the nest operator, ret an assoc array.
+\end{thm}\begin{thm} [ nest.entries ]  evaluate the nest operator, ret an array of key-values tuples.
+\end{thm}\begin{thm} [ d3.map ]  a shim for ES6 maps, since objects are not hashes!
+\end{thm}\begin{thm} [ map.has ]  returns true if the map contains the specified key.
+\end{thm}\begin{thm} [ map.get ]  returns the value for the specified key.
+\end{thm}\begin{thm} [ map.set ]  sets the value for the specified key.
+\end{thm}\begin{thm} [ map.remove ]  removes the entry for specified key.
+\end{thm}\begin{thm} [ map.keys ]  returns the map’s array of keys.
+\end{thm}\begin{thm} [ map.values ]  returns the map’s array of vals.
+\end{thm}\begin{thm} [ map.entries ]  returns the map’s array of entries (key-values objects).
+\end{thm}\begin{thm} [ map.forEach ]  calls the specified fcn for each entry in the map.
+\end{thm}\begin{thm} [ d3.set ]  a shim for ES6 sets, since objects are not hashes!
+\end{thm}\begin{thm} [ set.has ]  returns true if the set contains the specified val.
+\end{thm}\begin{thm} [ set.add ]  adds the specified val.
+\end{thm}\begin{thm} [ set.remove ]  removes the specified val.
+\end{thm}\begin{thm} [ set.values ]  returns the set’s array of vals.
+\end{thm}\begin{thm} [ set.forEach ]  calls the specified fcn for each val in the set.\end{thm}
+\hdrule
+\subsection*{Math}
+
+\begin{thm} [ d3.random.normal ]  generate a RV with a normal dist.
+\end{thm}\begin{thm} [ d3.random.logNormal ]  generate a RV with a log-normal dist.
+\end{thm}\begin{thm} [ d3.random.irwinHall ]  generate a RV with an Irwin–Hall dist.
+\end{thm}\begin{thm} [ d3.transform ]  compute the std form of a 2D matrix trans.\end{thm}
+\hdrule
+\subsection*{String Formatting}
+
+\begin{thm} [ d3.format ]  format a number as a string.
+\end{thm}\begin{thm} [ d3.formatPrefix ]  returns the [SI prefix]  for the specified val and precision.
+\end{thm}\begin{thm} [ d3.requote ]  quote a string for use in a regular expression.
+\end{thm}\begin{thm} [ d3.round ]  rounds a val to some digits after the decimal point.\end{thm}
+\hdrule
+\subsection*{Loading External Resources}
+
+\begin{thm} [ d3.xhr ]  request a resource using XMLHttpRequest.
+\end{thm}\begin{thm} [ xhr.header ]  set a request header.
+\end{thm}\begin{thm} [ xhr.mimeType ]  set the Accept request header and override the response MIME type.
+\end{thm}\begin{thm} [ xhr.response ]  set a response mapping fcn.
+\end{thm}\begin{thm} [ xhr.get ]  issue a GET request.
+\end{thm}\begin{thm} [ xhr.post ]  issue a POST request.
+\end{thm}\begin{thm} [ xhr.send ]  issue a request with the specified method and data.
+\end{thm}\begin{thm} [ xhr.abort ]  abort an outstanding request.
+\end{thm}\begin{thm} [ xhr.on ]  add an event listener for "progress", "load" or "error" events.
+\end{thm}\begin{thm} [ d3.text ]  request a text file.
+\end{thm}\begin{thm} [ d3.json ]  request a JSON blob.
+\end{thm}\begin{thm} [ d3.html ]  request an HTML doc fragment.
+\end{thm}\begin{thm} [ d3.xml ]  request an XML doc fragment.
+\end{thm}\begin{thm} [ d3.csv ]  request a comma-separated values (CSV) file.
+\end{thm}\begin{thm} [ d3.tsv ]  request a tab-separated values (TSV) file.\end{thm}
+\hdrule
+
+\subsection*{CSV Formatting (d3.csv)}
+
+\begin{thm} [ d3.csv ]  request a comma-separated values (CSV) file.
+\end{thm}\begin{thm} [ d3.csv.parse ]  parse a CSV string into objects using the header row.
+\end{thm}\begin{thm} [ d3.csv.parseRows ]  parse a CSV string into tuples, ignoring the header row.
+\end{thm}\begin{thm} [ d3.csv.format ]  format an array of objects into a CSV string.
+\end{thm}\begin{thm} [ d3.csv.formatRows ]  format an array of tuples into a CSV string.
+\end{thm}\begin{thm} [ d3.tsv ]  request a tab-separated values (TSV) file.
+\end{thm}\begin{thm} [ d3.tsv.parse ]  parse a TSV string into objects using the header row.
+\end{thm}\begin{thm} [ d3.tsv.parseRows ]  parse a TSV string into tuples, ignoring the header row.
+\end{thm}\begin{thm} [ d3.tsv.format ]  format an array of objects into a TSV string.
+\end{thm}\begin{thm} [ d3.tsv.formatRows ]  format an array of tuples into a TSV string.\end{thm}
+\hdrule
+\subsection*{Colors}
+
+\begin{thm} [ d3.rgb ]  specify a color in RGB space.
+\end{thm}\begin{thm} [ rgb.brighter ]  increase RGB channels by some exp. factor.
+\end{thm}\begin{thm} [ rgb.darker ]  decrease RGB channels by some exp. factor.
+\end{thm}\begin{thm} [ rgb.hsl ]  convert from RGB to HSL.
+\end{thm}\begin{thm} [ rgb.toString ]  convert an RGB color to a string.
+\end{thm}\begin{thm} [ d3.hsl ]  specify a color in HSL space.
+\end{thm}\begin{thm} [ hsl.brighter ]  increase lightness by some exp. factor.
+\end{thm}\begin{thm} [ hsl.darker ]  decrease lightness by some exp. factor.
+\end{thm}\begin{thm} [ hsl.rgb ]  convert from HSL to RGB.
+\end{thm}\begin{thm} [ hsl.toString ]  convert an HSL color to a string.
+\end{thm}\begin{thm} [ d3.lab ]  specify a color in L*a*b* space.
+\end{thm}\begin{thm} [ lab.brighter ]  increase lightness by some exp. factor.
+\end{thm}\begin{thm} [ lab.darker ]  decrease lightness by some exp. factor.
+\end{thm}\begin{thm} [ lab.rgb ]  convert from L*a*b* to RGB.
+\end{thm}\begin{thm} [ lab.toString ]  convert a L*a*b* color to a string.
+\end{thm}\begin{thm} [ d3.hcl ]  specify a color in HCL space.
+\end{thm}\begin{thm} [ hcl.brighter ]  increase lightness by some exp. factor.
+\end{thm}\begin{thm} [ hcl.darker ]  decrease lightness by some exp. factor.
+\end{thm}\begin{thm} [ hcl.rgb ]  convert from HCL to RGB.
+\end{thm}\begin{thm} [ hcl.toString ]  convert an HCL color to a string.\end{thm}
+\hdrule
+\subsection*{Namespaces}
+
+\begin{thm} [ d3.ns.prefix ]  access/extend known XML namespaces.
+\end{thm}\begin{thm} [ d3.ns.qualify ]  qualify a prefixed name, such as "xlink:href".\end{thm}
+\hdrule
+\subsection*{Internals}
+
+\begin{thm} [ d3.functor ]  create a fcn that returns a constant.
+\end{thm}\begin{thm} [ d3.rebind ]  rebind an inherited getter/setter method to a subclass.
+\end{thm}\begin{thm} [ d3.dispatch ]  create custom event dispatchers.
+\end{thm}\begin{thm} [ dispatch.on ]  register an event listener.
+\end{thm}\begin{thm} [ dispatch ]  dispatch an event to registered listeners.\end{thm}
+\hrule\hspace{3pt}\vspace*{52pt}\\
+
+
+\section*{d3.scale (Scales)}
+\hdrule
+\subsection*{Quantitative}
+
+\begin{thm} [ d3.scale.linear ]  construct a linear quantitative scale.
+\end{thm}\begin{thm} [ linear ]  get the range val corresp to a given domain val.
+\end{thm}\begin{thm} [ linear.invert ]  get the domain val corresp to a given range val.
+\end{thm}\begin{thm} [ linear.domain ]  get/set the scale's input domain.
+\end{thm}\begin{thm} [ linear.range ]  get/set the scale's output range.
+\end{thm}\begin{thm} [ linear.rangeRound ]  set the scale's output range, and enable rounding.
+\end{thm}\begin{thm} [ linear.interpolate ]  get/set the scale's output interpolator.
+\end{thm}\begin{thm} [ linear.clamp ]  enable/disable clamping of the output range.
+\end{thm}\begin{thm} [ linear.nice ]  extend the scale domain to nice round numbers.
+\end{thm}\begin{thm} [ linear.ticks ]  get representative values from the input domain.
+\end{thm}\begin{thm} [ linear.tickFormat ]  get a formatter for displaying tick vals.
+\end{thm}\begin{thm} [ linear.copy ]  create a new scale from an existing scale.
+\end{thm}\begin{thm} [ d3.scale.sqrt ]  construct a quantitative scale with a square root trans.
+\end{thm}\begin{thm} [ d3.scale.pow ]  construct a quantitative scale with an exponential trans.
+\end{thm}\begin{thm} [ pow ]  get the range val corresp to a given domain val.
+\end{thm}\begin{thm} [ pow.invert ]  get the domain val corresp to a given range val.
+\end{thm}\begin{thm} [ pow.domain ]  get/set the scale's input domain.
+\end{thm}\begin{thm} [ pow.range ]  get/set the scale's output range.
+\end{thm}\begin{thm} [ pow.rangeRound ]  set the scale's output range, and enable rounding.
+\end{thm}\begin{thm} [ pow.interpolate ]  get/set the scale's output interpolator.
+\end{thm}\begin{thm} [ pow.clamp ]  enable/disable clamping of the output range.
+\end{thm}\begin{thm} [ pow.nice ]  extend the scale domain to nice round numbers.
+\end{thm}\begin{thm} [ pow.ticks ]  get representative values from the input domain.
+\end{thm}\begin{thm} [ pow.tickFormat ]  get a formatter for displaying tick vals.
+\end{thm}\begin{thm} [ pow.exponent ]  get/set the exponent power.
+\end{thm}\begin{thm} [ pow.copy ]  create a new scale from an existing scale.
+\end{thm}\begin{thm} [ d3.scale.log ]  construct a quantitative scale with an logarithmic trans.
+\end{thm}\begin{thm} [ log ]  get the range val corresp to a given domain val.
+\end{thm}\begin{thm} [ log.invert ]  get the domain val corresp to a given range val.
+\end{thm}\begin{thm} [ log.domain ]  get/set the scale's input domain.
+\end{thm}\begin{thm} [ log.range ]  get/set the scale's output range.
+\end{thm}\begin{thm} [ log.rangeRound ]  set the scale's output range, and enable rounding.
+\end{thm}\begin{thm} [ log.interpolate ]  get/set the scale's output interpolator.
+\end{thm}\begin{thm} [ log.clamp ]  enable/disable clamping of the output range.
+\end{thm}\begin{thm} [ log.nice ]  extend the scale domain to nice powers of ten.
+\end{thm}\begin{thm} [ log.ticks ]  get representative values from the input domain.
+\end{thm}\begin{thm} [ log.tickFormat ]  get a formatter for displaying tick vals.
+\end{thm}\begin{thm} [ log.copy ]  create a new scale from an existing scale.
+\end{thm}\begin{thm} [ d3.scale.quantize ]  construct a linear quantitative scale with a discrete output range.
+\end{thm}\begin{thm} [ quantize ]  get the range val corresp to a given domain val.
+\end{thm}\begin{thm} [ quantize.domain ]  get/set the scale's input domain.
+\end{thm}\begin{thm} [ quantize.range ]  get/set the scale's output range (discrete).
+\end{thm}\begin{thm} [ quantize.copy ]  create a new scale from an existing scale.
+\end{thm}\begin{thm} [ d3.scale.threshold ]  construct a threshold scale with a discrete output range.
+\end{thm}\begin{thm} [ threshold ]  get the range val corresp to a given domain val.
+\end{thm}\begin{thm} [ threshold.domain ]  get/set the scale's input domain.
+\end{thm}\begin{thm} [ threshold.range ]  get/set the scale's output range (discrete).
+\end{thm}\begin{thm} [ threshold.copy ]  create a new scale from an existing scale.
+\end{thm}\begin{thm} [ d3.scale.quantile ]  construct a quantitative scale mapping to quantiles.
+\end{thm}\begin{thm} [ quantile ]  get the range val corresp to a given domain val.
+\end{thm}\begin{thm} [ quantile.domain ]  get/set the scale's input domain (discrete).
+\end{thm}\begin{thm} [ quantile.range ]  get/set the scale's output range (discrete).
+\end{thm}\begin{thm} [ quantile.quantiles ]  get the scale's quantile bin thresholds.
+\end{thm}\begin{thm} [ quantile.copy ]  create a new scale from an existing scale.
+\end{thm}\begin{thm} [ d3.scale.identity ]  construct a linear identity scale.
+\end{thm}\begin{thm} [ identity ]  the identity fcn.
+\end{thm}\begin{thm} [ identity.invert ]  equivalent to identity; the identity fcn.
+\end{thm}\begin{thm} [ identity.domain ]  get/set the scale's domain and range.
+\end{thm}\begin{thm} [ identity.range ]  equivalent to identity.domain.
+\end{thm}\begin{thm} [ identity.ticks ]  get representative values from the domain.
+\end{thm}\begin{thm} [ identity.tickFormat ]  get a formatter for displaying tick vals.
+\end{thm}\begin{thm} [ identity.copy ]  create a new scale from an existing scale.
+\end{thm}
+\hdrule
+\subsection*{Ordinal}
+
+\begin{thm} [ d3.scale.ordinal ]  construct an ordinal scale.
+\end{thm}\begin{thm} [ ordinal ]  get the range val corresp to a given domain val.
+\end{thm}\begin{thm} [ ordinal.domain ]  get/set the scale's input domain.
+\end{thm}\begin{thm} [ ordinal.range ]  get/set the scale's output range.
+\end{thm}\begin{thm} [ ordinal.rangePoints ]  divide a continuous output range for discrete points.
+\end{thm}\begin{thm} [ ordinal.rangeBands ]  divide a continuous output range for discrete bands.
+\end{thm}\begin{thm} [ ordinal.rangeRoundBands ]  divide a continuous output range for discrete bands.
+\end{thm}\begin{thm} [ ordinal.rangeBand ]  get the discrete range band width.
+\end{thm}\begin{thm} [ ordinal.rangeExtent ]  get the min and max values of the output range.
+\end{thm}\begin{thm} [ ordinal.copy ]  create a new scale from an existing scale.
+\end{thm}\begin{thm} [ d3.scale.category10 ]  constr an ord scale w/ 10 categ cols.
+\end{thm}\begin{thm} [ d3.scale.category20 ]  constr an ord scale w/ 20 categ cols.
+\end{thm}\begin{thm} [ d3.scale.category20b ]  constr an ord scale w/ 20 categ cols.
+\end{thm}\begin{thm} [ d3.scale.category20c ]  constr an ord scale w/ 20 categ cols.
+\end{thm}
+\hrule
+\hspace{1pt}\vspace*{2.35in}\\
+\section*{d3.svg (SVG)}
+\hdrule
+\subsection*{Shapes}
+
+\begin{thm} [ d3.svg.line ]  create a new line generator.
+\end{thm}\begin{thm} [ line ]  generate a piecewise linear curve, as in a line chart.
+\end{thm}\begin{thm} [ line.x ]  get/set the x-coord accessor.
+\end{thm}\begin{thm} [ line.y ]  get/set the y-coord accessor.
+\end{thm}\begin{thm} [ line.interpolate ]  get/set the interpolation mode.
+\end{thm}\begin{thm} [ line.tension ]  get/set the cardinal spline tension.
+\end{thm}\begin{thm} [ line.defined ]  control whether the line is def at a given point.
+\end{thm}\begin{thm} [ d3.svg.line.radial ]  create a new radial line generator.
+\end{thm}\begin{thm} [ line ]  generate a piecewise linear curve, as in a polar line chart.
+\end{thm}\begin{thm} [ line.radius ]  get/set the rad accessor.
+\end{thm}\begin{thm} [ line.angle ]  get/set the angle accessor.
+\end{thm}\begin{thm} [ line.defined ]  control whether the line is def at a given point.
+\end{thm}\begin{thm} [ d3.svg.area ]  create a new area generator.
+\end{thm}\begin{thm} [ area ]  generate a piecewise linear area, as in an area chart.
+\end{thm}\begin{thm} [ area.x ]  get/set the x-coord accessors.
+\end{thm}\begin{thm} [ area.x0 ]  get/set the x0-coord (baseline) accessor.
+\end{thm}\begin{thm} [ area.x1 ]  get/set the x1-coord (topline) accessor.
+\end{thm}\begin{thm} [ area.y ]  get/set the y-coord accessors.
+\end{thm}\begin{thm} [ area.y0 ]  get/set the y0-coord (baseline) accessor.
+\end{thm}\begin{thm} [ area.y1 ]  get/set the y1-coord (topline) accessor.
+\end{thm}\begin{thm} [ area.interpolate ]  get/set the interpolation mode.
+\end{thm}\begin{thm} [ area.tension ]  get/set the cardinal spline tension.
+\end{thm}\begin{thm} [ area.defined ]  control whether the area is def at a given point.
+\end{thm}\begin{thm} [ d3.svg.area.radial ]  create a new area generator.
+\end{thm}\begin{thm} [ area ]  generate a piecewise linear area, as in a polar area chart.
+\end{thm}\begin{thm} [ area.radius ]  get/set the rad accessors.
+\end{thm}\begin{thm} [ area.innerRadius ]  get/set the inner rad (baseline) accessor.
+\end{thm}\begin{thm} [ area.outerRadius ]  get/set the outer rad (topline) accessor.
+\end{thm}\begin{thm} [ area.angle ]  get/set the angle accessors.
+\end{thm}\begin{thm} [ area.startAngle ]  get/set the angle (baseline) accessor.
+\end{thm}\begin{thm} [ area.endAngle ]  get/set the angle (topline) accessor.
+\end{thm}\begin{thm} [ area.defined ]  control whether the area is def at a given point.
+\end{thm}\begin{thm} [ d3.svg.arc ]  create a new arc generator.
+\end{thm}\begin{thm} [ arc ]  generate a solid arc, as in a pie/donut chart.
+\end{thm}\begin{thm} [ arc.innerRadius ]  get/set the inner rad accessor.
+\end{thm}\begin{thm} [ arc.outerRadius ]  get/set the outer rad accessor.
+\end{thm}\begin{thm} [ arc.startAngle ]  get/set the start angle accessor.
+\end{thm}\begin{thm} [ arc.endAngle ]  get/set the end angle accessor.
+\end{thm}\begin{thm} [ arc.centroid ]  compute the arc centroid.
+\end{thm}\begin{thm} [ d3.svg.symbol ]  create a new symbol generator.
+\end{thm}\begin{thm} [ symbol ]  generate categ symbols, as in a scatterplot.
+\end{thm}\begin{thm} [ symbol.type ]  get/set the symbol type accessor.
+\end{thm}\begin{thm} [ symbol.size ]  get/set the symbol size (in square px) accessor.
+\end{thm}\begin{thm} [ d3.svg.symbolTypes ]  the array of supported symbol types.
+\end{thm}\begin{thm} [ d3.svg.chord ]  create a new chord generator.
+\end{thm}\begin{thm} [ chord ]  generate a quadratic Bézier connecting two arcs, as in a chord diagram.
+\end{thm}\begin{thm} [ chord.radius ]  get/set the arc rad accessor.
+\end{thm}\begin{thm} [ chord.startAngle ]  get/set the arc start angle accessor.
+\end{thm}\begin{thm} [ chord.endAngle ]  get/set the arc end angle accessor.
+\end{thm}\begin{thm} [ chord.source ]  get/set the source arc accessor.
+\end{thm}\begin{thm} [ chord.target ]  get/set the target arc accessor.
+\end{thm}\begin{thm} [ d3.svg.diagonal ]  create a new diagonal generator.
+\end{thm}\begin{thm} [ diagonal ]  generate a two-dim Bézier connector, as in a node-link diagram.
+\end{thm}\begin{thm} [ diagonal.source ]  get/set the source point accessor.
+\end{thm}\begin{thm} [ diagonal.target ]  get/set the target point accessor.
+\end{thm}\begin{thm} [ diagonal.projection ]  get/set an optional point transform.
+\end{thm}\begin{thm} [ d3.svg.diagonal.radial ]  create a new diagonal generator.
+\end{thm}\begin{thm} [ diagonal ]  generate a two-dim Bézier connector, as in a node-link diagram.
+\end{thm}
+\hdrule
+\subsection*{Axes}
+
+\begin{thm} [ d3.svg.axis ]  create a new axis generator.
+\end{thm}\begin{thm} [ axis ]  creates/updates an axis for the given sel. or trans.
+\end{thm}\begin{thm} [ axis.scale ]  get/set the axis scale.
+\end{thm}\begin{thm} [ axis.orient ]  get/set the axis orientation.
+\end{thm}\begin{thm} [ axis.ticks ]  control how ticks are generated for the axis.
+\end{thm}\begin{thm} [ axis.tickValues ]  specify tick values explicitly.
+\end{thm}\begin{thm} [ axis.tickSubdivide ]  optionally subdivide ticks uniformly.
+\end{thm}\begin{thm} [ axis.tickSize ]  specify the size of major, minor and end ticks.
+\end{thm}\begin{thm} [ axis.tickPadding ]  specify padding b/w ticks and tick labels.
+\end{thm}\begin{thm} [ axis.tickFormat ]  override the tick formatting for labels.\end{thm}
+\hdrule
+\subsection*{Controls}
+
+\begin{thm} [ d3.svg.brush ]  click and drag to select one- or two-dim regions.
+\end{thm}\begin{thm} [ brush ]  creates or updates a brush for the given sel. or trans.
+\end{thm}\begin{thm} [ brush.x ]  get/set the brush’s x-scale.
+\end{thm}\begin{thm} [ brush.y ]  get/set the brush’s y-scale.
+\end{thm}\begin{thm} [ brush.extent ]  get/set the brush’s extent.
+\end{thm}\begin{thm} [ brush.clear ]  reset the brush extent.
+\end{thm}\begin{thm} [ brush.empty ]  returns true if the brush extent is empty.
+\end{thm}\begin{thm} [ brush.on ]  respond to events when the brush is moved.\end{thm}
+\hrule
+\section*{d3.time (Time)}
+\hdrule
+\subsection*{Time Formatting}
+
+\begin{thm} [ d3.time.format ]  create a new local time formatter for a given specifier.
+\end{thm}\begin{thm} [ format ]  format a date into a string.
+\end{thm}\begin{thm} [ format.parse ]  parse a string into a date.
+\end{thm}\begin{thm} [ d3.time.format.utc ]  create a new UTC time formatter for a given specifier.
+\end{thm}\begin{thm} [ d3.time.format.iso ]  the ISO 8601 UTC time formatter.\end{thm}
+\hdrule
+\subsection*{Time Scales}
+
+\begin{thm} [ d3.time.scale ]  construct a linear time scale.
+\end{thm}\begin{thm} [ scale ]  get the range val corresp to a given domain val.
+\end{thm}\begin{thm} [ scale.invert ]  get the domain val corresp to a given range val.
+\end{thm}\begin{thm} [ scale.domain ]  get/set the scale's input domain.
+\end{thm}\begin{thm} [ scale.range ]  get/set the scale's output range.
+\end{thm}\begin{thm} [ scale.rangeRound ]  set the scale's output range, and enable rounding.
+\end{thm}\begin{thm} [ scale.interpolate ]  get/set the scale's output interpolator.
+\end{thm}\begin{thm} [ scale.clamp ]  enable/disable clamping of the output range.
+\end{thm}\begin{thm} [ scale.ticks ]  get representative values from the input domain.
+\end{thm}\begin{thm} [ scale.tickFormat ]  get a formatter for displaying tick vals.
+\end{thm}\begin{thm} [ scale.copy ]  create a new scale from an existing scale.\end{thm}
+\hdrule
+\subsection*{Time Intervals}
+
+\begin{thm} [ d3.time.interval ]  a time interval in local time.
+\end{thm}\begin{thm} [ interval ]  alias for interval.floor.
+\end{thm}\begin{thm} [ interval.range ]  returns dates within the specified range.
+\end{thm}\begin{thm} [ interval.floor ]  rounds down to the nearest interval.
+\end{thm}\begin{thm} [ interval.round ]  rounds up/down to the nearest interval.
+\end{thm}\begin{thm} [ interval.ceil ]  rounds up to the nearest interval.
+\end{thm}\begin{thm} [ interval.offset ]  returns a date offset by some interval.
+\end{thm}\begin{thm} [ interval.utc ]  returns the UTC-equivalent time interval.
+\end{thm}\begin{thm} [ d3.time.day ]  every day (12:00 AM).
+\end{thm}\begin{thm} [ d3.time.days ]  alias for day.range.
+\end{thm}\begin{thm} [ d3.time.dayOfYear ]  computes the day num.
+\end{thm}\begin{thm} [ d3.time.hour ]  every hour (e.g., 1:00 AM).
+\end{thm}\begin{thm} [ d3.time.hours ]  alias for hour.range.
+\end{thm}\begin{thm} [ d3.time.minute ]  every minute (e.g., 1:02 AM).
+\end{thm}\begin{thm} [ d3.time.minutes ]  alias for minute.range.
+\end{thm}\begin{thm} [ d3.time.month ]  every month (e.g., February 1, 12:00 AM).
+\end{thm}\begin{thm} [ d3.time.months ]  alias for month.range.
+\end{thm}\begin{thm} [ d3.time.second ]  every second (e.g., 1:02:03 AM).
+\end{thm}\begin{thm} [ d3.time.seconds ]  alias for second.range.
+\end{thm}\begin{thm} [ d3.time.sunday ]  every Sunday.
+\end{thm}\begin{thm} [ d3.time.sundays ]  alias for sunday.range.
+\end{thm}\begin{thm} [ d3.time.sundayOfYear ]  computes the sun-based wk num.
+\end{thm}\begin{thm} [ d3.time.monday ]  every Monday.
+\end{thm}\begin{thm} [ d3.time.mondays ]  alias for monday.range.
+\end{thm}\begin{thm} [ d3.time.mondayOfYear ]  computes the mon-based wk num.
+\end{thm}\begin{thm} [ d3.time.tuesday ]  every Tuesday.
+\end{thm}\begin{thm} [ d3.time.tuesdays ]  alias for tuesday.range.
+\end{thm}\begin{thm} [ d3.time.tuesdayOfYear ]  computes the tues-based wk num.
+\end{thm}\begin{thm} [ d3.time.wednesday ]  every Wednesday.
+\end{thm}\begin{thm} [ d3.time.wednesdays ]  alias for wednesday.range.
+\end{thm}\begin{thm} [ d3.time.wednesdayOfYear ] computes the wed-based wk num
+\end{thm}\begin{thm} [ d3.time.thursday ]  every Thursday.
+\end{thm}\begin{thm} [ d3.time.thursdays ]  alias for thursday.range.
+\end{thm}\begin{thm} [ d3.time.thursdayOfYear ]  computes the thurs-based wk num.
+\end{thm}\begin{thm} [ d3.time.friday ]  every Friday.
+\end{thm}\begin{thm} [ d3.time.fridays ]  alias for friday.range.
+\end{thm}\begin{thm} [ d3.time.fridayOfYear ]  computes the fri-based wk num.
+\end{thm}\begin{thm} [ d3.time.saturday ]  every Saturday.
+\end{thm}\begin{thm} [ d3.time.saturdays ]  alias for saturday.range.
+\end{thm}\begin{thm} [ d3.time.saturdayOfYear ]  computes the sat-based wk num.
+\end{thm}\begin{thm} [ d3.time.week ]  alias for sunday.
+\end{thm}\begin{thm} [ d3.time.weeks ]  alias for sunday.range.
+\end{thm}\begin{thm} [ d3.time.weekOfYear ]  alias for sundayOfYear.
+\end{thm}\begin{thm} [ d3.time.year ]  every year (e.g., January 1, 12:00 AM).
+\end{thm}\begin{thm} [ d3.time.years ]  alias for year.range.\end{thm}
+\hrule
+\section*{d3.layout (Layouts)}
+\hdrule
+\subsection*{Bundle}
+
+\begin{thm} [ d3.layout.bundle ]  construct a new default bundle layout.
+\end{thm}\begin{thm} [ bundle ]  apply Holten's hierarchical bundling algorithm to edges.\end{thm}
+\hdrule
+\subsection*{Chord}
+
+\begin{thm} [ d3.layout.chord ]  produce a chord diagram from a matrix of relationships.
+\end{thm}\begin{thm} [ chord.matrix ]  get/set the matrix data backing the layout.
+\end{thm}\begin{thm} [ chord.padding ]  get/set the angular padding b/w chord segments.
+\end{thm}\begin{thm} [ chord.sortGroups ]  get/set the comparator fcn for groups.
+\end{thm}\begin{thm} [ chord.sortSubgroups ]  get/set the comparator fcn for subgroups.
+\end{thm}\begin{thm} [ chord.sortChords ]  get/set the comparator fcn for chords (z-order).
+\end{thm}\begin{thm} [ chord.chords ]  retrieve the computed chord angles.
+\end{thm}\begin{thm} [ chord.groups ]  retrieve the computed group angles.\end{thm}
+\hdrule
+\subsection*{Cluster}
+
+\begin{thm} [ d3.layout.cluster ]  cluster entities into a dendrogram.
+\end{thm}\begin{thm} [ cluster.sort ]  get/set the comparator fcn for sibling nodes.
+\end{thm}\begin{thm} [ cluster.children ]  get/set the accessor fcn for child nodes.
+\end{thm}\begin{thm} [ cluster.nodes ]  compute the cluster layout and return the array of nodes.
+\end{thm}\begin{thm} [ cluster.links ]  compute the parent-child links b/w tree nodes.
+\end{thm}\begin{thm} [ cluster.separation ]  get/set the spacing fcn b/w neighboring nodes.
+\end{thm}\begin{thm} [ cluster.size ]  get/set the layout size in x and y.\end{thm}
+\hdrule
+\subsection*{Force}
+
+\begin{thm} [ d3.layout.force ]  position linked nodes using physical sim.
+\end{thm}\begin{thm} [ force.on ]  listen to updates in the computed layout positions.
+\end{thm}\begin{thm} [ force.nodes ]  get/set the array of nodes to layout.
+\end{thm}\begin{thm} [ force.links ]  get/set the array of links b/w nodes.
+\end{thm}\begin{thm} [ force.size ]  get/set the layout size in x and y.
+\end{thm}\begin{thm} [ force.linkDistance ]  get/set the link distance.
+\end{thm}\begin{thm} [ force.linkStrength ]  get/set the link strength.
+\end{thm}\begin{thm} [ force.friction ]  get/set the friction coefficient.
+\end{thm}\begin{thm} [ force.charge ]  get/set the charge strength.
+\end{thm}\begin{thm} [ force.gravity ]  get/set the gravity strength.
+\end{thm}\begin{thm} [ force.theta ]  get/set the accuracy of the charge interaction.
+\end{thm}\begin{thm} [ force.start ]  start/restart the sim when the nodes change.
+\end{thm}\begin{thm} [ force.resume ]  reheat the cooling parameter and restart sim.
+\end{thm}\begin{thm} [ force.stop ]  immediately terminate the sim.
+\end{thm}\begin{thm} [ force.alpha ]  get/set the layout's cooling parameter.
+\end{thm}\begin{thm} [ force.tick ]  run the layout sim one step.
+\end{thm}\begin{thm} [ force.drag ]  bind a behavior to nodes to allow interactive dragging.\end{thm}
+\hdrule
+\subsection*{Hierarchy}
+
+\begin{thm} [ d3.layout.hierarchy ]  derive a custom hierarchical layout implementation.
+\end{thm}\begin{thm} [ hierarchy.sort ]  get/set the comparator fcn for sibling nodes.
+\end{thm}\begin{thm} [ hierarchy.children ]  get/set the accessor fcn for child nodes.
+\end{thm}\begin{thm} [ hierarchy.nodes ]  compute the layout and return the array of nodes.
+\end{thm}\begin{thm} [ hierarchy.links ]  compute the parent-child links b/w tree nodes.
+\end{thm}\begin{thm} [ hierarchy.value ]  get/set the val accessor fcn.
+\end{thm}\begin{thm} [ hierarchy.revalue ]  recompute the hierarchy vals.\end{thm}
+\hdrule
+\subsection*{Histogram}
+
+\begin{thm} [ d3.layout.histogram ]  construct a new default histogram.
+\end{thm}\begin{thm} [ histogram ]  compute the dist of data using quantized bins.
+\end{thm}\begin{thm} [ histogram.value ]  get/set the val accessor fcn.
+\end{thm}\begin{thm} [ histogram.range ]  get/set the considered val range.
+\end{thm}\begin{thm} [ histogram.bins ]  specify how values are organized into bins.
+\end{thm}\begin{thm} [ histogram.frequency ]  compute the dist as counts/probabilities.\end{thm}
+\hdrule
+\subsection*{Pack}
+
+\begin{thm} [ d3.layout.pack ]  produce a hierarchical layout using recursive circle-packing.
+\end{thm}\begin{thm} [ pack.sort ]  control the order in which sibling nodes are traversed.
+\end{thm}\begin{thm} [ pack.children ]  get/set the children accessor fcn.
+\end{thm}\begin{thm} [ pack.nodes ]  compute the pack layout and return the array of nodes.
+\end{thm}\begin{thm} [ pack.links ]  compute the parent-child links b/w tree nodes.
+\end{thm}\begin{thm} [ pack.value ]  get/set the val accessor used to size circles.
+\end{thm}\begin{thm} [ pack.size ]  specify the layout size in x and y.
+\end{thm}\begin{thm} [ pack.padding ]  specify the layout padding in (approx) px.\end{thm}
+\hdrule
+\subsection*{Partition}
+
+\begin{thm} [ d3.layout.partition ]  recursively partition a node tree into a sunburst or icicle.
+\end{thm}\begin{thm} [ partition.sort ]  control the order in which sibling nodes are traversed.
+\end{thm}\begin{thm} [ partition.children ]  get/set the children accessor fcn.
+\end{thm}\begin{thm} [ partition.nodes ]  compute the partition layout and return the array of nodes.
+\end{thm}\begin{thm} [ partition.links ]  compute the parent-child links b/w tree nodes.
+\end{thm}\begin{thm} [ partition.value ]  get/set the val accessor used to size circles.
+\end{thm}\begin{thm} [ partition.size ]  specify the layout size in x and y.\end{thm}
+\hdrule
+\subsection*{Pie}
+
+\begin{thm} [ d3.layout.pie ]  construct a new default pie layout.
+\end{thm}\begin{thm} [ pie ]  compute the start/end angles for arcs in a pie/donut chart.
+\end{thm}\begin{thm} [ pie.value ]  get/set the val accessor fcn.
+\end{thm}\begin{thm} [ pie.sort ]  control the clockwise order of pie slices.
+\end{thm}\begin{thm} [ pie.startAngle ]  get/set the overall start angle of the pie.
+\end{thm}\begin{thm} [ pie.endAngle ]  get/set the overall end angle of the pie.\end{thm}
+
+\subsection*{Stack}
+\hdrule
+\begin{thm} [ d3.layout.stack ]  construct a new default stack layout.
+\end{thm}\begin{thm} [ stack ]  compute the baseline for each series in a stacked bar/area chart.
+\end{thm}\begin{thm} [ stack.values ]  get/set the values accessor fcn per series.
+\end{thm}\begin{thm} [ stack.order ]  control the order in which series are stacked.
+\end{thm}\begin{thm} [ stack.offset ]  specify the overall baseline algorithm.
+\end{thm}\begin{thm} [ stack.x ]  get/set the x-dimension accessor fcn.
+\end{thm}\begin{thm} [ stack.y ]  get/set the y-dimension accessor fcn.
+\end{thm}\begin{thm} [ stack.out ]  get/set the output fcn for storing the baseline.\end{thm}
+\hdrule
+\subsection*{Tree}
+
+\begin{thm} [ d3.layout.tree ]  position a tree of nodes tidily.
+\end{thm}\begin{thm} [ tree.sort ]  control the order in which sibling nodes are traversed.
+\end{thm}\begin{thm} [ tree.children ]  get/set the children accessor fcn.
+\end{thm}\begin{thm} [ tree.nodes ]  compute the tree layout and return the array of nodes.
+\end{thm}\begin{thm} [ tree.links ]  compute the parent-child links b/w tree nodes.
+\end{thm}\begin{thm} [ tree.separation ]  get/set the spacing fcn b/w neighboring nodes.
+\end{thm}\begin{thm} [ tree.size ]  specify the layout size in x and y.
+\end{thm}
+\hdrule
+\subsection*{Treemap}
+
+\begin{thm} [ d3.layout.treemap ]  use recursive spatial subdivision to display a tree of nodes.
+\end{thm}\begin{thm} [ treemap.sort ]  control the order in which sibling nodes are traversed.
+\end{thm}\begin{thm} [ treemap.children ]  get/set the children accessor fcn.
+\end{thm}\begin{thm} [ treemap.nodes ]  compute the treemap layout and return the array of nodes.
+\end{thm}\begin{thm} [ treemap.links ]  compute the parent-child links b/w tree nodes.
+\end{thm}\begin{thm} [ treemap.value ]  get/set the val accessor used to size treemap cells.
+\end{thm}\begin{thm} [ treemap.size ]  specify the layout size in x and y.
+\end{thm}\begin{thm} [ treemap.padding ]  specify the padding b/w a parent and its children.
+\end{thm}\begin{thm} [ treemap.round ]  enable/disable rounding to exact px.
+\end{thm}\begin{thm} [ treemap.sticky ]  make the layout sticky for stable updates.
+\end{thm}\begin{thm} [ treemap.mode ]  change the treemap layout algorithm.
+\end{thm}
+\hrule
+\section*{d3.geo (Geography)}
+\hdrule
+\subsection*{Paths}
+
+\begin{thm} [ d3.geo.path ]  create a new geographic path generator.
+\end{thm}\begin{thm} [ path ]  project the specified feature and render it to the context.
+\end{thm}\begin{thm} [ path.projection ]  get/set the geographic proj.
+\end{thm}\begin{thm} [ path.context ]  get/set the render context.
+\end{thm}\begin{thm} [ path.pointRadius ]  get/set the radius to display point features.
+\end{thm}\begin{thm} [ path.area ]  compute the proj area of a given feature.
+\end{thm}\begin{thm} [ path.centroid ]  compute the proj centroid of a given feature.
+\end{thm}\begin{thm} [ path.bounds ]  compute the proj bounds of a given feature.
+\end{thm}\begin{thm} [ d3.geo.circle ]  create a circle generator.
+\end{thm}\begin{thm} [ circle ]  generate a piecewise circle as a Polygon.
+\end{thm}\begin{thm} [ circle.origin ]  specify the origin in lat and long.
+\end{thm}\begin{thm} [ circle.angle ]  specify the angular radius in degrees.
+\end{thm}\begin{thm} [ circle.precision ]  specify the precision of the piecewise circle.
+\end{thm}\begin{thm} [ d3.geo.area ]  compute the spherical area of a given feature.
+\end{thm}\begin{thm} [ d3.geo.bounds ]  compute the lat-long bounding box for a feature.
+\end{thm}\begin{thm} [ d3.geo.centroid ]  compute the spherical centroid of a feature.
+\end{thm}\begin{thm} [ d3.geo.distance ]  compute the great-arc dist b/w two points.
+\end{thm}\begin{thm} [ d3.geo.interpolate ]  interpolate b/w 2 points along a great arc.
+\end{thm}\begin{thm} [ d3.geo.length ]  compute the length of a line string/the circumf. of a polygon.
+\end{thm}
+\hdrule
+\subsection*{Projections}
+
+\begin{thm} [ d3.geo.projection ]  create a standard proj from a raw proj
+\end{thm}\begin{thm} [ projection ]  project the specified location
+\end{thm}\begin{thm} [ projection.invert ]  invert the proj for the specified point
+\end{thm}\begin{thm} [ projection.rotate ]  get/set the proj's three-axis rotation
+\end{thm}\begin{thm} [ projection.center ]  get/set the proj's center location
+\end{thm}\begin{thm} [ projection.translate ]  get/set the proj's translation pos
+\end{thm}\begin{thm} [ projection.scale ]  get/set the proj's scale factor
+\end{thm}\begin{thm} [ projection.clipAngle ]  get/set the rad of the proj's clip circle
+\end{thm}\begin{thm} [ projection.clipExtent ]  get/set the proj viewport clip ext(px)
+\end{thm}\begin{thm} [ projection.precision ]  get/set the precision threshold for adaptive resampling
+\end{thm}\begin{thm} [ projection.stream ]  wrap the specified stream listener, projecting input geometry
+\end{thm}\begin{thm} [ d3.geo.projectionMutator ]  create a standard proj from a mutable raw proj
+\end{thm}\begin{thm} [ d3.geo.albers ]  the Albers equal-area conic proj
+\end{thm}\begin{thm} [ albers.parallels ]  get/set the proj's two standard parallels
+\end{thm}\begin{thm} [ d3.geo.albersUsa ]  a composite Albers proj for the US
+\end{thm}\begin{thm} [ d3.geo.azimuthalEqualArea ]  the azimuthal equal-area proj
+\end{thm}\begin{thm} [ d3.geo.azimuthalEquidistant ]  the azimuthal equidist proj
+\end{thm}\begin{thm} [ d3.geo.conicConformal ]  the conic conformal projection
+\end{thm}\begin{thm} [ d3.geo.conicEquidistant ]  the conic equidist projection
+\end{thm}\begin{thm} [ d3.geo.conicEqualArea ]  the conic equal-area (Albers) proj
+\end{thm}\begin{thm} [ d3.geo.equirectangular ]  the equirect(plate carr\`ee) proj
+\end{thm}\begin{thm} [ d3.geo.gnomonic ]  the gnomonic proj.
+\end{thm}\begin{thm} [ d3.geo.mercator ]  the spherical Mercator proj
+\end{thm}\begin{thm} [ d3.geo.orthographic ]  the azimuthal orthographic proj
+\end{thm}\begin{thm} [ d3.geo.stereographic ]  the azimuthal stereographic proj
+\end{thm}\begin{thm} [ d3.geo.azimuthalEqualArea.raw ]  the raw azim eq-area proj
+\end{thm}\begin{thm} [ d3.geo.azimuthalEquidistant.raw ]  the azim equidist proj
+\end{thm}\begin{thm} [ d3.geo.conicConformal.raw ]  the raw conic conformal proj
+\end{thm}\begin{thm} [ d3.geo.conicEquidistant.raw ]  the raw conic equidist proj
+\end{thm}\begin{thm} [ d3.geo.conicEqualArea.raw ]  the raw conic equal-area (Albers) proj
+\end{thm}\begin{thm} [ d3.geo.equirectangular.raw ] raw equirect(plate carr\`ee) proj
+\end{thm}\begin{thm} [ d3.geo.gnomonic.raw ]  the raw gnomonic proj
+\end{thm}\begin{thm} [ d3.geo.mercator.raw ]  the raw Mercator proj
+\end{thm}\begin{thm} [ d3.geo.orthographic.raw ]  the raw azimuthal orthog proj
+\end{thm}\begin{thm} [ d3.geo.stereographic.raw ]  the raw azimuthal stereog proj
+\end{thm}\begin{thm} [ d3.geo.transverseMercator.raw ]  the raw transverse Mercator proj\end{thm}
+\hdrule
+\subsection*{Streams}
+
+\begin{thm} [ d3.geo.stream ]  convert a GeoJSON object to a geometry stream.
+\end{thm}\begin{thm} [ stream.point ]  indicate an x, y (and optionally z) coord.
+\end{thm}\begin{thm} [ stream.lineStart ]  indicate the start of a line or ring.
+\end{thm}\begin{thm} [ stream.lineEnd ]  indicate the end of a line or ring.
+\end{thm}\begin{thm} [ stream.polygonStart ]  indicate the start of a polygon.
+\end{thm}\begin{thm} [ stream.polygonEnd ]  indicate the end of a polygon.
+\end{thm}\begin{thm} [ stream.sphere ]  indicate a sphere.\end{thm}
+\hrule
+\vspace{55pt}
+\section*{d3.geom (Geometry)}
+\hdrule
+\subsection*{Voronoi}
+
+\begin{thm} [ d3.geom.voronoi ]  compute the Voronoi diagram for the specified points.
+\end{thm}\begin{thm} [ d3.geom.delaunay ]  compute the Delaunay triangulation for the specified points.\end{thm}
+\hdrule
+\subsection*{Quadtree}
+
+\begin{thm} [ d3.geom.quadtree ]  constructs a quadtree for an array of points.
+\end{thm}\begin{thm} [ quadtree.add ]  add a point to the quadtree.
+\end{thm}\begin{thm} [ quadtree.visit ]  recursively visit nodes in the quadtree.\end{thm}
+\hdrule
+\subsection*{Polygon}
+
+\begin{thm} [ d3.geom.polygon ] 
+\end{thm}\begin{thm} [ polygon.area ] 
+\end{thm}\begin{thm} [ polygon.centroid ] 
+\end{thm}\begin{thm} [ polygon.clip ] \end{thm}
+\hdrule
+\subsection*{Hull}
+
+\begin{thm} [ d3.geom.hull ] \end{thm}
+\hrule
+\section*{d3.behavior (Behaviors)}
+\hdrule
+\subsection*{Drag}
+
+\begin{thm} [ d3.behavior.drag ] 
+\end{thm}\begin{thm} [ drag.origin ] 
+\end{thm}\begin{thm} [ drag.on ] \end{thm}
+\hdrule
+\subsection*{Zoom}
+
+\begin{thm} [ d3.behavior.zoom ] 
+\end{thm}\begin{thm} [ zoom.on ] 
+\end{thm}\begin{thm} [ zoom.scale ] 
+\end{thm}\begin{thm} [ zoom.translate ] 
+\end{thm}\begin{thm} [ zoom.scaleExtent ] 
+\end{thm}\begin{thm} [ zoom.x ] 
+\end{thm}\begin{thm} [ zoom.y ] \end{thm}
+\hrule
+\hspace{1em}\vspace*{3in}\\
+\hspace{1em}\\
+\hspace{1em}\vspace*{7.5in}\\
+\hspace{1em}
+\end{multicols}
+\end{document}
