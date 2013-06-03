@@ -16,7 +16,7 @@ CONTACT INFORMATION
 
 Student name: Susan VanderPlas
 
-Link_id:  
+Link_id: srvanderplas
 
 Student postal address: 802 17th St, Auburn NE, 68305
 
@@ -42,7 +42,7 @@ Contact to verify: Heike Hofmann (hofmann@iastate.edu)
 
  
 
-Bio of Student: I graduated with a BS in applied math and psychology from Texas A&M University in 2009, and moved to Iowa to work on a PhD in Bioinformatics at Iowa State. After the first year, I decided to switch to Statistics because I preferred statistical analysis to bioinformatics-specific topics and didn't want to be pigeonholed into biology-specific topics forever. I have worked in materials informatics, bayesian modeling of vehicle collisions, and more recently, data visualization and graphics under Heike Hofmann and Di Cook. My interests are specifically in perception of graphics, graphical inference, and optical illusions. I'm currently working on estimating the size of the visual distortion due to the sine illusion, as well as more general methods for estimating visual ability and its relation to graphical perception. 
+Bio of Student: I graduated with a BS in applied math and psychology from Texas A&M University in 2009, and moved to Iowa to work on a PhD in Bioinformatics at Iowa State. After the first year, I decided to switch to Statistics because I preferred statistical analysis to bioinformatics-specific topics and didn't want to be pigeonholed into biology-specific topics forever. I have worked in materials informatics, bayesian modeling of vehicle collisions, and more recently, data visualization and graphics under Heike Hofmann and Di Cook. My interests are specifically in perception of graphics, graphical inference, and optical illusions. I'm currently working on estimating the size of the visual distortion due to the sine illusion, as well as more general methods for estimating visual ability and its relation to graphical perception. I can think of several applications that I would have used this package for in the past 8 months, so I'm excited about the possibility of extending animint to a more complete implementation of ggplot2 -> d3.
 
  
 
@@ -50,7 +50,7 @@ Schedule Conflicts:
 
 Please describe, in detail, any schedule conflicts or other demands on your time for the summer.  GSoC is not a part-time engagement, so you'll be expected to spend 40+ hours per week working on your project.  
 
-I will be going to JSM in August, which should be about 3 days away, and otherwise may be gone on the occasional weekend. The only other ongoing project I have this summer is data collection for a paper, but the time investment should be relatively minimal as the coding should be completed before GSoC starts and the actual collection is online and only needs occasional monitoring.  
+I will be going to JSM in August, which should be about 5 days away, and otherwise may be gone on the occasional weekend. The only other ongoing project I have this summer is data collection for a paper, but the time investment should be relatively minimal as the coding should be completed before GSoC starts and the actual collection is online and only needs occasional monitoring. I may also participate in a coursera course for fun, but this should not interfere with the required time committment; I just live in a place that has very little to do offline :).  
 
 MENTORS
 
@@ -60,10 +60,10 @@ Mentor names: Toby Dylan Hocking , Hadley Wickham, Yihui Xie
 
 Mentor emails: toby.hocking@inria.fr, h.wickham@gmail.com, xie@yihui.name
 
-Mentor link_ids: 
+Mentor link_ids: tdhock 
 
 Have you been in touch with the mentors? When and how?
-Yes, I have been in touch with Toby by email and using skype, between April 17th and April 24th.
+Yes, I have been in touch with Toby by email and skype since April 17th. I will also meet with Hadley in person on Friday, May 3. 
  
 
 CODING PLAN & METHODS
@@ -71,62 +71,74 @@ CODING PLAN & METHODS
 Describe in detail your plan for completing the work.  What functions will be written, how and when will you do design, how will you verify the results of your coding?  The sub-section headings below are examples only.  Each project is different, please make your application appropriate to the work you propose.  
 
 Main steps:
-1. Convert framework for ggplot2 scales into d3 scale framework, including scales for axes and object attributes such as size, color, etc. I expect there will be a corresponding d3/javascript scale function for each ggplot2 scale type, though it may be possible to consolidate methods for scale generation. 
+1. Convert framework for ggplot2 scales into d3 scale framework. Begin with scale_x_continuous and scale_y_continuous (and xlim, ylim), then discrete scales for x and y, then non-manual scales for aesthetics like color, size, etc. 
 
-2. Convert ggplot2 transformations so that the gg2animint() function writes the transformed values to the generated svg file so that they are accessible in javascript. This may overlap somewhat with (1) given that d3 scales seem to also be useable as transformations; it is possible that some of the more common transformations may be implemented in javascript, however, a generic framework is likely to be more easily implemented in R.
+2. Write methods to write ggplot2 stat_() method outputs to the svg data files so that javascript can access them without additional computation. I expect this will also involve implementing additional geoms (such as geom_ribbon for stat_smooth error bars) that are currently not implemented. I plan to start with some of the more common stats, such as smooth, boxplot, density and then approach the less commonly used stats (in my opinion) such as binhex and spoke. 
 
-3. Write methods to write ggplot2 stat_() method outputs to the svg data files so that javascript can access them without additional computation. I expect this will also involve implementing additional geoms (such as geom_ribbon for stat_smooth error bars) that are currently not implemented. I expect to start with some of the more common stats, such as smooth, boxplot, density and then approach the less commonly used stats (in my opinion) such as binhex and spoke. 
+3. Convert ggplot2 transformations so that the gg2animint() function writes the transformed values to the csv file so that they are accessible in javascript. This may overlap somewhat with (1) given that d3 scales seem to also be useable as transformations; it is possible that some of the more common transformations may be implemented in javascript, however, a generic framework is likely to be more easily implemented in R.
 
 4. If there is additional time remaining, attempt to implement facets. 
 
-I expect that step 1 will be the first and most easily approached, and that steps 2 and 3 will be completed in tandem based on the frequency with which I use (or see others use) certain methods. 4 will require some additional work, as I'm not entirely sure how facets are created in R (other than the obvious use of plyr), and I'm not entirely sure how that method would translate into d3, both in the storage dimension (how to write/read the csv file and if multiple csv files would be necessary) and in the altered structure of the javascript logic that might be required. I expect it will be easier to assess the work required for this step as I become more familiar with the implementation of animint and with d3 itself.
+5. Implement additional geoms (abline, area, bar, histogram, linerange, pointrange, polygon, ribbon, rug, step, tile, violin)
+
+I expect that step 1 will be the first and most easily approached, and that steps 2 and 3 will be completed in tandem based on the frequency with which I use (or see others use) certain methods. 4 will require some additional work, as I'm not entirely sure how facets are created in R (other than the obvious use of plyr), and I'm not entirely sure how that method would translate into d3, both in the storage dimension (how to write/read the csv file and if multiple csv files would be necessary) and in the altered structure of the javascript logic that might be required. I expect it will be easier to assess the work required for this step as I become more familiar with the implementation of animint and with d3 itself. Step 5 (implementation of geoms that are currently unsupported) will likely occur throughout the duration of the project, as some of the geoms are just displayed stat_() calculated quantities (i.e. geom_ribbon and stat_smooth error bars) , and others are likely to provide useful tests to demonstrate effective coding. 
 
 
 Evaluation:
-Evaluation should be reasonably simple, as the primary objective is to effectively implement as many of the methods as possible
+The timeline laid out above should be a sufficient framework for evaluation, as clear milestones are laid out and it should be reasonably easy to judge completion not only by amount of code but by the addition of features to the existing project.
 
 Planning:
+While much of the planning has been considered above (in terms of order of attack), any major project additions or modifications that become necessary will be discussed with advisors before implementation. 
 
 Implementation:
+As the framework is already in place, implementation will follow the ggplot2 framework on the R end of the code; few (if any) modifications are anticipated from that perspective. The JavaScript implementation may be a bit more pragmatic; there is a framework in place for the basic geoms and for manual scales, so extensions of these methods will follow the existing framework; additional methods (such as transformations) may require some extra attention. 
 
 Testing:
+Testing will be completed by creating graphs utilizing the features implemented with both simple/contrived data and real-world data (if possible) or more complicated simulated data. Testing should also include more common combinations of stats/geoms/aesthetics. Testing facets in addition should be fairly straightforward; many of the common datasets (i.e. the tips dataset, or the diamonds dataset) have enough variables that facets can be added to already existing test code. 
 
 Documentation:
+Provide simple, meaningful, modular examples that demonstrate the functions without requiring much user overhead. Documentation will be completed as new functions are implemented as much as possible.
 
-Perceived obstacles and critical objectives:
-
+Obstacles and Critical Objectives:
+Scales are likely to be one of the more difficult things to implement, but they are also the most important - currently there are no axes, which makes it rather difficult to graph meaningful data. While I am a javascript novice, I have experience combing through R package source code to find relevant code chunks; I expect that I will be able to rely rather heavily on the ggplot2 source code to implement scales for animint. I also have access to people who are very familiar with ggplot2's inner workings and others who are familiar with d3, so if I run into a problem I can't solve, I will be able to get help.
  
 
 TIMELINE:
 
-(consult GSOC schedule)
+May 28 - June 16: "Get up to speed period" - I will use this time (and additionally the interval between the end of the semester on May 15 and the start of GSoC) to become more familiar with d3 and JavaScript, as well as the ggplot2 source code and its implementation of scales, transformations, and statistics. I will begin implementation of scales as I become more familiar with the material, hopefully implementing discrete and continuous x and y axis scales. 
 
-Provide a detailed timeline of how you plan to spend your summer.  Don't leave testing and documentation for last, as that's almost a guarantee of a failed project. 
+June 16 - June 30: Scales. Implement aesthetic scales, test the implemented x and y axis scales, and ensure that each function is documented. If time allows, start writing transformations for the implemented scales.
+
+July 1 - July 15: Statistics. Record R output from stat() functions, write to csv, and read into JavaScript. Continue working on transformations, as they are likely to come up in this area as well. Work on documenting and testing scales. Implement geom_histogram(), geom_tile(), geom_violin(), and geom_ribbon() to allow statistics to be appropriately displayed.
+
+July 16 - July 31: Assuming all has gone according to plan up to this point (haha), begin working on facets. If there have been hangups, use this extra 2-week period to sort those hangups out so that a reasonable amount of the project has been completed by the midterm deadline.
+
+August 1 - August 15: Continue (or begin) implementing facets and testing statistics. Facets will likely be a good way to test the statistics, as it's more likely that an odd case will come up when faceting the dataset. Documentation, testing of facets, and general cleaning up of code. I will be at JSM during this period for 5 days, internet access may be limited during this time.
+
+August 15 - September 23: Project completion, wrapping up loose ends, possibly implementing a neat example or two to demonstrate the project. By this point, school will have started, so ideally most of the work should have been completed at this point because a 40 hour a week committment will be a bit difficult once classes have resumed.
 
 What is your contingency plan for things not going to schedule?
-
+I have built in periods of "catch-up" time to mitigate the reasonably ambitious schedule, but I've also started with the most important parts of the project, so that even if facets aren't implemented, there will be significant improvements to the functionality of animint. 
   
 
 MANAGEMENT OF CODING PROJECT
 
 How do you propose to ensure code is submitted / tested?
 
+I will use github to keep track of the improvements and modifications, and I will do much of the testing myself. Once I have tested the improvements, beta versions of animint can be released for wider testing. 
+
 What is the communication plan with mentors?
 
-(i.e. contact method, frequency, dealing with timezone issues and work schedules)
+I plan to use email primarily, and then use skype for more specific and critical problems. Toby is 10 hours ahead of me, but we can skype in the evenings (for me) and morning (for him) as necessary. 
 
 Examples of similar coding problems that you have solved.
-
+I've implemented methods to add coloring schemes and labels to the mosaicplots setup, and I have created several Shiny applets that involved creating custom input and output bindings in JavaScript. 
  
 
 TEST
 
 Describe the qualification test that you have submitted to you project mentors.  If feasible, include code, details, output, etc here.
 
- 
+ I have implemented geom_rect, geom_hline, geom_vline, and geom_segment in d3 (available on github.com/srvanderplas/animint), and I have created a trivial example to demonstrate these implementations. I am also working on a less-trivial animation demonstration at Toby's request, since the current demonstration is somewhat bioinformatics-heavy and may not be accessible to the average user, however, this animation example requires that I implement manual color scales as well as potentially geom_polygon and is proving to be a bit more complex than I anticipated - it's entirely doable (and in the debugging stage right now), but it likely won't be finished by the May 3 deadline because of other committments (i.e. finals week). Code fragments are available in Susantests.R on github at the bottom of the file.
 
-Remember, this is a template.  You need to include all of the information requested here, but may need to include additional sections, examples, etc.  Submissions that are simply copies of the project idea pages with minimal effort shown by the applicant will be swiftly ignored, so make yourself stand out by starting your summer effort now.
-
-Good Luck, and thanks for participating in R's GSoC 2013 projects!
-
- 
+Code files that have been modified: animint.js; Demonstrations are in Susantests.R.
