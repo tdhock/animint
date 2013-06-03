@@ -136,6 +136,13 @@ var animint = function(to_select, json_file){
 		return g_info.params.fill;
 	    }
 	}
+  var get_colour = function(d){
+	    try{
+		return svg.plot.scales.colour[ d[aes.colour] ];
+	    }catch(err){
+		return g_info.params.colour;
+	    }
+	}
 	var colour = "black";
 	if(g_info.params.colour){
 	    colour = g_info.params.colour;
@@ -195,9 +202,11 @@ var animint = function(to_select, json_file){
 	}else if(g_info.geom == "point"){
 	    elements = elements.data(data);
 	    eActions = function(e){
-		e.attr("cx",toXY("x","x"))
+		   e.attr("cx",toXY("x","x"))
 		    .attr("cy",toXY("y","y"))
 		    .attr("r",size)
+        .style("fill",get_fill)
+//        .style("stroke",get_colour)
 		;
 	    }
 	    eAppend = "circle";
