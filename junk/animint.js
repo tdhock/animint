@@ -21,72 +21,85 @@ var animint = function(to_select, json_file){
     var Animation = {};
     this.Animation = Animation;
     var getcol = function(v_name){
-	return function(d){return d[v_name];};
+    	return function(d){return d[v_name];};
     }
     var add_geom = function(g_name, g_info){
-	d3.csv(g_info.data, function(error, response){
-	    // First convert to correct types.
-	    response.forEach(function(d){
-		for(var v_name in g_info.types){
-		    var r_type = g_info.types[v_name];
-		    if(r_type == "integer"){
-			d[v_name] = parseInt(d[v_name]);
-		    }else if(r_type == "numeric"){
-			d[v_name] = parseFloat(d[v_name]);
-		    }else if(r_type == "factor"){
-			//keep it as a character.
-		    }else{
-			throw "unsupported R type "+r_type;
-		    }
-		}
-	    });
-	    var nest = d3.nest();
-	    g_info.subord.forEach(function(aes_name){
-		var v_name = g_info.subvars[aes_name];
-		//alert(aes_name+" "+g_info.classed+" "+v_name);
-		nest.key(getcol(v_name));
-	    });
-	    g_info.data = nest.map(response);
-	    Geoms[g_name] = g_info;
-	    update_geom(g_name);
-	});
+    	d3.csv(g_info.data, function(error, response){
+    	    // First convert to correct types.
+    	  response.forEach(function(d){
+      		for(var v_name in g_info.types){
+      		    var r_type = g_info.types[v_name];
+      		    if(r_type == "integer"){
+      			d[v_name] = parseInt(d[v_name]);
+      		    }else if(r_type == "numeric"){
+      			d[v_name] = parseFloat(d[v_name]);
+      		    }else if(r_type == "factor"){
+      			//keep it as a character.
+      		    }else{
+      			throw "unsupported R type "+r_type;
+      		    }
+    		    }
+    	  });
+    	  var nest = d3.nest();
+    	  g_info.subord.forEach(function(aes_name){
+      		var v_name = g_info.subvars[aes_name];
+      		//alert(aes_name+" "+g_info.classed+" "+v_name);
+      		nest.key(getcol(v_name));
+    	  });
+    	  g_info.data = nest.map(response);
+    	  Geoms[g_name] = g_info;
+    	  update_geom(g_name);
+    	});
     }
     var add_plot = function(p_name, p_info){
-	var svg = element.append("svg")
-	    .attr("id",p_name)
-	    .attr("height",p_info.options.height)
-	    .attr("width",p_info.options.width)
-	;
-	svg.x = d3.scale.linear()
-	    .domain(p_info.ranges.x)
-	    .range([0,svg.attr("width")]);
-	svg.y = d3.scale.linear()
-	    .domain(p_info.ranges.y)
-	    .range([svg.attr("height"),0]);
-	svg.plot = p_info;
-	p_info.geoms.forEach(function(g_name){
-	    SVGs[g_name] = svg;
-	});
-	Plots[p_name] = p_info;
+    	var svg = element.append("svg")
+    	    .attr("id",p_name)
+    	    .attr("height",p_info.options.height)
+    	    .attr("width",p_info.options.width);
+      var padding = 30;
+      var h = svg.attr("height");
+      var w = svg.attr("width");
+    	svg.x = d3.scale.linear()
+    	    .domain(p_info.ranges.x)
+    	    .range([padding,svg.attr("width")-padding]);
+    	svg.y = d3.scale.linear()
+    	    .domain(p_info.ranges.y)
+    	    .range([svg.attr("height")-padding,padding]);
+      var xaxis = d3.svg.axis().scale(svg.x).orient("bottom");
+        svg.append("g")
+          .attr("class", "axis")
+          .attr("transform", "translate(0," + (h-padding) + ")")
+          .call(xaxis);
+      var yaxis = d3.svg.axis().scale(svg.y).orient("left");
+        svg.append("g")
+          .attr("class", "axis")
+          .attr("transform", "translate("+padding+",0)")
+          .call(yaxis);
+    	svg.plot = p_info;
+    	p_info.geoms.forEach(function(g_name){
+    	    SVGs[g_name] = svg;
+	    });
+
+	    Plots[p_name] = p_info;
     }
     var add_selector = function(s_name, s_info){
-	Selectors[s_name] = s_info;
+    	Selectors[s_name] = s_info;
     }
     var update_geom = function(g_name){
-	var svg = SVGs[g_name];
-	var g_info = Geoms[g_name];
-	var data = g_info.data;
-	g_info.subord.forEach(function(aes_name){
-	    if(aes_name != "group"){
-		var v_name = g_info.subvars[aes_name];
-		var value = Selectors[v_name].selected;
-		if(data.hasOwnProperty(value)){
-		    data = data[value];
-		}else{
-		    data = [];
-		}
-	    }
-	});
+  	var svg = SVGs[g_name];
+  	var g_info = Geoms[g_name];
+  	var data = g_info.data;
+  	g_info.subord.forEach(function(aes_name){
+  	    if(aes_name != "group"){
+  		var v_name = g_info.subvars[aes_name];
+  		var value = Selectors[v_name].selected;
+  		if(data.hasOwnProperty(value)){
+  		    data = data[value];
+  		}else{
+  		    data = [];
+  		}
+  	    }
+  	});
 	var aes = g_info.aes;
 	var toXY = function(xy, a){
 	    return function(d){
@@ -130,11 +143,14 @@ var animint = function(to_select, json_file){
 	    return linetypesize2dasharray(lt, get_size(d));
 	}
 	var get_fill = function(d){
+    var value, fl;
 	    try{
-		return svg.plot.scales.fill[ d[aes.fill] ];
+        value = d[aes.fill];
+		    fl = svg.plot.scales.fill[ value ];
 	    }catch(err){
-		return g_info.params.fill;
+		    fl =  g_info.params.fill;
 	    }
+    return fl;
 	}
   var get_colour = function(d){
 	    try{
@@ -206,7 +222,7 @@ var animint = function(to_select, json_file){
 		    .attr("cy",toXY("y","y"))
 		    .attr("r",size)
         .style("fill",get_fill)
-//        .style("stroke",get_colour)
+        .style("stroke",get_colour)
 		;
 	    }
 	    eAppend = "circle";
