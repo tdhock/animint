@@ -21,7 +21,7 @@ var animint = function(to_select, json_file){
     var Animation = {};
     this.Animation = Animation;
     var getcol = function(v_name){
-    	return function(d){return d[v_name];};
+      return function(d){return d[v_name];};
     }
     var add_geom = function(g_name, g_info){
     	d3.csv(g_info.data, function(error, response){
@@ -69,7 +69,9 @@ var animint = function(to_select, json_file){
         svg.append("g")
           .attr("class", "axis")
           .attr("transform", "translate(0," + (h-padding) + ")")
-          .call(xaxis);
+          .call(xaxis)
+          .tickValues({return p_info.axis.x*svg.attr("width")-padding})
+          .tickFormat(function(d) {return p_info.axis.xlab[p_info.axis.x.indexOf(d)]});
       var yaxis = d3.svg.axis().scale(svg.y).orient("left");
         svg.append("g")
           .attr("class", "axis")
