@@ -18,9 +18,9 @@ gg2list <- function(p){
   }
   plist$ranges <- lapply(plist$ranges, range, na.rm=TRUE)
   plist$axis <- list(
-    x = plistextra$panel$ranges[[1]]$x.major,
+    x = plistextra$panel$ranges[[1]]$x.major_source,
     xlab = plistextra$panel$ranges[[1]]$x.labels,
-    y = plistextra$panel$ranges[[1]]$y.major,
+    y = plistextra$panel$ranges[[1]]$y.major_source,
     ylab = plistextra$panel$ranges[[1]]$y.labels
   )
   plist$options <- list(width=300,height=300)

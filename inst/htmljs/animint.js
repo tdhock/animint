@@ -65,14 +65,20 @@ var animint = function(to_select, json_file){
     	svg.y = d3.scale.linear()
     	    .domain(p_info.ranges.y)
     	    .range([svg.attr("height")-padding,padding]);
-      var xaxis = d3.svg.axis().scale(svg.x).orient("bottom")
-          .tickValues({return p_info.axis.x*svg.attr("width")-padding})
-          .tickFormat(function(d) {return p_info.axis.xlab[p_info.axis.x.indexOf(d)]});
+
+      var xaxis = d3.svg.axis()
+          .scale(svg.x)
+          .tickValues(p_info.axis.x)
+          .tickFormat(function(d) {return p_info.axis.xlab[p_info.axis.x.indexOf(d)].toString()})
+          .orient("bottom");
         svg.append("g")
           .attr("class", "axis")
           .attr("transform", "translate(0," + (h-padding) + ")")
           .call(xaxis);
-      var yaxis = d3.svg.axis().scale(svg.y).orient("left");
+      var yaxis = d3.svg.axis().scale(svg.y)
+          .tickValues(p_info.axis.y)
+          .tickFormat(function(d) {return p_info.axis.ylab[p_info.axis.y.indexOf(d)].toString()})
+          .orient("left");
         svg.append("g")
           .attr("class", "axis")
           .attr("transform", "translate("+padding+",0)")
