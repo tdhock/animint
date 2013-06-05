@@ -71,7 +71,9 @@ var animint = function(to_select, json_file){
         svg.append("g")
           .attr("class", "axis")
           .attr("transform", "translate(0," + (h-padding) + ")")
-          .call(xaxis);
+          .call(xaxis)
+          .tickValues({return p_info.axis.x*svg.attr("width")-padding})
+          .tickFormat(function(d) {return p_info.axis.xlab[p_info.axis.x.indexOf(d)]});
       var yaxis = d3.svg.axis().scale(svg.y).orient("left");
         svg.append("g")
           .attr("class", "axis")
