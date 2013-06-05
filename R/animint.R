@@ -1,6 +1,7 @@
 ### Convert a ggplot to a list.
 gg2list <- function(p){
   plist <- list(ranges=list(x=c(),y=c()))
+  plistextra <- ggplot2::ggplot_build(p)
   for(sc in p$scales$scales){
     ## TODO: make use of other scales than manual.
     if(sc$scale_name == "manual"){
@@ -8,7 +9,7 @@ gg2list <- function(p){
     }
   }
   for(i in seq_along(p$layers)){
-    g <- layer2list(p$layers[[i]])
+    g <- layer2list(p, i, plistextra)
     plist$geoms[[i]] <- g
     for(ax.name in names(plist$ranges)){
       plist$ranges[[ax.name]] <-
@@ -16,26 +17,32 @@ gg2list <- function(p){
     }
   }
   plist$ranges <- lapply(plist$ranges, range, na.rm=TRUE)
+  plist$axis <- list(
+    x = plistextra$panel$ranges[[1]]$x.major,
+    xlab = plistextra$panel$ranges[[1]]$x.labels,
+    y = plistextra$panel$ranges[[1]]$y.major,
+    ylab = plistextra$panel$ranges[[1]]$y.labels
+  )
   plist$options <- list(width=300,height=300)
   plist
-### List representing a ggplot, with elements ranges, scales, geoms,
-### options.
+  ### List representing a ggplot, with elements ranges, scales, geoms,
+  ### options.
 }
 
 ### Convert a layer to a list.
-layer2list <- function(l){
-  g <- list(geom=l$geom$objname, data=l$data)
+layer2list <- function(p, i, plistextra){
+  g <- list(geom=p$layers[[i]]$geom$objname, data=plistextra$data[[i]])
   
   ## use un-named parameters so that they will not be exported
   ## to JSON as a named object, since that causes problems with
   ## e.g. colour.
-  g$params <- l$geom_params
+  g$params <- p$layers[[i]]$geom_params
   for(p.name in names(g$params)){
     names(g$params[[p.name]]) <- NULL
   }
   g$aes <- list()
-  for(aes.name in names(l$mapping)){
-    x <- l$mapping[[aes.name]]
+  for(aes.name in names(p$layers[[i]]$mapping)){
+    x <- p$layers[[i]]$mapping[[aes.name]]
     g$aes[[aes.name]] <- if(is.symbol(x)){
       as.character(x)
     }else if(is.language(x)){
@@ -53,23 +60,25 @@ layer2list <- function(l){
   g$subord <- as.list(names(subset.vars))
   g$subvars <- as.list(subset.vars)
   ## TODO: use actual ggplot2 x and y scales! How?
-  g$ranges <- matrix(NA,2,2,dimnames=list(axis=c("x","y"),limit=c("min","max")))
-  range.map <- c(xintercept="x",x="x",xend="x",xmin="x",xmax="x",
-                 yintercept="y",y="y",yend="y",ymin="y",ymax="y")
-  for(aesname in names(range.map)){
-    if(aesname %in% names(g$aes)){
-      var.name <- g$aes[[aesname]]
-      ax.name <- range.map[[aesname]]
-      r <- range(g$data[[var.name]], na.rm=TRUE, finite=TRUE)
-      g$ranges[ax.name,] <- range(c(g$ranges[ax.name,],r),na.rm=TRUE)
-      ## TODO: handle Inf like in ggplot2.
-      size <- r[2]-r[1]
-      g$data[[var.name]][g$data[[var.name]]==Inf] <- r[2]+size
-      g$data[[var.name]][g$data[[var.name]]==-Inf] <- r[1]-size
-    }
-  }
+  g$ranges <- matrix(c(plistextra$panel$ranges[[1]]$x.range, 
+                       plistextra$panel$ranges[[1]]$y.range),
+                     2,2,dimnames=list(axis=c("x","y"),limit=c("min","max")), byrow=TRUE)
+  #   range.map <- c(xintercept="x",x="x",xend="x",xmin="x",xmax="x",
+  #                  yintercept="y",y="y",yend="y",ymin="y",ymax="y")
+  #   for(aesname in names(range.map)){
+  #     if(aesname %in% names(g$aes)){
+  #       var.name <- g$aes[[aesname]]
+  #       ax.name <- range.map[[aesname]]
+  #       r <- range(g$data[[var.name]], na.rm=TRUE, finite=TRUE)
+  #       g$ranges[ax.name,] <- range(c(g$ranges[ax.name,],r),na.rm=TRUE)
+  #       ## TODO: handle Inf like in ggplot2.
+  #       size <- r[2]-r[1]
+  #       g$data[[var.name]][g$data[[var.name]]==Inf] <- r[2]+size
+  #       g$data[[var.name]][g$data[[var.name]]==-Inf] <- r[1]-size
+  #     }
+  #   }
   g
-### List representing a layer.
+  ### List representing a layer.
 }
 
 gg2animint <- structure(function
@@ -137,6 +146,7 @@ gg2animint <- structure(function
     result$plots[[plot.name]]$scales <- p$scales
     result$plots[[plot.name]]$options <- p$options
     result$plots[[plot.name]]$ranges <- p$ranges
+    result$plots[[plot.name]]$axis <- p$axis
   }
   ## add nextgeom so that drawing order is preserved.
   
