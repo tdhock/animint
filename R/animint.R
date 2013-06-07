@@ -41,19 +41,28 @@ layer2list <- function(p, i, plistextra){
     names(g$params[[p.name]]) <- NULL
   }
   g$aes <- list()
+  
+  # not necessary since data now comes from ggplot_build()
+#   for(aes.name in names(p$layers[[i]]$mapping)){
+#     x <- p$layers[[i]]$mapping[[aes.name]]
+#     g$aes[[aes.name]] <- if(is.symbol(x)){
+#       as.character(x)
+#     }else if(is.language(x)){
+#       newcol <- as.character(as.expression(x))
+#       g$data[[newcol]] <- eval(x, g$data)
+#       newcol
+#     }else{
+#       str(x)
+#       stop("don't know how to convert")
+#     }
+#   }
+  
   for(aes.name in names(p$layers[[i]]$mapping)){
     x <- p$layers[[i]]$mapping[[aes.name]]
-    g$aes[[aes.name]] <- if(is.symbol(x)){
-      as.character(x)
-    }else if(is.language(x)){
-      newcol <- as.character(as.expression(x))
-      g$data[[newcol]] <- eval(x, g$data)
-      newcol
-    }else{
-      str(x)
-      stop("don't know how to convert")
-    }
+    names(g$data) <- gsub(aes.name, as.character(as.expression(x)), names(g$data))
+    g$aes[[aes.name]] <- as.character(as.expression(x))
   }
+
   some.vars <- c(g$aes[grepl("showSelected",names(g$aes))])
   g$update <- c(some.vars, g$aes[names(g$aes)=="clickSelects"])
   subset.vars <- c(some.vars, g$aes[names(g$aes)=="group"])
@@ -63,20 +72,20 @@ layer2list <- function(p, i, plistextra){
   g$ranges <- matrix(c(plistextra$panel$ranges[[1]]$x.range, 
                        plistextra$panel$ranges[[1]]$y.range),
                      2,2,dimnames=list(axis=c("x","y"),limit=c("min","max")), byrow=TRUE)
-  #   range.map <- c(xintercept="x",x="x",xend="x",xmin="x",xmax="x",
-  #                  yintercept="y",y="y",yend="y",ymin="y",ymax="y")
-  #   for(aesname in names(range.map)){
-  #     if(aesname %in% names(g$aes)){
-  #       var.name <- g$aes[[aesname]]
-  #       ax.name <- range.map[[aesname]]
-  #       r <- range(g$data[[var.name]], na.rm=TRUE, finite=TRUE)
-  #       g$ranges[ax.name,] <- range(c(g$ranges[ax.name,],r),na.rm=TRUE)
-  #       ## TODO: handle Inf like in ggplot2.
-  #       size <- r[2]-r[1]
-  #       g$data[[var.name]][g$data[[var.name]]==Inf] <- r[2]+size
-  #       g$data[[var.name]][g$data[[var.name]]==-Inf] <- r[1]-size
-  #     }
-  #   }
+#     range.map <- c(xintercept="x",x="x",xend="x",xmin="x",xmax="x",
+#                    yintercept="y",y="y",yend="y",ymin="y",ymax="y")
+#     for(aesname in names(range.map)){
+#       if(aesname %in% names(g$aes)){
+#         var.name <- g$aes[[aesname]]
+#         ax.name <- range.map[[aesname]]
+#         r <- range(g$data[[var.name]], na.rm=TRUE, finite=TRUE)
+#         g$ranges[ax.name,] <- range(c(g$ranges[ax.name,],r),na.rm=TRUE)
+#         ## TODO: handle Inf like in ggplot2.
+#         size <- r[2]-r[1]
+#         g$data[[var.name]][g$data[[var.name]]==Inf] <- r[2]+size
+#         g$data[[var.name]][g$data[[var.name]]==-Inf] <- r[1]-size
+#       }
+#     }
   g
   ### List representing a layer.
 }
@@ -137,7 +146,11 @@ gg2animint <- structure(function
       csv.name <- sprintf("%s.csv", g$classed)
       write.csv(g$data, file.path(out.dir, csv.name),
                 quote=FALSE,row.names=FALSE)
+      ## Output types
+      ## Check to see if character type is d3's rgb type. 
       g$types <- as.list(sapply(g$data, class))
+      charidx <- which(g$types=="character")
+      g$types[charidx] <- sapply(charidx, function(i) if(sum(!grepl("#", g$data[[i]], fixed=TRUE))==0 & sum(nchar(g$data[[i]])!=7)==0) "rgb" else "character")
       g$data <- csv.name
       ## Finally save to the master geom list.
       result$geoms[[g$classed]] <- g
@@ -331,20 +344,20 @@ gg2animint <- structure(function
          geom_tallrect(aes(xmin=first.base/1e6, xmax=last.base/1e6,
                            fill=annotation,
                            showSelected=signal),
-                       data=intreg$ann)+
+                       data=intreg$annotations)+
          scale_fill_manual(values=breakpoint.colors,guide="none")+
          geom_text(aes((first.base+last.base)/2e6, logratio+1/8,
                        label=annotation,
                        showSelected=signal),
-                   data=intreg$ann)+
+                   data=intreg$annotations)+
          geom_blank(aes(first.base/1e6, logratio+2/8), data=intreg$ann)+
          geom_point(aes(base/1e6, logratio,
                         showSelected=signal),
-                    data=intreg$sig)+
+                    data=intreg$signals)+
          geom_segment(aes(first.base/1e6, mean, xend=last.base/1e6, yend=mean,
                           showSelected=signal,
                           showSelected2=segments),
-                      data=intreg$seg, colour=signal.colors[["estimate"]])+
+                      data=intreg$segments, colour=signal.colors[["estimate"]])+
          geom_vline(aes(xintercept=base/1e6,
                         showSelected=signal,
                         showSelected2=segments),

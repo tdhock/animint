@@ -30,13 +30,15 @@ var animint = function(to_select, json_file){
       		for(var v_name in g_info.types){
       		    var r_type = g_info.types[v_name];
       		    if(r_type == "integer"){
-      			d[v_name] = parseInt(d[v_name]);
+      	    		d[v_name] = parseInt(d[v_name]);
       		    }else if(r_type == "numeric"){
-      			d[v_name] = parseFloat(d[v_name]);
+      	    		d[v_name] = parseFloat(d[v_name]);
       		    }else if(r_type == "factor"){
-      			//keep it as a character.
+      		    	//keep it as a character.
+      		    }else if(r_type == "rgb"){
+              	//keep it as a character.        	      
       		    }else{
-      			throw "unsupported R type "+r_type;
+      			    throw "unsupported R type "+r_type;
       		    }
     		    }
     	  });
@@ -168,8 +170,12 @@ var animint = function(to_select, json_file){
 	    }
 	}
 	var colour = "black";
+  var fill = "black";
 	if(g_info.params.colour){
 	    colour = g_info.params.colour;
+	}
+  if(g_info.params.fill){
+	    fill = g_info.params.fill;
 	}
 	var text_anchor = "middle";
 	if(g_info.params.hjust == 0){
@@ -229,8 +235,8 @@ var animint = function(to_select, json_file){
 		   e.attr("cx",toXY("x","x"))
 		    .attr("cy",toXY("y","y"))
 		    .attr("r",size)
-        .style("fill",get_fill)
-        .style("stroke",get_colour)
+        .style("fill",fill)
+        .style("stroke",colour)
 		;
 	    }
 	    eAppend = "circle";
@@ -243,7 +249,7 @@ var animint = function(to_select, json_file){
 		    })
 		    .attr("y", svg.y.range()[1])
 		    .attr("height", svg.y.range()[0])
-		    .style("fill",get_fill)
+		    .style("fill",fill)
 		;
 	    }
 	    eAppend = "rect";
@@ -256,23 +262,23 @@ var animint = function(to_select, json_file){
 		    .attr("height",function(d) {return svg.y(d[aes.ymin])-svg.y(d[aes.ymax]);})
 		    .style("stroke-dasharray",get_dasharray)
 		    .style("stroke-width",size)
-		    .style("stroke",colour)
-		;
+		    .style("stroke",get_colour)
+		    ;
 	    }
 	    eAppend = "rect";
-	}else if(g_info.geom == "vline"){
-	    elements = elements.data(data);
+	}else if(g_info.geom == "bar"){
+      elements = elements.data(data);
 	    eActions = function(e){
-		e.attr("x1",toXY("x","xintercept"))
-		    .attr("x2",toXY("x","xintercept"))
-		    .attr("y1",svg.y.range()[0])
-		    .attr("y2",svg.y.range()[1])
-		    .style("stroke-dasharray",get_dasharray)
-		    .style("stroke-width",size)
-		    .style("stroke",colour)
-		;
+  	   e.attr("x",toXY("x","xmin"))
+		    .attr("width",function(d) {return svg.x(d[aes.xmax])-svg.x(d[aes.xmin]);})
+		    .attr("y",toXY("y","ymax"))
+		    .attr("height",function(d) {return svg.y(d[aes.ymin])-svg.y(d[aes.ymax]);})
+//		    .style("stroke-width",size)
+//		    .style("stroke",colour)
+//        .style("fill", fill)
+        ;
 	    }
-	    eAppend = "line";
+	    eAppend = "rect";
   }else if(g_info.geom == "segment"){
       elements = elements.data(data);
 	    eActions = function(e){

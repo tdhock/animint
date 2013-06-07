@@ -2,12 +2,27 @@ library(animint)
 library(ggplot2)
 
 #' Randomly generate some data
-data <- data.frame(x=rnorm(100, 0, 1))
-data$y <- with(data, runif(100, x-.5, x+.5))
+data <- data.frame(x=rnorm(100, 50, 15))
+data$y <- with(data, runif(100, x-5, x+5))
 
-qplot(data=data, x=x, y=y, geom="point")
+# qplot(data=data, x=x, y=y, geom="point")
 #' Must use empty ggplot() statement because of structure of ggplot/qplot object
-p <- ggplot() + geom_point(data=data, aes(x=x, y=y))
+splot <- ggplot() + geom_point(data=data, aes(x=x, y=y)) + geom_smooth(data=data, aes(x=x, y=y))
 
 #' Must provide a named list of ggplots.
-gg2animint(list(p1 = ggplot() + geom_point(data=data, aes(x=x, y=y))), out.dir="./junk/", open.browser=FALSE)
+gg2animint(list(p1 = ggplot() + geom_point(data=data, aes(x=x, y=y))), out.dir="./junk", open.browser=FALSE)
+
+#' Factor data
+data$xnew <- round(data$x/20)*20
+data$xnew <- as.factor(data$xnew)
+
+gg2animint(list(p1 = ggplot() + geom_point(data=data, aes(x=xnew, y=y))), out.dir="./junk", open.browser=FALSE)
+
+
+#' Colors?
+data$class <- factor(round(data$x/10)%%2, labels=c("high", "low"))
+
+ggplot() + geom_point(data=data, aes(x=xnew, y=y), colour="blue")
+gg2animint(list(p1 = ggplot() + geom_point(data=data, aes(x=xnew, y=y), colour="blue", fill="blue")), out.dir="./junk", open.browser=FALSE)
+
+gg2animint(list(p1 = ggplot() + geom_point(data=data, aes(x=xnew, y=y, colour=class)) + scale_colour_manual(values=c("#aaaaaa", "#bbbbbb"))), out.dir="./junk", open.browser=FALSE)
