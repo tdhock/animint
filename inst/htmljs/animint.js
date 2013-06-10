@@ -152,25 +152,20 @@ var animint = function(to_select, json_file){
 	    }
 	    return linetypesize2dasharray(lt, get_size(d));
 	}
-	var get_fill = function(d){
-    var value, fl;
-	    try{
-        value = d[aes.fill];
-		    fl = svg.plot.scales.fill[ value ];
-	    }catch(err){
-		    fl =  g_info.params.fill;
-	    }
-    return fl;
-	}
-  var get_colour = function(d){
-	    try{
-		return svg.plot.scales.colour[ d[aes.colour] ];
-	    }catch(err){
-		return g_info.params.colour;
-	    }
-	}
-	var colour = "black";
+  var colour = "black";
   var fill = "black";
+  var get_colour = function(d){
+    if(aes.hasOwnProperty("colour") && d.hasOwnProperty(aes.colour)){
+		    return d[ aes.colour ];
+	    }
+	    return colour;
+	}
+  var get_fill = function(d){
+    if(aes.hasOwnProperty("colour") && d.hasOwnProperty(aes.colour)){
+  	    return d[ aes.colour ];
+	    }
+	    return colour;
+	}
 	if(g_info.params.colour){
 	    colour = g_info.params.colour;
 	}
@@ -212,7 +207,7 @@ var animint = function(to_select, json_file){
 		    .style("fill","none")
 		    .style("stroke-width",size)
 		    .style("stroke-dasharray",get_dasharray)
-		    .style("stroke",colour)
+		    .style("stroke",get_colour)
 		;
 	    }
 	    eAppend = "path";
@@ -235,8 +230,8 @@ var animint = function(to_select, json_file){
 		   e.attr("cx",toXY("x","x"))
 		    .attr("cy",toXY("y","y"))
 		    .attr("r",size)
-        .style("fill",fill)
-        .style("stroke",colour)
+        .style("fill",get_fill)
+        .style("stroke",get_colour)
 		;
 	    }
 	    eAppend = "circle";
@@ -249,7 +244,7 @@ var animint = function(to_select, json_file){
 		    })
 		    .attr("y", svg.y.range()[1])
 		    .attr("height", svg.y.range()[0])
-		    .style("fill",fill)
+		    .style("fill",get_fill)
 		;
 	    }
 	    eAppend = "rect";
@@ -263,6 +258,7 @@ var animint = function(to_select, json_file){
 		    .style("stroke-dasharray",get_dasharray)
 		    .style("stroke-width",size)
 		    .style("stroke",get_colour)
+        .style("fill", get_fill)
 		    ;
 	    }
 	    eAppend = "rect";
