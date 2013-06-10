@@ -2,3 +2,16 @@ animint.js
 *.csv
 plot.json
 *.html
+geom1_line_ts.csv
+geom1_rect_ts.csv
+geom2_line_bs.csv
+geom2_line_cdf.csv
+geom3_hline_is.csv
+geom3_segment_cdf.csv
+geom3_vline_cdf.csv
+geom4_line_cdf2.csv
+geom4_text_cdf.csv
+geom5_segment_cdf2.csv
+geom6_segment_cdf2.csv
+index.html
+plot-scatter.json
