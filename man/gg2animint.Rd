@@ -1,40 +1,47 @@
 \name{gg2animint}
 \alias{gg2animint}
-\title{gg2animint}
-\description{Convert a list of ggplots to an interactive animation.}
-\usage{gg2animint(plot.list, out.dir = tempfile(), open.browser = interactive())}
-\arguments{
-  \item{plot.list}{List of named ggplots with showSelected and clickSelects
-aesthetics.}
-  \item{out.dir}{Directory to store html/js/csv files.}
-  \item{open.browser}{Open a web browser?}
+\title{Convert a list of ggplots to an interactive animation.}
+\usage{
+  gg2animint(plot.list, out.dir = tempfile(),
+    open.browser = interactive())
 }
+\arguments{
+  \item{plot.list}{list of named ggplots with showSelected
+  and clickSelects aesthetics. Input must be a list, so to
+  use a single ggplot named g, it must be passed to the
+  function as plot.list = list(g=g).}
 
-\value{An invisible copy of the R list that was exported to JSON.}
+  \item{out.dir}{directory to store html/js/csv files}
 
-\author{Toby Dylan Hocking}
-
-
-
-
+  \item{open.browser}{Should R open a browser? Note: Chrome
+  will not display local html files unless you are running
+  a local webserver. Firefox should display local html
+  files (including those containing javascript).}
+}
+\value{
+  invisible list of ggplots in list format
+}
+\description{
+  Convert a list of ggplots to an interactive animation.
+}
 \examples{
 data(generation.loci)
 ## Example: 2 plots, 2 selectors.
 generations <- data.frame(generation=unique(generation.loci$generation))
 loci <- data.frame(locus=unique(generation.loci$locus))
-two.selectors.not.animated <- 
+two.selectors.not.animated <-
   list(ts=ggplot()+
-       geom_vline(aes(xintercept=generation, clickSelects=generation),
-                  data=generations, alpha=1/2, lwd=4)+
-       geom_line(aes(generation, frequency, group=population,
-                     showSelected=locus), data=generation.loci),
+         geom_vline(aes(xintercept=generation, clickSelects=generation),
+                    data=generations, alpha=1/2, lwd=4)+
+         geom_line(aes(generation, frequency, group=population,
+                       showSelected=locus), data=generation.loci),
        loci=ggplot()+
-       geom_vline(aes(xintercept=locus, clickSelects=locus),
-                  data=loci, alpha=1/2, size=4)+
-       geom_point(aes(locus, frequency, showSelected=generation),
-                  data=generation.loci),
+         geom_vline(aes(xintercept=locus, clickSelects=locus),
+                    data=loci, alpha=1/2, size=4)+
+         geom_point(aes(locus, frequency, showSelected=generation),
+                    data=generation.loci),
        duration=list(generation=1000)
-       )
+  )
 gg2animint(two.selectors.not.animated)
 
 ## Example: 3 plots, 1 selector.
@@ -54,18 +61,18 @@ generation.pop$ancestral <- ancestral$ancestral[generation.pop$locus]
 ## Calculate the subset for just the last generation, to plot.
 generation.loci.last <- subset(generation.loci,generation==max(generation))
 generation.pop.last <- subset(generation.pop,generation==max(generation))
-one.selector.not.animated <- 
+one.selector.not.animated <-
   list(ts=ggplot()+
-       geom_line(aes(generation, frequency, group=population,
-                     showSelected=locus), data=generation.loci),
+         geom_line(aes(generation, frequency, group=population,
+                       showSelected=locus), data=generation.loci),
        predictions=ggplot()+
-       geom_point(aes(ancestral, estimated, clickSelects=locus),
-                  data=generation.pop.last, size=4, alpha=3/4),
+         geom_point(aes(ancestral, estimated, clickSelects=locus),
+                    data=generation.pop.last, size=4, alpha=3/4),
        loci=ggplot()+
-       geom_vline(aes(xintercept=locus, clickSelects=locus),
-                  data=loci, alpha=1/2, lwd=4)+
-       geom_point(aes(locus, frequency), data=generation.loci.last)
-       )
+         geom_vline(aes(xintercept=locus, clickSelects=locus),
+                    data=loci, alpha=1/2, lwd=4)+
+         geom_point(aes(locus, frequency), data=generation.loci.last)
+  )
 gg2animint(one.selector.not.animated)
 
 ## Example: 2 plots, 2 selectors, but only interacting with 1 plot.
@@ -74,48 +81,48 @@ only.error <- subset(breakpoints$error,type=="E")
 only.segments <- subset(only.error,bases.per.probe==bases.per.probe[1])
 signal.colors <- c(estimate="#0adb0a",
                    latent="#0098ef")
-breakpointError <- 
+breakpointError <-
   list(signal=ggplot()+
-       geom_point(aes(position, signal, showSelected=bases.per.probe),
-                  data=breakpoints$signals)+
-       geom_line(aes(position, signal), colour=signal.colors[["latent"]],
-                 data=breakpoints$imprecision)+
-       geom_segment(aes(first.base, mean, xend=last.base, yend=mean,
+         geom_point(aes(position, signal, showSelected=bases.per.probe),
+                    data=breakpoints$signals)+
+         geom_line(aes(position, signal), colour=signal.colors[["latent"]],
+                   data=breakpoints$imprecision)+
+         geom_segment(aes(first.base, mean, xend=last.base, yend=mean,
+                          showSelected=segments,
+                          showSelected2=bases.per.probe),
+                      colour=signal.colors[["estimate"]],
+                      data=breakpoints$segments)+
+         geom_vline(aes(xintercept=base,
                         showSelected=segments,
                         showSelected2=bases.per.probe),
                     colour=signal.colors[["estimate"]],
-                    data=breakpoints$segments)+
-       geom_vline(aes(xintercept=base,
-                      showSelected=segments,
-                      showSelected2=bases.per.probe),
-                  colour=signal.colors[["estimate"]],
-                  linetype="dashed",
-                  data=breakpoints$breaks),
+                    linetype="dashed",
+                    data=breakpoints$breaks),
        error=ggplot()+
-       geom_vline(aes(xintercept=segments, clickSelects=segments),
-                  data=only.segments, lwd=17, alpha=1/2)+
-       geom_line(aes(segments, error, group=bases.per.probe,
-                     clickSelects=bases.per.probe),
-                 data=only.error, lwd=4))
+         geom_vline(aes(xintercept=segments, clickSelects=segments),
+                    data=only.segments, lwd=17, alpha=1/2)+
+         geom_line(aes(segments, error, group=bases.per.probe,
+                       clickSelects=bases.per.probe),
+                   data=only.error, lwd=4))
 gg2animint(breakpointError)
 
 ## Example: animated time series with 3 plots and 2 selectors.
-two.selectors.animated <- 
+two.selectors.animated <-
   list(ts=ggplot()+
-       geom_vline(aes(xintercept=generation,
-                      clickSelects=generation),
-                  data=generations, alpha=1/2, lwd=4)+
-       geom_line(aes(generation, frequency, group=population,
-                     showSelected=locus), data=generation.loci),
+         geom_vline(aes(xintercept=generation,
+                        clickSelects=generation),
+                    data=generations, alpha=1/2, lwd=4)+
+         geom_line(aes(generation, frequency, group=population,
+                       showSelected=locus), data=generation.loci),
        predictions=ggplot()+
-       geom_point(aes(ancestral, estimated, showSelected=generation,
-                      clickSelects=locus),
-                  data=generation.pop, size=4, alpha=3/4),
+         geom_point(aes(ancestral, estimated, showSelected=generation,
+                        clickSelects=locus),
+                    data=generation.pop, size=4, alpha=3/4),
        loci=ggplot()+
-       geom_vline(aes(xintercept=locus, clickSelects=locus),
-                  data=loci, alpha=1/2, lwd=4)+
-       geom_point(aes(locus, frequency, showSelected=generation),
-                  data=generation.loci),
+         geom_vline(aes(xintercept=locus, clickSelects=locus),
+                    data=loci, alpha=1/2, lwd=4)+
+         geom_point(aes(locus, frequency, showSelected=generation),
+                    data=generation.loci),
        duration=list(generation=1000),
        time=list(variable="generation",ms=2000))
 gg2animint(two.selectors.animated)
@@ -132,7 +139,7 @@ blank.items <- with(intreg,{
   list(segments=list(data=selection,x="min.L",y="segments"),
        error=list(data=selection,x="max.L",y="cost"),
        regression=list(data=model,x=c("min.L","max.L"),
-         y=c("min.feature","max.feature")),
+                       y=c("min.feature","max.feature")),
        intervals=list(data=intervals,x=c("min.L","max.L"),y="feature"))
 })
 Lrange <- c()
@@ -148,58 +155,58 @@ for(N in names(blank.items)){
   blank.items[[N]]$blank <- data.frame(x=Lrange, y=L$yrange)
 }
 
-mmir.plot <- 
+mmir.plot <-
   list(signal=ggplot()+
-       scale_x_continuous("position on chromosome (mega base pairs)",
-                          breaks=c(100,200))+
-       geom_tallrect(aes(xmin=first.base/1e6, xmax=last.base/1e6,
-                         fill=annotation,
-                         showSelected=signal),
-                     data=intreg$ann)+
-       scale_fill_manual(values=breakpoint.colors,guide="none")+
-       geom_text(aes((first.base+last.base)/2e6, logratio+1/8,
-                     label=annotation,
-                     showSelected=signal),
-                 data=intreg$ann)+
-       geom_blank(aes(first.base/1e6, logratio+2/8), data=intreg$ann)+
-       geom_point(aes(base/1e6, logratio,
-                      showSelected=signal),
-                  data=intreg$sig)+
-       geom_segment(aes(first.base/1e6, mean, xend=last.base/1e6, yend=mean,
+         scale_x_continuous("position on chromosome (mega base pairs)",
+                            breaks=c(100,200))+
+         geom_tallrect(aes(xmin=first.base/1e6, xmax=last.base/1e6,
+                           fill=annotation,
+                           showSelected=signal),
+                       data=intreg$annotations)+
+         scale_fill_manual(values=breakpoint.colors,guide="none")+
+         geom_text(aes((first.base+last.base)/2e6, logratio+1/8,
+                       label=annotation,
+                       showSelected=signal),
+                   data=intreg$annotations)+
+         geom_blank(aes(first.base/1e6, logratio+2/8), data=intreg$ann)+
+         geom_point(aes(base/1e6, logratio,
+                        showSelected=signal),
+                    data=intreg$signals)+
+         geom_segment(aes(first.base/1e6, mean, xend=last.base/1e6, yend=mean,
+                          showSelected=signal,
+                          showSelected2=segments),
+                      data=intreg$segments, colour=signal.colors[["estimate"]])+
+         geom_vline(aes(xintercept=base/1e6,
                         showSelected=signal,
                         showSelected2=segments),
-                    data=intreg$seg, colour=signal.colors[["estimate"]])+
-       geom_vline(aes(xintercept=base/1e6,
-                      showSelected=signal,
-                      showSelected2=segments),
-                  colour=signal.colors[["estimate"]],
-                  linetype="dashed",
-                  data=intreg$breaks),
+                    colour=signal.colors[["estimate"]],
+                    linetype="dashed",
+                    data=intreg$breaks),
        regression=ggplot()+
-       geom_blank(aes(x,y), data=blank.items$regression$blank)+
-       geom_segment(aes(min.L, feature, xend=max.L, yend=feature,
-                        clickSelects=signal),
-                    size=5,
-                    data=intreg$int)+
-       geom_segment(aes(min.L, min.feature, xend=max.L, yend=max.feature,
-                        linetype=line),
-                    colour="red",
-                    size=3,
-                    data=intreg$model)+
-       scale_linetype_manual(values=model.linetypes),
+         geom_blank(aes(x,y), data=blank.items$regression$blank)+
+         geom_segment(aes(min.L, feature, xend=max.L, yend=feature,
+                          clickSelects=signal),
+                      size=5,
+                      data=intreg$int)+
+         geom_segment(aes(min.L, min.feature, xend=max.L, yend=max.feature,
+                          linetype=line),
+                      colour="red",
+                      size=3,
+                      data=intreg$model)+
+         scale_linetype_manual(values=model.linetypes),
        error=ggplot()+
-       geom_blank(aes(x,y), data=blank.items$error$blank)+
-       geom_segment(aes(min.L, cost, xend=max.L, yend=cost,
-                        showSelected=signal), data=intreg$selection),
+         geom_blank(aes(x,y), data=blank.items$error$blank)+
+         geom_segment(aes(min.L, cost, xend=max.L, yend=cost,
+                          showSelected=signal), data=intreg$selection),
        segments=ggplot()+
-       geom_blank(aes(x,y), data=blank.items$segments$blank)+
-       geom_segment(aes(min.L, segments, xend=max.L, yend=segments,
-                        showSelected=signal), data=intreg$selection)+
-       geom_tallrect(aes(xmin=min.L, xmax=max.L,
-                         showSelected=signal,
-                         clickSelects=segments),
-                     data=intreg$selection,
-                     alpha=1/2),
+         geom_blank(aes(x,y), data=blank.items$segments$blank)+
+         geom_segment(aes(min.L, segments, xend=max.L, yend=segments,
+                          showSelected=signal), data=intreg$selection)+
+         geom_tallrect(aes(xmin=min.L, xmax=max.L,
+                           showSelected=signal,
+                           clickSelects=segments),
+                       data=intreg$selection,
+                       alpha=1/2),
        width=list(800),
        height=list(signal=300,regression=150,error=50,segments=100))
 ## This is a normal ggplot of all the data, subsets of which can be
@@ -214,33 +221,33 @@ gg2animint(mmir.plot)
 ## TODO: mmir.plot is way too complicated, since facets are not yet
 ## implemented in animint. The easier facetted version would look
 ## like this:
-mmir.facet <- 
+mmir.facet <-
   list(signal=mmir.plot$signal,
        penalty=ggplot()+
-       geom_segment(aes(min.L, feature, xend=max.L, yend=feature,
-                        clickSelects=signal),
-                    size=5,
-                    data=data.frame(intreg$int, what="regression"))+
-       geom_segment(aes(min.L, min.feature, xend=max.L, yend=max.feature,
-                        linetype=line),
-                    colour="red",
-                    size=3,
-                    data=data.frame(intreg$model, what="regression"))+
-       scale_linetype_manual(values=model.linetypes)+
-       geom_segment(aes(min.L, cost, xend=max.L, yend=cost,
-                        showSelected=signal),
-                    data=data.frame(intreg$selection, what="error"))+
-       geom_segment(aes(min.L, segments, xend=max.L, yend=segments,
-                        showSelected=signal),
-                    data=data.frame(intreg$selection, what="segments"))+
-       geom_tallrect(aes(xmin=min.L, xmax=max.L,
-                         showSelected=signal,
-                         clickSelects=segments),
-                     data=data.frame(intreg$selection, what="segments"),
-                     alpha=1/2)+
-       ylab("")+
-       xlab("penalty value $L=f(x)$")+ # TODO: mathjax.
-       facet_grid(what~.,scales="free"),
+         geom_segment(aes(min.L, feature, xend=max.L, yend=feature,
+                          clickSelects=signal),
+                      size=5,
+                      data=data.frame(intreg$int, what="regression"))+
+         geom_segment(aes(min.L, min.feature, xend=max.L, yend=max.feature,
+                          linetype=line),
+                      colour="red",
+                      size=3,
+                      data=data.frame(intreg$model, what="regression"))+
+         scale_linetype_manual(values=model.linetypes)+
+         geom_segment(aes(min.L, cost, xend=max.L, yend=cost,
+                          showSelected=signal),
+                      data=data.frame(intreg$selection, what="error"))+
+         geom_segment(aes(min.L, segments, xend=max.L, yend=segments,
+                          showSelected=signal),
+                      data=data.frame(intreg$selection, what="segments"))+
+         geom_tallrect(aes(xmin=min.L, xmax=max.L,
+                           showSelected=signal,
+                           clickSelects=segments),
+                       data=data.frame(intreg$selection, what="segments"),
+                       alpha=1/2)+
+         ylab("")+
+         xlab("penalty value $L=f(x)$")+ # TODO: mathjax.
+         facet_grid(what~.,scales="free"),
        width=list(800),
        height=list(signal=300,regression=150,error=50,segments=100))
 gg2animint(mmir.facet) # doesn't work yet.
@@ -253,3 +260,4 @@ too.many.facets <- mmir.facet$penalty+
   theme(panel.margin=unit(0, "cm"))
 print(too.many.facets)
 }
+

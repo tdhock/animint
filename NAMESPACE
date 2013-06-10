@@ -1,1 +1,4 @@
-exportPattern(".*")
+export(geom_tallrect)
+export(gg2animint)
+export(gg2list)
+export(layer2list)
