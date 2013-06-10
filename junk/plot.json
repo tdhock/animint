@@ -4,34 +4,31 @@
  "geom": "point",
 "data": "geom1_point_p1.csv",
 "params": {
- "na.rm": false,
-"size":      4 
+ "na.rm": false 
 },
 "aes": {
- "x": "x",
+ "x": "xnew",
 "y": "y",
-"colour": "group",
-"fill": "group" 
+"colour": "class" 
 },
 "update": [],
 "subord": [],
 "subvars": [],
 "ranges": [ {
- "min": -1.7465,
-"max": 1.8935 
+ "min":    0.4,
+"max":    6.6 
 },
 {
- "min": -1.9525,
-"max":  1.958 
+ "min": 5.6613,
+"max": 95.475 
 } ],
 "classed": "geom1_point_p1",
 "types": {
- "x": "numeric",
+ "class": "rgb",
+"xnew": "integer",
 "y": "numeric",
-"step": "integer",
-"group": "factor",
-"group.x": "numeric",
-"group.y": "numeric" 
+"PANEL": "integer",
+"group": "integer" 
 } 
 } 
 },
@@ -42,28 +39,21 @@
  "geom1_point_p1" 
 ],
 "scales": {
- "colour": {
- "1": "#FF0000FF",
-"2": "#CCFF00FF",
-"3": "#00FF66FF",
-"4": "#0066FFFF",
-"5": "#CC00FFFF" 
-},
-"fill": {
- "1": "#FF0000FF",
-"2": "#CCFF00FF",
-"3": "#00FF66FF",
-"4": "#0066FFFF",
-"5": "#CC00FFFF" 
-} 
+ "colour": [ "#aaaaaa", "#bbbbbb" ] 
 },
 "options": {
  "width":    300,
 "height":    300 
 },
 "ranges": {
- "x": [ -1.7465, 1.8935 ],
-"y": [ -1.9525,  1.958 ] 
+ "x": [    0.4,    6.6 ],
+"y": [ 5.6613, 95.475 ] 
+},
+"axis": {
+ "x": [ 1, 2, 3, 4, 5, 6 ],
+"xlab": [ "0", "20", "40", "60", "80", "100" ],
+"y": [     25,     50,     75 ],
+"ylab": [ "25", "50", "75" ] 
 } 
 } 
 } 
