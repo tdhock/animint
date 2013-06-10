@@ -1,18 +1,22 @@
 library(animint)
 library(ggplot2)
 
-#' Randomly generate some data
+#' Demonstrates axis specification, serves as a tutorial to introduce animint (eventually?)
+# Randomly generate some data
 data <- data.frame(x=rnorm(100, 50, 15))
 data$y <- with(data, runif(100, x-5, x+5))
 
-# qplot(data=data, x=x, y=y, geom="point")
-#' Must use empty ggplot() statement because of structure of ggplot/qplot object
+qplot(data=data, x=x, y=y, geom="point")
+# This throws an error.
+## TODO: qplot specification should be feasible... how to implement?
+
+# Must use empty ggplot() statement because of structure of ggplot/qplot object
 splot <- ggplot() + geom_point(data=data, aes(x=x, y=y)) + geom_smooth(data=data, aes(x=x, y=y))
 
-#' Must provide a named list of ggplots.
+# Must provide a named list of ggplots.
 gg2animint(list(p1 = ggplot() + geom_point(data=data, aes(x=x, y=y))), out.dir="./junk", open.browser=FALSE)
 
-#' Factor data
+#' Demonstrates axis -- works with factor data
 data$xnew <- round(data$x/20)*20
 data$xnew <- as.factor(data$xnew)
 

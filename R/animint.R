@@ -24,6 +24,15 @@ gg2list <- function(p){
     }
   }
   plist$ranges <- lapply(plist$ranges, range, na.rm=TRUE)
+  
+  # Export axis specification as a combination of breaks and
+  # labels, on the relevant axis scale (i.e. so that it can
+  # be passed into d3 on the x axis scale instead of on the 
+  # grid 0-1 scale). This allows transformations to be used 
+  # out of the box, with no additional d3 coding. 
+  
+  ## TODO: Make sure that if there are no labels specified, 
+  ##       everything will still work.
   plist$axis <- list(
     x = plistextra$panel$ranges[[1]]$x.major_source,
     xlab = plistextra$panel$ranges[[1]]$x.labels,
@@ -66,6 +75,10 @@ layer2list <- function(p, i, plistextra){
   g$subord <- as.list(names(subset.vars))
   g$subvars <- as.list(subset.vars)
 
+  # Use ggplot2's ranges, which incorporate all layers. 
+  # Strictly speaking, this isn't "layer" information as much 
+  # as it is plot information, but d3 specification is easier 
+  # using layers. 
   g$ranges <- matrix(c(plistextra$panel$ranges[[1]]$x.range, 
                        plistextra$panel$ranges[[1]]$y.range),
                      2,2,dimnames=list(axis=c("x","y"),limit=c("min","max")), byrow=TRUE)
