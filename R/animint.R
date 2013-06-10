@@ -9,14 +9,14 @@
 gg2list <- function(p){
   plist <- list(ranges=list(x=c(),y=c()))
   plistextra <- ggplot2::ggplot_build(p)
-  for(sc in p$scales$scales){
+  for(sc in plistextra$plot$scales$scales){
     # TODO: make use of other scales than manual.
     if(sc$scale_name == "manual"){
       plist$scales[[sc$aesthetics]] <- sc$palette(0)
     }
   }
-  for(i in seq_along(p$layers)){
-    g <- layer2list(p, i, plistextra)
+  for(i in seq_along(plistextra$plot$layers)){
+    g <- layer2list(i, plistextra)
     plist$geoms[[i]] <- g
     for(ax.name in names(plist$ranges)){
       plist$ranges[[ax.name]] <-
@@ -44,27 +44,26 @@ gg2list <- function(p){
 }
 
 #' Convert a layer to a list. Called from gg2list()
-#' @param p ggplot2 plot
 #' @param i index of layer, in order of call. 
 #' @param plistextra output from ggplot2::ggplot_build(p)
 #' @return list representing a layer, with corresponding aesthetics, ranges, and groups.
 #' @export
 #' @seealso \code{\link{gg2animint}}
-layer2list <- function(p, i, plistextra){
-  g <- list(geom=p$layers[[i]]$geom$objname, data=plistextra$data[[i]])
+layer2list <- function(i, plistextra){
+  g <- list(geom=plistextra$plot$layers[[i]]$geom$objname, data=plistextra$data[[i]])
   
   # use un-named parameters so that they will not be exported
   # to JSON as a named object, since that causes problems with
   # e.g. colour.
-  g$params <- p$layers[[i]]$geom_params
+  g$params <- plistextra$plot$layers[[i]]$geom_params
   for(p.name in names(g$params)){
     names(g$params[[p.name]]) <- NULL
   }
   g$aes <- list()
   
   # Populate list of aesthetics
-  for(aes.name in names(p$layers[[i]]$mapping)){
-    x <- p$layers[[i]]$mapping[[aes.name]]
+  for(aes.name in names(plistextra$plot$layers[[i]]$mapping)){
+    x <- plistextra$plot$layers[[i]]$mapping[[aes.name]]
     names(g$data) <- gsub(aes.name, as.character(as.expression(x)), names(g$data))
     g$aes[[aes.name]] <- as.character(as.expression(x))
   }
