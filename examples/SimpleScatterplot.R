@@ -42,6 +42,6 @@ p <- ggplot() + geom_point(data=data, aes(x=xnew, y=y, colour=xnew, fill=xnew))
 p
 gg2animint(list(p1 = p), out.dir="./junk", open.browser=FALSE)
 
-p <- ggplot() + geom_jitter(data=data, aes(x=xnew, y=y, colour=xnew, fill=xnew))
+p <- ggplot() + geom_jitter(data=data, aes(x=xnew, y=y, colour=class4, fill=class4))
 p
 gg2animint(list(p1 = p), out.dir="./junk", open.browser=FALSE)
