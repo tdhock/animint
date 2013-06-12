@@ -156,22 +156,15 @@ var animint = function(to_select, json_file){
     var fill = "black";
     var get_colour = function(d){
       if(aes.hasOwnProperty("colour") && d.hasOwnProperty(aes.colour)){
-        var value, lt;
-  	    try{
-      		value = d[aes.colour];
-      		lt = svg.plot.scales.colour[value];
-  	    }catch(err){
-  	    	lt = g_info.params.colour;
-  	    }
-  		    return lt;
-  	    }
-  	    return colour;
+        return d[ aes.colour ];
+	    }
+	    return colour;
   	}
     var get_fill = function(d){
       if(aes.hasOwnProperty("fill") && d.hasOwnProperty(aes.fill)){
-    	    return d[ aes.fill ];
-  	    }
-  	    return colour;
+  	    return d[ aes.fill ];
+	    }
+	    return fill;
   	}
   	if(g_info.params.colour){
   	    colour = g_info.params.colour;
@@ -188,6 +181,8 @@ var animint = function(to_select, json_file){
   	}
 
   	var eActions, eAppend;
+    //In order to get d3 lines to play nice, bind fake "data" (group id's) -- the kv variable
+    //Then each line is plotted using a path object. 
   	if(g_info.geom == "line"){
   	    // case of only 1 line and no groups.
   	    if(!aes.hasOwnProperty("group")){
@@ -205,7 +200,7 @@ var animint = function(to_select, json_file){
       		.x(toXY("x","x"))
       		.y(toXY("y","y"))
   	    ;
-  	    elements = elements.data(kv);
+  	    elements = elements.data(kv); //select the correct group before returning anything
   	    eActions = function(e){
       		e.attr("d",function(d){
       		    var one_group = data[d.value];
@@ -214,7 +209,11 @@ var animint = function(to_select, json_file){
   		    .style("fill","none")
   		    .style("stroke-width",size)
   		    .style("stroke-dasharray",get_dasharray)
-  		    .style("stroke",get_colour)
+          .style("stroke", function(group_info){
+            var one_group = data[group_info.value];
+            var one_row = one_group[0]; // take color for first value in the group
+            return(get_colour(one_row));
+          })
   	    	;
   	    }
   	    eAppend = "path";
