@@ -28,6 +28,7 @@ gg2animint(list(p1 = ggplot() + geom_point(data=data, aes(x=xnew, y=y))), out.di
 
 #' Colors?
 data$class <- factor(round(data$x/10)%%2, labels=c("high", "low"))
+data$class4 <- factor(round(data$x/10)%%4, labels=c("high", "medhigh", "medlow", "low"))
 
 p <- ggplot() + geom_point(data=data, aes(x=xnew, y=y), colour="blue")
 p
@@ -37,4 +38,10 @@ p <- ggplot() + geom_point(data=data, aes(x=xnew, y=y, colour=class, fill=class)
 p
 gg2animint(list(p1 = p), out.dir="./junk", open.browser=FALSE)
 
-gg2animint(list(p1 = ggplot() + geom_point(data=data, aes(x=xnew, y=y, colour=class)) + scale_colour_manual(values=c("#aaaaaa", "#bbbbbb"))), out.dir="./junk", open.browser=FALSE)
+p <- ggplot() + geom_point(data=data, aes(x=xnew, y=y, colour=xnew, fill=xnew))
+p
+gg2animint(list(p1 = p), out.dir="./junk", open.browser=FALSE)
+
+p <- ggplot() + geom_jitter(data=data, aes(x=xnew, y=y, colour=xnew, fill=xnew))
+p
+gg2animint(list(p1 = p), out.dir="./junk", open.browser=FALSE)

@@ -13,6 +13,10 @@ gg2list <- function(p){
     # TODO: make use of other scales than manual.
     if(sc$scale_name == "manual"){
       plist$scales[[sc$aesthetics]] <- sc$palette(0)
+    }else if(sc$scale_name == "brewer"){
+      plist$scales[[sc$aesthetics]] <- sc$palette(length(sc$range$range))
+    }else if(sc$scale_name == "hue"){
+      plist$scales[[sc$aesthetics]] <- sc$palette(length(sc$range$range))
     }
   }
   for(i in seq_along(plistextra$plot$layers)){
@@ -63,7 +67,14 @@ layer2list <- function(i, plistextra){
   
   # Populate list of aesthetics
   for(aes.name in names(plistextra$plot$layers[[i]]$mapping)){
-    x <- plistextra$plot$layers[[i]]$mapping[[aes.name]]
+    if(aes.name=="colour"){
+      x <- "stroke"
+    }else if(aes.name=="fill"){
+      # fill is the same in R and d3...
+      x <- "fill"
+    }else{
+      x <- plistextra$plot$layers[[i]]$mapping[[aes.name]]
+    }
     names(g$data) <- gsub(aes.name, as.character(as.expression(x)), names(g$data))
     g$aes[[aes.name]] <- as.character(as.expression(x))
   }

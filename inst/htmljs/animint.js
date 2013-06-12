@@ -161,8 +161,8 @@ var animint = function(to_select, json_file){
 	    return colour;
 	}
   var get_fill = function(d){
-    if(aes.hasOwnProperty("colour") && d.hasOwnProperty(aes.colour)){
-  	    return d[ aes.colour ];
+    if(aes.hasOwnProperty("fill") && d.hasOwnProperty(aes.fill)){
+  	    return d[ aes.fill ];
 	    }
 	    return colour;
 	}
@@ -226,6 +226,17 @@ var animint = function(to_select, json_file){
 	    eAppend = "text";
 	}else if(g_info.geom == "point"){
 	    elements = elements.data(data);
+	    eActions = function(e){
+		   e.attr("cx",toXY("x","x"))
+		    .attr("cy",toXY("y","y"))
+		    .attr("r",size)
+        .style("fill",get_fill)
+        .style("stroke",get_colour)
+		;
+	    }
+	    eAppend = "circle";
+	}else if(g_info.geom == "jitter"){
+      elements = elements.data(data);
 	    eActions = function(e){
 		   e.attr("cx",toXY("x","x"))
 		    .attr("cy",toXY("y","y"))
