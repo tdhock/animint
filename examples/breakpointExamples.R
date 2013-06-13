@@ -1,30 +1,3 @@
-\name{gg2animint}
-\alias{gg2animint}
-\title{Convert a list of ggplots to an interactive animation.}
-\usage{
-  gg2animint(plot.list, out.dir = tempfile(),
-    open.browser = interactive())
-}
-\arguments{
-  \item{plot.list}{list of named ggplots with showSelected
-  and clickSelects aesthetics. Input must be a list, so to
-  use a single ggplot named g, it must be passed to the
-  function as plot.list = list(g=g).}
-
-  \item{out.dir}{directory to store html/js/csv files}
-
-  \item{open.browser}{Should R open a browser? Note: Chrome
-  will not display local html files unless you are running
-  a local webserver. Firefox should display local html
-  files (including those containing javascript).}
-}
-\value{
-  invisible list of ggplots in list format
-}
-\description{
-  Convert a list of ggplots to an interactive animation.
-}
-\examples{
 data(generation.loci)
 ## Example: 2 plots, 2 selectors.
 generations <- data.frame(generation=unique(generation.loci$generation))
@@ -259,5 +232,3 @@ too.many.facets <- mmir.facet$penalty+
   theme_bw()+
   theme(panel.margin=unit(0, "cm"))
 print(too.many.facets)
-}
-

@@ -2,11 +2,9 @@
 \alias{layer2list}
 \title{Convert a layer to a list. Called from gg2list()}
 \usage{
-  layer2list(p, i, plistextra)
+  layer2list(i, plistextra)
 }
 \arguments{
-  \item{p}{ggplot2 plot}
-
   \item{i}{index of layer, in order of call.}
 
   \item{plistextra}{output from ggplot2::ggplot_build(p)}
