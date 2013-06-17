@@ -1,3 +1,5 @@
+library(animint)
+
 data(generation.loci)
 ## Example: 2 plots, 2 selectors.
 generations <- data.frame(generation=unique(generation.loci$generation))
@@ -135,20 +137,20 @@ mmir.plot <-
          geom_tallrect(aes(xmin=first.base/1e6, xmax=last.base/1e6,
                            fill=annotation,
                            showSelected=signal),
-                       data=intreg$annotations)+
+                       data=intreg$ann)+
          scale_fill_manual(values=breakpoint.colors,guide="none")+
          geom_text(aes((first.base+last.base)/2e6, logratio+1/8,
                        label=annotation,
                        showSelected=signal),
-                   data=intreg$annotations)+
+                   data=intreg$ann)+
          geom_blank(aes(first.base/1e6, logratio+2/8), data=intreg$ann)+
          geom_point(aes(base/1e6, logratio,
                         showSelected=signal),
-                    data=intreg$signals)+
+                    data=intreg$sig)+
          geom_segment(aes(first.base/1e6, mean, xend=last.base/1e6, yend=mean,
                           showSelected=signal,
                           showSelected2=segments),
-                      data=intreg$segments, colour=signal.colors[["estimate"]])+
+                      data=intreg$seg, colour=signal.colors[["estimate"]])+
          geom_vline(aes(xintercept=base/1e6,
                         showSelected=signal,
                         showSelected2=segments),
