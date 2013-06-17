@@ -30,18 +30,22 @@ gg2animint(list(p1 = ggplot() + geom_point(data=data, aes(x=xnew, y=y))), out.di
 data$class <- factor(round(data$x/10)%%2, labels=c("high", "low"))
 data$class4 <- factor(round(data$x/10)%%4, labels=c("high", "medhigh", "medlow", "low"))
 
+#' Specify colors using R color names does not work
 p <- ggplot() + geom_point(data=data, aes(x=xnew, y=y), colour="blue")
 p
 gg2animint(list(p1 = ggplot() + geom_point(data=data, aes(x=xnew, y=y), colour="blue", fill="blue")), out.dir="./junk", open.browser=FALSE)
 
+#' Specify colors manually using hex values works
 p <- ggplot() + geom_point(data=data, aes(x=xnew, y=y, colour=class, fill=class)) + scale_colour_manual(values=c("#FF0000", "#0000FF")) + scale_fill_manual(values=c("#FF0000", "#0000FF"))
 p
 gg2animint(list(p1 = p), out.dir="./junk", open.browser=FALSE)
 
+#' Color by x axis
 p <- ggplot() + geom_point(data=data, aes(x=xnew, y=y, colour=xnew, fill=xnew))
 p
 gg2animint(list(p1 = p), out.dir="./junk", open.browser=FALSE)
 
+#' Use geom_jitter and color by another variable
 p <- ggplot() + geom_jitter(data=data, aes(x=xnew, y=y, colour=class4, fill=class4))
 p
 gg2animint(list(p1 = p), out.dir="./junk", open.browser=FALSE)
