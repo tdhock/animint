@@ -17,6 +17,8 @@ gg2list <- function(p){
       plist$scales[[sc$aesthetics]] <- sc$palette(length(sc$range$range))
     }else if(sc$scale_name == "hue"){
       plist$scales[[sc$aesthetics]] <- sc$palette(length(sc$range$range))
+    }else if(sc$scale_name == "linetype_d"){
+      plist$scales[[sc$aesthetics]] <- sc$palette(length(sc$range$range))
     }
   }
   for(i in seq_along(plistextra$plot$layers)){
@@ -185,12 +187,17 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
       
       ## Output types
       ## Check to see if character type is d3's rgb type. 
-      linetypes <- c("solid", "dashed", "dotted", "dotdash", "longdash", "twodash")
+      is.linetype <- function(x){
+        x <- tolower(x)
+        namedlinetype <- x%in%c("blank", "solid", "dashed", "dotted", "dotdash", "longdash", "twodash")
+        xsplit <- sapply(x, function(i) sum(is.na(strtoi(strsplit(i,"")[[1]],16)))==0)
+        return(namedlinetype | xsplit)
+      }
       g$types <- as.list(sapply(g$data, class))
       charidx <- which(g$types=="character")
       g$types[charidx] <- sapply(charidx, function(i) 
         if(sum(!grepl("#", g$data[[i]], fixed=TRUE))==0 & sum(nchar(g$data[[i]])!=7)==0){"rgb"
-        }else if(sum(!g$data[[i]]%in%linetypes)==0){"linetype"
+        }else if(sum(!is.linetype(g$data[[i]]))==0){"linetype"
         }else "character")
       
       g$data <- csv.name
