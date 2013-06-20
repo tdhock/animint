@@ -17,7 +17,7 @@ two.selectors.not.animated <-
                     data=generation.loci),
        duration=list(generation=1000)
   )
-gg2animint(two.selectors.not.animated)
+gg2animint(two.selectors.not.animated, out.dir="./junk")
 
 ## Example: 3 plots, 1 selector.
 first <- subset(generation.loci,generation==1)
@@ -159,7 +159,7 @@ mmir.plot <-
                     data=intreg$breaks),
        regression=ggplot()+
          geom_blank(aes(x,y), data=blank.items$regression$blank)+
-         geom_segment(aes(min.L, feature, xend=max.L, yend=feature,
+         geom_segment(aes(x=min.L, y=feature, xend=max.L, yend=feature,
                           clickSelects=signal),
                       size=5,
                       data=intreg$int)+
@@ -191,7 +191,7 @@ sig.facets <- mmir.plot$sig+
   theme_bw()+
   theme(panel.margin=unit(0,"cm"))
 print(sig.facets)
-gg2animint(mmir.plot)
+gg2animint(mmir.plot, out.dir="./junk")
 
 ## TODO: mmir.plot is way too complicated, since facets are not yet
 ## implemented in animint. The easier facetted version would look

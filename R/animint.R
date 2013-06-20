@@ -54,8 +54,9 @@ gg2list <- function(p){
 #' @export
 #' @seealso \code{\link{gg2animint}}
 layer2list <- function(i, plistextra){
-  g <- list(geom=plistextra$plot$layers[[i]]$geom$objname, data=plistextra$data[[i]])
-  
+#   g <- list(geom=plistextra$plot$layers[[i]]$geom$objname, data=plistextra$data[[i]])
+  l <- plistextra$plot$layers[[i]]
+  g <- list(geom=l$geom$objname, data=l$data)
   # use un-named parameters so that they will not be exported
   # to JSON as a named object, since that causes problems with
   # e.g. colour.
@@ -66,21 +67,42 @@ layer2list <- function(i, plistextra){
   g$aes <- list()
   
   # Populate list of aesthetics
-  for(aes.name in names(plistextra$plot$layers[[i]]$mapping)){
-    if(aes.name=="colour"){
-      x <- "stroke"
-    }else if(aes.name=="fill"){
-      # fill is the same in R and d3...
-      x <- "fill"
-    }else{
-      x <- plistextra$plot$layers[[i]]$mapping[[aes.name]]
-    }
-    names(g$data) <- gsub(aes.name, as.character(as.expression(x)), names(g$data))
-    g$aes[[aes.name]] <- as.character(as.expression(x))
-  }
+#   for(aes.name in names(plistextra$plot$layers[[i]]$mapping)){
+#     if(aes.name=="colour"){
+#       x <- "stroke"
+#     }else if(aes.name=="fill"){
+#       # fill is the same in R and d3...
+#       x <- "fill"
+#     }else{
+#       x <- plistextra$plot$layers[[i]]$mapping[[aes.name]]
+#       if(is.language(x)) 
+#     }
+#     names(g$data) <- gsub(aes.name, as.character(as.expression(x)), names(g$data))
+#     g$aes[[aes.name]] <- as.character(as.expression(x))
+#   }
 
+  for(aes.name in names(plistextra$plot$layers[[i]]$mapping)){
+    x <- plistextra$plot$layers[[i]]$mapping[[aes.name]]
+    g$aes[[aes.name]] <- 
+      if(aes.name=="colour"){
+        "stroke"
+      }else if(aes.name=="fill"){
+        # fill is the same in R and d3...
+        "fill"
+      }else if(is.symbol(x)){
+        as.character(x)
+      }else if(is.language(x)){
+        newcol <- as.character(as.expression(x))
+        newcol
+      }else{
+        str(x)
+        stop("don't know how to convert")
+      }
+    g$data[[g$aes[[aes.name]]]] <- eval(x, g$data)
+  }
   some.vars <- c(g$aes[grepl("showSelected",names(g$aes))])
-  g$update <- c(some.vars, g$aes[names(g$aes)=="clickSelects"])
+  g$update <- c(some.vars, g$aes[names(g$aes)=="clickSelects"]) 
+  # updates based on showSelected and clickSelects
   subset.vars <- c(some.vars, g$aes[names(g$aes)=="group"])
   g$subord <- as.list(names(subset.vars))
   g$subvars <- as.list(subset.vars)
@@ -92,22 +114,7 @@ layer2list <- function(i, plistextra){
   g$ranges <- matrix(c(plistextra$panel$ranges[[1]]$x.range, 
                        plistextra$panel$ranges[[1]]$y.range),
                      2,2,dimnames=list(axis=c("x","y"),limit=c("min","max")), byrow=TRUE)
-
-# Old way of getting ranges...
-#     range.map <- c(xintercept="x",x="x",xend="x",xmin="x",xmax="x",
-#                    yintercept="y",y="y",yend="y",ymin="y",ymax="y")
-#     for(aesname in names(range.map)){
-#       if(aesname %in% names(g$aes)){
-#         var.name <- g$aes[[aesname]]
-#         ax.name <- range.map[[aesname]]
-#         r <- range(g$data[[var.name]], na.rm=TRUE, finite=TRUE)
-#         g$ranges[ax.name,] <- range(c(g$ranges[ax.name,],r),na.rm=TRUE)
-#         ## TODO: handle Inf like in ggplot2.
-#         size <- r[2]-r[1]
-#         g$data[[var.name]][g$data[[var.name]]==Inf] <- r[2]+size
-#         g$data[[var.name]][g$data[[var.name]]==-Inf] <- r[1]-size
-#       }
-#     }
+  
   g
 }
 
