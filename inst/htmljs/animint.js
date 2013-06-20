@@ -139,10 +139,14 @@ var animint = function(to_select, json_file){
 	    }
   	    return size;
   	}
-    var linetypesize2dasharray = function(linetype, size){
+    var linetype = "solid";
+    if(g_info.params.linetype){
+      linetype = g_info.params.linetype;
+  	}
+    var linetypesize2dasharray = function(lt, size){
       var o={
         "blank":size*0+","+size*10,
-        "solid":size,
+        "solid":0,
         "dashed":size*4+","+size*4,
         "dotted":size+","+size*2,
         "dotdash":size+","+size*2+","+size*4+","+size*2,
@@ -161,20 +165,25 @@ var animint = function(to_select, json_file){
         "224282F2":size*2+","+size*2+","+size*4+","+size*2+","+size*8+","+size*2+","+size*16+","+size*2,
         "F1":size*16+","+size};
         
-      if(linetype in o) return o[linetype]; else return genlinetype2dasharray(linetype,size);
+      if(lt in o) return o[lt]; else return genlinetype2dasharray(lt,size);
     }
-    var genlinetype2dasharray = function(linetype, size){
-      str = linetype.split("");
+    var genlinetype2dasharray = function(lt, size){
+      str = lt.split("");
       strnum = str.map(function(d){return size*parseInt(d,16);});
       return strnum;  
     }
   	var get_dasharray = function(d){
   	    var lt;
-  	    try{
-      		lt = d[aes.linetype];
-  	    }catch(err){
-  	    	lt = g_info.params.linetype;
-  	    }
+        if(aes.hasOwnProperty("linetype") && d.hasOwnProperty(aes.linetype)){
+          try{
+        	  lt = d[aes.linetype];
+  	      }catch(err){
+  	      	lt = g_info.params.linetype;
+  	      }
+        } else {
+          lt = linetype;
+        }
+  	    
   	    return linetypesize2dasharray(lt, get_size(d));
   	}
     var colour = "black";
@@ -242,9 +251,7 @@ var animint = function(to_select, json_file){
             var one_group = data[group_info.value];
             var one_row = one_group[0]; // take linetype for first value in the group
             return(get_dasharray(one_row));
-          })
-          .style("stroke-dasharray",get_dasharray)
-  	    	;
+          });
   	    }
   	    eAppend = "path";
   	}else if(g_info.geom == "text"){
