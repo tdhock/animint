@@ -140,12 +140,34 @@ var animint = function(to_select, json_file){
   	    return size;
   	}
     var linetypesize2dasharray = function(linetype, size){
-  	    return {
-  		"dashed":size*4+","+size*4,
-  		"solid":null,
-  		"dotted":size+","+size*2,
-  	    }[linetype];
-  	}
+      var o={
+        "blank":size*0+","+size*10,
+        "solid":size,
+        "dashed":size*4+","+size*4,
+        "dotted":size+","+size*2,
+        "dotdash":size+","+size*2+","+size*4+","+size*2,
+        "longdash":size*8+","+size*4,
+        "twodash":size*2+","+size*2+","+size*6+","+size*2,
+        "22":size*2+","+size*2,
+        "42":size*4+","+size*2,
+        "44":size*4+","+size*4,
+        "13":size+","+size*3,
+        "1343":size+","+size*3+","+size*4+","+size*3,
+        "73":size*7+","+size*3,
+        "2262":size*2+","+size*2+","+size*6+","+size*2,
+        "12223242":size+","+size*2+","+size*2+","+size*2+","+size*3+","+size*2+","+size*4+","+size*2,
+        "F282":size*15+","+size*2+","+size*8+","+size*2,
+        "F4448444":size*15+","+size*4+","+size*4+","+size*4+","+size*8+","+size*4+","+size*4+","+size*4,
+        "224282F2":size*2+","+size*2+","+size*4+","+size*2+","+size*8+","+size*2+","+size*16+","+size*2,
+        "F1":size*16+","+size};
+        
+      if(linetype in o) return o[linetype]; else return genlinetype2dasharray(linetype,size);
+    }
+    var genlinetype2dasharray = function(linetype, size){
+      str = linetype.split("");
+      strnum = str.map(function(d){return size*parseInt(d,16);});
+      return strnum;  
+    }
   	var get_dasharray = function(d){
   	    var lt;
   	    try{
@@ -192,7 +214,7 @@ var animint = function(to_select, json_file){
       		kv = [{"key":0,"value":0}];
       		data = {0:data};
   	    }else{
-  		// we need to use a path for each group.
+  		  // we need to use a path for each group.
   		    var kv = d3.entries(d3.keys(data));
       		kv = kv.map(function(d){
       		    d[aes.group] = d.value;
@@ -215,6 +237,11 @@ var animint = function(to_select, json_file){
             var one_group = data[group_info.value];
             var one_row = one_group[0]; // take color for first value in the group
             return(get_colour(one_row));
+          })
+          .style("stroke-dasharray", function(group_info){
+            var one_group = data[group_info.value];
+            var one_row = one_group[0]; // take linetype for first value in the group
+            return(get_dasharray(one_row));
           })
           .style("stroke-dasharray",get_dasharray)
   	    	;
