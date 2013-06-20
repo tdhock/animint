@@ -76,6 +76,9 @@ layer2list <- function(i, plistextra){
         # fill is the same in R and d3...
         g$data[["fill"]] <- plistextra$data[[i]]$fill
         "fill"
+      }else if(aes.name=="linetype"){
+        g$data[["linetype"]] <- plistextra$data[[i]]$linetype
+        "linetype"
       }else if(is.symbol(x)){
         if(is.factor(g$data[[as.character(x)]])){
           g$data[[as.character(x)]] <- plistextra$data[[i]][[aes.name]]

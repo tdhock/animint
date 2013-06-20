@@ -147,10 +147,9 @@ var animint = function(to_select, json_file){
   	    }[linetype];
   	}
   	var get_dasharray = function(d){
-  	    var value, lt;
+  	    var lt;
   	    try{
-      		value = d[aes.linetype];
-      		lt = svg.plot.scales.linetype[value];
+      		lt = d[aes.linetype];
   	    }catch(err){
   	    	lt = g_info.params.linetype;
   	    }
