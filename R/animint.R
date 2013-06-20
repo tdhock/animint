@@ -105,21 +105,23 @@ layer2list <- function(i, plistextra){
                        plistextra$panel$ranges[[1]]$y.range),
                      2,2,dimnames=list(axis=c("x","y"),limit=c("min","max")), byrow=TRUE)
   
-  # Old way of getting ranges...
-  #     range.map <- c(xintercept="x",x="x",xend="x",xmin="x",xmax="x",
-  #                    yintercept="y",y="y",yend="y",ymin="y",ymax="y")
-  #     for(aesname in names(range.map)){
-  #       if(aesname %in% names(g$aes)){
-  #         var.name <- g$aes[[aesname]]
-  #         ax.name <- range.map[[aesname]]
-  #         r <- range(g$data[[var.name]], na.rm=TRUE, finite=TRUE)
-  #         g$ranges[ax.name,] <- range(c(g$ranges[ax.name,],r),na.rm=TRUE)
-  #         ## TODO: handle Inf like in ggplot2.
-  #         size <- r[2]-r[1]
-  #         g$data[[var.name]][g$data[[var.name]]==Inf] <- r[2]+size
-  #         g$data[[var.name]][g$data[[var.name]]==-Inf] <- r[1]-size
-  #       }
-  #     }
+  # Old way of getting ranges... still needed for handling Inf values.
+    range.map <- c(xintercept="x",x="x",xend="x",xmin="x",xmax="x",
+                   yintercept="y",y="y",yend="y",ymin="y",ymax="y")
+    for(aesname in names(range.map)){
+      if(aesname %in% names(g$aes)){
+        var.name <- g$aes[[aesname]]
+        ax.name <- range.map[[aesname]]
+        r <- range(g$data[[var.name]], na.rm=TRUE, finite=TRUE)
+        ## TODO: handle Inf like in ggplot2.
+        size <- r[2]-r[1]
+        rowidx <- which(dimnames(g$ranges)$axis%in%ax.name)
+        if(length(rowidx)>0){
+          g$data[[var.name]][g$data[[var.name]]==Inf] <- g$ranges[rowidx,2]
+          g$data[[var.name]][g$data[[var.name]]==-Inf] <- g$ranges[rowidx,1]
+        }
+      }
+    }
   g
 }
 
@@ -180,11 +182,13 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
       
       ## Output types
       ## Check to see if character type is d3's rgb type. 
+      linetypes <- c("solid", "dashed", "dotted", "dotdash", "longdash", "twodash")
       g$types <- as.list(sapply(g$data, class))
       charidx <- which(g$types=="character")
       g$types[charidx] <- sapply(charidx, function(i) 
-        if(sum(!grepl("#", g$data[[i]], fixed=TRUE))==0 & sum(nchar(g$data[[i]])!=7)==0) "rgb" 
-                                 else "character")
+        if(sum(!grepl("#", g$data[[i]], fixed=TRUE))==0 & sum(nchar(g$data[[i]])!=7)==0){"rgb"
+        }else if(sum(!g$data[[i]]%in%linetypes)==0){"linetype"
+        }else "character")
       
       g$data <- csv.name
       ## Finally save to the master geom list.

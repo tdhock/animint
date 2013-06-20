@@ -23,6 +23,7 @@ var animint = function(to_select, json_file){
   var getcol = function(v_name){
     return function(d){return d[v_name];};
   }
+  var padding = 30;
   var add_geom = function(g_name, g_info){
   	d3.csv(g_info.data, function(error, response){
   	    // First convert to correct types.
@@ -37,6 +38,8 @@ var animint = function(to_select, json_file){
     		    	//keep it as a character.
     		    }else if(r_type == "rgb"){
             	//keep it as a character.        	      
+    		    }else if(r_type == "linetype"){
+      	      //keep it as a character. 
     		    }else{
     			    throw "unsupported R type "+r_type;
     		    }
@@ -53,12 +56,12 @@ var animint = function(to_select, json_file){
   	  update_geom(g_name);
   	});
   }
+
   var add_plot = function(p_name, p_info){
   	var svg = element.append("svg")
   	    .attr("id",p_name)
   	    .attr("height",p_info.options.height)
   	    .attr("width",p_info.options.width);
-    var padding = 30;
     var h = svg.attr("height");
     var w = svg.attr("width");
   	svg.x = d3.scale.linear()
@@ -67,7 +70,6 @@ var animint = function(to_select, json_file){
   	svg.y = d3.scale.linear()
   	    .domain(p_info.ranges.y)
   	    .range([svg.attr("height")-padding,padding]);
-
     var xaxis = d3.svg.axis()
         .scale(svg.x)
         .tickValues(p_info.axis.x)
@@ -89,8 +91,10 @@ var animint = function(to_select, json_file){
   	p_info.geoms.forEach(function(g_name){
   	    SVGs[g_name] = svg;
     });
-
     Plots[p_name] = p_info;
+  }
+  var add_axis = function(p_name, p_info){
+    
   }
   var add_selector = function(s_name, s_info){
   	Selectors[s_name] = s_info;
@@ -135,11 +139,11 @@ var animint = function(to_select, json_file){
 	    }
   	    return size;
   	}
-  	var linetypesize2dasharray = function(linetype, size){
+    var linetypesize2dasharray = function(linetype, size){
   	    return {
-      		"dashed":size*4+","+size*4,
-      		"solid":null,
-      		"dotted":size+","+size*2,
+  		"dashed":size*4+","+size*4,
+  		"solid":null,
+  		"dotted":size+","+size*2,
   	    }[linetype];
   	}
   	var get_dasharray = function(d){
@@ -208,12 +212,12 @@ var animint = function(to_select, json_file){
       		})
   		    .style("fill","none")
   		    .style("stroke-width",size)
-  		    .style("stroke-dasharray",get_dasharray)
           .style("stroke", function(group_info){
             var one_group = data[group_info.value];
             var one_row = one_group[0]; // take color for first value in the group
             return(get_colour(one_row));
           })
+          .style("stroke-dasharray",get_dasharray)
   	    	;
   	    }
   	    eAppend = "path";
@@ -257,10 +261,10 @@ var animint = function(to_select, json_file){
   	    eActions = function(e){
   		e.attr("x",toXY("x","xmin"))
   		    .attr("width",function(d){
-  			return svg.x(d[ aes.xmax ])-svg.x(d[ aes.xmin ]);
+  		    	return svg.x(d[ aes.xmax ])-svg.x(d[ aes.xmin ]);
   		    })
   		    .attr("y", svg.y.range()[1])
-  		    .attr("height", svg.y.range()[0])
+  		    .attr("height", svg.y.range()[0]-padding)
   		    .style("fill",get_fill)
   		;
   	    }
@@ -268,9 +272,9 @@ var animint = function(to_select, json_file){
   	}else if(g_info.geom == "rect"){
         elements = elements.data(data);
   	    eActions = function(e){
-  		   e.attr("x",toXY("x","xmin"))
-  		    .attr("width",function(d) {return svg.x(d[aes.xmax])-svg.x(d[aes.xmin]);})
-  		    .attr("y",toXY("y","ymax"))
+    	   e.attr("x",function(d){return svg.x(d[aes.xmin]);})
+    	    .attr("width",function(d) {return svg.x(d[aes.xmax])-svg.x(d[aes.xmin]);})
+  		    .attr("y",function(d){return svg.y(d[aes.ymin]);})
   		    .attr("height",function(d) {return svg.y(d[aes.ymin])-svg.y(d[aes.ymax]);})
   		    .style("stroke-dasharray",get_dasharray)
   		    .style("stroke-width",size)
@@ -295,10 +299,10 @@ var animint = function(to_select, json_file){
     }else if(g_info.geom == "segment"){
         elements = elements.data(data);
   	    eActions = function(e){
-  		e.attr("x1",toXY("x","x"))
-  		    .attr("x2",toXY("x","xend"))
-  		    .attr("y1",toXY("y", "y"))
-  		    .attr("y2",toXY("y", "yend"))
+  		e.attr("x1",function(d){return svg.x(d[aes.x]);})
+  		    .attr("x2",function(d){return svg.x(d[aes.xend]);})
+  		    .attr("y1",function(d){return svg.y(d[aes.y]);})
+  		    .attr("y2",function(d){return svg.y(d[aes.yend]);})
   		    .style("stroke-dasharray",get_dasharray)
   		    .style("stroke-width",size)
   		    .style("stroke",colour)
@@ -324,8 +328,8 @@ var animint = function(to_select, json_file){
   	    eActions = function(e){
   		e.attr("y1",toXY("y","yintercept"))
   		    .attr("y2",toXY("y","yintercept"))
-  		    .attr("x1",svg.x.range()[0])
-  		    .attr("x2",svg.x.range()[1])
+  		    .attr("x1",svg.x.range()[0]+padding)
+  		    .attr("x2",svg.x.range()[1]-padding)
   		    .style("stroke-dasharray",get_dasharray)
   		    .style("stroke-width",size)
   		    .style("stroke",colour)
