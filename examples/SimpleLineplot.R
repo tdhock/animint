@@ -48,4 +48,23 @@ lts2 <- c("solid", "dashed", "dotted", "dotdash", "longdash", "twodash")
 lt2 <- data.frame(x=0, xend=.25, y=1:6, yend=1:6, lt=lts2)
 p7 <- ggplot() + geom_segment(data=lt2, aes(x=x, xend=xend, y=y, yend=yend, linetype=lt)) + 
       scale_linetype_identity() + geom_text(data=lt2, aes(x=-.125, y=y, label=lt), hjust=0)
-gg2animint(list(p1=p1, p2=p2, p3=p3, p4=p4, p5=p5, p6=p6, p7=p7))
+# gg2animint(list(p1=p1, p2=p2, p3=p3, p4=p4, p5=p5, p6=p6, p7=p7))
+
+#' Spaghetti Plot Data
+n <- 500
+pts <- 10
+data2 <- data.frame(x=rep(1:pts, times=n), group = rep(1:n, each=pts))
+data2$group <- as.factor(data2$group)
+data2$y <- rnorm(length(data2$x), data2$x*rep(rnorm(n, 1, .25), each=pts), .25) + rep(rnorm(n, 0, 1), each=pts)
+data2$lty <- "solid"
+data2$lty[which(data2$group%in%subset(data2, x==10)$group[order(subset(data2, x==10)$y)][1:floor(n/10)])] <- "3133"
+
+qplot(data=data2, x=x, y=y, group=group, geom="line", alpha=I(.2))
+
+p8 <- ggplot() + geom_line(data=data2, aes(x=x, y=y, group=group), alpha=.1)
+p8
+# gg2animint(list(p1=p1, p2=p2, p3=p3, p4=p4, p5=p5, p6=p6, p7=p7, p8=p8))
+
+p9 <- ggplot() + geom_line(data=data2, aes(x=x, y=y, group=group, linetype=lty), alpha=.1)+scale_linetype_identity()
+p9
+gg2animint(list(p1=p1, p2=p2, p3=p3, p4=p4, p5=p5, p6=p6, p7=p7, p8=p8, p9=p9))
