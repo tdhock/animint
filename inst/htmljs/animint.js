@@ -129,6 +129,20 @@ var animint = function(to_select, json_file){
   	if(g_info.params.alpha){
   	    base_opacity = g_info.params.alpha;
   	}
+    var get_alpha = function(d){
+      var a;
+      if(aes.hasOwnProperty("alpha") && d.hasOwnProperty(aes.alpha)){
+        try{
+      	  a = d[aes.alpha];
+	      }catch(err){
+	      	a = g_info.params.alpha;
+	      }
+      } else {
+        a = base_opacity;
+      }
+	    
+	    return a;
+  	}
   	var size = 2;
   	if(g_info.params.size){
   	    size = g_info.params.size;
@@ -390,15 +404,15 @@ var animint = function(to_select, json_file){
   	enter.classed(g_info.classed, 1);
   	if(g_info.aes.hasOwnProperty("clickSelects")){
   	    var notOver = function(d){
-  		return selectedOpacity(d, g_info.aes.clickSelects, 
-  				       base_opacity, base_opacity-1/2);
+  	    	return selectedOpacity(d, g_info.aes.clickSelects, 
+  				            base_opacity, base_opacity-1/2);
   	    }
   	    //elements.style("opacity",notOver);
   	    elements.style("opacity",notOver)
   		.on("mouseover",function(d){
   		    d3.select(this).style("opacity",function(d){
-  			return selectedOpacity(d, g_info.aes.clickSelects,
-  					       base_opacity, base_opacity);
+            return selectedOpacity(d, g_info.aes.clickSelects,
+  					                       get_alpha, get_alpha);
   		    });
   		})
   		.on("mouseout",function(d){
@@ -415,7 +429,7 @@ var animint = function(to_select, json_file){
   		    return v_name+" "+d[v_name];
   		});
   	}else{
-  	    enter.style("opacity",base_opacity);
+  	    enter.style("opacity",get_alpha);
   	}
   	eActions(enter);
   	if(g_info.duration){
