@@ -17,7 +17,7 @@ two.selectors.not.animated <-
                     data=generation.loci),
        duration=list(generation=1000)
   )
-gg2animint(two.selectors.not.animated, out.dir="./junk")
+gg2animint(two.selectors.not.animated)
 
 ## Example: 3 plots, 1 selector.
 first <- subset(generation.loci,generation==1)
@@ -191,7 +191,7 @@ sig.facets <- mmir.plot$sig+
   theme_bw()+
   theme(panel.margin=unit(0,"cm"))
 print(sig.facets)
-gg2animint(mmir.plot, out.dir="./junk")
+gg2animint(mmir.plot)
 
 ## TODO: mmir.plot is way too complicated, since facets are not yet
 ## implemented in animint. The easier facetted version would look
