@@ -49,7 +49,7 @@
   many R shape types, so mapping between the two is
   difficult. } Currently unsupported scales (may be
   supported in the future) (TODO): \itemize{ \item area
-  \item size } TODO: \itemize{ \item add legends } }
+  \item size } TODO: \itemize{ \item add legends }
 }
 \examples{
 library(animint)

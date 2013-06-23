@@ -202,7 +202,7 @@ layer2list <- function(i, plistextra){
 #' \itemize{
 #' \item add legends
 #' }
-#' }
+#' 
 #' @title gg2animint
 #' @param plot.list list of named ggplots with showSelected and clickSelects aesthetics. Input must be a list, so to use a single ggplot named g, it must be passed to the function as plot.list = list(g=g).
 #' @param out.dir directory to store html/js/csv files 
