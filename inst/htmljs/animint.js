@@ -384,19 +384,6 @@ var animint = function(to_select, json_file){
   		;
   	    }
   	    eAppend = "line";
-  	}else if(g_info.geom == "segment"){
-  	    elements = elements.data(data);
-  	    eAppend = "line";
-  	    eActions = function(e){
-  		e.attr("x1",toXY("x","x"))
-  		    .attr("y1",toXY("y","y"))
-  		    .attr("y2",toXY("y","yend"))
-  		    .attr("x2",toXY("x","xend"))
-  		    .style("stroke-width",size)
-  		    .style("stroke-dasharray",get_dasharray)
-  		    .style("stroke",colour)
-  		;
-  	    }
   	}else{
   	    return "unsupported geom "+g_info.geom;
   	}
