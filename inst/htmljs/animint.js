@@ -393,14 +393,14 @@ var animint = function(to_select, json_file){
   	if(g_info.aes.hasOwnProperty("clickSelects")){
   	    var notOver = function(d){
   	    	return selectedOpacity(d, g_info.aes.clickSelects, 
-  				            base_opacity, base_opacity-1/2);
+  				            get_alpha(d), get_alpha(d)-1/2);
   	    }
   	    //elements.style("opacity",notOver);
   	    elements.style("opacity",notOver)
   		.on("mouseover",function(d){
   		    d3.select(this).style("opacity",function(d){
             return selectedOpacity(d, g_info.aes.clickSelects,
-  					                       get_alpha, get_alpha);
+  					                       get_alpha(d), get_alpha(d));
   		    });
   		})
   		.on("mouseout",function(d){
@@ -417,7 +417,7 @@ var animint = function(to_select, json_file){
   		    return v_name+" "+d[v_name];
   		});
   	}else{
-  	    enter.style("opacity",get_alpha);
+  	    enter.style("opacity",base_opacity);
   	}
   	eActions(enter);
   	if(g_info.duration){
