@@ -322,8 +322,8 @@ var animint = function(to_select, json_file){
   	    eActions = function(e){
     	   e.attr("x",function(d){return svg.x(d[aes.xmin]);})
     	    .attr("width",function(d) {return svg.x(d[aes.xmax])-svg.x(d[aes.xmin]);})
-  		    .attr("y",function(d){return svg.y(d[aes.ymin]);})
-  		    .attr("height",function(d) {return svg.y(d[aes.ymin])-svg.y(d[aes.ymax]);})
+  		    .attr("y",function(d){return svg.y(d[aes.ymax]);})
+  		    .attr("height",function(d) {return Math.abs(svg.y(d[aes.ymax])-svg.y(d[aes.ymin]));})
   		    .style("stroke-dasharray",get_dasharray)
   		    .style("stroke-width",size)
   		    .style("stroke",get_colour)
@@ -417,7 +417,7 @@ var animint = function(to_select, json_file){
   		    return v_name+" "+d[v_name];
   		});
   	}else{
-  	    enter.style("opacity",base_opacity);
+  	    enter.style("opacity",get_alpha);
   	}
   	eActions(enter);
   	if(g_info.duration){
