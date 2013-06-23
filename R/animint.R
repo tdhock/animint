@@ -135,12 +135,81 @@ layer2list <- function(i, plistextra){
   g
 }
 
-#' Convert a list of ggplots to an interactive animation.
+#' Workhorse function for the animint package.}
+#' Convert a list of ggplots to a d3-ready graphic. 
+#' Adds aesthetics clickSelects and updateSelected to utilize 
+#' d3's mouseover and interactivity features for multiple linked plots,
+#' and allows animated sequences of graphics. 
+#' 
+#' Supported ggplot2 geoms: 
+#' \itemize{
+#' \item point 
+#' \item jitter
+#' \item line
+#' \item rect
+#' \item tallRect (new with this package)
+#' \item segment
+#' \item hline
+#' \item vline
+#' \item bar
+#' \item text.
+#' }
+#' Currently unsupported (TODO): 
+#' \itemize{
+#' \item abline
+#' \item path
+#' \item histogram
+#' \item density
+#' \item area
+#' \item freqpoly
+#' \item polygonv
+#' \item ribbon
+#' \item smooth
+#' \item violin
+#' \item rug
+#' \item quantile
+#' \item boxplot
+#' \item crossbar
+#' \item linerange
+#' \item pointrange
+#' \item step
+#' \item dotplot
+#' \item contour
+#' \item density2d
+#' \item tile
+#' \item bin2d
+#' \item hex
+#' \item raster
+#' \item map
+#'}
+#' Supported scales: 
+#' \itemize{
+#' \item alpha, 
+#' \item fill/colour (brewer, gradient, identity, manual)
+#' \item linetype
+#' \item x and y axis scales, manual break specification, label formatting
+#' }
+#' Unsupported scales: 
+#' \itemize{
+#' \item shape. Open and closed circles can be represented by manipulating fill and colour scales and using default (circle) points, but d3 does not support many R shape types, so mapping between the two is difficult.
+#' }
+#' Currently unsupported scales (may be supported in the future) (TODO): 
+#' \itemize{
+#' \item area 
+#' \item size
+#' }
+#' TODO: 
+#' \itemize{
+#' \item add legends
+#' }
+#' }
+#' @title gg2animint
 #' @param plot.list list of named ggplots with showSelected and clickSelects aesthetics. Input must be a list, so to use a single ggplot named g, it must be passed to the function as plot.list = list(g=g).
 #' @param out.dir directory to store html/js/csv files 
 #' @param open.browser Should R open a browser? Note: Chrome will not display local html files unless you are running a local webserver. Firefox should display local html files (including those containing javascript).
 #' @return invisible list of ggplots in list format
 #' @export 
+#' @seealso \code{\link{ggplot2}}
 #' @example examples/breakpointExamples.R
 gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()){
   ## Check that it is a list and every element is named.

@@ -1,0 +1,18 @@
+\name{transform_shape}
+\alias{transform_shape}
+\title{Function to transform R shapes into d3 shapes...}
+\usage{
+  transform_shape(dframe)
+}
+\arguments{
+  \item{dframe}{Data frame with columns shape, fill,
+  colour.}
+}
+\value{
+  Data frame transformed so that shape corresponds to d3
+  shape. Also includes Rshape column for debugging.
+}
+\description{
+  Function to transform R shapes into d3 shapes...
+}
+

@@ -1,6 +1,6 @@
 \name{gg2animint}
 \alias{gg2animint}
-\title{Convert a list of ggplots to an interactive animation.}
+\title{gg2animint}
 \usage{
   gg2animint(plot.list, out.dir = tempfile(),
     open.browser = interactive())
@@ -22,9 +22,38 @@
   invisible list of ggplots in list format
 }
 \description{
-  Convert a list of ggplots to an interactive animation.
+  Workhorse function for the animint package.} Convert a
+  list of ggplots to a d3-ready graphic. Adds aesthetics
+  clickSelects and updateSelected to utilize d3's mouseover
+  and interactivity features for multiple linked plots, and
+  allows animated sequences of graphics.
+}
+\details{
+  Supported ggplot2 geoms: \itemize{ \item point \item
+  jitter \item line \item rect \item tallRect (new with
+  this package) \item segment \item hline \item vline \item
+  bar \item text. } Currently unsupported (TODO): \itemize{
+  \item abline \item path \item histogram \item density
+  \item area \item freqpoly \item polygonv \item ribbon
+  \item smooth \item violin \item rug \item quantile \item
+  boxplot \item crossbar \item linerange \item pointrange
+  \item step \item dotplot \item contour \item density2d
+  \item tile \item bin2d \item hex \item raster \item map }
+  Supported scales: \itemize{ \item alpha, \item
+  fill/colour (brewer, gradient, identity, manual) \item
+  linetype \item x and y axis scales, manual break
+  specification, label formatting } Unsupported scales:
+  \itemize{ \item shape. Open and closed circles can be
+  represented by manipulating fill and colour scales and
+  using default (circle) points, but d3 does not support
+  many R shape types, so mapping between the two is
+  difficult. } Currently unsupported scales (may be
+  supported in the future) (TODO): \itemize{ \item area
+  \item size } TODO: \itemize{ \item add legends } }
 }
 \examples{
+library(animint)
+
 data(generation.loci)
 ## Example: 2 plots, 2 selectors.
 generations <- data.frame(generation=unique(generation.loci$generation))
@@ -162,20 +191,20 @@ mmir.plot <-
          geom_tallrect(aes(xmin=first.base/1e6, xmax=last.base/1e6,
                            fill=annotation,
                            showSelected=signal),
-                       data=intreg$annotations)+
+                       data=intreg$ann)+
          scale_fill_manual(values=breakpoint.colors,guide="none")+
          geom_text(aes((first.base+last.base)/2e6, logratio+1/8,
                        label=annotation,
                        showSelected=signal),
-                   data=intreg$annotations)+
+                   data=intreg$ann)+
          geom_blank(aes(first.base/1e6, logratio+2/8), data=intreg$ann)+
          geom_point(aes(base/1e6, logratio,
                         showSelected=signal),
-                    data=intreg$signals)+
+                    data=intreg$sig)+
          geom_segment(aes(first.base/1e6, mean, xend=last.base/1e6, yend=mean,
                           showSelected=signal,
                           showSelected2=segments),
-                      data=intreg$segments, colour=signal.colors[["estimate"]])+
+                      data=intreg$seg, colour=signal.colors[["estimate"]])+
          geom_vline(aes(xintercept=base/1e6,
                         showSelected=signal,
                         showSelected2=segments),
@@ -184,7 +213,7 @@ mmir.plot <-
                     data=intreg$breaks),
        regression=ggplot()+
          geom_blank(aes(x,y), data=blank.items$regression$blank)+
-         geom_segment(aes(min.L, feature, xend=max.L, yend=feature,
+         geom_segment(aes(x=min.L, y=feature, xend=max.L, yend=feature,
                           clickSelects=signal),
                       size=5,
                       data=intreg$int)+
@@ -259,5 +288,8 @@ too.many.facets <- mmir.facet$penalty+
   theme_bw()+
   theme(panel.margin=unit(0, "cm"))
 print(too.many.facets)
+}
+\seealso{
+  \code{\link{ggplot2}}
 }
 
