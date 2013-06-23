@@ -76,5 +76,3 @@ s10 <- ggplot() + geom_point(data=scatterdata2, aes(x=x, y=y, colour=factor(quad
 s10
 gg2animint(list(s1=s1, s2=s2, s3=s3, s4=s4, s5=s5, s6=s6, s7=s7, s8=s8, s9=s9, s10=s10))
 
-s11 <- ggplot() + geom_point(data=scatterdata, aes(x=x, y=y, colour=factor(xnew), fill=factor(xnew), shape=factor(class)))
-s11

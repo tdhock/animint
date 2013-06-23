@@ -21,8 +21,6 @@ gg2list <- function(p){
       plist$scales[[sc$aesthetics]] <- sc$palette(length(sc$range$range))
     }else if(sc$scale_name == "alpha_c"){
       plist$scales[[sc$aesthetics]] <- sc$palette(sc$range$range)
-    }else if(sc$scale_name == "shape_c"){
-      plist$scales[[sc$aesthetics]] <- sc$palette(length(sc$range$range))
     }
   }
   for(i in seq_along(plistextra$plot$layers)){
@@ -88,13 +86,6 @@ layer2list <- function(i, plistextra){
       }else if(aes.name=="alpha"){
         g$data[["alpha"]] <-  plistextra$data[[i]]$alpha
         "alpha"
-      }else if(aes.name=="shape"){
-        dframe <- transform_shape(plistextra$data[[i]][,c("shape", "colour", "fill")])
-        if("colour"%in%names(g$data)) g$data[["colour"]] <- dframe$colour
-        if("fill"%in%names(g$data)) g$data[["fill"]] <- dframe$fill
-        g$data[["shape"]] <- dframe$shape
-        g$data[["Rshape"]] <- dframe$Rshape
-        "shape"
       }else if(is.symbol(x)){
         if(is.factor(g$data[[as.character(x)]])){
           g$data[[as.character(x)]] <- plistextra$data[[i]][[aes.name]]
@@ -207,18 +198,14 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
         xsplit <- sapply(x, function(i) sum(is.na(strtoi(strsplit(i,"")[[1]],16)))==0)
         return(namedlinetype | xsplit)
       }
-      is.shape <- function(x){
-        x%in%c("square", "cross", "diamond", "circle", "triangle-down", "triangle-up")
-      }
       is.rgb <- function(x){
-        grepl("null", x) | (grepl("#", x) & nchar(x)==7)
+        grepl("NULL", x) | (grepl("#", x) & nchar(x)==7)
       }
       g$types <- as.list(sapply(g$data, class))
       charidx <- which(g$types=="character")
       g$types[charidx] <- sapply(charidx, function(i) 
         if(sum(!is.rgb(g$data[[i]]))==0){"rgb"
         }else if(sum(!is.linetype(g$data[[i]]))==0){"linetype"
-        }else if(sum(!is.shape(g$data[[i]]))==0){"shape"
         }else "character")
       
       g$data <- csv.name
@@ -276,37 +263,4 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
   }
   invisible(result)
   ### An invisible copy of the R list that was exported to JSON.
-}
-
-transform_shape <- function(dframe){
-  dframe[,2:3] <- apply(dframe[,2:3], 2, as.character)
-  unfilled <- which(dframe$shape<=14)
-  solid <- which(dframe$shape>14 & dframe$shape<=20)
-  outlined <- which(dframe$shape>20)
-  xold <- dframe$shape
-  shapeidx <- data.frame(x = 0:25, shape="", stringsAsFactors=FALSE)
-  shapeidx[c(0, 7, 12, 13, 14, 15, 22)+1,2] <- "square"
-  shapeidx[c(3, 4, 8)+1, 2] <- "cross"
-  shapeidx[c(5, 9, 18, 23)+1, 2] <- "diamond"
-  shapeidx[c(1, 10, 16, 19, 20, 21)+1, 2] <- "circle"
-  shapeidx[c(6, 11, 25)+1, 2] <- "triangle-down"
-  shapeidx[c(2, 17, 24)+1, 2] <- "triangle-up"
-  shapeidx$fill <- c(rep(FALSE, 15), rep(TRUE, 6), rep(TRUE, 5))
-  shapeidx$line <- c(rep(TRUE, 15), rep(FALSE, 6), rep(TRUE, 5))
-  vals <- unique(xold)
-  
-  dframe$fill[unfilled] <- "null"
-  dframe$colour[solid] <- "null"
-  dframe$Rshape <- dframe$shape
-  dframe$shape <- shapeidx$shape[xold+1]
-  
-  
-  # 16, 19, 20 are duplicates
-  # 0, 7, 12, 13, 14 are duplicates
-  # 3, 4, 8 are duplicates
-  # 5, 9 are duplicates
-  # 1, 10 are duplicates
-  # 6, 11 are duplicates
-  # 4, 7, 8, 9, 10, 11, 12, 13, 14, 19, 20 are not equivalent to their R shapes
-  return(dframe)
 }

@@ -40,8 +40,6 @@ var animint = function(to_select, json_file){
             	//keep it as a character.        	      
     		    }else if(r_type == "linetype"){
       	      //keep it as a character. 
-    		    }else if(r_type == "shape"){
-              //keep it as a character. 
     		    }else{
     			    throw "unsupported R type "+r_type;
     		    }
@@ -155,16 +153,7 @@ var animint = function(to_select, json_file){
 	    }
   	    return size;
   	}
-    var shape = "circle";
-    if(g_info.params.shape){
-      shape = g_info.params.shape;
-    }
-    var get_shape = function(d){
-      if(aes.hasOwnProperty("shape") && d.hasOwnProperty(aes.shape)){
-    		return d[ aes.shape ];
-	    }
-  	    return shape;
-    }
+    
     var linetype = "solid";
     if(g_info.params.linetype){
       linetype = g_info.params.linetype;
@@ -293,7 +282,7 @@ var animint = function(to_select, json_file){
   		;
   	    }
   	    eAppend = "text";
-/*  	}else if(g_info.geom == "point"){
+  	}else if(g_info.geom == "point"){
   	    elements = elements.data(data);
   	    eActions = function(e){
   		   e.attr("cx",toXY("x","x"))
@@ -304,17 +293,6 @@ var animint = function(to_select, json_file){
   		;
   	    }
   	    eAppend = "circle";
-*/
-  	}else if(g_info.geom == "point"){
-        elements = elements.data(data);
-  	    eActions = function(e){
-  		   e.attr("transform", function(d){return "translate(" + toXY("x", "x") + ","+toXY("y", "y")+")";})
-  		    .attr("size",size)
-          .attr("shape",shape)
-          .style("fill",get_fill)
-          .style("stroke",get_colour);
-  	    }
-  	    eAppend = "symbol";
   	}else if(g_info.geom == "jitter"){
         elements = elements.data(data);
   	    eActions = function(e){
