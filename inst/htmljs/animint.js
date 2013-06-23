@@ -393,7 +393,7 @@ var animint = function(to_select, json_file){
   	if(g_info.aes.hasOwnProperty("clickSelects")){
   	    var notOver = function(d){
   	    	return selectedOpacity(d, g_info.aes.clickSelects, 
-  				            get_alpha(d), get_alpha(d)-1/2);
+  				            get_alpha(d), get_alpha(d)*1/2);
   	    }
   	    //elements.style("opacity",notOver);
   	    elements.style("opacity",notOver)
