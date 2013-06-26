@@ -64,6 +64,8 @@ gg2list <- function(p){
 #' @seealso \code{\link{gg2animint}}
 layer2list <- function(i, plistextra){
   g <- list(geom=plistextra$plot$layers[[i]]$geom$objname, data=plistextra$plot$layers[[i]]$data)
+  g$aes <- list()
+
   
   # use un-named parameters so that they will not be exported
   # to JSON as a named object, since that causes problems with
@@ -72,7 +74,7 @@ layer2list <- function(i, plistextra){
   for(p.name in names(g$params)){
     names(g$params[[p.name]]) <- NULL
   }
-  g$aes <- list()
+
   
   # Populate list of aesthetics
   for(aes.name in names(plistextra$plot$layers[[i]]$mapping)){
@@ -103,17 +105,41 @@ layer2list <- function(i, plistextra){
         newcol <- as.character(as.expression(x))
         g$data[[newcol]] <- plistextra$data[[i]][[aes.name]]
         newcol
+      }else if(is.numeric(x)){
+        newcol <- aes.name
+        g$data[[newcol]] <- plistextra$data[[i]][[aes.name]]
+        newcol
       }else{
         str(x)
         stop("don't know how to convert")
       }
   }
   
+  
   some.vars <- c(g$aes[grepl("showSelected",names(g$aes))])
   g$update <- c(some.vars, g$aes[names(g$aes)=="clickSelects"])
   subset.vars <- c(some.vars, g$aes[names(g$aes)=="group"])
   g$subord <- as.list(names(subset.vars))
   g$subvars <- as.list(subset.vars)
+  
+  
+  if(g$geom=="abline"){
+    g$geom <- "segment"
+    slope <- plistextra$data[[i]]$slope
+    intercept <- plistextra$data[[i]]$intercept
+    temp.x <- matrix(plistextra$panel$ranges[[1]]$x.range, ncol=2, nrow=length(slope), byrow=TRUE)
+    temp.y <- slope*temp.x+intercept
+    g$data <- unique(data.frame(x=temp.x[,1], 
+                   xend=temp.x[,2], 
+                   y=temp.y[,1], 
+                   yend=temp.y[,2]))
+    g$aes$x <- "x"
+    g$aes$xend <- "xend"
+    g$aes$y <- "y"
+    g$aes$yend <- "yend"
+    g$subord <- list()
+    g$subvars <- list()
+  }
   
   # Use ggplot2's ranges, which incorporate all layers. 
   # Strictly speaking, this isn't "layer" information as much 

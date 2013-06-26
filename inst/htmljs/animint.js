@@ -362,6 +362,57 @@ var animint = function(to_select, json_file){
   		;
   	    }
   	    eAppend = "circle";
+  	}else if(g_info.geom == "ribbon"){
+        // case of only 1 ribbon and no groups.
+  	    if(!aes.hasOwnProperty("group")){
+      		kv = [{"key":0,"value":0}];
+      		data = {0:data};
+  	    }else{
+  		  // we need to use a path for each group.
+  		    var kv = d3.entries(d3.keys(data));
+      		kv = kv.map(function(d){
+      		    d[aes.group] = d.value;
+      		    return d;
+  	    	});
+  	    }
+  	    var areaThing = d3.svg.area()
+      		.x(toXY("x","x"))
+        	.y0(toXY("y","ymin"))
+          .y(toXY("y","ymax"))
+  	    ;
+        elements = elements.data(kv); //select the correct group before returning anything
+        eActions = function(e){
+      		e.attr("d",function(d){
+      		    var one_group = data[d.value];
+      		    return areaThing(one_group);
+      		})
+  		    .style("fill", function(group_info){
+            var one_group = data[group_info.value];
+            var one_row = one_group[0]; // take fill for first value in the group
+            return(get_fill(one_row));
+          })
+  		    .style("stroke-width", function(group_info){
+            var one_group = data[group_info.value];
+            var one_row = one_group[0]; // take size for first value in the group
+            return(get_size(one_row));
+          })
+          .style("stroke", function(group_info){
+            var one_group = data[group_info.value];
+            var one_row = one_group[0]; // take color for first value in the group
+            return(get_colour(one_row));
+          })
+          .style("stroke-dasharray", function(group_info){
+            var one_group = data[group_info.value];
+            var one_row = one_group[0]; // take linetype for first value in the group
+            return(get_dasharray(one_row));
+          })
+          .style("stroke-width", function(group_info){
+            var one_group = data[group_info.value];
+            var one_row = one_group[0]; // take line size for first value in the group
+            return(get_size(one_row));
+          });
+  	    }
+  	    eAppend = "area";
   	}else if(g_info.geom == "tallrect"){
         elements = elements.data(data);
   	    eActions = function(e){
@@ -369,8 +420,8 @@ var animint = function(to_select, json_file){
   		    .attr("width",function(d){
   		    	return svg.x(d[ aes.xmax ])-svg.x(d[ aes.xmin ]);
   		    })
-  		    .attr("y", svg.y.range()[1])
-  		    .attr("height", svg.y.range()[0]-axispadding)
+  		    .attr("y", plotdim.ystart)
+  		    .attr("height", plotdim.graph.height)
   		    .style("fill",get_fill)
           .style("stroke-width", get_size)
           .style("stroke",get_colour)
@@ -419,7 +470,7 @@ var animint = function(to_select, json_file){
   	    eAppend = "line";
     }else if(g_info.geom == "vline"){
       elements = elements.data(data);
-	    eActions = function(e){
+      eActions = function(e){
 		e.attr("x1",toXY("x","xintercept"))
 		    .attr("x2",toXY("x","xintercept"))
 		    .attr("y1",svg.y.range()[0])
@@ -429,15 +480,15 @@ var animint = function(to_select, json_file){
 		    .style("stroke",get_colour)
 		;
 	    }
-	    eAppend = "line";
-	}else if(g_info.geom == "hline"){  
+	    eAppend = "line"; 
+    }else if(g_info.geom == "hline"){  
       //pretty much a copy of geom_vline with obvious modifications
         elements = elements.data(data);
   	    eActions = function(e){
   		e.attr("y1",toXY("y","yintercept"))
   		    .attr("y2",toXY("y","yintercept"))
-  		    .attr("x1",svg.x.range()[0]+axispadding)
-  		    .attr("x2",svg.x.range()[1]-axispadding)
+  		    .attr("x1",svg.x.range()[0]+plotdim.margin.left)
+  		    .attr("x2",svg.x.range()[1]-plotdim.margin.right)
   		    .style("stroke-dasharray",get_dasharray)
   		    .style("stroke-width",get_size)
   		    .style("stroke",get_colour)
@@ -478,6 +529,12 @@ var animint = function(to_select, json_file){
   		});
   	}else{
       if(g_info.geom=="line"){ // treat lines (groups of points) differently
+        enter.style("opacity", function(group_info){
+            var one_group = data[group_info.value];
+            var one_row = one_group[0]; // take aesthetic for first value in the group
+            return(get_alpha(one_row));
+          })
+      }else if(g_info.geom=="area"){ // treat areas (groups of points) differently
         enter.style("opacity", function(group_info){
             var one_group = data[group_info.value];
             var one_row = one_group[0]; // take aesthetic for first value in the group
