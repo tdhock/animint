@@ -51,6 +51,7 @@ gg2list <- function(p){
     ylab = plistextra$panel$ranges[[1]]$y.labels,
     yname = plistextra$plot$labels$y
   )
+  plist$title <- plistextra$plot$labels$title
   plist$options <- list(width=300,height=300)
   plist
 }
@@ -210,7 +211,7 @@ layer2list <- function(i, plistextra){
 #' @title gg2animint
 #' @param plot.list list of named ggplots with showSelected and clickSelects aesthetics. Input must be a list, so to use a single ggplot named g, it must be passed to the function as plot.list = list(g=g).
 #' @param out.dir directory to store html/js/csv files 
-#' @param open.browser Should R open a browser? Note: Chrome will not display local html files unless you are running a local webserver. Firefox should display local html files (including those containing javascript).
+#' @param open.browser Should R open a browser? Note: Chrome will not display local html files unless you are running a local webserver or have launched chrome with the option --allow-file-access-from-files. Firefox should display local html files (including those containing javascript).
 #' @return invisible list of ggplots in list format
 #' @export 
 #' @seealso \code{\link{ggplot2}}
@@ -290,6 +291,7 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
     result$plots[[plot.name]]$options <- p$options
     result$plots[[plot.name]]$ranges <- p$ranges
     result$plots[[plot.name]]$axis <- p$axis
+    result$plots[[plot.name]]$title <- p$title
   }
   ## add nextgeom so that drawing order is preserved.
   

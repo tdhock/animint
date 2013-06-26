@@ -59,19 +59,49 @@ var animint = function(to_select, json_file){
   var axispadding = 30;
   var labelpadding = 15;
   var titlepadding = 30;
+  var margin = {left: labelpadding+axispadding,
+                right: 0,
+                top: titlepadding,
+                bottom: labelpadding+axispadding};
+  var plotdim = {width: 0, 
+                 height: 0,
+                 xstart: margin.left,
+                 xend: 0,
+                 ystart: 0,
+                 yend: margin.top,
+                 graph: {width: 0, height: 0},
+                 margin: margin,
+                 xlab: {x: 0, y:0},
+                 ylab: {x: 0, y:0},
+                 title: {x: 0, y:0}
+                 };
   var add_plot = function(p_name, p_info){
+    // initialize svg group
   	var svg = element.append("svg")
   	    .attr("id",p_name)
   	    .attr("height",p_info.options.height)
   	    .attr("width",p_info.options.width);
-    var h = svg.attr("height");
-    var w = svg.attr("width");
+
+    // calculate plot dimensions to be used in placing axes, labels, etc.
+    plotdim.width = svg.attr("width");
+    plotdim.height = svg.attr("height");
+    plotdim.graph.width = svg.attr("width")-margin.left-margin.right;
+    plotdim.graph.height = svg.attr("height")-margin.top-margin.bottom;;
+    plotdim.xend = plotdim.graph.width+margin.left;
+    plotdim.ystart = plotdim.graph.height+margin.top;
+    plotdim.xlab.x = plotdim.xstart + plotdim.graph.width/2;
+    plotdim.xlab.y = axispadding+labelpadding/2;
+    plotdim.ylab.x = axispadding+labelpadding/2;
+    plotdim.ylab.y = plotdim.ystart - plotdim.graph.height/2;
+    plotdim.title.x = plotdim.width/2;
+    plotdim.title.y = plotdim.margin.top/2;
+    
   	svg.x = d3.scale.linear()
   	    .domain(p_info.ranges.x)
-  	    .range([axispadding+labelpadding,svg.attr("width")]);
+  	    .range([plotdim.xstart, plotdim.xend]);
   	svg.y = d3.scale.linear()
   	    .domain(p_info.ranges.y)
-  	    .range([svg.attr("height")-labelpadding - axispadding,titlepadding]);
+  	    .range([plotdim.ystart, plotdim.yend]);
     var xaxis = d3.svg.axis()
         .scale(svg.x)
         .tickValues(p_info.axis.x)
@@ -79,12 +109,13 @@ var animint = function(to_select, json_file){
         .orient("bottom");
       svg.append("g")
         .attr("class", "axis")
-        .attr("transform", "translate(0," + (h-labelpadding-axispadding) + ")")
+        .attr("transform", "translate(0," + (plotdim.ystart) + ")")
         .call(xaxis)
       .append("text")
         .text(p_info.axis.xname)
+        .attr("class", "label")
         .style("text-anchor", "middle")
-        .attr("transform", "translate("+(labelpadding/2+axispadding/2+w/2)+","+(axispadding+labelpadding/2)+")")
+        .attr("transform", "translate("+(plotdim.xlab.x)+","+(plotdim.xlab.y)+")")
         ;
     var yaxis = d3.svg.axis().scale(svg.y)
         .tickValues(p_info.axis.y)
@@ -92,13 +123,23 @@ var animint = function(to_select, json_file){
         .orient("left");
       svg.append("g")
         .attr("class", "axis")
-        .attr("transform", "translate("+(labelpadding+axispadding)+",0)")
+        .attr("transform", "translate("+(plotdim.xstart)+",0)")
         .call(yaxis)
       .append("text")
         .text(p_info.axis.yname)
+        .attr("class", "label")
         .style("text-anchor", "middle")
-        .attr("transform", "rotate(270)translate("+(-h/2)+","+(-axispadding-labelpadding/2)+")") // translate coordinates are specified in (-y, -x)
+        .attr("transform", "rotate(270)translate("+(-plotdim.ylab.y)+","+(-plotdim.ylab.x)+")") 
+        // translate coordinates are specified in (-y, -x)
         ;
+    svg.append("text")
+       .text(p_info.title)
+       .attr("class", "title")
+       .attr("font-family", "sans-serif")
+       .attr("font-size", "20px")
+       .style("text-anchor", "middle")
+       .attr("transform", "translate("+(plotdim.width/2)+","+(plotdim.margin.top/2)+")")
+       ;
   	svg.plot = p_info;
   	p_info.geoms.forEach(function(g_name){
   	    SVGs[g_name] = svg;
