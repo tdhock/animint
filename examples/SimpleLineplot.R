@@ -58,13 +58,30 @@ data2$group <- as.factor(data2$group)
 data2$y <- rnorm(length(data2$x), data2$x*rep(rnorm(n, 1, .25), each=pts), .25) + rep(rnorm(n, 0, 1), each=pts)
 data2$lty <- "solid"
 data2$lty[which(data2$group%in%subset(data2, x==10)$group[order(subset(data2, x==10)$y)][1:floor(n/10)])] <- "3133"
+data2 <- ddply(data2, .(group), transform, maxy = max(y), miny=min(y))
 
 qplot(data=data2, x=x, y=y, group=group, geom="line", alpha=I(.2))
 
+#' Check whether scale_alpha works.
 p8 <- ggplot() + geom_line(data=data2, aes(x=x, y=y, group=group), alpha=.1)
 p8
 # gg2animint(list(p1=p1, p2=p2, p3=p3, p4=p4, p5=p5, p6=p6, p7=p7, p8=p8))
 
-p9 <- ggplot() + geom_line(data=data2, aes(x=x, y=y, group=group, linetype=lty), alpha=.1)+scale_linetype_identity()
+p9 <- ggplot() + geom_line(data=subset(data2, as.numeric(group) < 50), 
+                           aes(x=x, y=y, group=group, linetype=lty), alpha=.1) +
+  scale_linetype_identity()
 p9
-gg2animint(list(p1=p1, p2=p2, p3=p3, p4=p4, p5=p5, p6=p6, p7=p7, p8=p8, p9=p9))
+# gg2animint(list(p1=p1, p2=p2, p3=p3, p4=p4, p5=p5, p6=p6, p7=p7, p8=p8, p9=p9))
+
+p10 <- ggplot() + geom_line(data=subset(data2, as.numeric(group) < 50), 
+                            aes(x=x, y=y, group=group, linetype=factor(sign(miny)), alpha=maxy)) + 
+  scale_alpha_continuous(range=c(.1, .5))
+p10
+# gg2animint(list(p1=p1, p2=p2, p3=p3, p4=p4, p5=p5, p6=p6, p7=p7, p8=p8, p9=p9, p10=p10))
+
+#' Size Scaling
+p11 <- ggplot() + geom_line(data=subset(data2, as.numeric(group)%%50 ==1), 
+                            aes(x=x, y=y, group=group, size=(floor(miny)+3)/3)) + 
+  scale_size_continuous(range=c(1,3))
+p11
+gg2animint(list(p1=p1, p2=p2, p3=p3, p4=p4, p5=p5, p6=p6, p7=p7, p8=p8, p9=p9, p10=p10, p11 = p11))

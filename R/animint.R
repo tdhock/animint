@@ -21,6 +21,8 @@ gg2list <- function(p){
       plist$scales[[sc$aesthetics]] <- sc$palette(length(sc$range$range))
     }else if(sc$scale_name == "alpha_c"){
       plist$scales[[sc$aesthetics]] <- sc$palette(sc$range$range)
+    }else if(sc$scale_name == "size_c"){
+      plist$scales[[sc$aesthetics]] <- sc$palette(sc$range$range)
     }
   }
   for(i in seq_along(plistextra$plot$layers)){
@@ -86,6 +88,9 @@ layer2list <- function(i, plistextra){
       }else if(aes.name=="alpha"){
         g$data[["alpha"]] <-  plistextra$data[[i]]$alpha
         "alpha"
+      }else if(aes.name=="size"){
+        g$data[["size"]] <-  plistextra$data[[i]]$size
+        "size"
       }else if(is.symbol(x)){
         if(is.factor(g$data[[as.character(x)]])){
           g$data[[as.character(x)]] <- plistextra$data[[i]][[aes.name]]

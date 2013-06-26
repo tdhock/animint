@@ -87,16 +87,30 @@ s9
 scatterdata2.summary <- ddply(scatterdata2, .(quad), summarise, xmin=min(x), xmax=max(x), ymin=min(y), ymax=max(y), xmean=mean(x), ymean=mean(y))
 s10 <- ggplot() + 
   geom_rect(data=scatterdata2.summary, aes(xmax=xmax, xmin=xmin, ymax=ymax, ymin=ymin,
-                                           colour=factor(quad)), fill="white", alpha=.5) +
+                                           colour=factor(quad)), fill="white", alpha=.2) +
   geom_rect(data=scatterdata2.summary, aes(xmax=xmax, xmin=xmin, ymax=ymax, ymin=ymin, 
                                            colour=factor(quad), fill=factor(quad),
-                                           clickSelects = quad), alpha=.5) +
+                                           clickSelects = quad), alpha=.2) +
   geom_point(data=scatterdata2, aes(x=x, y=y, fill=factor(quad), colour=factor(quad)), alpha=.2) + 
   geom_point(data=scatterdata2.summary, aes(x=xmean, y=ymean, fill=factor(quad), showSelected = quad), colour="black", size=5)
 s10
 
-gg2animint(list(s1=s1, s2=s2, s3=s3, s4=s4, s5=s5, s6=s6, s7=s7, s8=s8, s9=s9, s10=s10))
+# gg2animint(list(s1=s1, s2=s2, s3=s3, s4=s4, s5=s5, s6=s6, s7=s7, s8=s8, s9=s9, s10=s10))
 
 
-#' Kmeans Implementation
-#' 
+#' Point Size Scaling
+#' Scale defaults to radius, but area is more easily interpreted by the brain (Tufte).
+s11 <- ggplot() + 
+  geom_point(data=scatterdata2, aes(x=x, y=y, colour=factor(quad), fill=factor(quad), size=str), alpha=.5) +
+  geom_point(data=scatterdata2, aes(x=x, y=y, colour=factor(quad), fill=factor(quad), 
+                                    size=str, clickSelects=quad, showSelected=quad), alpha=.3)
+s11
+
+# gg2animint(list(s1=s1, s2=s2, s3=s3, s4=s4, s5=s5, s6=s6, s7=s7, s8=s8, s9=s9, s10=s10, s11=s11))
+
+s12 <- ggplot() + 
+  geom_point(data=scatterdata2, aes(x=x, y=y, colour=factor(quad), fill=factor(quad), size=str), alpha=.5) + 
+  scale_size_area()
+s12
+
+gg2animint(list(s1=s1, s2=s2, s3=s3, s4=s4, s5=s5, s6=s6, s7=s7, s8=s8, s9=s9, s10=s10, s11=s11, s12=s12))
