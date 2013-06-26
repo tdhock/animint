@@ -377,8 +377,8 @@ var animint = function(to_select, json_file){
   	    }
   	    var areaThing = d3.svg.area()
       		.x(toXY("x","x"))
-        	.y0(toXY("y","ymin"))
           .y(toXY("y","ymax"))
+          .y0(toXY("y","ymin"))
   	    ;
         elements = elements.data(kv); //select the correct group before returning anything
         eActions = function(e){
@@ -386,6 +386,7 @@ var animint = function(to_select, json_file){
       		    var one_group = data[d.value];
       		    return areaThing(one_group);
       		})
+          .attr("id", function(d){return d.key;})
   		    .style("fill", function(group_info){
             var one_group = data[group_info.value];
             var one_row = one_group[0]; // take fill for first value in the group
@@ -412,7 +413,7 @@ var animint = function(to_select, json_file){
             return(get_size(one_row));
           });
   	    }
-  	    eAppend = "area";
+  	    eAppend = "path";
   	}else if(g_info.geom == "tallrect"){
         elements = elements.data(data);
   	    eActions = function(e){
