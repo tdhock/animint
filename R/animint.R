@@ -193,15 +193,12 @@ layer2list <- function(i, plistextra){
 #' \item fill/colour (brewer, gradient, identity, manual)
 #' \item linetype
 #' \item x and y axis scales, manual break specification, label formatting
+#' \item area 
+#' \item size
 #' }
 #' Unsupported scales: 
 #' \itemize{
 #' \item shape. Open and closed circles can be represented by manipulating fill and colour scales and using default (circle) points, but d3 does not support many R shape types, so mapping between the two is difficult.
-#' }
-#' Currently unsupported scales (may be supported in the future) (TODO): 
-#' \itemize{
-#' \item area 
-#' \item size
 #' }
 #' TODO: 
 #' \itemize{
