@@ -64,8 +64,10 @@ gg2list <- function(p){
 #' @seealso \code{\link{gg2animint}}
 layer2list <- function(i, plistextra){
   g <- list(geom=plistextra$plot$layers[[i]]$geom$objname, data=plistextra$plot$layers[[i]]$data)
+#   g <- list(geom=plistextra$plot$layers[[i]]$geom$objname, data=plistextra$data[[i]])
   g$aes <- list()
 
+  calc.geoms <- c("abline", "area", "bar", "bin2d", "boxplot", "contour", "crossbar", "density", "density2d", "dotplot", "errorbar", "freqpoly", "hex", "histogram", "map", "quantile", "smooth", "step", "tile", "raster", "violin")
   
   # use un-named parameters so that they will not be exported
   # to JSON as a named object, since that causes problems with
@@ -75,46 +77,58 @@ layer2list <- function(i, plistextra){
     names(g$params[[p.name]]) <- NULL
   }
 
-  
-  # Populate list of aesthetics
-  for(aes.name in names(plistextra$plot$layers[[i]]$mapping)){
-    x <- plistextra$plot$layers[[i]]$mapping[[aes.name]]
-    g$aes[[aes.name]] <- 
-      if(aes.name=="colour"){
-        g$data[["colour"]] <- plistextra$data[[i]]$colour
-        "colour"
-      }else if(aes.name=="fill"){
-        # fill is the same in R and d3...
-        g$data[["fill"]] <- plistextra$data[[i]]$fill
-        "fill"
-      }else if(aes.name=="linetype"){
-        g$data[["linetype"]] <- plistextra$data[[i]]$linetype
-        "linetype"
-      }else if(aes.name=="alpha"){
-        g$data[["alpha"]] <-  plistextra$data[[i]]$alpha
-        "alpha"
-      }else if(aes.name=="size"){
-        g$data[["size"]] <-  plistextra$data[[i]]$size
-        "size"
-      }else if(is.symbol(x)){
-        if(is.factor(g$data[[as.character(x)]])){
-          g$data[[as.character(x)]] <- plistextra$data[[i]][[aes.name]]
+  if(!g$geom%in%calc.geoms){
+    # Populate list of aesthetics
+    for(aes.name in names(plistextra$plot$layers[[i]]$mapping)){
+      x <- plistextra$plot$layers[[i]]$mapping[[aes.name]]
+      g$aes[[aes.name]] <- 
+        if(aes.name=="colour"){
+          g$data[["colour"]] <- plistextra$data[[i]]$colour
+          "colour"
+        }else if(aes.name=="fill"){
+          # fill is the same in R and d3...
+          g$data[["fill"]] <- plistextra$data[[i]]$fill
+          "fill"
+        }else if(aes.name=="linetype"){
+          g$data[["linetype"]] <- plistextra$data[[i]]$linetype
+          "linetype"
+        }else if(aes.name=="alpha"){
+          g$data[["alpha"]] <-  plistextra$data[[i]]$alpha
+          "alpha"
+        }else if(aes.name=="size"){
+          g$data[["size"]] <-  plistextra$data[[i]]$size
+          "size"
+        }else if(aes.name=="label"){
+          g$data[["label"]] <- plistextra$data[[i]]$label
+          "label"
+        }else if(is.symbol(x)){
+          if(is.factor(g$data[[as.character(x)]])){
+            g$data[[as.character(x)]] <- plistextra$data[[i]][[aes.name]]
+          }
+          as.character(x)
+        }else if(is.language(x)){
+          newcol <- as.character(as.expression(x))
+          g$data[[newcol]] <- plistextra$data[[i]][[aes.name]]
+          newcol
+        }else if(is.numeric(x)){
+          newcol <- aes.name
+          g$data[[newcol]] <- plistextra$data[[i]][[aes.name]]
+          newcol
+        }else{
+          str(x)
+          stop("don't know how to convert")
         }
-        as.character(x)
-      }else if(is.language(x)){
-        newcol <- as.character(as.expression(x))
-        g$data[[newcol]] <- plistextra$data[[i]][[aes.name]]
-        newcol
-      }else if(is.numeric(x)){
-        newcol <- aes.name
-        g$data[[newcol]] <- plistextra$data[[i]][[aes.name]]
-        newcol
-      }else{
-        str(x)
-        stop("don't know how to convert")
+    }
+  } else {
+    g$data <- plistextra$data[[i]]
+    for(aes.name in names(plistextra$plot$layers[[i]]$mapping))
+    g$aes[[aes.name]] <- 
+      if(aes.name%in%names(g$data)){
+        g$data[[aes.name]] <- plistextra$data[[i]][,aes.name]
+        aes.name
       }
   }
-  
+    
   
   some.vars <- c(g$aes[grepl("showSelected",names(g$aes))])
   g$update <- c(some.vars, g$aes[names(g$aes)=="clickSelects"])
@@ -139,6 +153,11 @@ layer2list <- function(i, plistextra){
     g$aes$yend <- "yend"
     g$subord <- list()
     g$subvars <- list()
+  } else if(g$geom=="density" | g$geom=="area"){
+    g$geom <- "ribbon"
+    g$aes$x <- "x"
+    g$aes$ymax <- "ymax"
+    g$aes$ymin <- "ymin"
   }
   
   # Use ggplot2's ranges, which incorporate all layers. 

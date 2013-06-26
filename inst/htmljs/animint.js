@@ -63,18 +63,9 @@ var animint = function(to_select, json_file){
                 right: 0,
                 top: titlepadding,
                 bottom: labelpadding+axispadding};
-  var plotdim = {width: 0, 
-                 height: 0,
-                 xstart: margin.left,
-                 xend: 0,
-                 ystart: 0,
-                 yend: margin.top,
-                 graph: {width: 0, height: 0},
-                 margin: margin,
-                 xlab: {x: 0, y:0},
-                 ylab: {x: 0, y:0},
-                 title: {x: 0, y:0}
-                 };
+  var plotdim = {width: 0, height: 0, xstart: 0, xend: 0, ystart: 0, yend: 0,
+                 graph: {width: 0, height: 0}, margin: margin, xlab: {x: 0, y:0},
+                 ylab: {x: 0, y:0}, title: {x: 0, y:0}};
   var add_plot = function(p_name, p_info){
     // initialize svg group
   	var svg = element.append("svg")
@@ -83,16 +74,18 @@ var animint = function(to_select, json_file){
   	    .attr("width",p_info.options.width);
 
     // calculate plot dimensions to be used in placing axes, labels, etc.
-    plotdim.width = svg.attr("width");
-    plotdim.height = svg.attr("height");
-    plotdim.graph.width = svg.attr("width")-margin.left-margin.right;
-    plotdim.graph.height = svg.attr("height")-margin.top-margin.bottom;;
+    plotdim.width = p_info.options.width;
+    plotdim.height = p_info.options.height;
+    plotdim.graph.width = plotdim.width-margin.left-margin.right;
+    plotdim.graph.height = plotdim.height-margin.top-margin.bottom;
+    plotdim.xstart = plotdim.margin.left;
     plotdim.xend = plotdim.graph.width+margin.left;
-    plotdim.ystart = plotdim.graph.height+margin.top;
+    plotdim.ystart = plotdim.margin.top;
+    plotdim.yend = plotdim.graph.height+margin.top;
     plotdim.xlab.x = plotdim.xstart + plotdim.graph.width/2;
     plotdim.xlab.y = axispadding+labelpadding/2;
     plotdim.ylab.x = axispadding+labelpadding/2;
-    plotdim.ylab.y = plotdim.ystart - plotdim.graph.height/2;
+    plotdim.ylab.y = plotdim.yend - plotdim.graph.height/2;
     plotdim.title.x = plotdim.width/2;
     plotdim.title.y = plotdim.margin.top/2;
     
@@ -101,7 +94,7 @@ var animint = function(to_select, json_file){
   	    .range([plotdim.xstart, plotdim.xend]);
   	svg.y = d3.scale.linear()
   	    .domain(p_info.ranges.y)
-  	    .range([plotdim.ystart, plotdim.yend]);
+  	    .range([plotdim.yend, plotdim.ystart]);
     var xaxis = d3.svg.axis()
         .scale(svg.x)
         .tickValues(p_info.axis.x)
@@ -109,7 +102,7 @@ var animint = function(to_select, json_file){
         .orient("bottom");
       svg.append("g")
         .attr("class", "axis")
-        .attr("transform", "translate(0," + (plotdim.ystart) + ")")
+        .attr("transform", "translate(0," + (plotdim.yend) + ")")
         .call(xaxis)
       .append("text")
         .text(p_info.axis.xname)
@@ -145,9 +138,6 @@ var animint = function(to_select, json_file){
   	    SVGs[g_name] = svg;
     });
     Plots[p_name] = p_info;
-  }
-  var add_axis = function(p_name, p_info){
-    
   }
   var add_selector = function(s_name, s_info){
   	Selectors[s_name] = s_info;
@@ -421,8 +411,8 @@ var animint = function(to_select, json_file){
   		    .attr("width",function(d){
   		    	return svg.x(d[ aes.xmax ])-svg.x(d[ aes.xmin ]);
   		    })
-  		    .attr("y", plotdim.ystart)
-  		    .attr("height", plotdim.graph.height)
+  		    .attr("y", svg.y.range()[1])
+  		    .attr("height", svg.y.range()[0]-svg.y.range()[1])
   		    .style("fill",get_fill)
           .style("stroke-width", get_size)
           .style("stroke",get_colour)
@@ -505,7 +495,7 @@ var animint = function(to_select, json_file){
   	if(g_info.aes.hasOwnProperty("clickSelects")){
   	    var notOver = function(d){
   	    	return selectedOpacity(d, g_info.aes.clickSelects, 
-  				            get_alpha(d), get_alpha(d)*1/2);
+  				            get_alpha(d), get_alpha(d)-1/2);
   	    }
   	    //elements.style("opacity",notOver);
   	    elements.style("opacity",notOver)
@@ -535,7 +525,7 @@ var animint = function(to_select, json_file){
             var one_row = one_group[0]; // take aesthetic for first value in the group
             return(get_alpha(one_row));
           })
-      }else if(g_info.geom=="area"){ // treat areas (groups of points) differently
+      }else if(g_info.geom=="ribbon"){ // treat areas (groups of points) differently
         enter.style("opacity", function(group_info){
             var one_group = data[group_info.value];
             var one_row = one_group[0]; // take aesthetic for first value in the group
