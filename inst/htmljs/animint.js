@@ -23,7 +23,7 @@ var animint = function(to_select, json_file){
   var getcol = function(v_name){
     return function(d){return d[v_name];};
   }
-  var padding = 30;
+
   var add_geom = function(g_name, g_info){
   	d3.csv(g_info.data, function(error, response){
   	    // First convert to correct types.
@@ -56,7 +56,9 @@ var animint = function(to_select, json_file){
   	  update_geom(g_name);
   	});
   }
-
+  var axispadding = 30;
+  var labelpadding = 15;
+  var titlepadding = 30;
   var add_plot = function(p_name, p_info){
   	var svg = element.append("svg")
   	    .attr("id",p_name)
@@ -66,10 +68,10 @@ var animint = function(to_select, json_file){
     var w = svg.attr("width");
   	svg.x = d3.scale.linear()
   	    .domain(p_info.ranges.x)
-  	    .range([padding,svg.attr("width")-padding]);
+  	    .range([axispadding+labelpadding,svg.attr("width")]);
   	svg.y = d3.scale.linear()
   	    .domain(p_info.ranges.y)
-  	    .range([svg.attr("height")-padding,padding]);
+  	    .range([svg.attr("height")-labelpadding - axispadding,titlepadding]);
     var xaxis = d3.svg.axis()
         .scale(svg.x)
         .tickValues(p_info.axis.x)
@@ -77,16 +79,26 @@ var animint = function(to_select, json_file){
         .orient("bottom");
       svg.append("g")
         .attr("class", "axis")
-        .attr("transform", "translate(0," + (h-padding) + ")")
-        .call(xaxis);
+        .attr("transform", "translate(0," + (h-labelpadding-axispadding) + ")")
+        .call(xaxis)
+      .append("text")
+        .text(p_info.axis.xname)
+        .style("text-anchor", "middle")
+        .attr("transform", "translate("+(labelpadding/2+axispadding/2+w/2)+","+(axispadding+labelpadding/2)+")")
+        ;
     var yaxis = d3.svg.axis().scale(svg.y)
         .tickValues(p_info.axis.y)
         .tickFormat(function(d) {return p_info.axis.ylab[p_info.axis.y.indexOf(d)].toString()})
         .orient("left");
       svg.append("g")
         .attr("class", "axis")
-        .attr("transform", "translate("+padding+",0)")
-        .call(yaxis);
+        .attr("transform", "translate("+(labelpadding+axispadding)+",0)")
+        .call(yaxis)
+      .append("text")
+        .text(p_info.axis.yname)
+        .style("text-anchor", "middle")
+        .attr("transform", "rotate(270)translate("+(-h/2)+","+(-axispadding-labelpadding/2)+")") // translate coordinates are specified in (-y, -x)
+        ;
   	svg.plot = p_info;
   	p_info.geoms.forEach(function(g_name){
   	    SVGs[g_name] = svg;
@@ -317,7 +329,7 @@ var animint = function(to_select, json_file){
   		    	return svg.x(d[ aes.xmax ])-svg.x(d[ aes.xmin ]);
   		    })
   		    .attr("y", svg.y.range()[1])
-  		    .attr("height", svg.y.range()[0]-padding)
+  		    .attr("height", svg.y.range()[0]-axispadding)
   		    .style("fill",get_fill)
           .style("stroke-width", get_size)
           .style("stroke",get_colour)
@@ -383,8 +395,8 @@ var animint = function(to_select, json_file){
   	    eActions = function(e){
   		e.attr("y1",toXY("y","yintercept"))
   		    .attr("y2",toXY("y","yintercept"))
-  		    .attr("x1",svg.x.range()[0]+padding)
-  		    .attr("x2",svg.x.range()[1]-padding)
+  		    .attr("x1",svg.x.range()[0]+axispadding)
+  		    .attr("x2",svg.x.range()[1]-axispadding)
   		    .style("stroke-dasharray",get_dasharray)
   		    .style("stroke-width",get_size)
   		    .style("stroke",get_colour)

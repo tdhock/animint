@@ -20,7 +20,10 @@ gg2animint(list(p=p))
 
 #' Must use empty ggplot() statement because of structure of ggplot/qplot object
 #' Must provide a named list of ggplots.
-s1 <- ggplot() + geom_point(data=scatterdata, aes(x=x,y=y))
+#' Axis labels now work
+s1 <- ggplot() + geom_point(data=scatterdata, aes(x=x, y=y)) + 
+  xlab("very long x axis label") + 
+  ylab("very long y axis label")
 s1
 # gg2animint(list(s1=s1))
 
@@ -114,3 +117,4 @@ s12 <- ggplot() +
 s12
 
 gg2animint(list(s1=s1, s2=s2, s3=s3, s4=s4, s5=s5, s6=s6, s7=s7, s8=s8, s9=s9, s10=s10, s11=s11, s12=s12))
+

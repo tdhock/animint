@@ -46,8 +46,10 @@ gg2list <- function(p){
   plist$axis <- list(
     x = plistextra$panel$ranges[[1]]$x.major_source,
     xlab = plistextra$panel$ranges[[1]]$x.labels,
+    xname = plistextra$plot$labels$x,
     y = plistextra$panel$ranges[[1]]$y.major_source,
-    ylab = plistextra$panel$ranges[[1]]$y.labels
+    ylab = plistextra$panel$ranges[[1]]$y.labels,
+    yname = plistextra$plot$labels$y
   )
   plist$options <- list(width=300,height=300)
   plist
