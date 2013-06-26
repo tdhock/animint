@@ -8,6 +8,8 @@ p1
 # gg2animint(list(p1=p1))
 
 ribbondata <- data.frame(x=seq(0, 1, .1), ymin=runif(11, 0, 1), ymax=runif(11, 1, 2))
-p2 <- ggplot() + geom_ribbon(data=ribbondata, aes(x=x, ymin=ymin, ymax=ymax), fill="blue", colour="red")
+ribbondata <- rbind(cbind(ribbondata, group=1), cbind(ribbondata, group=2))
+ribbondata[12:22,2:3] <- ribbondata[12:22,2:3]+1
+p2 <- ggplot() + geom_ribbon(data=ribbondata, aes(x=x, ymin=ymin, ymax=ymax, group=group, fill=group), alpha=.5)
 p2
 gg2animint(list(p1=p1, p2=p2))
