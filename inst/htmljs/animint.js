@@ -40,6 +40,8 @@ var animint = function(to_select, json_file){
             	//keep it as a character.        	      
     		    }else if(r_type == "linetype"){
       	      //keep it as a character. 
+    		    }else if(r_type == "label"){
+              //keep it as a character
     		    }else{
     			    throw "unsupported R type "+r_type;
     		    }
@@ -341,6 +343,52 @@ var animint = function(to_select, json_file){
       		    return lineThing(one_group);
       		})
   		    .style("fill","none")
+  		    .style("stroke-width",size)
+          .style("stroke", function(group_info){
+            var one_group = data[group_info.value];
+            var one_row = one_group[0]; // take color for first value in the group
+            return(get_colour(one_row));
+          })
+          .style("stroke-dasharray", function(group_info){
+            var one_group = data[group_info.value];
+            var one_row = one_group[0]; // take linetype for first value in the group
+            return(get_dasharray(one_row));
+          })
+          .style("stroke-width", function(group_info){
+            var one_group = data[group_info.value];
+            var one_row = one_group[0]; // take line size for first value in the group
+            return(get_size(one_row));
+          });
+  	    }
+  	    eAppend = "path";
+  	}else if(g_info.geom == "polygon"){
+        // case of only 1 line and no groups.
+  	    if(!aes.hasOwnProperty("group")){
+      		kv = [{"key":0,"value":0}];
+      		data = {0:data};
+  	    }else{
+  		  // we need to use a path for each group.
+  		    var kv = d3.entries(d3.keys(data));
+      		kv = kv.map(function(d){
+      		    d[aes.group] = d.value;
+      		    return d;
+  	    	});
+  	    }
+  	    var lineThing = d3.svg.line()
+      		.x(toXY("x","x"))
+      		.y(toXY("y","y"))
+  	    ;
+  	    elements = elements.data(kv); //select the correct group before returning anything
+  	    eActions = function(e){
+      		e.attr("d",function(d){
+      		    var one_group = data[d.value];
+      		    return lineThing(one_group);
+      		})
+  		    .style("fill", function(group_info){
+            var one_group = data[group_info.value];
+            var one_row = one_group[0]; // take color for first value in the group
+            return(get_fill(one_row));
+          })
   		    .style("stroke-width",size)
           .style("stroke", function(group_info){
             var one_group = data[group_info.value];

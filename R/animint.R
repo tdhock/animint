@@ -67,7 +67,7 @@ layer2list <- function(i, plistextra){
 #   g <- list(geom=plistextra$plot$layers[[i]]$geom$objname, data=plistextra$data[[i]])
   g$aes <- list()
 
-  calc.geoms <- c("abline", "area", "bar", "bin2d", "boxplot", "contour", "crossbar", "density", "density2d", "dotplot", "errorbar", "freqpoly", "hex", "histogram", "map", "quantile", "smooth", "step", "tile", "raster", "violin")
+  calc.geoms <- c("abline", "area", "bar", "bin2d", "boxplot", "contour", "crossbar", "density", "density2d", "dotplot", "errorbar", "freqpoly", "hex", "histogram", "map", "quantile", "smooth", "step", "tile", "raster", "violin", "polygon")
   
   # use un-named parameters so that they will not be exported
   # to JSON as a named object, since that causes problems with
@@ -127,6 +127,12 @@ layer2list <- function(i, plistextra){
         g$data[[aes.name]] <- plistextra$data[[i]][,aes.name]
         aes.name
       }
+  }
+  
+  # Check g$data for color/fill - convert to hexadecimal.
+  idx <- which(names(g$data)%in%c("colour", "color", "fill"))
+  if(sum(!is.rgb(as.character(g$data[,idx])))!=0){
+    g$data[,idx] <- sapply(g$data[,idx], function(x) rgb(t(col2rgb(as.character(x))), maxColorValue=255))
   }
     
   
@@ -326,9 +332,6 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
         xsplit <- sapply(x, function(i) sum(is.na(strtoi(strsplit(i,"")[[1]],16)))==0)
         return(namedlinetype | xsplit)
       }
-      is.rgb <- function(x){
-        grepl("NULL", x) | (grepl("#", x) & nchar(x)==7)
-      }
       g$types <- as.list(sapply(g$data, class))
       charidx <- which(g$types=="character")
       g$types[charidx] <- sapply(charidx, function(i) 
@@ -392,4 +395,13 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
   }
   invisible(result)
   ### An invisible copy of the R list that was exported to JSON.
+}
+
+
+#' Check if character is an RGB hexadecimal color value
+#' @param x character 
+#' @return True/False value
+#' @export 
+is.rgb <- function(x){
+  grepl("NULL", x) | (grepl("#", x) & nchar(x)==7)
 }

@@ -15,14 +15,16 @@
 
   \item{open.browser}{Should R open a browser? Note: Chrome
   will not display local html files unless you are running
-  a local webserver. Firefox should display local html
-  files (including those containing javascript).}
+  a local webserver or have launched chrome with the option
+  --allow-file-access-from-files. Firefox should display
+  local html files (including those containing
+  javascript).}
 }
 \value{
   invisible list of ggplots in list format
 }
 \description{
-  Workhorse function for the animint package.} Convert a
+  Workhorse function for the animint package. Convert a
   list of ggplots to a d3-ready graphic. Adds aesthetics
   clickSelects and updateSelected to utilize d3's mouseover
   and interactivity features for multiple linked plots, and
@@ -32,24 +34,23 @@
   Supported ggplot2 geoms: \itemize{ \item point \item
   jitter \item line \item rect \item tallRect (new with
   this package) \item segment \item hline \item vline \item
-  bar \item text. } Currently unsupported (TODO): \itemize{
-  \item abline \item path \item histogram \item density
-  \item area \item freqpoly \item polygonv \item ribbon
-  \item smooth \item violin \item rug \item quantile \item
-  boxplot \item crossbar \item linerange \item pointrange
-  \item step \item dotplot \item contour \item density2d
-  \item tile \item bin2d \item hex \item raster \item map }
+  bar \item text \item tile \item raster \item ribbon \item
+  abline \item density } Currently unsupported (TODO):
+  \itemize{ \item path \item histogram \item area \item
+  freqpoly \item polygonv \item smooth \item violin \item
+  rug \item quantile \item boxplot \item crossbar \item
+  linerange \item pointrange \item step \item dotplot \item
+  contour \item density2d \item bin2d \item hex \item map }
   Supported scales: \itemize{ \item alpha, \item
   fill/colour (brewer, gradient, identity, manual) \item
   linetype \item x and y axis scales, manual break
-  specification, label formatting } Unsupported scales:
-  \itemize{ \item shape. Open and closed circles can be
-  represented by manipulating fill and colour scales and
-  using default (circle) points, but d3 does not support
-  many R shape types, so mapping between the two is
-  difficult. } Currently unsupported scales (may be
-  supported in the future) (TODO): \itemize{ \item area
-  \item size } TODO: \itemize{ \item add legends }
+  specification, label formatting \item area \item size }
+  Unsupported scales: \itemize{ \item shape. Open and
+  closed circles can be represented by manipulating fill
+  and colour scales and using default (circle) points, but
+  d3 does not support many R shape types, so mapping
+  between the two is difficult. } TODO: \itemize{ \item add
+  legends }
 }
 \examples{
 library(animint)
