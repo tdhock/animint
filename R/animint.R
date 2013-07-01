@@ -226,14 +226,14 @@ layer2list <- function(i, plistextra){
 #' \item ribbon
 #' \item abline
 #' \item density
+#' \item path
+#' \item polygon
 #' }
 #' Currently unsupported (TODO): 
 #' \itemize{
-#' \item path
 #' \item histogram
 #' \item area
 #' \item freqpoly
-#' \item polygonv
 #' \item smooth
 #' \item violin
 #' \item rug
