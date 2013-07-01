@@ -42,4 +42,16 @@ pathdata <- data.frame(x=rnorm(30, 0, .5), y=rnorm(30, 0, .5), z=1:30)
 g5 <- ggplot() + geom_path(data=pathdata, aes(x=x, y=y), alpha=.5) +
   geom_text(data=pathdata, aes(x=x, y=y, label=z))
 g5
-gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5))
+# gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5))
+
+#' 
+polydata <- rbind(
+  data.frame(x=c(0, .5, 1, .5, 0), y=c(0, 0, 1, 1, 0), group="parallelogram", fill="blue", xc=.5, yc=.5),
+  data.frame(x=c(.5, .75, 1, .5), y=c(.5, 0, .5, .5), group="triangle", fill="red", xc=.75, yc=.33)
+  )
+g6 <- ggplot() + 
+  geom_polygon(data=polydata, aes(x=x, y=y, group=group, fill=fill, colour=fill), alpha=.5)+
+  scale_colour_identity() + scale_fill_identity()+
+  geom_text(data=polydata, aes(x=xc, y=yc, label=group))
+g6
+gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6))
