@@ -158,6 +158,15 @@ layer2list <- function(i, plistextra){
     g$aes$x <- "x"
     g$aes$ymax <- "ymax"
     g$aes$ymin <- "ymin"
+  } else if(g$geom=="tile" | g$geom=="raster"){
+    g$geom <- "rect"
+    g$aes$xmin <- "xmin"
+    g$aes$xmax <- "xmax"
+    g$aes$ymin <- "ymin"
+    g$aes$ymax <- "ymax"
+    if(is.null(g$aes$colour) & !is.null(g$aes$fill)){
+      g$aes$colour <- g$aes$fill
+    }
   }
   
   # Use ggplot2's ranges, which incorporate all layers. 
@@ -205,18 +214,20 @@ layer2list <- function(i, plistextra){
 #' \item hline
 #' \item vline
 #' \item bar
-#' \item text.
+#' \item text
+#' \item tile
+#' \item raster
+#' \item ribbon
+#' \item abline
+#' \item density
 #' }
 #' Currently unsupported (TODO): 
 #' \itemize{
-#' \item abline
 #' \item path
 #' \item histogram
-#' \item density
 #' \item area
 #' \item freqpoly
 #' \item polygonv
-#' \item ribbon
 #' \item smooth
 #' \item violin
 #' \item rug
@@ -229,10 +240,8 @@ layer2list <- function(i, plistextra){
 #' \item dotplot
 #' \item contour
 #' \item density2d
-#' \item tile
 #' \item bin2d
 #' \item hex
-#' \item raster
 #' \item map
 #'}
 #' Supported scales: 
