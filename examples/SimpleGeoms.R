@@ -1,4 +1,6 @@
 #' Tests for each geom
+library(ggplot2)
+library(ddply)
 
 xydata <- data.frame(x=sort(runif(50, 0, 10)))
 xydata$y <- 3+2*xydata$x + rnorm(50, 0, 1)
@@ -17,4 +19,15 @@ g2
 densdata <- data.frame(x=c(rnorm(100), rexp(100)), group=rep(1:2, each=100))
 g3 <- ggplot() + geom_density(data=densdata, aes(x=x, group=group, fill=factor(group)), alpha=.5)
 g3
-gg2animint(list(g1=g1, g2=g2, g3=g3))
+# gg2animint(list(g1=g1, g2=g2, g3=g3))
+
+tiledata <- data.frame(x=rnorm(1000, 0, 3))
+tiledata$y <- rnorm(1000, tiledata$x, 3)
+tiledata$rx <- round(tiledata$x)
+tiledata$ry <- round(tiledata$y)
+tiledata <- ddply(tiledata, .(rx,ry), summarise, n=length(rx))
+
+g4 <- ggplot() + geom_tile(data=tiledata, aes(x=rx, y=ry, fill=n)) +
+  scale_fill_gradient(low="#56B1F7", high="#132B43") + xlab("x") + ylab("y")
+g4
+# gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4))
