@@ -197,7 +197,7 @@ layer2list <- function(i, plistextra){
   g
 }
 
-#' Workhorse function for the animint package.}
+#' Workhorse function for the animint package.
 #' Convert a list of ggplots to a d3-ready graphic. 
 #' Adds aesthetics clickSelects and updateSelected to utilize 
 #' d3's mouseover and interactivity features for multiple linked plots,
