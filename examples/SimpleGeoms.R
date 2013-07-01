@@ -2,6 +2,7 @@
 library(ggplot2)
 library(ddply)
 
+#' abline: should show two lines: one running through the points, the other with an intercept of 0 and slope of 2.
 xydata <- data.frame(x=sort(runif(50, 0, 10)))
 xydata$y <- 3+2*xydata$x + rnorm(50, 0, 1)
 g1 <- ggplot() + geom_point(data=xydata, aes(x=x, y=y)) + 
@@ -9,6 +10,7 @@ g1 <- ggplot() + geom_point(data=xydata, aes(x=x, y=y)) +
 g1
 # gg2animint(list(g1=g1))
 
+#' ribbon: should show two overlapping ribbons, with the same basic shape, one translated up by one unit.
 ribbondata <- data.frame(x=seq(0, 1, .1), ymin=runif(11, 0, 1), ymax=runif(11, 1, 2))
 ribbondata <- rbind(cbind(ribbondata, group=1), cbind(ribbondata, group=2))
 ribbondata[12:22,2:3] <- ribbondata[12:22,2:3]+1
@@ -16,11 +18,14 @@ g2 <- ggplot() + geom_ribbon(data=ribbondata, aes(x=x, ymin=ymin, ymax=ymax, gro
 g2
 # gg2animint(list(g1=g1, g2=g2))
 
+#' density: should show an exponential density curve in blue and a normal(ish) density curve in pink.
 densdata <- data.frame(x=c(rnorm(100), rexp(100)), group=rep(1:2, each=100))
 g3 <- ggplot() + geom_density(data=densdata, aes(x=x, group=group, fill=factor(group)), alpha=.5)
 g3
 # gg2animint(list(g1=g1, g2=g2, g3=g3))
 
+
+#' tile: should show an approximately bivariate normal distribution.
 tiledata <- data.frame(x=rnorm(1000, 0, 3))
 tiledata$y <- rnorm(1000, tiledata$x, 3)
 tiledata$rx <- round(tiledata$x)
@@ -31,3 +36,10 @@ g4 <- ggplot() + geom_tile(data=tiledata, aes(x=rx, y=ry, fill=n)) +
   scale_fill_gradient(low="#56B1F7", high="#132B43") + xlab("x") + ylab("y")
 g4
 # gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4))
+
+#' path: should show a two-dimensional random walk, where x and y are position, z is time.
+pathdata <- data.frame(x=rnorm(30, 0, .5), y=rnorm(30, 0, .5), z=1:30)
+g5 <- ggplot() + geom_path(data=pathdata, aes(x=x, y=y), alpha=.5) +
+  geom_text(data=pathdata, aes(x=x, y=y, label=z))
+g5
+gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5))
