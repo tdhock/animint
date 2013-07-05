@@ -1,6 +1,6 @@
 #' Tests for each geom
 library(ggplot2)
-library(ddply)
+library(plyr)
 
 #' abline: should show two lines: one running through the points, the other with an intercept of 0 and slope of 2.
 xydata <- data.frame(x=sort(runif(50, 0, 10)))
@@ -44,7 +44,7 @@ g5 <- ggplot() + geom_path(data=pathdata, aes(x=x, y=y), alpha=.5) +
 g5
 # gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5))
 
-#' 
+#' Polygons
 polydata <- rbind(
   data.frame(x=c(0, .5, 1, .5, 0), y=c(0, 0, 1, 1, 0), group="parallelogram", fill="blue", xc=.5, yc=.5),
   data.frame(x=c(.5, .75, 1, .5), y=c(.5, 0, .5, .5), group="triangle", fill="red", xc=.75, yc=.33)
@@ -54,4 +54,13 @@ g6 <- ggplot() +
   scale_colour_identity() + scale_fill_identity()+
   geom_text(data=polydata, aes(x=xc, y=yc, label=group))
 g6
-gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6))
+# gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6))
+
+#' Boxplots
+boxplotdata <- rbind(data.frame(y=rnorm(30, 3, 1), group=1),
+                     data.frame(y=rnorm(30, 0, 1), group=2), 
+                     data.frame(y=rgamma(30, 2, 1/3), group=3))
+g7 <- ggplot() + 
+  geom_boxplot(data=boxplotdata, aes(y=y, x=factor(group)))
+g7
+gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7))

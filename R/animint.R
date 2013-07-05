@@ -173,6 +173,20 @@ layer2list <- function(i, plistextra){
     if(is.null(g$aes$colour) & !is.null(g$aes$fill)){
       g$aes$colour <- g$aes$fill
     }
+  } else if(g$geom=="boxplot"){
+    g$data$outliers <- sapply(g$data$outliers, FUN=paste, collapse=" @ ") 
+    g$aes$xmin <- "xmin"
+    g$aes$xmax <- "xmax"
+    g$aes$ymin <- "ymin"
+    g$aes$ymax <- "ymax"
+    g$aes$lower <- "lower"
+    g$aes$middle <- "middle"
+    g$aes$upper <- "upper"
+    g$aes$outliers <- "outliers"
+    g$aes$notchupper <- "notchupper"
+    g$aes$notchlower <- "notchlower"
+    # outliers are specified as a list... change so that they are specified as a single string which can then be parsed in JavaScript.
+    # there has got to be a better way to do this!!
   }
   
   # Use ggplot2's ranges, which incorporate all layers. 
