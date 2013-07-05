@@ -193,6 +193,12 @@ layer2list <- function(i, plistextra){
     g$aes$xmax <- "xmax"
     g$aes$ymin <- "ymin"
     g$aes$ymax <- "ymax"
+  } else if(g$geom=="violin"){
+    g$geom <- "polygon"
+    g$data <- transform(g$data, xminv = x-violinwidth*(x-xmin),xmaxv = x+violinwidth*(xmax-x))
+    newdata <- ddply(g$data, .(group), function(df) rbind(arrange(transform(df, x=xminv), y), arrange(transform(df, x=xmaxv), -y)))
+    newdata <- ddply(newdata, .(group), function(df) rbind(df, df[1,]))
+    g$data <- newdata
   }
   
   
