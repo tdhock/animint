@@ -199,6 +199,10 @@ layer2list <- function(i, plistextra){
     newdata <- ddply(g$data, .(group), function(df) rbind(arrange(transform(df, x=xminv), y), arrange(transform(df, x=xmaxv), -y)))
     newdata <- ddply(newdata, .(group), function(df) rbind(df, df[1,]))
     g$data <- newdata
+  } else if(g$geom=="step"){
+    g$geom <- "path"
+    datanames <- names(g$data)
+    g$data <- ggplot2:::stairstep(g$data)
   }
   
   
@@ -258,6 +262,7 @@ layer2list <- function(i, plistextra){
 #' \item histogram
 #' \item violin
 #' \item linerange
+#' \item step
 #' }
 #' Currently unsupported (TODO): 
 #' \itemize{
@@ -269,7 +274,6 @@ layer2list <- function(i, plistextra){
 #' \item boxplot
 #' \item crossbar
 #' \item pointrange
-#' \item step
 #' \item dotplot
 #' \item contour
 #' \item density2d

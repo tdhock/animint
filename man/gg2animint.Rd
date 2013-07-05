@@ -36,12 +36,12 @@
   this package) \item segment \item hline \item vline \item
   bar \item text \item tile \item raster \item ribbon \item
   abline \item density \item path \item polygon \item
-  histogram \item violin \item linerange } Currently
-  unsupported (TODO): \itemize{ \item area \item freqpoly
-  \item smooth \item rug \item quantile \item boxplot \item
-  crossbar \item pointrange \item step \item dotplot \item
-  contour \item density2d \item bin2d \item hex \item map }
-  Supported scales: \itemize{ \item alpha, \item
+  histogram \item violin \item linerange \item step }
+  Currently unsupported (TODO): \itemize{ \item area \item
+  freqpoly \item smooth \item rug \item quantile \item
+  boxplot \item crossbar \item pointrange \item dotplot
+  \item contour \item density2d \item bin2d \item hex \item
+  map } Supported scales: \itemize{ \item alpha, \item
   fill/colour (brewer, gradient, identity, manual) \item
   linetype \item x and y axis scales, manual break
   specification, label formatting \item area \item size }

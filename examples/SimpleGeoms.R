@@ -79,4 +79,10 @@ g9
 g10 <- ggplot() + 
   geom_violin(data=boxplotdata, aes(x=factor(group), y=y, fill=factor(group), group=group))
 g10
-gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10))
+# gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10))
+
+#' Step Plot
+stepdata <- data.frame(x=1:50, y=sort(rnorm(50)))
+g11 <- ggplot() + geom_step(data=stepdata, aes(x=x, y=y), colour="blue")
+g11
+gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11))
