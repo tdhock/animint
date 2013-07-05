@@ -202,7 +202,7 @@ layer2list <- function(i, plistextra){
   } else if(g$geom=="step"){
     g$geom <- "path"
     datanames <- names(g$data)
-    g$data <- ggplot2:::stairstep(g$data)
+    g$data <- ddply(g$data, .(group), function(df) ggplot2:::stairstep(df))
   }
   
   

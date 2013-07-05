@@ -57,14 +57,16 @@ g6
 # gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6))
 
 #' Boxplots
-boxplotdata <- rbind(data.frame(y=rnorm(50, 3, 1), group=1),
-                     data.frame(y=rnorm(50, 0, 1), group=2), 
-                     data.frame(y=rgamma(50, 2, 1/3), group=3))
+boxplotdata <- rbind(data.frame(x=1:50, y=sort(rnorm(50, 3, 1)), group=1),
+                     data.frame(x=1:50, y=sort(rnorm(50, 0, 1)), group=2), 
+                     data.frame(x=1:50, y=sort(rgamma(50, 2, 1/3)), group=3))
 boxplotdata <- ddply(boxplotdata, .(group), transform, ymax=max(y), ymin=min(y), med=median(y))
+
+#' Boxplot does not work (7/5/13)
 g7 <- ggplot() + 
   geom_boxplot(data=boxplotdata, aes(y=y, x=factor(group)))
 g7
-gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7))
+# gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7))
 
 g8 <- ggplot() + 
   geom_linerange(data=boxplotdata, aes(x=factor(group), ymax=ymax, ymin=ymin, colour=factor(group)))
@@ -82,7 +84,7 @@ g10
 # gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10))
 
 #' Step Plot
-stepdata <- data.frame(x=1:50, y=sort(rnorm(50)))
-g11 <- ggplot() + geom_step(data=stepdata, aes(x=x, y=y), colour="blue")
+#' Must specify group and then use colour=factor(group) to get desired effect.
+g11 <- ggplot() + geom_step(data=boxplotdata, aes(x=x, y=y, colour=factor(group), group=group))
 g11
 gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11))
