@@ -57,10 +57,22 @@ g6
 # gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6))
 
 #' Boxplots
-boxplotdata <- rbind(data.frame(y=rnorm(30, 3, 1), group=1),
-                     data.frame(y=rnorm(30, 0, 1), group=2), 
-                     data.frame(y=rgamma(30, 2, 1/3), group=3))
+boxplotdata <- rbind(data.frame(y=rnorm(50, 3, 1), group=1),
+                     data.frame(y=rnorm(50, 0, 1), group=2), 
+                     data.frame(y=rgamma(50, 2, 1/3), group=3))
+boxplotdata <- ddply(boxplotdata, .(group), transform, ymax=max(y), ymin=min(y), med=median(y))
 g7 <- ggplot() + 
   geom_boxplot(data=boxplotdata, aes(y=y, x=factor(group)))
 g7
 gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7))
+
+g8 <- ggplot() + 
+  geom_linerange(data=boxplotdata, aes(x=factor(group), ymax=ymax, ymin=ymin, colour=factor(group)))
+g8
+gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8))
+
+g9 <- ggplot() + 
+  geom_histogram(data=subset(boxplotdata, group==3), aes(x=y), binwidth=1)
+g9
+gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9))
+

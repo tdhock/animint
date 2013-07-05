@@ -551,6 +551,19 @@ var animint = function(to_select, json_file){
           ;
   	    }
   	    eAppend = "line";
+    }else if(g_info.geom == "linerange"){
+        elements = elements.data(data);
+        eActions = function(e){
+  	     e.attr("x1",function(d){return svg.x(d[aes.x]);})
+  		    .attr("x2",function(d){return svg.x(d[aes.x]);})
+  		    .attr("y1",function(d){return svg.y(d[aes.ymax]);})
+  		    .attr("y2",function(d){return svg.y(d[aes.ymin]);})
+  		    .style("stroke-dasharray",get_dasharray)
+  		    .style("stroke-width",get_size)
+  		    .style("stroke",get_colour)
+          ;
+  	    }
+  	    eAppend = "line";
     }else if(g_info.geom == "vline"){
       elements = elements.data(data);
       eActions = function(e){

@@ -187,7 +187,14 @@ layer2list <- function(i, plistextra){
     g$aes$notchlower <- "notchlower"
     # outliers are specified as a list... change so that they are specified as a single string which can then be parsed in JavaScript.
     # there has got to be a better way to do this!!
+  } else if(g$geom=="histogram"){
+    g$geom <- "bar"
+    g$aes$xmin <- "xmin"
+    g$aes$xmax <- "xmax"
+    g$aes$ymin <- "ymin"
+    g$aes$ymax <- "ymax"
   }
+  
   
   # Use ggplot2's ranges, which incorporate all layers. 
   # Strictly speaking, this isn't "layer" information as much 
