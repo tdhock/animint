@@ -35,12 +35,12 @@
   jitter \item line \item rect \item tallRect (new with
   this package) \item segment \item hline \item vline \item
   bar \item text \item tile \item raster \item ribbon \item
-  abline \item density \item path \item polygon } Currently
-  unsupported (TODO): \itemize{ \item histogram \item area
-  \item freqpoly \item smooth \item violin \item rug \item
-  quantile \item boxplot \item crossbar \item linerange
-  \item pointrange \item step \item dotplot \item contour
-  \item density2d \item bin2d \item hex \item map }
+  abline \item density \item path \item polygon \item
+  histogram \item violin \item linerange } Currently
+  unsupported (TODO): \itemize{ \item area \item freqpoly
+  \item smooth \item rug \item quantile \item boxplot \item
+  crossbar \item pointrange \item step \item dotplot \item
+  contour \item density2d \item bin2d \item hex \item map }
   Supported scales: \itemize{ \item alpha, \item
   fill/colour (brewer, gradient, identity, manual) \item
   linetype \item x and y axis scales, manual break

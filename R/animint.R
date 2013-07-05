@@ -255,19 +255,19 @@ layer2list <- function(i, plistextra){
 #' \item density
 #' \item path
 #' \item polygon
+#' \item histogram
+#' \item violin
+#' \item linerange
 #' }
 #' Currently unsupported (TODO): 
 #' \itemize{
-#' \item histogram
 #' \item area
 #' \item freqpoly
 #' \item smooth
-#' \item violin
 #' \item rug
 #' \item quantile
 #' \item boxplot
 #' \item crossbar
-#' \item linerange
 #' \item pointrange
 #' \item step
 #' \item dotplot
