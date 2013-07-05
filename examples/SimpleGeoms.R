@@ -72,7 +72,7 @@ g8
 gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8))
 
 g9 <- ggplot() + 
-  geom_histogram(data=subset(boxplotdata, group==3), aes(x=y), binwidth=1)
+  geom_histogram(data=subset(boxplotdata, group==3), aes(x=y, fill=..count..), binwidth=1)
 g9
 gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9))
 
