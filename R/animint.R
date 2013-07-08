@@ -140,11 +140,12 @@ layer2list <- function(i, plistextra){
   }
   
   # Check g$data for color/fill - convert to hexadecimal.
-  idx <- which(names(g$data)%in%c("colour", "color", "fill"))
-  if(sum(!is.rgb(as.character(g$data[,idx])))!=0){
-    g$data[,idx] <- sapply(g$data[,idx], function(x) rgb(t(col2rgb(as.character(x))), maxColorValue=255))
+  toRGB <- function(x) rgb(t(col2rgb(as.character(x))), maxColorValue=255)
+  for(color.var in c("colour", "color", "fill")){
+    if(color.var %in% names(g$data)){
+      g$data[,color.var] <- toRGB(g$data[,color.var])
+    }
   }
-    
   
   some.vars <- c(g$aes[grepl("showSelected",names(g$aes))])
   g$update <- c(some.vars, g$aes[names(g$aes)=="clickSelects"])
