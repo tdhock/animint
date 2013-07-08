@@ -87,8 +87,8 @@ layer2list <- function(i, plistextra){
     # Populate list of aesthetics
     for(aes.name in names(plistextra$plot$layers[[i]]$mapping)){
       x <- plistextra$plot$layers[[i]]$mapping[[aes.name]]
-      str(plistextra$data[[i]])
-      str(g$data)
+      ##str(plistextra$data[[i]])
+      ##str(g$data)
       g$aes[[aes.name]] <- 
         if(aes.name %in% usegg){
           g$data[[aes.name]] <- ggdata[[aes.name]]
