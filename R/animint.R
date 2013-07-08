@@ -183,7 +183,38 @@ layer2list <- function(i, plistextra){
     if(is.null(g$aes$colour) & !is.null(g$aes$fill)){
       g$aes$colour <- g$aes$fill
     }
+  } else if(g$geom=="boxplot"){
+    g$data$outliers <- sapply(g$data$outliers, FUN=paste, collapse=" @ ") 
+    g$aes$xmin <- "xmin"
+    g$aes$xmax <- "xmax"
+    g$aes$ymin <- "ymin"
+    g$aes$ymax <- "ymax"
+    g$aes$lower <- "lower"
+    g$aes$middle <- "middle"
+    g$aes$upper <- "upper"
+    g$aes$outliers <- "outliers"
+    g$aes$notchupper <- "notchupper"
+    g$aes$notchlower <- "notchlower"
+    # outliers are specified as a list... change so that they are specified as a single string which can then be parsed in JavaScript.
+    # there has got to be a better way to do this!!
+  } else if(g$geom=="histogram"){
+    g$geom <- "bar"
+    g$aes$xmin <- "xmin"
+    g$aes$xmax <- "xmax"
+    g$aes$ymin <- "ymin"
+    g$aes$ymax <- "ymax"
+  } else if(g$geom=="violin"){
+    g$geom <- "polygon"
+    g$data <- transform(g$data, xminv = x-violinwidth*(x-xmin),xmaxv = x+violinwidth*(xmax-x))
+    newdata <- ddply(g$data, .(group), function(df) rbind(arrange(transform(df, x=xminv), y), arrange(transform(df, x=xmaxv), -y)))
+    newdata <- ddply(newdata, .(group), function(df) rbind(df, df[1,]))
+    g$data <- newdata
+  } else if(g$geom=="step"){
+    g$geom <- "path"
+    datanames <- names(g$data)
+    g$data <- ddply(g$data, .(group), function(df) ggplot2:::stairstep(df))
   }
+  
   
   # Use ggplot2's ranges, which incorporate all layers. 
   # Strictly speaking, this isn't "layer" information as much 
@@ -243,21 +274,21 @@ layer2list <- function(i, plistextra){
 #' \item density
 #' \item path
 #' \item polygon
+#' \item histogram
+#' \item violin
+#' \item linerange
+#' \item step
 #' }
 #' Currently unsupported (TODO): 
 #' \itemize{
-#' \item histogram
 #' \item area
 #' \item freqpoly
 #' \item smooth
-#' \item violin
 #' \item rug
 #' \item quantile
 #' \item boxplot
 #' \item crossbar
-#' \item linerange
 #' \item pointrange
-#' \item step
 #' \item dotplot
 #' \item contour
 #' \item density2d
