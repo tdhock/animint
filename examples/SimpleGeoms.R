@@ -1,6 +1,7 @@
 #' Tests for each geom
 library(ggplot2)
-library(ddply)
+library(animint)
+library(plyr)
 
 #' abline: should show two lines: one running through the points, the other with an intercept of 0 and slope of 2.
 xydata <- data.frame(x=sort(runif(50, 0, 10)))

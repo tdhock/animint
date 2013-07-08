@@ -63,8 +63,12 @@ gg2list <- function(p){
 #' @export
 #' @seealso \code{\link{gg2animint}}
 layer2list <- function(i, plistextra){
-  g <- list(geom=plistextra$plot$layers[[i]]$geom$objname, data=plistextra$plot$layers[[i]]$data)
-#   g <- list(geom=plistextra$plot$layers[[i]]$geom$objname, data=plistextra$data[[i]])
+  g <- list(geom=plistextra$plot$layers[[i]]$geom$objname,
+            data=plistextra$plot$layers[[i]]$data)
+  ##str(g$data)
+  
+  ## g <- list(geom=plistextra$plot$layers[[i]]$geom$objname,
+  ##           data=plistextra$data[[i]])
   g$aes <- list()
 
   calc.geoms <- c("abline", "area", "bar", "bin2d", "boxplot", "contour", "crossbar", "density", "density2d", "dotplot", "errorbar", "freqpoly", "hex", "histogram", "map", "quantile", "smooth", "step", "tile", "raster", "violin", "polygon")
@@ -77,33 +81,39 @@ layer2list <- function(i, plistextra){
     names(g$params[[p.name]]) <- NULL
   }
 
+  ggdata <- plistextra$data[[i]]
+  usegg <- c("colour","fill","linetype","alpha","size","label")
   if(!g$geom%in%calc.geoms){
     # Populate list of aesthetics
     for(aes.name in names(plistextra$plot$layers[[i]]$mapping)){
       x <- plistextra$plot$layers[[i]]$mapping[[aes.name]]
+      str(plistextra$data[[i]])
+      str(g$data)
       g$aes[[aes.name]] <- 
-        if(aes.name=="colour"){
-          g$data[["colour"]] <- plistextra$data[[i]]$colour
-          "colour"
-        }else if(aes.name=="fill"){
-          # fill is the same in R and d3...
-          g$data[["fill"]] <- plistextra$data[[i]]$fill
-          "fill"
-        }else if(aes.name=="linetype"){
-          g$data[["linetype"]] <- plistextra$data[[i]]$linetype
-          "linetype"
-        }else if(aes.name=="alpha"){
-          g$data[["alpha"]] <-  plistextra$data[[i]]$alpha
-          "alpha"
-        }else if(aes.name=="size"){
-          g$data[["size"]] <-  plistextra$data[[i]]$size
-          "size"
-        }else if(aes.name=="label"){
-          g$data[["label"]] <- plistextra$data[[i]]$label
-          "label"
+        if(aes.name %in% usegg){
+          g$data[[aes.name]] <- ggdata[[aes.name]]
+          aes.name
         }else if(is.symbol(x)){
           if(is.factor(g$data[[as.character(x)]])){
-            g$data[[as.character(x)]] <- plistextra$data[[i]][[aes.name]]
+            ## BUG: for example in breakpointError$error$layers[[2]],
+
+### Browse[1]> plistextra$data[[i]]
+###     x           y group clickSelects PANEL
+### 1   1  5.00000000     1          133     1
+### 2   2  4.00183002     1          133     1
+### 3   3  3.01800018     1          133     1
+
+            ## so since group=bases.per.probe and
+            ## clickSelects=bases.per.probe, we end up first
+            ## overwriting g$data$bases.per.probe with an integer =>
+            ## BUG! Temporary solution: just don't overwrite...? This
+            ## causes a problem...
+
+### > Error in Summary.factor(c(4L, 4L, 3L, 3L, 4L, 3L, 4L, 3L, 4L, 2L, 4L,  : 
+### range not meaningful for factors
+
+            
+            ##g$data[[as.character(x)]] <- plistextra$data[[i]][[aes.name]]
           }
           as.character(x)
         }else if(is.language(x)){
@@ -190,14 +200,19 @@ layer2list <- function(i, plistextra){
       if(aesname %in% names(g$aes)){
         var.name <- g$aes[[aesname]]
         ax.name <- range.map[[aesname]]
-        r <- range(g$data[[var.name]], na.rm=TRUE, finite=TRUE)
-        ## TODO: handle Inf like in ggplot2.
-        size <- r[2]-r[1]
-        rowidx <- which(dimnames(g$ranges)$axis%in%ax.name)
-        if(length(rowidx)>0){
-          g$data[[var.name]][g$data[[var.name]]==Inf] <- g$ranges[rowidx,2]
-          g$data[[var.name]][g$data[[var.name]]==-Inf] <- g$ranges[rowidx,1]
-        }
+        v <- g$data[[var.name]]
+        if(is.factor(v)){
+          g$data[[var.name]] <- ggdata[[aesname]]
+        }else{
+          r <- range(v, na.rm=TRUE, finite=TRUE)
+          ## TODO: handle Inf like in ggplot2.
+          size <- r[2]-r[1]
+          rowidx <- which(dimnames(g$ranges)$axis%in%ax.name)
+          if(length(rowidx)>0){
+            g$data[[var.name]][g$data[[var.name]]==Inf] <- g$ranges[rowidx,2]
+            g$data[[var.name]][g$data[[var.name]]==-Inf] <- g$ranges[rowidx,1]
+          }
+        }          
       }
     }
   g
