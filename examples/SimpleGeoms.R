@@ -7,7 +7,8 @@ library(animint)
 xydata <- data.frame(x=sort(runif(50, 0, 10)))
 xydata$y <- 3+2*xydata$x + rnorm(50, 0, 1)
 g1 <- ggplot() + geom_point(data=xydata, aes(x=x, y=y)) + 
-  geom_abline(data=data.frame(intercept=c(3, 0), slope=c(2,1)), aes(intercept=intercept, slope=slope))
+  geom_abline(data=data.frame(intercept=c(3, 0), slope=c(2,1)), aes(intercept=intercept, slope=slope)) +
+  ggtitle("geom_abline")
 g1
 # gg2animint(list(g1=g1))
 
@@ -15,13 +16,16 @@ g1
 ribbondata <- data.frame(x=seq(0, 1, .1), ymin=runif(11, 0, 1), ymax=runif(11, 1, 2))
 ribbondata <- rbind(cbind(ribbondata, group=1), cbind(ribbondata, group=2))
 ribbondata[12:22,2:3] <- ribbondata[12:22,2:3]+1
-g2 <- ggplot() + geom_ribbon(data=ribbondata, aes(x=x, ymin=ymin, ymax=ymax, group=group, fill=group), alpha=.5)
+g2 <- ggplot() + 
+  geom_ribbon(data=ribbondata, aes(x=x, ymin=ymin, ymax=ymax, group=group, fill=group), alpha=.5) + 
+  ggtitle("geom_ribbon")
 g2
 # gg2animint(list(g1=g1, g2=g2))
 
 #' density: should show an exponential density curve in blue and a normal(ish) density curve in pink.
 densdata <- data.frame(x=c(rnorm(100), rexp(100)), group=rep(1:2, each=100))
-g3 <- ggplot() + geom_density(data=densdata, aes(x=x, group=group, fill=factor(group)), alpha=.5)
+g3 <- ggplot() + geom_density(data=densdata, aes(x=x, group=group, fill=factor(group)), alpha=.5) +
+  ggtitle("geom_density")
 g3
 # gg2animint(list(g1=g1, g2=g2, g3=g3))
 
@@ -34,14 +38,16 @@ tiledata$ry <- round(tiledata$y)
 tiledata <- ddply(tiledata, .(rx,ry), summarise, n=length(rx))
 
 g4 <- ggplot() + geom_tile(data=tiledata, aes(x=rx, y=ry, fill=n)) +
-  scale_fill_gradient(low="#56B1F7", high="#132B43") + xlab("x") + ylab("y")
+  scale_fill_gradient(low="#56B1F7", high="#132B43") + 
+  xlab("x") + ylab("y") + ggtitle("geom_tile")
 g4
 # gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4))
 
 #' path: should show a two-dimensional random walk, where x and y are position, z is time.
 pathdata <- data.frame(x=rnorm(30, 0, .5), y=rnorm(30, 0, .5), z=1:30)
 g5 <- ggplot() + geom_path(data=pathdata, aes(x=x, y=y), alpha=.5) +
-  geom_text(data=pathdata, aes(x=x, y=y, label=z))
+  geom_text(data=pathdata, aes(x=x, y=y, label=z)) + 
+  ggtitle("geom_path")
 g5
 # gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5))
 
@@ -53,7 +59,8 @@ polydata <- rbind(
 g6 <- ggplot() + 
   geom_polygon(data=polydata, aes(x=x, y=y, group=group, fill=fill, colour=fill), alpha=.5)+
   scale_colour_identity() + scale_fill_identity()+
-  geom_text(data=polydata, aes(x=xc, y=yc, label=group))
+  geom_text(data=polydata, aes(x=xc, y=yc, label=group)) +
+  ggtitle("geom_polygon")
 g6
 # gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6))
 
@@ -65,28 +72,33 @@ boxplotdata <- ddply(boxplotdata, .(group), transform, ymax=max(y), ymin=min(y),
 
 #' Boxplot does not work (7/5/13)
 g7 <- ggplot() + 
-  geom_boxplot(data=boxplotdata, aes(y=y, x=factor(group)))
+  geom_boxplot(data=boxplotdata, aes(y=y, x=factor(group))) +
+  ggtitle("geom_boxplot")
 g7
 # gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7))
 
 g8 <- ggplot() + 
-  geom_linerange(data=boxplotdata, aes(x=factor(group), ymax=ymax, ymin=ymin, colour=factor(group)))
+  geom_linerange(data=boxplotdata, aes(x=factor(group), ymax=ymax, ymin=ymin, colour=factor(group))) +
+  ggtitle("geom_linerange")
 g8
 # gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8))
 
 g9 <- ggplot() + 
-  geom_histogram(data=subset(boxplotdata, group==3), aes(x=y, fill=..count..), binwidth=1)
+  geom_histogram(data=subset(boxplotdata, group==3), aes(x=y, fill=..count..), binwidth=1) + 
+  ggtitle("geom_histogram")
 g9
 # gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9))
 
 g10 <- ggplot() + 
-  geom_violin(data=boxplotdata, aes(x=factor(group), y=y, fill=factor(group), group=group))
+  geom_violin(data=boxplotdata, aes(x=factor(group), y=y, fill=factor(group), group=group)) +
+  ggtitle("geom_violin")
 g10
 # gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10))
 
 #' Step Plot
 #' Must specify group and then use colour=factor(group) to get desired effect.
-g11 <- ggplot() + geom_step(data=boxplotdata, aes(x=x, y=y, colour=factor(group), group=group))
+g11 <- ggplot() + geom_step(data=boxplotdata, aes(x=x, y=y, colour=factor(group), group=group)) +
+  ggtitle("geom_step")
 g11
 # gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11))
 
@@ -94,6 +106,8 @@ g11
 library(reshape2) # for melt
 contourdata <- melt(volcano)
 names(contourdata) <- c("x", "y", "z")
-g12 <- ggplot() + geom_contour(data=contourdata, aes(x=x, y=y, z=z))
+g12 <- ggplot() + geom_contour(data=contourdata, aes(x=x, y=y, z=z), binwidth=4, size=0.5) + 
+  geom_contour(data=contourdata, aes(x=x, y=y, z=z), binwidth=10, size=1) +
+  ggtitle("geom_contour")
 g12
 gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11, g12=g12))
