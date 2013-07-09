@@ -88,4 +88,12 @@ g10
 #' Must specify group and then use colour=factor(group) to get desired effect.
 g11 <- ggplot() + geom_step(data=boxplotdata, aes(x=x, y=y, colour=factor(group), group=group))
 g11
-gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11))
+# gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11))
+
+#' contour plot
+library(reshape2) # for melt
+contourdata <- melt(volcano)
+names(contourdata) <- c("x", "y", "z")
+g12 <- ggplot() + geom_contour(data=contourdata, aes(x=x, y=y, z=z))
+g12
+gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11, g12=g12))

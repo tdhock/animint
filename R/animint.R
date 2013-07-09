@@ -147,12 +147,6 @@ layer2list <- function(i, plistextra){
     }
   }
   
-  some.vars <- c(g$aes[grepl("showSelected",names(g$aes))])
-  g$update <- c(some.vars, g$aes[names(g$aes)=="clickSelects"])
-  subset.vars <- c(some.vars, g$aes[names(g$aes)=="group"])
-  g$subord <- as.list(names(subset.vars))
-  g$subvars <- as.list(subset.vars)
-  
   if("flip"%in%attr(plistextra$plot$coordinates, "class")){
     oldnames <- names(g$data)
     newnames <- oldnames
@@ -210,7 +204,7 @@ layer2list <- function(i, plistextra){
     # outliers are specified as a list... change so that they are specified as a single string which can then be parsed in JavaScript.
     # there has got to be a better way to do this!!
   } else if(g$geom=="histogram"){
-    g$geom <- "bar"
+    g$geom <- "rect"
     g$aes$xmin <- "xmin"
     g$aes$xmax <- "xmax"
     g$aes$ymin <- "ymin"
@@ -225,8 +219,17 @@ layer2list <- function(i, plistextra){
     g$geom <- "path"
     datanames <- names(g$data)
     g$data <- ddply(g$data, .(group), function(df) ggplot2:::stairstep(df))
+  } else if(g$geom=="contour"){
+    g$geom <- "path"
+    g$aes$group <- "piece"
   }
   
+  
+  some.vars <- c(g$aes[grepl("showSelected",names(g$aes))])
+  g$update <- c(some.vars, g$aes[names(g$aes)=="clickSelects"])
+  subset.vars <- c(some.vars, g$aes[names(g$aes)=="group"])
+  g$subord <- as.list(names(subset.vars))
+  g$subvars <- as.list(subset.vars)
   
   # Use ggplot2's ranges, which incorporate all layers. 
   # Strictly speaking, this isn't "layer" information as much 
