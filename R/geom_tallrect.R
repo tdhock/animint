@@ -120,3 +120,41 @@ geom_tallrect <- function(mapping=NULL, data=NULL, stat="identity", position="id
   GeomTallRect$new(mapping = mapping, data = data, stat = stat,
                    position = position, ...)
 }
+
+##' Make a clickSelects geom_tallrect that completely tiles the x
+##' range. This makes it easy to construct tallrects for the common
+##' case of selecting a particular x value.
+##' @param x.name variable to be used for x, clickSelects.
+##' @param data data.frame to analyze for unique x.name values.
+##' @param alpha transparency of a selected tallrect, default 1/2.
+##' @return a geom_tallrect layer.
+##' @author Toby Dylan Hocking
+##' @examples
+##' data(worldPop)
+##' popPlot <- ggplot()+
+##'   make_tallrect("year", worldPop)+
+##'   geom_line(aes(year, population, group=subcontinent),
+##'             data=worldPop, size=4)
+##' print(popPlot)
+##' gg2animint(list(popPlot=popPlot))
+make_tallrect <- function(x.name, data, alpha=1/2){
+  stopifnot(is.data.frame(data))
+  stopifnot(is.character(x.name))
+  stopifnot(length(x.name)==1)
+  x <- data[,x.name]
+  stopifnot(is.numeric(x))
+  vals <- sort(unique(x))
+  Delta <- diff(vals)/2
+  breaks <- c(vals[1] - Delta[1],
+              vals[-1] - Delta,
+              vals[length(vals)]+Delta[length(Delta)])
+  
+  stopifnot(length(breaks) == length(vals)+1)
+  df <- data.frame(vals,
+                   xmin=breaks[-length(breaks)],
+                   xmax=breaks[-1])
+  names(df)[1] <- x.name
+  a <- aes_string(xmin="xmin", xmax="xmax", clickSelects=x.name)
+  geom_tallrect(a, df, alpha=alpha)
+}
+

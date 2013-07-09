@@ -22,7 +22,10 @@ popPlots <-
                   data=years, alpha=1/2, size=12)+
        geom_line(aes(year, population, group=subcontinent,
                      clickSelects=subcontinent),
-                 data=worldPop, alpha=3/4, size=4))
+                 data=worldPop, alpha=3/4, size=4)+
+       geom_point(aes(year, population, fill=type, colour=type,
+                      clickSelects=subcontinent),
+                 data=worldPop))
 gg2animint(popPlots)
 
 ## TODO: we should at least see the bars in this simpler test.
@@ -36,3 +39,12 @@ popPlots$bars+
   facet_wrap("year")+
   theme_bw()+
   theme(panel.margin=unit(0,"cm"))
+
+## simpler example using make_tallrect.
+data(worldPop)
+popPlot <- ggplot()+
+  make_tallrect("year", worldPop)+
+  geom_line(aes(year, population, group=subcontinent),
+            data=worldPop, size=4)
+print(popPlot)
+gg2animint(list(popPlot=popPlot))
