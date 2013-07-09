@@ -156,9 +156,11 @@ layer2list <- function(i, plistextra){
   if("flip"%in%attr(plistextra$plot$coordinates, "class")){
     oldnames <- names(g$data)
     newnames <- oldnames
-    newnames <- gsub("^x", "z", newnames)
-    newnames <- gsub("^y", "x", newnames)
-    newnames <- gsub("^z", "y", newnames)
+    xs <- which(oldnames%in%c("x", "xmin", "xend", "xmax", "xintercept"))
+    ys <- which(oldnames%in%c("y", "ymin", "ymax", "yend", "yintercept"))
+    
+    newnames[xs] <- gsub("x", "y", oldnames[xs])
+    newnames[ys] <- gsub("y", "x", oldnames[ys])
     
     names(g$data) <- newnames
   }
