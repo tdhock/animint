@@ -364,7 +364,7 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
           result$selectors[[v.name]] <- list(selected=g$data[[v.name]][1])
         }
         result$selectors[[v.name]]$subset <-
-          c(result$selectors[[v.name]]$subset, g$classed)
+          c(result$selectors[[v.name]]$subset, list(g$classed))
       }
       ## Output data to csv.
       csv.name <- sprintf("%s.csv", g$classed)
