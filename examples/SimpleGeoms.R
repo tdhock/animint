@@ -110,14 +110,35 @@ g11 <- ggplot() + geom_contour(data=contourdata, aes(x=x, y=y, z=z), binwidth=4,
   geom_contour(data=contourdata, aes(x=x, y=y, z=z), binwidth=10, size=1) +
   ggtitle("geom_contour")
 g11
-gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11))
+# gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11))
 
 library("MASS")
 data(geyser,package="MASS")
-g12 <- ggplot() +  xlim(0.5, 6) + scale_y_log10() +
+g12 <- ggplot() +  
   geom_point(data=geyser, aes(x = duration, y = waiting)) + 
   geom_density2d(data=geyser, aes(x = duration, y = waiting), colour="blue", size=.5) + 
-  xlim(0.5, 6) + scale_y_log10()
+  xlim(0.5, 6) + scale_y_log10() +
+  ggtitle("geom_density2d")
 g12
-gg2animint(list(g12=g12)) 
+# gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11, g12=g12)) 
 # geom_point disappears because it does not get transformed.
+
+g13 <- ggplot() +  xlim(0.5, 6) + scale_y_log10() +
+  geom_polygon(data=geyser,aes(x=duration, y=waiting, fill=..level.., 
+                               colour=..level.., group=..piece..), 
+               stat="density2d", alpha=.5) +
+  geom_point(data=geyser, aes(x = duration, y = waiting)) + 
+  scale_fill_continuous(low="#56B1F7", high="#132B43", trans="log") +
+  xlim(0.5, 6) + ylim(40, 110) +
+  ggtitle("geom_density2d polygon")
+g13
+gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11, g12=g12, g13=g13))
+
+data(diamonds)
+dsmall <- diamonds[sample(nrow(diamonds), 1000), ]
+g14 <- ggplot() + xlim(c(1,3))+
+  geom_tile(data=dsmall, aes(x=carat, y=price, fill=..density.., colour=..density..), stat="density2d", contour=FALSE) +
+  ggtitle("geom_density2d tile")
+g14
+gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11, g12=g12, g13=g13, g14=g14))
+  
