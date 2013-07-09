@@ -112,18 +112,27 @@ g11 <- ggplot() + geom_contour(data=contourdata, aes(x=x, y=y, z=z), binwidth=4,
 g11
 # gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11))
 
+g12 <- ggplot() + 
+  geom_tile(data=contourdata, aes(x=x, y=y, fill=z, colour=z)) + 
+  geom_contour(data=contourdata, aes(x=x, y=y, z=z), colour="black", size=.5) +
+  scale_fill_continuous(low="#56B1F7", high="#132B43", trans="log") +
+  scale_colour_continuous(low="#56B1F7", high="#132B43", trans="log") +
+  ggtitle("geom_tile + geom_contour") 
+g12
+# gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11, g12=g12)) 
+
 library("MASS")
 data(geyser,package="MASS")
-g12 <- ggplot() +  
+g13 <- ggplot() +  
   geom_point(data=geyser, aes(x = duration, y = waiting)) + 
   geom_contour(data=geyser, aes(x = duration, y = waiting), colour="blue", size=.5, stat="density2d") + 
   xlim(0.5, 6) + scale_y_log10() +
   ggtitle("geom_contour 2d density")
-g12
-# gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11, g12=g12)) 
+g13
+# gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11, g12=g12, g13=g13))
 # geom_point disappears because it does not get transformed.
 
-g13 <- ggplot() +  xlim(0.5, 6) + scale_y_log10() +
+g14 <- ggplot() +  xlim(0.5, 6) + scale_y_log10() +
   geom_polygon(data=geyser,aes(x=duration, y=waiting, fill=..level.., 
                                colour=..level.., group=..piece..), 
                stat="density2d", alpha=.5) +
@@ -131,22 +140,23 @@ g13 <- ggplot() +  xlim(0.5, 6) + scale_y_log10() +
   scale_fill_continuous(low="#56B1F7", high="#132B43", trans="log") +
   xlim(0.5, 6) + ylim(40, 110) +
   ggtitle("geom_density2d polygon")
-g13
-# gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11, g12=g12, g13=g13))
+g14
+# gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11, g12=g12, g13=g13, g14=g14))
+
 
 data(diamonds)
 dsmall <- diamonds[sample(nrow(diamonds), 1000), ]
-g14 <- ggplot() + xlim(c(1,3))+
+g15 <- ggplot() + xlim(c(1,3))+
   geom_tile(data=dsmall, aes(x=carat, y=price, fill=..density.., colour=..density..), stat="density2d", contour=FALSE) +
   scale_fill_gradient(limits=c(1e-5,8e-4), na.value="white") + 
   scale_colour_gradient(limits=c(1e-5,8e-4), na.value="white") +
   ggtitle("geom_density2d tile")
-g14
-# gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11, g12=g12, g13=g13, g14=g14))
+g15
+# gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11, g12=g12, g13=g13, g14=g14, g15=g15))
   
-g15 <- ggplot() + xlim(c(1,3))+
+g16 <- ggplot() + xlim(c(1,3))+
   geom_point(data=dsmall, aes(x=carat, y=price, size=..density..), stat="density2d", contour=FALSE) +
   ggtitle("geom_density2d points")
-g15
-gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11, g12=g12, g13=g13, g14=g14, g15=g15))
+g16
+gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11, g12=g12, g13=g13, g14=g14, g15=g15, g16=g16))
 # doesn't work because statistics and transformations won't work with points
