@@ -90,7 +90,7 @@ var animint = function(to_select, json_file){
     plotdim.xlab.y = axispadding+labelpadding/2;
     plotdim.ylab.x = axispadding+labelpadding/2;
     plotdim.ylab.y = plotdim.yend - plotdim.graph.height/2;
-    plotdim.title.x = plotdim.width/2;
+    plotdim.title.x = plotdim.xstart + plotdim.graph.width/2;
     plotdim.title.y = plotdim.margin.top/2;
     
   	svg.x = d3.scale.linear()
@@ -134,8 +134,8 @@ var animint = function(to_select, json_file){
        .attr("class", "title")
        .attr("font-family", "sans-serif")
        .attr("font-size", "20px")
+       .attr("transform", "translate("+(plotdim.title.x)+","+(plotdim.title.y)+")")
        .style("text-anchor", "middle")
-       .attr("transform", "translate("+(plotdim.width/2)+","+(plotdim.margin.top/2)+")")
        ;
   	svg.plot = p_info;
   	p_info.geoms.forEach(function(g_name){
