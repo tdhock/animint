@@ -99,10 +99,32 @@ var animint = function(to_select, json_file){
   	svg.y = d3.scale.linear()
   	    .domain(p_info.ranges.y)
   	    .range([plotdim.yend, plotdim.ystart]);
+        
+    function isArray(o) {  return Object.prototype.toString.call(o) === '[object Array]'; }
+    //forces values to be in an array
+    var xaxisvals = [];
+    var xaxislabs = [];
+    var yaxisvals = [];
+    var yaxislabs = [];
+    if(isArray(p_info.axis.x)){
+      p_info.axis.x.forEach(function(d){xaxisvals.push(d);});
+      p_info.axis.xlab.forEach(function(d){xaxislabs.push(d);});
+    } else {
+      xaxisvals.push(p_info.axis.x);
+      xaxislabs.push(p_info.axis.xlab);
+    }
+    if(isArray(p_info.axis.y)){
+      p_info.axis.y.forEach(function(d){yaxisvals.push(d);});
+      p_info.axis.ylab.forEach(function(d){yaxislabs.push(d);});
+    } else {
+      yaxisvals.push(p_info.axis.y);
+      yaxislabs.push(p_info.axis.ylab);
+    }
+
     var xaxis = d3.svg.axis()
         .scale(svg.x)
-        .tickValues(p_info.axis.x)
-        .tickFormat(function(d) {return p_info.axis.xlab[p_info.axis.x.indexOf(d)].toString()})
+        .tickValues(xaxisvals)
+        .tickFormat(function(d) {return xaxislabs[xaxisvals.indexOf(d)].toString()})
         .orient("bottom");
       svg.append("g")
         .attr("class", "axis")
@@ -115,8 +137,8 @@ var animint = function(to_select, json_file){
         .attr("transform", "translate("+(plotdim.xlab.x)+","+(plotdim.xlab.y)+")")
         ;
     var yaxis = d3.svg.axis().scale(svg.y)
-        .tickValues(p_info.axis.y)
-        .tickFormat(function(d) {return p_info.axis.ylab[p_info.axis.y.indexOf(d)].toString()})
+        .tickValues(yaxisvals)
+        .tickFormat(function(d) {return yaxislabs[yaxisvals.indexOf(d)].toString()})
         .orient("left");
       svg.append("g")
         .attr("class", "axis")
