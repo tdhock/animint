@@ -61,7 +61,7 @@ var animint = function(to_select, json_file){
   	});
   }
   var axispadding = 30;
-  var labelpadding = 15;
+  var labelpadding = 35;
   var titlepadding = 30;
   var margin = {left: labelpadding+axispadding,
                 right: 0,
@@ -525,20 +525,7 @@ var animint = function(to_select, json_file){
   		    ;
   	    }
   	    eAppend = "rect";
-  	}else if(g_info.geom == "bar"){
-        elements = elements.data(data);
-  	    eActions = function(e){
-    	   e.attr("x",toXY("x","xmin"))
-  		    .attr("width",function(d) {return svg.x(d[aes.xmax])-svg.x(d[aes.xmin]);})
-  		    .attr("y",toXY("y","ymax"))
-  		    .attr("height",function(d) {return svg.y(d[aes.ymin])-svg.y(d[aes.ymax]);})
-  		    .style("stroke-width",get_size)
-  		    .style("stroke",get_colour)
-          .style("fill",get_fill)
-          ;
-  	    }
-  	    eAppend = "rect";
-    }else if(g_info.geom == "segment"){
+  	}else if(g_info.geom == "segment"){
         elements = elements.data(data);
   	    eActions = function(e){
   	     e.attr("x1",function(d){return svg.x(d[aes.x]);})

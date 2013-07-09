@@ -153,6 +153,15 @@ layer2list <- function(i, plistextra){
   g$subord <- as.list(names(subset.vars))
   g$subvars <- as.list(subset.vars)
   
+  if("flip"%in%attr(plistextra$plot$coordinates, "class")){
+    oldnames <- names(g$data)
+    newnames <- oldnames
+    newnames <- gsub("^x", "z", newnames)
+    newnames <- gsub("^y", "x", newnames)
+    newnames <- gsub("^z", "y", newnames)
+    
+    names(g$data) <- newnames
+  }
   
   if(g$geom=="abline"){
     g$geom <- "segment"
@@ -175,7 +184,7 @@ layer2list <- function(i, plistextra){
     g$aes$x <- "x"
     g$aes$ymax <- "ymax"
     g$aes$ymin <- "ymin"
-  } else if(g$geom=="tile" | g$geom=="raster"){
+  } else if(g$geom=="tile" | g$geom=="raster" | g$geom=="bar"){
     g$geom <- "rect"
     g$aes$xmin <- "xmin"
     g$aes$xmax <- "xmax"

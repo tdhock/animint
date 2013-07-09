@@ -10,13 +10,13 @@ years$population <- 4e7
 ## TODO: this should be similar to the example on polychartjs.com
 popPlots <-
   list(bars=ggplot()+
-       geom_bar(aes(subcontinent, population,
+       geom_bar(aes(x=subcontinent, y=population,
                     clickSelects=subcontinent, showSelected=year),
                 data=worldPop, stat="identity")+
-       geom_text(aes(subcontinent, population,
+       geom_text(aes(x=subcontinent, y=population,
                      label=title, showSelected=year),
-                 data=years)+
-       coord_flip(),
+                 data=years) +
+         coord_flip(),
        lines=ggplot()+
        geom_vline(aes(xintercept=year, clickSelects=year),
                   data=years, alpha=1/2, size=12)+
