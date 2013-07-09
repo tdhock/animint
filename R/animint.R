@@ -40,8 +40,10 @@ gg2list <- function(p){
   # be passed into d3 on the x axis scale instead of on the 
   # grid 0-1 scale). This allows transformations to be used 
   # out of the box, with no additional d3 coding. 
-  
+  theme.pars <- ggplot2:::plot_theme(p)  
   plist$axis <- list(
+
+#     if("element_blank"%in%attr(theme.pars$axis.text.x, "class")) # code to get blank elements... come back later?
     x = plistextra$panel$ranges[[1]]$x.major_source,
     xlab = plistextra$panel$ranges[[1]]$x.labels,
     xname = plistextra$plot$labels$x,
