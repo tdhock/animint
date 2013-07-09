@@ -71,43 +71,43 @@ boxplotdata <- rbind(data.frame(x=1:50, y=sort(rnorm(50, 3, 1)), group=1),
 boxplotdata <- ddply(boxplotdata, .(group), transform, ymax=max(y), ymin=min(y), med=median(y))
 
 #' Boxplot does not work (7/5/13)
+# g7 <- ggplot() + 
+#   geom_boxplot(data=boxplotdata, aes(y=y, x=factor(group))) +
+#   ggtitle("geom_boxplot")
+# g7
+# gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7))
+
 g7 <- ggplot() + 
-  geom_boxplot(data=boxplotdata, aes(y=y, x=factor(group))) +
-  ggtitle("geom_boxplot")
+  geom_linerange(data=boxplotdata, aes(x=factor(group), ymax=ymax, ymin=ymin, colour=factor(group))) +
+  ggtitle("geom_linerange")
 g7
 # gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7))
 
 g8 <- ggplot() + 
-  geom_linerange(data=boxplotdata, aes(x=factor(group), ymax=ymax, ymin=ymin, colour=factor(group))) +
-  ggtitle("geom_linerange")
+  geom_histogram(data=subset(boxplotdata, group==3), aes(x=y, fill=..count..), binwidth=1) + 
+  ggtitle("geom_histogram")
 g8
 # gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8))
 
 g9 <- ggplot() + 
-  geom_histogram(data=subset(boxplotdata, group==3), aes(x=y, fill=..count..), binwidth=1) + 
-  ggtitle("geom_histogram")
+  geom_violin(data=boxplotdata, aes(x=factor(group), y=y, fill=factor(group), group=group)) +
+  ggtitle("geom_violin")
 g9
 # gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9))
 
-g10 <- ggplot() + 
-  geom_violin(data=boxplotdata, aes(x=factor(group), y=y, fill=factor(group), group=group)) +
-  ggtitle("geom_violin")
-g10
-# gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10))
-
 #' Step Plot
 #' Must specify group and then use colour=factor(group) to get desired effect.
-g11 <- ggplot() + geom_step(data=boxplotdata, aes(x=x, y=y, colour=factor(group), group=group)) +
+g10 <- ggplot() + geom_step(data=boxplotdata, aes(x=x, y=y, colour=factor(group), group=group)) +
   ggtitle("geom_step")
-g11
-# gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11))
+g10
+# gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10))
 
 #' contour plot
 library(reshape2) # for melt
 contourdata <- melt(volcano)
 names(contourdata) <- c("x", "y", "z")
-g12 <- ggplot() + geom_contour(data=contourdata, aes(x=x, y=y, z=z), binwidth=4, size=0.5) + 
+g11 <- ggplot() + geom_contour(data=contourdata, aes(x=x, y=y, z=z), binwidth=4, size=0.5) + 
   geom_contour(data=contourdata, aes(x=x, y=y, z=z), binwidth=10, size=1) +
   ggtitle("geom_contour")
-g12
-gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11, g12=g12))
+g11
+gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11))
