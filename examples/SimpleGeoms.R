@@ -111,3 +111,13 @@ g11 <- ggplot() + geom_contour(data=contourdata, aes(x=x, y=y, z=z), binwidth=4,
   ggtitle("geom_contour")
 g11
 gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11))
+
+library("MASS")
+data(geyser,package="MASS")
+g12 <- ggplot() +  xlim(0.5, 6) + scale_y_log10() +
+  geom_point(data=geyser, aes(x = duration, y = waiting)) + 
+  geom_density2d(data=geyser, aes(x = duration, y = waiting), colour="blue", size=.5) + 
+  xlim(0.5, 6) + scale_y_log10()
+g12
+gg2animint(list(g12=g12)) 
+# geom_point disappears because it does not get transformed.

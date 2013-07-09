@@ -41,8 +41,6 @@ gg2list <- function(p){
   # grid 0-1 scale). This allows transformations to be used 
   # out of the box, with no additional d3 coding. 
   
-  ## TODO: Make sure that if there are no labels specified, 
-  ##       everything will still work.
   plist$axis <- list(
     x = plistextra$panel$ranges[[1]]$x.major_source,
     xlab = plistextra$panel$ranges[[1]]$x.labels,
@@ -227,7 +225,7 @@ layer2list <- function(i, plistextra){
     g$geom <- "path"
     datanames <- names(g$data)
     g$data <- ddply(g$data, .(group), function(df) ggplot2:::stairstep(df))
-  } else if(g$geom=="contour"){
+  } else if(g$geom=="contour" | g$geom=="density2d"){
     g$geom <- "path"
     g$aes$group <- "piece"
     # reset g$subord, g$subvars now that group aesthetic exists.
