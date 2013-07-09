@@ -159,6 +159,12 @@ layer2list <- function(i, plistextra){
     names(g$data) <- newnames
   }
   
+  some.vars <- c(g$aes[grepl("showSelected",names(g$aes))])
+  g$update <- c(some.vars, g$aes[names(g$aes)=="clickSelects"])
+  subset.vars <- c(some.vars, g$aes[names(g$aes)=="group"])
+  g$subord <- as.list(names(subset.vars))
+  g$subvars <- as.list(subset.vars)
+  
   if(g$geom=="abline"){
     g$geom <- "segment"
     slope <- plistextra$data[[i]]$slope
@@ -168,13 +174,15 @@ layer2list <- function(i, plistextra){
     g$data <- unique(data.frame(x=temp.x[,1], 
                    xend=temp.x[,2], 
                    y=temp.y[,1], 
-                   yend=temp.y[,2]))
+                   yend=temp.y[,2]), 
+                   group=1:length(slope))
     g$aes$x <- "x"
     g$aes$xend <- "xend"
     g$aes$y <- "y"
     g$aes$yend <- "yend"
-    g$subord <- list()
+    g$aes <- g$aes[-which(names(g$aes)%in%c("intercept", "slope"))]
     g$subvars <- list()
+    g$subord <- list()
   } else if(g$geom=="density" | g$geom=="area"){
     g$geom <- "ribbon"
     g$aes$x <- "x"
@@ -222,14 +230,14 @@ layer2list <- function(i, plistextra){
   } else if(g$geom=="contour"){
     g$geom <- "path"
     g$aes$group <- "piece"
+    # reset g$subord, g$subvars now that group aesthetic exists.
+    subset.vars <- c(some.vars, g$aes[names(g$aes)=="group"])
+    g$subord <- as.list(names(subset.vars))
+    g$subvars <- as.list(subset.vars)
   }
   
   
-  some.vars <- c(g$aes[grepl("showSelected",names(g$aes))])
-  g$update <- c(some.vars, g$aes[names(g$aes)=="clickSelects"])
-  subset.vars <- c(some.vars, g$aes[names(g$aes)=="group"])
-  g$subord <- as.list(names(subset.vars))
-  g$subvars <- as.list(subset.vars)
+
   
   # Use ggplot2's ranges, which incorporate all layers. 
   # Strictly speaking, this isn't "layer" information as much 
