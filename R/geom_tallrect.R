@@ -129,6 +129,7 @@ geom_tallrect <- function(mapping=NULL, data=NULL, stat="identity", position="id
 ##' @param alpha transparency of a selected tallrect, default 1/2.
 ##' @return a geom_tallrect layer.
 ##' @author Toby Dylan Hocking
+##' @export
 ##' @examples
 ##' data(worldPop)
 ##' popPlot <- ggplot()+

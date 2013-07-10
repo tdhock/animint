@@ -26,14 +26,35 @@ gg2list <- function(p){
     }
   }
   for(i in seq_along(plistextra$plot$layers)){
-    g <- layer2list(i, plistextra)
+    ## This is the layer from the original ggplot object.
+    L <- plistextra$plot$layers[[i]]
+
+    ## for each layer, there is a correpsonding data.frame which
+    ## evaluates the aesthetic mapping.
+    df <- plistextra$data[[i]]
+
+    ## This extracts essential info for this geom/layer.
+    g <- layer2list(L, df)
+    
+    ## Idea: use the ggplot2:::coord_transform(coords, data, scales)
+    ## function to handle cases like coord_flip. scales is a list of
+    ## 12, coords is a list(limits=list(x=NULL,y=NULL)) with class
+    ## e.g. c("cartesian","coord"). The result is a transformed data
+    ## frame where all the data values are between 0 and 1. TODO:
+    ## change the JS code to reflect this fact.
+    g$untransformed <- df
+    g$data <- ggplot2:::coord_transform(plistextra$plot$coord, df,
+                                        plistextra$panel$ranges[[1]])
     plist$geoms[[i]] <- g
-    for(ax.name in names(plist$ranges)){
-      plist$ranges[[ax.name]] <-
-        c(plist$ranges[[ax.name]], g$ranges[ax.name,])
-    }
+
+    ## TODO: use ranges calculated by ggplot2.
+    
+    ## for(ax.name in names(plist$ranges)){
+    ##   plist$ranges[[ax.name]] <-
+    ##     c(plist$ranges[[ax.name]], g$ranges[ax.name,])
+    ## }
   }
-  plist$ranges <- lapply(plist$ranges, range, na.rm=TRUE)
+  ##plist$ranges <- lapply(plist$ranges, range, na.rm=TRUE)
   
   # Export axis specification as a combination of breaks and
   # labels, on the relevant axis scale (i.e. so that it can
@@ -57,86 +78,21 @@ gg2list <- function(p){
 }
 
 #' Convert a layer to a list. Called from gg2list()
-#' @param i index of layer, in order of call. 
-#' @param plistextra output from ggplot2::ggplot_build(p)
+#' @param l one layer of the ggplot object
+#' @param d one layer of calculated data from ggplot2::ggplot_build(p)
 #' @return list representing a layer, with corresponding aesthetics, ranges, and groups.
 #' @export
 #' @seealso \code{\link{gg2animint}}
-layer2list <- function(i, plistextra){
-  g <- list(geom=plistextra$plot$layers[[i]]$geom$objname,
-            data=plistextra$plot$layers[[i]]$data)
-  ##str(g$data)
-  
-  ## g <- list(geom=plistextra$plot$layers[[i]]$geom$objname,
-  ##           data=plistextra$data[[i]])
-  g$aes <- list()
-
-  calc.geoms <- c("abline", "area", "bar", "bin2d", "boxplot", "contour", "crossbar", "density", "density2d", "dotplot", "errorbar", "freqpoly", "hex", "histogram", "map", "quantile", "smooth", "step", "tile", "raster", "violin", "polygon")
-  
+layer2list <- function(l, d){
+  g <- list(geom=l$geom$objname,
+            data=d)
+  g$aes <- sapply(l$mapping, as.character)
   # use un-named parameters so that they will not be exported
   # to JSON as a named object, since that causes problems with
   # e.g. colour.
-  g$params <- plistextra$plot$layers[[i]]$geom_params
+  g$params <- l$geom_params
   for(p.name in names(g$params)){
     names(g$params[[p.name]]) <- NULL
-  }
-
-  ggdata <- plistextra$data[[i]]
-  usegg <- c("colour","fill","linetype","alpha","size","label")
-  if(!g$geom%in%calc.geoms){
-    # Populate list of aesthetics
-    for(aes.name in names(plistextra$plot$layers[[i]]$mapping)){
-      x <- plistextra$plot$layers[[i]]$mapping[[aes.name]]
-      ##str(plistextra$data[[i]])
-      ##str(g$data)
-      g$aes[[aes.name]] <- 
-        if(aes.name %in% usegg){
-          g$data[[aes.name]] <- ggdata[[aes.name]]
-          aes.name
-        }else if(is.symbol(x)){
-          if(is.factor(g$data[[as.character(x)]])){
-            ## BUG: for example in breakpointError$error$layers[[2]],
-
-### Browse[1]> plistextra$data[[i]]
-###     x           y group clickSelects PANEL
-### 1   1  5.00000000     1          133     1
-### 2   2  4.00183002     1          133     1
-### 3   3  3.01800018     1          133     1
-
-            ## so since group=bases.per.probe and
-            ## clickSelects=bases.per.probe, we end up first
-            ## overwriting g$data$bases.per.probe with an integer =>
-            ## BUG! Temporary solution: just don't overwrite...? This
-            ## causes a problem...
-
-### > Error in Summary.factor(c(4L, 4L, 3L, 3L, 4L, 3L, 4L, 3L, 4L, 2L, 4L,  : 
-### range not meaningful for factors
-
-            
-            ##g$data[[as.character(x)]] <- plistextra$data[[i]][[aes.name]]
-          }
-          as.character(x)
-        }else if(is.language(x)){
-          newcol <- as.character(as.expression(x))
-          g$data[[newcol]] <- plistextra$data[[i]][[aes.name]]
-          newcol
-        }else if(is.numeric(x)){
-          newcol <- aes.name
-          g$data[[newcol]] <- plistextra$data[[i]][[aes.name]]
-          newcol
-        }else{
-          str(x)
-          stop("don't know how to convert")
-        }
-    }
-  } else {
-    g$data <- plistextra$data[[i]]
-    for(aes.name in names(plistextra$plot$layers[[i]]$mapping))
-    g$aes[[aes.name]] <- 
-      if(aes.name%in%names(g$data)){
-        g$data[[aes.name]] <- plistextra$data[[i]][,aes.name]
-        aes.name
-      }
   }
   
   # Check g$data for color/fill - convert to hexadecimal.
@@ -146,27 +102,18 @@ layer2list <- function(i, plistextra){
       g$data[,color.var] <- toRGB(g$data[,color.var])
     }
   }
-  
-  if("flip"%in%attr(plistextra$plot$coordinates, "class")){
-    oldnames <- names(g$data)
-    newnames <- oldnames
-    xs <- which(oldnames%in%c("x", "xmin", "xend", "xmax", "xintercept"))
-    ys <- which(oldnames%in%c("y", "ymin", "ymax", "yend", "yintercept"))
-    
-    newnames[xs] <- gsub("x", "y", oldnames[xs])
-    newnames[ys] <- gsub("y", "x", oldnames[ys])
-    
-    names(g$data) <- newnames
-  }
-  
+
+  ## Make a list of variables to use for subsetting.
   some.vars <- c(g$aes[grepl("showSelected",names(g$aes))])
   g$update <- c(some.vars, g$aes[names(g$aes)=="clickSelects"])
   subset.vars <- c(some.vars, g$aes[names(g$aes)=="group"])
   g$subord <- as.list(names(subset.vars))
   g$subvars <- as.list(subset.vars)
-  
-  if(g$geom=="abline"){
-    g$geom <- "segment"
+
+  ## Pre-process some complex geoms so that they are treated as
+  ## special cases of basic geoms. In ggplot2, this processing is done
+  ## in the draw method of the geoms.
+  g$geom <- if(g$geom=="abline"){
     slope <- plistextra$data[[i]]$slope
     intercept <- plistextra$data[[i]]$intercept
     temp.x <- matrix(plistextra$panel$ranges[[1]]$x.range, ncol=2, nrow=length(slope), byrow=TRUE)
@@ -176,99 +123,49 @@ layer2list <- function(i, plistextra){
                    y=temp.y[,1], 
                    yend=temp.y[,2]), 
                    group=1:length(slope))
-    g$aes$x <- "x"
-    g$aes$xend <- "xend"
-    g$aes$y <- "y"
-    g$aes$yend <- "yend"
-    g$aes <- g$aes[-which(names(g$aes)%in%c("intercept", "slope"))]
+
+    ##g$aes <- g$aes[-which(names(g$aes)%in%c("intercept", "slope"))]
+
+    ## WHY do we need to erase subvars/subord here?
     g$subvars <- list()
     g$subord <- list()
+    "segment"
   } else if(g$geom=="density" | g$geom=="area"){
-    g$geom <- "ribbon"
-    g$aes$x <- "x"
-    g$aes$ymax <- "ymax"
-    g$aes$ymin <- "ymin"
+    "ribbon"
   } else if(g$geom=="tile" | g$geom=="raster" | g$geom=="bar"){
-    g$geom <- "rect"
-    g$aes$xmin <- "xmin"
-    g$aes$xmax <- "xmax"
-    g$aes$ymin <- "ymin"
-    g$aes$ymax <- "ymax"
-    if(is.null(g$aes$colour) & !is.null(g$aes$fill)){
-      g$aes$colour <- g$aes$fill
+    ## WHY do we set colour here?
+    if(!"colour"%in%names(g$aes) & "fill"%in%names(g$aes)){
+      g$aes[["colour"]] <- g$aes[["fill"]]
     }
+    "rect"
   } else if(g$geom=="boxplot"){
+    stop("boxplots are not supported in animint")
     g$data$outliers <- sapply(g$data$outliers, FUN=paste, collapse=" @ ") 
-    g$aes$xmin <- "xmin"
-    g$aes$xmax <- "xmax"
-    g$aes$ymin <- "ymin"
-    g$aes$ymax <- "ymax"
-    g$aes$lower <- "lower"
-    g$aes$middle <- "middle"
-    g$aes$upper <- "upper"
-    g$aes$outliers <- "outliers"
-    g$aes$notchupper <- "notchupper"
-    g$aes$notchlower <- "notchlower"
     # outliers are specified as a list... change so that they are specified as a single string which can then be parsed in JavaScript.
     # there has got to be a better way to do this!!
   } else if(g$geom=="histogram"){
-    g$geom <- "rect"
-    g$aes$xmin <- "xmin"
-    g$aes$xmax <- "xmax"
-    g$aes$ymin <- "ymin"
-    g$aes$ymax <- "ymax"
+    "rect"
   } else if(g$geom=="violin"){
-    g$geom <- "polygon"
     g$data <- transform(g$data, xminv = x-violinwidth*(x-xmin),xmaxv = x+violinwidth*(xmax-x))
     newdata <- ddply(g$data, .(group), function(df) rbind(arrange(transform(df, x=xminv), y), arrange(transform(df, x=xmaxv), -y)))
     newdata <- ddply(newdata, .(group), function(df) rbind(df, df[1,]))
     g$data <- newdata
+    "polygon"
   } else if(g$geom=="step"){
-    g$geom <- "path"
     datanames <- names(g$data)
     g$data <- ddply(g$data, .(group), function(df) ggplot2:::stairstep(df))
+    "path"
   } else if(g$geom=="contour" | g$geom=="density2d"){
-    g$geom <- "path"
     g$aes$group <- "piece"
     # reset g$subord, g$subvars now that group aesthetic exists.
     subset.vars <- c(some.vars, g$aes[names(g$aes)=="group"])
     g$subord <- as.list(names(subset.vars))
     g$subvars <- as.list(subset.vars)
+    "path"
+  } else { ## all other geoms are basic, and keep the same name.
+    g$geom
   }
   
-  
-
-  
-  # Use ggplot2's ranges, which incorporate all layers. 
-  # Strictly speaking, this isn't "layer" information as much 
-  # as it is plot information, but d3 specification is easier 
-  # using layers. 
-  g$ranges <- matrix(c(plistextra$panel$ranges[[1]]$x.range, 
-                       plistextra$panel$ranges[[1]]$y.range),
-                     2,2,dimnames=list(axis=c("x","y"),limit=c("min","max")), byrow=TRUE)
-  
-  # Old way of getting ranges... still needed for handling Inf values.
-    range.map <- c(xintercept="x",x="x",xend="x",xmin="x",xmax="x",
-                   yintercept="y",y="y",yend="y",ymin="y",ymax="y")
-    for(aesname in names(range.map)){
-      if(aesname %in% names(g$aes)){
-        var.name <- g$aes[[aesname]]
-        ax.name <- range.map[[aesname]]
-        v <- g$data[[var.name]]
-        if(is.factor(v)){
-          g$data[[var.name]] <- ggdata[[aesname]]
-        }else{
-          r <- range(v, na.rm=TRUE, finite=TRUE)
-          ## TODO: handle Inf like in ggplot2.
-          size <- r[2]-r[1]
-          rowidx <- which(dimnames(g$ranges)$axis%in%ax.name)
-          if(length(rowidx)>0){
-            g$data[[var.name]][g$data[[var.name]]==Inf] <- g$ranges[rowidx,2]
-            g$data[[var.name]][g$data[[var.name]]==-Inf] <- g$ranges[rowidx,1]
-          }
-        }          
-      }
-    }
   g
 }
 

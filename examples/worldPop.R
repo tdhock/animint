@@ -20,11 +20,9 @@ popPlots <-
        lines=ggplot()+
        geom_vline(aes(xintercept=year, clickSelects=year),
                   data=years, alpha=1/2, size=12)+
-       geom_line(aes(year, population, group=subcontinent,
-                     clickSelects=subcontinent),
+       geom_line(aes(year, population, group=subcontinent),
                  data=worldPop, alpha=3/4, size=4)+
-       geom_point(aes(year, population, fill=type, colour=type,
-                      clickSelects=subcontinent),
+       geom_point(aes(year, population, fill=type, colour=type),
                  data=worldPop))
 gg2animint(popPlots)
 
