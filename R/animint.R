@@ -7,7 +7,7 @@
 #' gg2list(ggplot() + geom_point(data=data.frame(x=rnorm(100, 3, 1), y=rnorm(100, 5, 1))), aes(x=x, y=y))
 #' 
 gg2list <- function(p){
-  plist <- list(ranges=list(x=c(),y=c()))
+  plist <- list()
   plistextra <- ggplot2::ggplot_build(p)
   for(sc in plistextra$plot$scales$scales){
     # TODO: make use of other scales than manual.
@@ -42,9 +42,9 @@ gg2list <- function(p){
     ## e.g. c("cartesian","coord"). The result is a transformed data
     ## frame where all the data values are between 0 and 1. TODO:
     ## change the JS code to reflect this fact.
-    g$untransformed <- df
     g$data <- ggplot2:::coord_transform(plistextra$plot$coord, df,
                                         plistextra$panel$ranges[[1]])
+
     plist$geoms[[i]] <- g
 
     ## TODO: use ranges calculated by ggplot2.
@@ -67,9 +67,11 @@ gg2list <- function(p){
 #     if("element_blank"%in%attr(theme.pars$axis.text.x, "class")) # code to get blank elements... come back later?
     x = plistextra$panel$ranges[[1]]$x.major_source,
     xlab = plistextra$panel$ranges[[1]]$x.labels,
+    xrange = plistextra$panel$ranges[[1]]$x.range,
     xname = plistextra$plot$labels$x,
     y = plistextra$panel$ranges[[1]]$y.major_source,
     ylab = plistextra$panel$ranges[[1]]$y.labels,
+    yrange = plistextra$panel$ranges[[1]]$y.range,
     yname = plistextra$plot$labels$y
   )
   plist$title <- plistextra$plot$labels$title
