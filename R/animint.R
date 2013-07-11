@@ -44,7 +44,7 @@ gg2list <- function(p){
     ## change the JS code to reflect this fact.
     g$data <- ggplot2:::coord_transform(plistextra$plot$coord, df,
                                         plistextra$panel$ranges[[1]])
-
+    browser()
     plist$geoms[[i]] <- g
 
     ## TODO: use ranges calculated by ggplot2.
