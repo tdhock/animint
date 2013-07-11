@@ -279,10 +279,12 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
         c(result$plots[[plot.name]]$geoms, g$classed)
       df.list[[g$classed]] <- g$data
       ## Construct the selector.
-      for(v.name in g$update){
+      for(sel.i in seq_along(g$update)){
+        v.name <- g$update[[sel.i]]
+        col.name <- names(g$update)[[sel.i]]
         if(!v.name %in% names(result$selectors)){
           ## select the first one. TODO: customize.
-          result$selectors[[v.name]] <- list(selected=g$data[[v.name]][1])
+          result$selectors[[v.name]] <- list(selected=g$data[[col.name]][1])
         }
         result$selectors[[v.name]]$subset <-
           c(result$selectors[[v.name]]$subset, list(g$classed))

@@ -672,7 +672,7 @@ var animint = function(to_select, json_file){
   		})
   		.on("click",function(d){
   		    var v_name = g_info.aes.clickSelects;
-  		    update_selector(v_name, d[v_name]);
+  		    update_selector(v_name, d.clickSelects);
   		})
   		.text("")
   		.append("svg:title")
@@ -709,7 +709,7 @@ var animint = function(to_select, json_file){
   	//Selectors[v_name].hilite.forEach(update_geom);
     }
     var selectedOpacity = function(d, v_name, selected, others){
-  	if(d[v_name] == Selectors[v_name].selected){
+  	if(d.clickSelects == Selectors[v_name].selected){
   	    return selected;
   	}else{
   	    return others;
