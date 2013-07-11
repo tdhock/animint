@@ -282,13 +282,13 @@ var animint = function(to_select, json_file){
 	var colour = "black";
 	var fill = "black";
 	var get_colour = function(d){
-	    if(aes.hasOwnProperty("colour") && d.hasOwnProperty(aes.colour)){
+	    if(d.hasOwnProperty("colour")){
 		return d.colour;
 	    }
 	    return colour;
   	}
 	var get_fill = function(d){
-	    if(aes.hasOwnProperty("fill") && d.hasOwnProperty(aes.fill)){
+	    if(d.hasOwnProperty("fill")){
   		return d.fill;
 	    }
 	    return fill;
