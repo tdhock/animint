@@ -448,7 +448,7 @@ var animint = function(to_select, json_file){
   	    eActions = function(e){
   		e.attr("x",toXY("x","x"))
   		    .attr("y",toXY("y","y"))
-  		    .text(function(d){ return d[aes.label]; })
+  		    .text(function(d){ return d.label; })
   		    .style("text-anchor",text_anchor)
   		;
   	    }
@@ -545,10 +545,14 @@ var animint = function(to_select, json_file){
   	}else if(g_info.geom == "rect"){
             elements = elements.data(data);
   	    eActions = function(e){
-    		e.attr("x",function(d){return svg.x(d[aes.xmin]);})
-    		    .attr("width",function(d) {return svg.x(d[aes.xmax])-svg.x(d[aes.xmin]);})
-  		    .attr("y",function(d){return svg.y(d[aes.ymax]);})
-  		    .attr("height",function(d) {return Math.abs(svg.y(d[aes.ymax])-svg.y(d[aes.ymin]));})
+    		e.attr("x",toXY("x","xmin"))
+    		    .attr("width",function(d) {
+			return svg.x(d.xmax)-svg.x(d.xmin);
+		    })
+  		    .attr("y",toXY("y","ymax"))
+  		    .attr("height",function(d) {
+			return svg.y(d.ymin)-svg.y(d.ymax);
+		    })
   		    .style("stroke-dasharray",get_dasharray)
   		    .style("stroke-width",get_size)
   		    .style("stroke",get_colour)
