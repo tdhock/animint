@@ -20,9 +20,6 @@ var animint = function(to_select, json_file){
     this.SVGs = SVGs;
     var Animation = {};
     this.Animation = Animation;
-    var getcol = function(v_name){
-	return function(d){return d[v_name];};
-    }
 
     var add_geom = function(g_name, g_info){
   	d3.csv(g_info.data, function(error, response){
@@ -50,11 +47,9 @@ var animint = function(to_select, json_file){
   		}
   	    });
   	    var nest = d3.nest();
-  	    g_info.subord.forEach(function(aes_name){
-    		var v_name = g_info.subvars[aes_name];
-    		//alert(aes_name+" "+g_info.classed+" "+v_name);
-    		nest.key(getcol(v_name));
-  	    });
+  	    g_info.subord.forEach(function(v_name){
+		nest.key(function(d){ return d[v_name]; });
+	    });
   	    g_info.data = nest.map(response);
   	    Geoms[g_name] = g_info;
   	    update_geom(g_name);
@@ -104,10 +99,10 @@ var animint = function(to_select, json_file){
 	    .domain(p_info.axis.xrange)
 	    .range([plotdim.xstart, plotdim.xend]);
   	svg.y = d3.scale.linear()
-  	    .domain([1,0])
+  	    .domain([0,1])
   	    .range([plotdim.yend, plotdim.ystart]);
 	svg.y_fake = d3.scale.linear()
-	    .domain(p_info.axis.yrange)
+	    .domain([p_info.axis.yrange[1],p_info.axis.yrange[0]])
 	    .range([plotdim.ystart, plotdim.yend]);
         
 	function isArray(o) {  
@@ -204,26 +199,22 @@ var animint = function(to_select, json_file){
   	var aes = g_info.aes;
   	var toXY = function(xy, a){
 	    return function(d){
-    		return svg[xy](d[ aes[a] ]);
+    		return svg[xy](d[ a ]);
 	    }
   	}
 	var elements = svg.selectAll("."+g_info.classed);
 
-  	// TODO: set all of these on a per-item basis. Currently, only
-  	// linetype and fill have some support for manual scales. This
-  	// needs to be standardized!
+  	// TODO: set all of these on a per-item basis. This needs to
+  	// be standardized!
   	var base_opacity = 1;
   	if(g_info.params.alpha){
   	    base_opacity = g_info.params.alpha;
   	}
+	//alert(g_info.classed+" "+base_opacity);
 	var get_alpha = function(d){
 	    var a;
-	    if(aes.hasOwnProperty("alpha") && d.hasOwnProperty(aes.alpha)){
-		try{
-      		    a = d[aes.alpha];
-		}catch(err){
-	      	    a = g_info.params.alpha;
-		}
+	    if(d.hasOwnProperty("alpha")){
+      		a = d.alpha;
 	    } else {
 		a = base_opacity;
 	    }
@@ -236,7 +227,7 @@ var animint = function(to_select, json_file){
   	}
   	var get_size = function(d){
 	    if(aes.hasOwnProperty("size") && d.hasOwnProperty(aes.size)){
-    		return d[ aes.size ];
+    		return d.size;
 	    }
   	    return size;
   	}
@@ -278,7 +269,7 @@ var animint = function(to_select, json_file){
   	    var lt;
             if(aes.hasOwnProperty("linetype") && d.hasOwnProperty(aes.linetype)){
 		try{
-        	    lt = d[aes.linetype];
+        	    lt = d.linetype;
   		}catch(err){
   	      	    lt = g_info.params.linetype;
   		}
@@ -292,13 +283,13 @@ var animint = function(to_select, json_file){
 	var fill = "black";
 	var get_colour = function(d){
 	    if(aes.hasOwnProperty("colour") && d.hasOwnProperty(aes.colour)){
-		return d[ aes.colour ];
+		return d.colour;
 	    }
 	    return colour;
   	}
 	var get_fill = function(d){
 	    if(aes.hasOwnProperty("fill") && d.hasOwnProperty(aes.fill)){
-  		return d[ aes.fill ];
+  		return d.fill;
 	    }
 	    return fill;
   	}
@@ -687,7 +678,7 @@ var animint = function(to_select, json_file){
   		.append("svg:title")
   		.text(function(d){
   		    var v_name = g_info.aes.clickSelects;
-  		    return v_name+" "+d[v_name];
+  		    return v_name+" "+d.clickSelects;
   		});
   	}else{
 	    if(g_info.geom=="line"){ // treat lines (groups of points) differently
