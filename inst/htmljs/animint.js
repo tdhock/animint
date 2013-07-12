@@ -309,7 +309,16 @@ var animint = function(to_select, json_file){
 
   	var eActions, eAppend;
 	//In order to get d3 lines to play nice, bind fake "data" (group id's) -- the kv variable
-	//Then each line is plotted using a path object. 
+	//Then each line is plotted using a path object.
+
+	//TODO: make line, path, polygon, and ribbon share the same JS
+	//code, since indeed it is mostly the same! This will greatly
+	//minimize bugs and maintenance time. e.g. 12 July 2013 TDH
+	//fixed a bug with geom_line by adding a clickSelects
+	//attribute to the fake data. This needs to be done for path,
+	//polygon, and ribbon as well, but it would be better to make
+	//these geoms share the same code, instead of copy-pasting the
+	//bugfix to the other geoms.
   	if(g_info.geom == "line"){
   	    // case of only 1 line and no groups.
   	    if(!aes.hasOwnProperty("group")){
@@ -323,7 +332,8 @@ var animint = function(to_select, json_file){
 
 		    // Need to store the clickSelects value that will
 		    // be passed to the selector when we click on this
-		    // item.
+		    // item. TODO: do this for path, polygon, and
+		    // ribbon as well.
 		    d.clickSelects = data[d.value][0].clickSelects;
       		    return d;
   	    	});
