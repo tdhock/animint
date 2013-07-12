@@ -319,7 +319,12 @@ var animint = function(to_select, json_file){
   		// we need to use a path for each group.
   		var kv = d3.entries(d3.keys(data));
       		kv = kv.map(function(d){
-      		    d[aes.group] = d.value;
+      		    //d[aes.group] = d.value;
+
+		    // Need to store the clickSelects value that will
+		    // be passed to the selector when we click on this
+		    // item.
+		    d.clickSelects = data[d.value][0].clickSelects;
       		    return d;
   	    	});
   	    }

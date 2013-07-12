@@ -46,3 +46,20 @@ popPlot <- ggplot()+
 print(popPlot)
 
 gg2animint(list(lines=popPlot,bars=popPlots$bars))
+
+## Show the currently selected continent on both plots.
+popPlots2 <-
+  list(bars=ggplot()+
+       geom_bar(aes(x=subcontinent, y=population,
+                    showSelected=year, clickSelects=subcontinent),
+                data=worldPop, stat="identity", position="identity")+
+       geom_text(aes(x=subcontinent, y=population,
+                     label=title, showSelected=year),
+                 data=years) +
+       coord_flip(),
+       lines=ggplot()+
+       make_tallrect("year", worldPop)+
+       geom_line(aes(year, population, group=subcontinent,
+                     clickSelects=subcontinent),
+                 data=worldPop, size=4, alpha=3/4))
+gg2animint(popPlots2)
