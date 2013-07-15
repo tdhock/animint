@@ -34,7 +34,7 @@ gg2list <- function(p){
     df <- plistextra$data[[i]]
 
     ## This extracts essential info for this geom/layer.
-    g <- layer2list(L, df)
+    g <- layer2list(L, df, plistextra$panel$ranges[[1]])
     
     ## Idea: use the ggplot2:::coord_transform(coords, data, scales)
     ## function to handle cases like coord_flip. scales is a list of
@@ -42,7 +42,7 @@ gg2list <- function(p){
     ## e.g. c("cartesian","coord"). The result is a transformed data
     ## frame where all the data values are between 0 and 1. TODO:
     ## change the JS code to reflect this fact.
-    g$data <- ggplot2:::coord_transform(plistextra$plot$coord, df,
+    g$data <- ggplot2:::coord_transform(plistextra$plot$coord, g$data,
                                         plistextra$panel$ranges[[1]])
     plist$geoms[[i]] <- g
 
@@ -64,11 +64,11 @@ gg2list <- function(p){
   plist$axis <- list(
 
 #     if("element_blank"%in%attr(theme.pars$axis.text.x, "class")) # code to get blank elements... come back later?
-    x = plistextra$panel$ranges[[1]]$x.major_source,
+    x = plistextra$panel$ranges[[1]]$x.major,
     xlab = plistextra$panel$ranges[[1]]$x.labels,
     xrange = plistextra$panel$ranges[[1]]$x.range,
     xname = plistextra$plot$labels$x,
-    y = plistextra$panel$ranges[[1]]$y.major_source,
+    y = plistextra$panel$ranges[[1]]$y.major,
     ylab = plistextra$panel$ranges[[1]]$y.labels,
     yrange = plistextra$panel$ranges[[1]]$y.range,
     yname = plistextra$plot$labels$y
@@ -84,24 +84,17 @@ gg2list <- function(p){
 #' @return list representing a layer, with corresponding aesthetics, ranges, and groups.
 #' @export
 #' @seealso \code{\link{gg2animint}}
-layer2list <- function(l, d){
+layer2list <- function(l, d, ranges){
   g <- list(geom=l$geom$objname,
             data=d)
   g$aes <- sapply(l$mapping, as.character)
+  ggaeslist <- c("colour", "fill", "size", "linetype", "")
   # use un-named parameters so that they will not be exported
   # to JSON as a named object, since that causes problems with
   # e.g. colour.
   g$params <- l$geom_params
   for(p.name in names(g$params)){
     names(g$params[[p.name]]) <- NULL
-  }
-  
-  # Check g$data for color/fill - convert to hexadecimal.
-  toRGB <- function(x) rgb(t(col2rgb(as.character(x))), maxColorValue=255)
-  for(color.var in c("colour", "color", "fill")){
-    if(color.var %in% names(g$data)){
-      g$data[,color.var] <- toRGB(g$data[,color.var])
-    }
   }
 
   ## Make a list of variables to use for subsetting.
@@ -114,57 +107,55 @@ layer2list <- function(l, d){
   ## Pre-process some complex geoms so that they are treated as
   ## special cases of basic geoms. In ggplot2, this processing is done
   ## in the draw method of the geoms.
-  g$geom <- if(g$geom=="abline"){
-    slope <- plistextra$data[[i]]$slope
-    intercept <- plistextra$data[[i]]$intercept
-    temp.x <- matrix(plistextra$panel$ranges[[1]]$x.range, ncol=2, nrow=length(slope), byrow=TRUE)
-    temp.y <- slope*temp.x+intercept
-    g$data <- unique(data.frame(x=temp.x[,1], 
-                   xend=temp.x[,2], 
-                   y=temp.y[,1], 
-                   yend=temp.y[,2]), 
-                   group=1:length(slope))
-
-    ##g$aes <- g$aes[-which(names(g$aes)%in%c("intercept", "slope"))]
-
-    ## WHY do we need to erase subvars/subord here?
-    g$subvars <- list()
-    g$subord <- list()
-    "segment"
+  if(g$geom=="abline"){
+    # "Trick" ggplot coord_transform into transforming the slope and intercept
+    g$data$x <- ranges$x.range[1]
+    g$data$xend <- ranges$x.range[2]
+    g$data$y <- g$data$slope*ranges$x.range[1]+g$data$intercept
+    g$data$yend <-  g$data$slope*ranges$x.range[2]+g$data$intercept
+    g$geom <- "segment"
   } else if(g$geom=="density" | g$geom=="area"){
-    "ribbon"
-  } else if(g$geom=="tile" | g$geom=="raster" | g$geom=="bar"){
-    ## WHY do we set colour here?
+    g$geom <- "ribbon"
+  } else if(g$geom=="tile" | g$geom=="raster"){
+    # Color set to match ggplot2 default of tile with no outside border.
     if(!"colour"%in%names(g$aes) & "fill"%in%names(g$aes)){
       g$aes[["colour"]] <- g$aes[["fill"]]
     }
-    "rect"
+    g$geom <- "rect"
   } else if(g$geom=="boxplot"){
     stop("boxplots are not supported in animint")
     g$data$outliers <- sapply(g$data$outliers, FUN=paste, collapse=" @ ") 
     # outliers are specified as a list... change so that they are specified as a single string which can then be parsed in JavaScript.
     # there has got to be a better way to do this!!
-  } else if(g$geom=="histogram"){
-    "rect"
+  } else if(g$geom=="histogram" | g$geom=="bar"){
+    g$geom <- "rect"
   } else if(g$geom=="violin"){
     g$data <- transform(g$data, xminv = x-violinwidth*(x-xmin),xmaxv = x+violinwidth*(xmax-x))
     newdata <- ddply(g$data, .(group), function(df) rbind(arrange(transform(df, x=xminv), y), arrange(transform(df, x=xmaxv), -y)))
     newdata <- ddply(newdata, .(group), function(df) rbind(df, df[1,]))
     g$data <- newdata
-    "polygon"
+    g$geom <- "polygon"
   } else if(g$geom=="step"){
     datanames <- names(g$data)
     g$data <- ddply(g$data, .(group), function(df) ggplot2:::stairstep(df))
-    "path"
+    g$geom <- "path"
   } else if(g$geom=="contour" | g$geom=="density2d"){
     g$aes$group <- "piece"
     # reset g$subord, g$subvars now that group aesthetic exists.
     subset.vars <- c(some.vars, g$aes[names(g$aes)=="group"])
     g$subord <- as.list(names(subset.vars))
     g$subvars <- as.list(subset.vars)
-    "path"
+    g$geom <- "path"
   } else { ## all other geoms are basic, and keep the same name.
     g$geom
+  }
+  
+  # Check g$data for color/fill - convert to hexadecimal.
+  toRGB <- function(x) rgb(t(col2rgb(as.character(x))), maxColorValue=255)
+  for(color.var in c("colour", "color", "fill")){
+    if(color.var %in% names(g$data)){
+      g$data[,color.var] <- toRGB(g$data[,color.var])
+    }
   }
   
   g
