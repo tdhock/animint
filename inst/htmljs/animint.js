@@ -92,13 +92,13 @@ var animint = function(to_select, json_file){
 	// version. The real version will be used for plotting the
 	// data, and the fake version is just for the display of the
 	// axes.
-  	svg.x = d3.scale.linear()
+  svg.x = d3.scale.linear()
   	    .domain([0,1])
   	    .range([plotdim.xstart, plotdim.xend]);
 	svg.x_fake = d3.scale.linear()
 	    .domain(p_info.axis.xrange)
 	    .range([plotdim.xstart, plotdim.xend]);
-  	svg.y = d3.scale.linear()
+  svg.y = d3.scale.linear()
   	    .domain([0,1])
   	    .range([plotdim.yend, plotdim.ystart]);
 	svg.y_fake = d3.scale.linear()
@@ -129,7 +129,7 @@ var animint = function(to_select, json_file){
 	}
 
 	var xaxis = d3.svg.axis()
-            .scale(svg.x_fake)
+            .scale(svg.x)
             .tickValues(xaxisvals)
             .tickFormat(function(d) {
 		return xaxislabs[xaxisvals.indexOf(d)].toString();
@@ -147,7 +147,7 @@ var animint = function(to_select, json_file){
 		  plotdim.xlab.x+","+plotdim.xlab.y+")")
         ;
 	var yaxis = d3.svg.axis()
-	    .scale(svg.y_fake)
+	    .scale(svg.y)
             .tickValues(yaxisvals)
             .tickFormat(function(d) {
 		return yaxislabs[yaxisvals.indexOf(d)].toString();
@@ -216,7 +216,7 @@ var animint = function(to_select, json_file){
 	    if(d.hasOwnProperty("alpha")){
       		a = d.alpha;
 	    } else {
-		a = base_opacity;
+	      	a = base_opacity;
 	    }
 	    
 	    return a;
@@ -226,7 +226,7 @@ var animint = function(to_select, json_file){
   	    size = g_info.params.size;
   	}
   	var get_size = function(d){
-	    if(aes.hasOwnProperty("size") && d.hasOwnProperty(aes.size)){
+	    if(aes.hasOwnProperty("size") && d.hasOwnProperty("size")){
     		return d.size;
 	    }
   	    return size;
@@ -561,13 +561,9 @@ var animint = function(to_select, json_file){
             elements = elements.data(data);
   	    eActions = function(e){
     		e.attr("x",toXY("x","xmin"))
-    		    .attr("width",function(d) {
-			return svg.x(d.xmax)-svg.x(d.xmin);
-		    })
+    		 .attr("width",function(d) {return Math.abs(svg.x(d.xmax)-svg.x(d.xmin));})
   		    .attr("y",toXY("y","ymax"))
-  		    .attr("height",function(d) {
-			return svg.y(d.ymin)-svg.y(d.ymax);
-		    })
+  		    .attr("height",function(d) {return Math.abs(svg.y(d.ymin)-svg.y(d.ymax));})
   		    .style("stroke-dasharray",get_dasharray)
   		    .style("stroke-width",get_size)
   		    .style("stroke",get_colour)
@@ -576,12 +572,12 @@ var animint = function(to_select, json_file){
   	    }
   	    eAppend = "rect";
   	}else if(g_info.geom == "segment"){
-            elements = elements.data(data);
-  	    eActions = function(e){
-  		e.attr("x1",function(d){return svg.x(d[aes.x]);})
-  		    .attr("x2",function(d){return svg.x(d[aes.xend]);})
-  		    .attr("y1",function(d){return svg.y(d[aes.y]);})
-  		    .attr("y2",function(d){return svg.y(d[aes.yend]);})
+      elements = elements.data(data);
+      eActions = function(e){
+  		e.attr("x1",function(d){return svg.x(d.x);})
+  		    .attr("x2",function(d){return svg.x(d.xend);})
+  		    .attr("y1",function(d){return svg.y(d.y);})
+  		    .attr("y2",function(d){return svg.y(d.yend);})
   		    .style("stroke-dasharray",get_dasharray)
   		    .style("stroke-width",get_size)
   		    .style("stroke",get_colour)
