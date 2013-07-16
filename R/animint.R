@@ -443,8 +443,12 @@ getLegend <- function(mb, i){
   }
   df <- data.frame(breaks = bk, value = val, label = labels)
   df <- df[which(rowSums(is.na(df))==0),] # return only those entries that have breaks, values, and labels.
-  list(guide = guidetype, 
-       aesthetic = sc.aes, 
-       title = as.character(as.expression(mb$plot$mapping[[sc.aes]])), 
-       legend = df)
+  if(guidetype=="none"){
+    NULL
+  } else{
+    list(guide = guidetype, 
+         aesthetic = sc.aes, 
+         title = as.character(as.expression(mb$plot$mapping[[sc.aes]])), 
+         legend = df)
+  }
 }
