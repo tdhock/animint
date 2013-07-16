@@ -155,13 +155,14 @@ var animint = function (to_select, json_file) {
     } 
 
     titlepadding = measureText(p_info.title, 20).height+5;
-    axispaddingy = Math.max.apply(null, yaxislabs.map(function(entry){return measureText(entry, 11).width;}));
-    axispaddingx = Math.max.apply(null, xaxislabs.map(function(entry){return measureText(entry, 11).height;}));
-    labelpaddingy = measureText(p_info.axis.yname, 11).height;
-    labelpaddingx = measureText(p_info.axis.xname, 11).height;
+    axispaddingy = 5 + Math.max.apply(null, yaxislabs.map(function(entry){return measureText(entry, 11).width;}));
+    axispaddingx = 5 + Math.max.apply(null, xaxislabs.map(function(entry){return measureText(entry, 11).height;}));
+    labelpaddingy = 5 + measureText(p_info.axis.yname, 11).height;
+    labelpaddingx = 5 + measureText(p_info.axis.xname, 11).height;
     margin.left= labelpaddingy + axispaddingy;
     margin.bottom = labelpaddingx + axispaddingx;
     margin.top = titlepadding;
+    margin.right = 5 + xaxislabs.map(function(entry){return measureText(entry, 11).height;})[xaxislabs.length-1]/2; // to ensure the last x-axis label doesn't get cut off.
     plotdim.margin = margin;
     
     // calculate plot dimensions to be used in placing axes, labels, etc.
