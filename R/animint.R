@@ -89,9 +89,9 @@ layer2list <- function(l, d, ranges){
             data=d)
   g$aes <- sapply(l$mapping, as.character)
   
-  # use un-named parameters so that they will not be exported
-  # to JSON as a named object, since that causes problems with
-  # e.g. colour.
+  ## use un-named parameters so that they will not be exported
+  ## to JSON as a named object, since that causes problems with
+  ## e.g. colour.
   g$params <- l$geom_params
   for(p.name in names(g$params)){
     names(g$params[[p.name]]) <- NULL
@@ -122,16 +122,21 @@ layer2list <- function(l, d, ranges){
       g$data[["colour"]] <- g$data[["fill"]]
     }
     g$geom <- "rect"
+  } else if(g$geom=="histogram" | g$geom=="bar"){
+    g$geom <- "rect"
+  } else if(g$geom=="bin2d"){
+    stop("bin2d is not supported in animint. Try using geom_tile() and binning the data yourself.")
   } else if(g$geom=="boxplot"){
     stop("boxplots are not supported in animint")
     g$data$outliers <- sapply(g$data$outliers, FUN=paste, collapse=" @ ") 
-    # outliers are specified as a list... change so that they are specified as a single string which can then be parsed in JavaScript.
+    # outliers are specified as a list... change so that they are specified 
+    # as a single string which can then be parsed in JavaScript.
     # there has got to be a better way to do this!!
-  } else if(g$geom=="histogram" | g$geom=="bar"){
-    g$geom <- "rect"
   } else if(g$geom=="violin"){
     g$data <- transform(g$data, xminv = x-violinwidth*(x-xmin),xmaxv = x+violinwidth*(xmax-x))
-    newdata <- ddply(g$data, .(group), function(df) rbind(arrange(transform(df, x=xminv), y), arrange(transform(df, x=xmaxv), -y)))
+    newdata <- ddply(g$data, .(group), function(df){
+                  rbind(arrange(transform(df, x=xminv), y), arrange(transform(df, x=xmaxv), -y))
+                })
     newdata <- ddply(newdata, .(group), function(df) rbind(df, df[1,]))
     g$data <- newdata
     g$geom <- "polygon"
@@ -146,11 +151,24 @@ layer2list <- function(l, d, ranges){
     g$subord <- as.list(names(subset.vars))
     g$subvars <- as.list(subset.vars)
     g$geom <- "path"
-  } else { ## all other geoms are basic, and keep the same name.
+  } else if(g$geom=="freqpoly"){
+    g$geom <- "path"
+    # reset g$subord, g$subvars now that group aesthetic exists.
+    subset.vars <- c(some.vars, group="group")
+    g$subord <- as.list(names(subset.vars))
+    g$subvars <- as.list(subset.vars)
+  } else if(g$geom=="quantile"){
+    g$geom <- "path"
+    # reset g$subord, g$subvars now that group aesthetic exists.
+    subset.vars <- c(some.vars, group="group")
+    g$subord <- as.list(names(subset.vars))
+    g$subvars <- as.list(subset.vars)
+  } else { 
+    ## all other geoms are basic, and keep the same name.
     g$geom
   }
   
-  # Check g$data for color/fill - convert to hexadecimal.
+  ## Check g$data for color/fill - convert to hexadecimal so JS can parse correctly.
   toRGB <- function(x) rgb(t(col2rgb(as.character(x))), maxColorValue=255)
   for(color.var in c("colour", "color", "fill")){
     if(color.var %in% names(g$data)){
@@ -190,23 +208,23 @@ layer2list <- function(l, d, ranges){
 #' \item violin
 #' \item linerange
 #' \item step
-#' }
-#' Currently unsupported (TODO): 
-#' \itemize{
-#' \item area
-#' \item freqpoly
-#' \item smooth
-#' \item rug
-#' \item quantile
-#' \item boxplot
-#' \item crossbar
-#' \item pointrange
-#' \item dotplot
 #' \item contour
 #' \item density2d
-#' \item bin2d
+#' \item area
+#' \item freqpoly
+#' }
+#' Unsupported geoms: 
+#' \itemize{
+#' \item rug
+#' \item dotplot
 #' \item hex
-#' \item map
+#' \item quantile - should *theoretically* work but in practice does not work
+#' \item smooth - can be created using geom_line and geom_ribbon
+#' \item boxplot - can be created using geom_rect and geom_segment
+#' \item crossbar - can be created using geom_rect and geom_segment
+#' \item pointrange - can be created using geom_linerange and geom_point
+#' \item bin2d - bin using ddply() and then use geom_tile()
+#' \item map - can be created using geom_polygon or geom_path
 #'}
 #' Supported scales: 
 #' \itemize{
