@@ -392,7 +392,7 @@ var animint = function(to_select, json_file){
       		})
   		    .style("fill","none")
   		    .style("stroke-width",size)
-		    .style("stroke", function(group_info){
+		      .style("stroke", function(group_info){
 			var one_group = data[group_info.value];
 			var one_row = one_group[0]; // take color for first value in the group
 			return(get_colour(one_row));
@@ -574,10 +574,10 @@ var animint = function(to_select, json_file){
   	}else if(g_info.geom == "segment"){
       elements = elements.data(data);
       eActions = function(e){
-  		e.attr("x1",function(d){return svg.x(d.x);})
-  		    .attr("x2",function(d){return svg.x(d.xend);})
-  		    .attr("y1",function(d){return svg.y(d.y);})
-  		    .attr("y2",function(d){return svg.y(d.yend);})
+  		e.attr("x1",function(d){return svg.x(d["x"]);})
+  		    .attr("x2",function(d){return svg.x(d["xend"]);})
+  		    .attr("y1",function(d){return svg.y(d["y"]);})
+  		    .attr("y2",function(d){return svg.y(d["yend"]);})
   		    .style("stroke-dasharray",get_dasharray)
   		    .style("stroke-width",get_size)
   		    .style("stroke",get_colour)
