@@ -197,7 +197,6 @@ layer2list <- function(l, d, ranges){
   }
   
   ## Check g$data for color/fill - convert to hexadecimal so JS can parse correctly.
-  toRGB <- function(x) rgb(t(col2rgb(as.character(x))), maxColorValue=255)
   for(color.var in c("colour", "color", "fill")){
     if(color.var %in% names(g$data)){
       g$data[,color.var] <- toRGB(g$data[,color.var])
@@ -411,3 +410,10 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
 is.rgb <- function(x){
   grepl("NULL", x) | (grepl("#", x) & nchar(x)==7)
 }
+
+#' Convert R colors to RGB hexadecimal color values
+#' @param x character
+#' @return hexadecimal color value
+#' @export
+toRGB <- function(x) rgb(t(col2rgb(as.character(x))), maxColorValue=255)
+
