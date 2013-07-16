@@ -120,6 +120,8 @@ layer2list <- function(l, d, ranges){
     # Color set to match ggplot2 default of tile with no outside border.
     if(!"colour"%in%names(g$data) & "fill"%in%names(g$data)){
       g$data[["colour"]] <- g$data[["fill"]]
+      # Make outer border of 0 size if size isn't already specified.
+      if(!"size"%in%names(g$data)) g$data[["size"]] <- 0 
     }
     g$geom <- "rect"
   } else if(g$geom=="histogram" | g$geom=="bar"){
@@ -152,7 +154,7 @@ layer2list <- function(l, d, ranges){
     g$subvars <- as.list(subset.vars)
     g$geom <- "path"
   } else if(g$geom=="freqpoly"){
-    g$geom <- "path"
+    g$geom <- "line"
     # reset g$subord, g$subvars now that group aesthetic exists.
     subset.vars <- c(some.vars, group="group")
     g$subord <- as.list(names(subset.vars))
