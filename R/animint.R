@@ -417,3 +417,32 @@ is.rgb <- function(x){
 #' @export
 toRGB <- function(x) rgb(t(col2rgb(as.character(x))), maxColorValue=255)
 
+#' Function to get legend information from ggplot
+#' @param mb output from ggplot2::ggplot_build(p)
+#' @return list containing information for each legend
+#' @export
+getLegendList <- function(mb){
+  aes.scales <- which(sapply(mb$plot$scales$scales, function(i) sum(i$aesthetics%in%c("colour", "size", "fill", "linetype", "alpha"))>0))
+  lapply(aes.scales, getLegend, mb)
+}
+
+#' Function to get legend information for each scale
+#' @param mb output from ggplot2::ggplot_build(p)
+#' @i index of scale containing legend-generating information. Position scales do not generate legends, and must be excluded from possible indices.
+getLegend <- function(mb, i){
+  sc <- mb$plot$scales$scales[[i]]
+  guidetype <- sc$guide
+  sc.aes <- sc$aesthetics
+  bk <- ggplot2:::scale_breaks(sc)
+  val <- ggplot2:::scale_map(sc, bk)
+  labels <- ggplot2:::scale_labels(sc)
+  if(sc.aes %in% c("colour", "fill")){
+    val <- toRGB(val)
+  }
+  df <- data.frame(breaks = bk, value = val, label = labels)
+  df <- df[which(rowSums(is.na(df))==0),] # return only those entries that have breaks, values, and labels.
+  list(guide = guidetype, 
+       aesthetic = sc.aes, 
+       title = as.character(as.expression(mb$plot$mapping[[sc.aes]])), 
+       legend = df)
+}
