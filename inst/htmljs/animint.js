@@ -308,19 +308,13 @@ var animint = function(to_select, json_file){
   	}
 
   	var eActions, eAppend;
-	//In order to get d3 lines to play nice, bind fake "data" (group id's) -- the kv variable
-	//Then each line is plotted using a path object.
+	
+  
+  	if(g_info.geom == "line" || g_info.geom == "path" || g_info.geom == "polygon" || g_info.geom == "ribbon"){
+      //In order to get d3 lines to play nice, bind fake "data" (group id's) -- the kv variable
+      //Then each separate object is plotted using path.
 
-	//TODO: make line, path, polygon, and ribbon share the same JS
-	//code, since indeed it is mostly the same! This will greatly
-	//minimize bugs and maintenance time. e.g. 12 July 2013 TDH
-	//fixed a bug with geom_line by adding a clickSelects
-	//attribute to the fake data. This needs to be done for path,
-	//polygon, and ribbon as well, but it would be better to make
-	//these geoms share the same code, instead of copy-pasting the
-	//bugfix to the other geoms.
-  	if(g_info.geom == "line"){
-  	    // case of only 1 line and no groups.
+  	    // case of only 1 thing and no groups.
   	    if(!aes.hasOwnProperty("group")){
       		kv = [{"key":0,"value":0}];
       		data = {0:data};
@@ -330,131 +324,61 @@ var animint = function(to_select, json_file){
       		kv = kv.map(function(d){
       		    //d[aes.group] = d.value;
 
-		    // Need to store the clickSelects value that will
-		    // be passed to the selector when we click on this
-		    // item. TODO: do this for path, polygon, and
-		    // ribbon as well.
-		    d.clickSelects = data[d.value][0].clickSelects;
-      		    return d;
-  	    	});
-  	    }
-  	    var lineThing = d3.svg.line()
+	    // Need to store the clickSelects value that will
+	    // be passed to the selector when we click on this
+	    // item. 
+	    d.clickSelects = data[d.value][0].clickSelects;
+    		    return d;
+	    	});
+	    }
+      // line, path, and polygon use d3.svg.line(), 
+      // ribbon uses d3.svg.area()
+      // we have to define lineThing accordingly.
+      if(g_info.geom!="ribbon"){
+        var lineThing = d3.svg.line()
       		.x(toXY("x","x"))
       		.y(toXY("y","y"))
   	    ;
-  	    elements = elements.data(kv); //select the correct group before returning anything
-  	    eActions = function(e){
-      		e.attr("d",function(d){
-      		    var one_group = data[d.value];
-      		    return lineThing(one_group);
-      		})
-  		    .style("fill","none")
-  		    .style("stroke-width",size)
-		    .style("stroke", function(group_info){
-			var one_group = data[group_info.value];
-			var one_row = one_group[0]; // take color for first value in the group
-			return(get_colour(one_row));
-		    })
-		    .style("stroke-dasharray", function(group_info){
-			var one_group = data[group_info.value];
-			var one_row = one_group[0]; // take linetype for first value in the group
-			return(get_dasharray(one_row));
-		    })
-		    .style("stroke-width", function(group_info){
-			var one_group = data[group_info.value];
-			var one_row = one_group[0]; // take line size for first value in the group
-			return(get_size(one_row));
-		    });
-  	    }
-  	    eAppend = "path";
-  	} else if(g_info.geom == "path"){
-  	    // case of only 1 line and no groups.
-  	    if(!aes.hasOwnProperty("group")){
-      		kv = [{"key":0,"value":0}];
-      		data = {0:data};
-  	    }else{
-  		// we need to use a path for each group.
-  		var kv = d3.entries(d3.keys(data));
-      		kv = kv.map(function(d){
-      		    d[aes.group] = d.value;
-      		    return d;
-  	    	});
-  	    }
-  	    var lineThing = d3.svg.line()
-      		.x(toXY("x","x"))
-      		.y(toXY("y","y"))
+      } else {
+        var lineThing = d3.svg.area()
+        	.x(toXY("x","x"))
+        	.y(toXY("y","ymax"))
+      		.y0(toXY("y","ymin"));
   	    ;
-  	    elements = elements.data(kv); //select the correct group before returning anything
-  	    eActions = function(e){
-      		e.attr("d",function(d){
-      		    var one_group = data[d.value];
-      		    return lineThing(one_group);
-      		})
-  		    .style("fill","none")
-  		    .style("stroke-width",size)
-		      .style("stroke", function(group_info){
-			var one_group = data[group_info.value];
-			var one_row = one_group[0]; // take color for first value in the group
-			return(get_colour(one_row));
-		    })
-		    .style("stroke-dasharray", function(group_info){
-			var one_group = data[group_info.value];
-			var one_row = one_group[0]; // take linetype for first value in the group
-			return(get_dasharray(one_row));
-		    })
-		    .style("stroke-width", function(group_info){
-			var one_group = data[group_info.value];
-			var one_row = one_group[0]; // take line size for first value in the group
-			return(get_size(one_row));
-		    });
-  	    }
-  	    eAppend = "path";
-  	}else if(g_info.geom == "polygon"){
-            // case of only 1 line and no groups.
-  	    if(!aes.hasOwnProperty("group")){
-      		kv = [{"key":0,"value":0}];
-      		data = {0:data};
-  	    }else{
-  		// we need to use a path for each group.
-  		var kv = d3.entries(d3.keys(data));
-      		kv = kv.map(function(d){
-      		    d[aes.group] = d.value;
-      		    return d;
-  	    	});
-  	    }
-  	    var lineThing = d3.svg.line()
-      		.x(toXY("x","x"))
-      		.y(toXY("y","y"))
-  	    ;
-  	    elements = elements.data(kv); //select the correct group before returning anything
-  	    eActions = function(e){
-      		e.attr("d",function(d){
-      		    var one_group = data[d.value];
-      		    return lineThing(one_group);
-      		})
-  		    .style("fill", function(group_info){
-			var one_group = data[group_info.value];
-			var one_row = one_group[0]; // take color for first value in the group
-			return(get_fill(one_row));
-		    })
-  		    .style("stroke-width",size)
-		    .style("stroke", function(group_info){
-			var one_group = data[group_info.value];
-			var one_row = one_group[0]; // take color for first value in the group
-			return(get_colour(one_row));
-		    })
-		    .style("stroke-dasharray", function(group_info){
-			var one_group = data[group_info.value];
-			var one_row = one_group[0]; // take linetype for first value in the group
-			return(get_dasharray(one_row));
-		    })
-		    .style("stroke-width", function(group_info){
-			var one_group = data[group_info.value];
-			var one_row = one_group[0]; // take line size for first value in the group
-			return(get_size(one_row));
-		    });
-  	    }
-  	    eAppend = "path";
+      }
+
+	    elements = elements.data(kv); //select the correct group before returning anything
+	    eActions = function(e){
+    		e.attr("d",function(d){
+    		    var one_group = data[d.value];
+    		    return lineThing(one_group);
+    		    })
+		      .style("fill", function(group_info){
+            if(g_info.geom=="line" || g_info.geom=="path"){
+              return("none")
+            }
+      			var one_group = data[group_info.value];
+      			var one_row = one_group[0]; // take color for first value in the group
+      			return(get_fill(one_row));
+      		  })
+		      .style("stroke-width",size)
+  		    .style("stroke", function(group_info){
+      			var one_group = data[group_info.value];
+      			var one_row = one_group[0]; // take color for first value in the group
+      			return(get_colour(one_row));
+      		  })
+  		    .style("stroke-dasharray", function(group_info){
+      			var one_group = data[group_info.value];
+      			var one_row = one_group[0]; // take linetype for first value in the group
+      			return(get_dasharray(one_row));
+      		  })
+  		    .style("stroke-width", function(group_info){
+      			var one_group = data[group_info.value];
+      			var one_row = one_group[0]; // take line size for first value in the group
+      			return(get_size(one_row));
+      		  });
+	    }
+	    eAppend = "path";
   	}else if(g_info.geom == "text"){
   	    elements = elements.data(data);
   	    // TODO: how to support vjust? firefox doensn't support
@@ -490,58 +414,6 @@ var animint = function(to_select, json_file){
   		;
   	    }
   	    eAppend = "circle";
-  	}else if(g_info.geom == "ribbon"){
-            // case of only 1 ribbon and no groups.
-  	    if(!aes.hasOwnProperty("group")){
-      		kv = [{"key":0,"value":0}];
-      		data = {0:data};
-  	    }else{
-  		// we need to use a path for each group.
-  		var kv = d3.entries(d3.keys(data));
-      		kv = kv.map(function(d){
-      		    d[aes.group] = d.value;
-      		    return d;
-  	    	});
-  	    }
-  	    var areaThing = d3.svg.area()
-      		.x(toXY("x","x"))
-		.y(toXY("y","ymax"))
-		.y0(toXY("y","ymin"))
-  	    ;
-            elements = elements.data(kv); //select the correct group before returning anything
-            eActions = function(e){
-      		e.attr("d",function(d){
-      		    var one_group = data[d.value];
-      		    return areaThing(one_group);
-      		})
-		    .attr("id", function(d){return d.key;})
-  		    .style("fill", function(group_info){
-			var one_group = data[group_info.value];
-			var one_row = one_group[0]; // take fill for first value in the group
-			return(get_fill(one_row));
-		    })
-  		    .style("stroke-width", function(group_info){
-			var one_group = data[group_info.value];
-			var one_row = one_group[0]; // take size for first value in the group
-			return(get_size(one_row));
-		    })
-		    .style("stroke", function(group_info){
-			var one_group = data[group_info.value];
-			var one_row = one_group[0]; // take color for first value in the group
-			return(get_colour(one_row));
-		    })
-		    .style("stroke-dasharray", function(group_info){
-			var one_group = data[group_info.value];
-			var one_row = one_group[0]; // take linetype for first value in the group
-			return(get_dasharray(one_row));
-		    })
-		    .style("stroke-width", function(group_info){
-			var one_group = data[group_info.value];
-			var one_row = one_group[0]; // take line size for first value in the group
-			return(get_size(one_row));
-		    });
-  	    }
-  	    eAppend = "path";
   	}else if(g_info.geom == "tallrect"){
             elements = elements.data(data);
   	    eActions = function(e){
@@ -572,7 +444,7 @@ var animint = function(to_select, json_file){
   	    }
   	    eAppend = "rect";
   	}else if(g_info.geom == "segment"){
-      elements = elements.data(data);
+      elements = elements.data(data[1]); //This is a hack - why is it that geom_segment data is in its own object? 
       eActions = function(e){
   		e.attr("x1",function(d){return svg.x(d["x"]);})
   		    .attr("x2",function(d){return svg.x(d["xend"]);})
@@ -580,8 +452,7 @@ var animint = function(to_select, json_file){
   		    .attr("y2",function(d){return svg.y(d["yend"]);})
   		    .style("stroke-dasharray",get_dasharray)
   		    .style("stroke-width",get_size)
-  		    .style("stroke",get_colour)
-		;
+  		    .style("stroke",get_colour);
   	    }
   	    eAppend = "line";
 	}else if(g_info.geom == "linerange"){
