@@ -160,4 +160,49 @@ g16 <- ggplot() + xlim(c(1,3))+
              stat="density2d", contour=FALSE, n=10, size=I(.5)) +
   ggtitle("geom_density2d points")
 g16
-gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11, g12=g12, g13=g13, g14=g14, g15=g15, g16=g16))
+# gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11, g12=g12, g13=g13, g14=g14, g15=g15, g16=g16))
+
+
+#' geom_map using geom_polygon and merge
+crimes <- data.frame(state = tolower(rownames(USArrests)), USArrests)
+library(reshape2) # for melt
+crimesm <- melt(crimes, id = 1)
+library(maps)
+states_map <- map_data("state")
+assault.map <- merge(states_map, subset(crimesm, variable=="Assault"), by.x="region", by.y="state")
+assault.map <- assault.map[order(assault.map$group, assault.map$order),]
+g17 <- ggplot() + 
+  geom_polygon(data=assault.map, aes(x=long, y=lat, group=group, fill=value, colour=value)) +
+  expand_limits(x = states_map$long, y = states_map$lat) + 
+  ggtitle("geom_polygon map") + ylim(c(12, 63)) + 
+  geom_text(data=data.frame(x=-95.84, y=55, label="Arrests for Assault"), hjust=.5, aes(x=x, y=y, label=label))
+g17  
+# gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, 
+#                 g9=g9, g10=g10, g11=g11, g12=g12, g13=g13, g14=g14, g15=g15, 
+#                 g16 = g16, g17=g17))
+
+#' geom_bar stacked
+data(mtcars)
+g18 <- ggplot() + geom_bar(data=mtcars, aes(x=factor(cyl), fill=factor(vs))) + ggtitle("geom_bar stacked")
+g18
+# gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, 
+#                 g9=g9, g10=g10, g11=g11, g12=g12, g13=g13, g14=g14, g15=g15, 
+#                 g16 = g16, g17=g17, g18=g18))
+
+#' geom_area
+data(diamonds)
+g19 <- ggplot() + 
+  geom_area(data=diamonds, aes(x=clarity, y=..count.., group=cut, colour=cut, fill=cut), stat="density") +
+  ggtitle("geom_area")
+g19
+# gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, 
+#                 g9=g9, g10=g10, g11=g11, g12=g12, g13=g13, g14=g14, g15=g15, 
+#                 g16 = g16, g17=g17, g18=g18, g19=g19))
+
+g20 <- ggplot() + 
+  geom_freqpoly(data=diamonds, aes(x=clarity, group=cut, colour=cut)) +
+  ggtitle("geom_freqpoly")
+g20
+gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, 
+                g9=g9, g10=g10, g11=g11, g12=g12, g13=g13, g14=g14, g15=g15, 
+                g16 = g16, g17=g17, g18=g18, g19=g19, g20=g20))
