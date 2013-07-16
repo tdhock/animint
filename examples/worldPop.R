@@ -73,7 +73,8 @@ popCumSum <- ddply(worldPop[order(worldPop$year, worldPop$subcontinent),], .(yea
                    cumPop = cumsum(population)/sum(population), 
                    cumPop.lower = cumsum(c(0, population[-length(population)]))/sum(population))
 popCumSum$cumCenter = rowMeans(popCumSum[,c("cumPop", "cumPop.lower")])
-
+popCumSum$subcontinent.names <- factor(as.character(popCumSum$subcontinent)) # alphabetize
+popCumSum$subcontinent.lab.height <- 1-as.numeric(popCumSum$subcontinent.names)/15
 popPlots3 <-
   list(bars=ggplot()+
          geom_bar(aes(x=subcontinent, y=population,
@@ -96,13 +97,16 @@ popPlots3 <-
          geom_rect(aes(xmin=0, xmax=0.4, ymin=cumPop.lower, ymax=cumPop, fill=factor(subcontinent), 
                       showSelected=year, clickSelects=subcontinent),
                   data=popCumSum, colour="#000000")+
-         xlim(c(0, 1))+
-         geom_point(aes(x=.5, y=cumCenter, colour=factor(subcontinent), 
+         geom_point(aes(x=.5, y=subcontinent.lab.height, colour=factor(subcontinent), 
                         showSelected=year, clickSelects=subcontinent), 
                     data=popCumSum, size=4)+
-         geom_text(aes(x=.55, y=cumCenter, label=subcontinent, 
+         geom_text(aes(x=.55, y=subcontinent.lab.height, label=subcontinent, 
                        showSelected=year, clickSelects=subcontinent), 
-                   data=popCumSum, hjust=0)
+                   data=popCumSum, hjust=0) +
+         scale_x_continuous(limits=c(0,1), breaks=c(0, 1), labels=NULL) +
+         scale_y_continuous(limits=c(0,1), breaks=c(0, 1), labels=NULL) + 
+         xlab("") + ylab("")
+       
 )
 gg2animint(popPlots3)
 
