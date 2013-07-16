@@ -81,6 +81,8 @@ gg2list <- function(p){
     plist$axis$xname = plist$axis$yname
     plist$axis$yname = temp
   }
+  
+  plist$legend <- getLegendList(plistextra)
   plist$title <- plistextra$plot$labels$title
   plist$options <- list(width=400,height=400)
   plist
