@@ -97,7 +97,7 @@ p11
 # gg2animint(list(p1=p1, p2=p2, p3=p3, p4=p4, p5=p5, p6=p6, p7=p7, p8=p8, p9=p9, p10=p10, p11=p11))
 
 p12 <- ggplot() + geom_line(data=data2, aes(x=x, y=y, group=group, alpha=miny, colour=maxy)) + 
-  scale_alpha_continuous(range=c(.1, .5)) + 
+  scale_alpha_continuous(range=c(.1, .3)) + 
   ggtitle("scale_alpha + scale_colour")
 p12
 gg2animint(list(p1=p1, p2=p2, p3=p3, p4=p4, p5=p5, p6=p6, p7=p7, p8=p8, p9=p9, p10=p10, p11=p11, p12=p12))
