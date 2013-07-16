@@ -127,6 +127,11 @@ layer2list <- function(l, d, ranges){
       g$subvars <- as.list(subset.vars)
     } 
     g$geom <- "segment"
+  } else if(g$geom=="point"){
+    # Fill set to match ggplot2 default of filled in circle. 
+    if(!"fill"%in%names(g$data) & "colour"%in%names(g$data)){
+      g$data[["fill"]] <- g$data[["colour"]]
+    }
   } else if(g$geom=="density" | g$geom=="area"){
     g$geom <- "ribbon"
   } else if(g$geom=="tile" | g$geom=="raster"){
