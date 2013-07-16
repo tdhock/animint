@@ -74,7 +74,7 @@ gg2list <- function(p){
     yname = plistextra$plot$labels$y
   )
   plist$title <- plistextra$plot$labels$title
-  plist$options <- list(width=300,height=300)
+  plist$options <- list(width=400,height=400)
   plist
 }
 

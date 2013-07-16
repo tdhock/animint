@@ -54,14 +54,16 @@ var animint = function (to_select, json_file) {
       update_geom(g_name);
     });
   }
-  var axispadding = 30;
-  var labelpadding = 35;
+  var axispaddingx = 30;
+  var axispaddingy = 30;
+  var labelpaddingx = 35;
+  var labelpaddingy = 35;
   var titlepadding = 30;
   var margin = {
-    left: labelpadding + axispadding,
+    left: labelpaddingy + axispaddingy,
     right: 0,
     top: titlepadding,
-    bottom: labelpadding + axispadding
+    bottom: labelpaddingx + axispaddingx
   };
   var plotdim = {
     width: 0,
@@ -95,39 +97,6 @@ var animint = function (to_select, json_file) {
       .attr("height", p_info.options.height)
       .attr("width", p_info.options.width);
 
-    // calculate plot dimensions to be used in placing axes, labels, etc.
-    plotdim.width = p_info.options.width;
-    plotdim.height = p_info.options.height;
-    plotdim.graph.width = plotdim.width - margin.left - margin.right;
-    plotdim.graph.height = plotdim.height - margin.top - margin.bottom;
-    plotdim.xstart = plotdim.margin.left;
-    plotdim.xend = plotdim.graph.width + margin.left;
-    plotdim.ystart = plotdim.margin.top;
-    plotdim.yend = plotdim.graph.height + margin.top;
-    plotdim.xlab.x = plotdim.xstart + plotdim.graph.width / 2;
-    plotdim.xlab.y = axispadding + labelpadding / 2;
-    plotdim.ylab.x = axispadding + labelpadding / 2;
-    plotdim.ylab.y = plotdim.yend - plotdim.graph.height / 2;
-    plotdim.title.x = plotdim.xstart + plotdim.graph.width / 2;
-    plotdim.title.y = plotdim.margin.top / 2;
-
-    // for each of the x and y axes, there is a "real" and fake
-    // version. The real version will be used for plotting the
-    // data, and the fake version is just for the display of the
-    // axes.
-    svg.x = d3.scale.linear()
-      .domain([0, 1])
-      .range([plotdim.xstart, plotdim.xend]);
-    svg.x_fake = d3.scale.linear()
-      .domain(p_info.axis.xrange)
-      .range([plotdim.xstart, plotdim.xend]);
-    svg.y = d3.scale.linear()
-      .domain([0, 1])
-      .range([plotdim.yend, plotdim.ystart]);
-    svg.y_fake = d3.scale.linear()
-      .domain([p_info.axis.yrange[1], p_info.axis.yrange[0]])
-      .range([plotdim.ystart, plotdim.yend]);
-
     function isArray(o) {
       return Object.prototype.toString.call(o) === '[object Array]';
     }
@@ -158,6 +127,44 @@ var animint = function (to_select, json_file) {
       yaxisvals.push(p_info.axis.y);
       yaxislabs.push(p_info.axis.ylab);
     }
+
+    var yaxislabwidth = Math.max(yaxislabs.map(function(entry){return measureText(entry, 11).width;}));
+    axispaddingy = yaxislabwidth;
+    margin.left= labelpaddingy + axispaddingy;
+    plotdim.margin = margin;
+    
+    // calculate plot dimensions to be used in placing axes, labels, etc.
+    plotdim.width = p_info.options.width;
+    plotdim.height = p_info.options.height;
+    plotdim.graph.width = plotdim.width - plotdim.margin.left - plotdim.margin.right;
+    plotdim.graph.height = plotdim.height - plotdim.margin.top - plotdim.margin.bottom;
+    plotdim.xstart = plotdim.margin.left;
+    plotdim.xend = plotdim.graph.width + margin.left;
+    plotdim.ystart = plotdim.margin.top;
+    plotdim.yend = plotdim.graph.height + margin.top;
+    plotdim.xlab.x = plotdim.xstart + plotdim.graph.width / 2;
+    plotdim.xlab.y = axispaddingx + labelpaddingx / 2;
+    plotdim.ylab.x = axispaddingy + labelpaddingy / 2;
+    plotdim.ylab.y = plotdim.yend - plotdim.graph.height / 2;
+    plotdim.title.x = plotdim.xstart + plotdim.graph.width / 2;
+    plotdim.title.y = plotdim.margin.top / 2;
+
+    // for each of the x and y axes, there is a "real" and fake
+    // version. The real version will be used for plotting the
+    // data, and the fake version is just for the display of the
+    // axes.
+    svg.x = d3.scale.linear()
+      .domain([0, 1])
+      .range([plotdim.xstart, plotdim.xend]);
+    svg.x_fake = d3.scale.linear()
+      .domain(p_info.axis.xrange)
+      .range([plotdim.xstart, plotdim.xend]);
+    svg.y = d3.scale.linear()
+      .domain([0, 1])
+      .range([plotdim.yend, plotdim.ystart]);
+    svg.y_fake = d3.scale.linear()
+      .domain([p_info.axis.yrange[1], p_info.axis.yrange[0]])
+      .range([plotdim.ystart, plotdim.yend]);
 
     var xaxis = d3.svg.axis()
       .scale(svg.x)
@@ -728,4 +735,30 @@ var animint = function (to_select, json_file) {
       d3.timer(animateIfInactive, Animation.ms);
     }
   });
+}
+
+function measureText(pText, pFontSize, pStyle) {
+    var lDiv = document.createElement('lDiv');
+
+    document.body.appendChild(lDiv);
+
+    if (pStyle != null) {
+        lDiv.style = pStyle;
+    }
+    lDiv.style.fontSize = "" + pFontSize + "px";
+    lDiv.style.position = "absolute";
+    lDiv.style.left = -1000;
+    lDiv.style.top = -1000;
+
+    lDiv.innerHTML = pText;
+
+    var lResult = {
+        width: lDiv.clientWidth,
+        height: lDiv.clientHeight
+    };
+
+    document.body.removeChild(lDiv);
+    lDiv = null;
+
+    return lResult;
 }
