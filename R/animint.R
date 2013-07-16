@@ -118,8 +118,8 @@ layer2list <- function(l, d, ranges){
     g$geom <- "ribbon"
   } else if(g$geom=="tile" | g$geom=="raster"){
     # Color set to match ggplot2 default of tile with no outside border.
-    if(!"colour"%in%names(g$aes) & "fill"%in%names(g$aes)){
-      g$aes[["colour"]] <- g$aes[["fill"]]
+    if(!"colour"%in%names(g$data) & "fill"%in%names(g$data)){
+      g$data[["colour"]] <- g$data[["fill"]]
     }
     g$geom <- "rect"
   } else if(g$geom=="boxplot"){
