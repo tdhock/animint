@@ -11,6 +11,10 @@ m
 mb <- ggplot_build(m)
 aes.scales <- which(sapply(mb$plot$scales$scales, function(i) sum(i$aesthetics%in%c("colour", "size", "fill", "linetype", "alpha"))>0))
 
+getLegendList <- function(mb){
+  aes.scales <- which(sapply(mb$plot$scales$scales, function(i) sum(i$aesthetics%in%c("colour", "size", "fill", "linetype", "alpha"))>0))
+  lapply(aes.scales, getLegend, mb)
+}
 
 
 getLegend <- function(mb, i){
@@ -25,12 +29,15 @@ getLegend <- function(mb, i){
   }
   df <- data.frame(breaks = bk, value = val, label = labels)
   df <- df[which(rowSums(is.na(df))==0),] # return only those entries that have breaks, values, and labels.
-  list(guide = guidetype, 
-       aesthetic = sc.aes, 
-       title = as.character(as.expression(mb$plot$mapping[[sc.aes]])), 
-       legend = df)
+  if(guidetype=="none"){
+    NULL
+  } else{
+    list(guide = guidetype, 
+         aesthetic = sc.aes, 
+         title = as.character(as.expression(mb$plot$mapping[[sc.aes]])), 
+         legend = df)
+  }
 }
-
 legends <- lapply(aes.scales, getLegend, mb=mb)
 
 m <- ggplot(movies, aes(x=length, y=rating, size=votes, colour=factor(Comedy))) + scale_colour_manual(values=c("black", "green")) + geom_jitter(alpha=.5) + scale_size_area() + xlim(c(20, 300))
