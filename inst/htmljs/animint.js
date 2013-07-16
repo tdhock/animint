@@ -267,7 +267,7 @@ var animint = function(to_select, json_file){
 	}
   	var get_dasharray = function(d){
   	    var lt;
-            if(aes.hasOwnProperty("linetype") && d.hasOwnProperty(aes.linetype)){
+            if(aes.hasOwnProperty("linetype") && d.hasOwnProperty("linetype")){
 		try{
         	    lt = d.linetype;
   		}catch(err){
@@ -314,23 +314,24 @@ var animint = function(to_select, json_file){
       //In order to get d3 lines to play nice, bind fake "data" (group id's) -- the kv variable
       //Then each separate object is plotted using path.
 
-  	    // case of only 1 thing and no groups.
-  	    if(!aes.hasOwnProperty("group")){
-      		kv = [{"key":0,"value":0}];
-      		data = {0:data};
-  	    }else{
-  		// we need to use a path for each group.
-  		var kv = d3.entries(d3.keys(data));
-      		kv = kv.map(function(d){
-      		    //d[aes.group] = d.value;
+	    // case of only 1 thing and no groups.
+	    if(!aes.hasOwnProperty("group")){
+    		kv = [{"key":0,"value":0}];
+    		data = {0:data};
+	    }else{
+    		// we need to use a path for each group.
+    		var kv = d3.entries(d3.keys(data));
+    		kv = kv.map(function(d){
+    		  //d[aes.group] = d.value;
 
-	    // Need to store the clickSelects value that will
-	    // be passed to the selector when we click on this
-	    // item. 
-	    d.clickSelects = data[d.value][0].clickSelects;
-    		    return d;
-	    	});
-	    }
+    	    // Need to store the clickSelects value that will
+    	    // be passed to the selector when we click on this
+    	    // item. 
+  	      d.clickSelects = data[d.value][0].clickSelects;
+      		return d;
+    	  });
+      }
+      
       // line, path, and polygon use d3.svg.line(), 
       // ribbon uses d3.svg.area()
       // we have to define lineThing accordingly.
@@ -419,7 +420,7 @@ var animint = function(to_select, json_file){
   	    eActions = function(e){
   		e.attr("x",toXY("x","xmin"))
   		    .attr("width",function(d){
-  		    	return svg.x(d[ aes.xmax ])-svg.x(d[ aes.xmin ]);
+  		    	return svg.x(d[ "xmax" ])-svg.x(d[ "xmin" ]);
   		    })
   		    .attr("y", svg.y.range()[1])
   		    .attr("height", svg.y.range()[0]-svg.y.range()[1])
@@ -458,15 +459,15 @@ var animint = function(to_select, json_file){
 	}else if(g_info.geom == "linerange"){
             elements = elements.data(data);
             eActions = function(e){
-  		e.attr("x1",function(d){return svg.x(d[aes.x]);})
-  		    .attr("x2",function(d){return svg.x(d[aes.x]);})
-  		    .attr("y1",function(d){return svg.y(d[aes.ymax]);})
-  		    .attr("y2",function(d){return svg.y(d[aes.ymin]);})
-  		    .style("stroke-dasharray",get_dasharray)
-  		    .style("stroke-width",get_size)
-  		    .style("stroke",get_colour)
-		;
-  	    }
+          		e.attr("x1",function(d){return svg.x(d["x"]);})
+          		    .attr("x2",function(d){return svg.x(d["x"]);})
+          		    .attr("y1",function(d){return svg.y(d["ymax"]);})
+          		    .attr("y2",function(d){return svg.y(d["ymin"]);})
+          		    .style("stroke-dasharray",get_dasharray)
+          		    .style("stroke-width",get_size)
+          		    .style("stroke",get_colour)
+                  ;
+          	}
   	    eAppend = "line";
 	}else if(g_info.geom == "vline"){
 	    elements = elements.data(data);
@@ -500,39 +501,39 @@ var animint = function(to_select, json_file){
 
 	    elements = elements.data(data);
 	    eActions = function(e){
-		e.append("line")
-		    .attr("x1",function(d){return svg.x(d[aes.x]);})
-    		    .attr("x2",function(d){return svg.x(d[aes.x]);})
-  		    .attr("y1",function(d){return svg.y(d[aes.ymin]);})
-  		    .attr("y2",function(d){return svg.y(d[aes.lower]);})
-  		    .style("stroke-dasharray",get_dasharray)
-  		    .style("stroke-width",get_size)
-  		    .style("stroke",get_colour);
-		e.append("line")
-		    .attr("x1",function(d){return svg.x(d[aes.x]);})
-		    .attr("x2",function(d){return svg.x(d[aes.x]);})
-  		    .attr("y1",function(d){return svg.y(d[aes.upper]);})
-  		    .attr("y2",function(d){return svg.y(d[aes.ymax]);})
-  		    .style("stroke-dasharray",get_dasharray)
-  		    .style("stroke-width",get_size)
-  		    .style("stroke",get_colour);
-		e.append("rect")
-		    .attr("x",function(d){return svg.x(d[aes.xmin]);})
-		    .attr("width",function(d) {return svg.x(d[aes.xmax])-svg.x(d[aes.xmin]);})
-  		    .attr("y",function(d){return svg.y(d[aes.upper]);})
-  		    .attr("height",function(d) {return Math.abs(svg.y(d[aes.upper])-svg.y(d[aes.lower]));})
-  		    .style("stroke-dasharray",get_dasharray)
-  		    .style("stroke-width",get_size)
-  		    .style("stroke",get_colour)
-		    .style("fill", get_fill);
-		e.append("line")
-		    .attr("x1",function(d){return svg.x(d[aes.xmin]);})
-		    .attr("x2",function(d){return svg.x(d[aes.xmax]);})
-    		    .attr("y1",function(d){return svg.y(d[aes.middle]);})
-  		    .attr("y2",function(d){return svg.y(d[aes.middle]);})
-  		    .style("stroke-dasharray",get_dasharray)
-  		    .style("stroke-width",get_size)
-  		    .style("stroke",get_colour);
+    		e.append("line")
+    		    .attr("x1",function(d){return svg.x(d["x"]);})
+        		.attr("x2",function(d){return svg.x(d["x"]);})
+      		  .attr("y1",function(d){return svg.y(d["ymin"]);})
+      		  .attr("y2",function(d){return svg.y(d["lower"]);})
+      		  .style("stroke-dasharray",get_dasharray)
+      		  .style("stroke-width",get_size)
+      		  .style("stroke",get_colour);
+    		e.append("line")
+    		    .attr("x1",function(d){return svg.x(d["x"]);})
+    		    .attr("x2",function(d){return svg.x(d["x"]);})
+      		  .attr("y1",function(d){return svg.y(d["upper"]);})
+      		  .attr("y2",function(d){return svg.y(d["ymax"]);})
+      		  .style("stroke-dasharray",get_dasharray)
+      		  .style("stroke-width",get_size)
+      		  .style("stroke",get_colour);
+    		e.append("rect")
+    		    .attr("x",function(d){return svg.x(d["xmin"]);})
+    		    .attr("width",function(d) {return svg.x(d["xmax"])-svg.x(d["xmin"]);})
+      		  .attr("y",function(d){return svg.y(d["upper"]);})
+      		  .attr("height",function(d) {return Math.abs(svg.y(d["upper"])-svg.y(d["lower"]));})
+      		  .style("stroke-dasharray",get_dasharray)
+      		  .style("stroke-width",get_size)
+      		  .style("stroke",get_colour)
+    		    .style("fill", get_fill);
+    		e.append("line")
+    		    .attr("x1",function(d){return svg.x(d["xmin"]);})
+    		    .attr("x2",function(d){return svg.x(d["xmax"]);})
+        		    .attr("y1",function(d){return svg.y(d["middle"]);})
+      		    .attr("y2",function(d){return svg.y(d["middle"]);})
+      		    .style("stroke-dasharray",get_dasharray)
+      		    .style("stroke-width",get_size)
+      		    .style("stroke",get_colour);
 	    }
   	}else{
   	    return "unsupported geom "+g_info.geom;
