@@ -156,7 +156,7 @@ var animint = function (to_select, json_file) {
 
     var yaxislabwidth = Math.max.apply(null, yaxislabs.map(function(entry){return measureText(entry, 11).width;}));
     var xaxislabheight = Math.max.apply(null, xaxislabs.map(function(entry){return measureText(entry, 11).height;}));
-    titlepadding = measureText(p_info.title, 16).height;
+    titlepadding = measureText(p_info.title, 20).height+5;
     axispaddingy = yaxislabwidth;
     axispaddingx = xaxislabheight;
     margin.left= labelpaddingy + axispaddingy;
