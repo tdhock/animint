@@ -10,7 +10,6 @@ gg2list <- function(p){
   plist <- list()
   plistextra <- ggplot2::ggplot_build(p)
   for(sc in plistextra$plot$scales$scales){
-    # TODO: make use of other scales than manual.
     if(sc$scale_name == "manual"){
       plist$scales[[sc$aesthetics]] <- sc$palette(0)
     }else if(sc$scale_name == "brewer"){
@@ -23,6 +22,8 @@ gg2list <- function(p){
       plist$scales[[sc$aesthetics]] <- sc$palette(sc$range$range)
     }else if(sc$scale_name == "size_c"){
       plist$scales[[sc$aesthetics]] <- sc$palette(sc$range$range)
+    }else if(sc$scale_name == "gradient"){
+      plist$scales[[sc$aesthetics]] <- ggplot2:::scale_map(sc, ggplot2:::scale_breaks(sc))
     }
   }
   for(i in seq_along(plistextra$plot$layers)){
