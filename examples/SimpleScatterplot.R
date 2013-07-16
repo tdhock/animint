@@ -16,7 +16,7 @@ scatterdata$class4 <- factor(round(scatterdata$x/10)%%4, labels=c("high", "medhi
 #' combinations... 
 #' TODO: Test further.
 p <- qplot(data=scatterdata, x=x, y=y, geom="point", colour=floor(x))
-gg2animint(list(p=p))
+# gg2animint(list(p=p))
 
 #' Should use empty ggplot() statement because of structure of ggplot/qplot object
 #' Must provide a named list of ggplots.
