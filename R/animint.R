@@ -113,6 +113,19 @@ layer2list <- function(l, d, ranges){
     g$data[,"xend"] <- ranges$x.range[2]
     g$data[,"y"] <- g$data$slope*ranges$x.range[1]+g$data$intercept
     g$data[,"yend"] <-  g$data$slope*ranges$x.range[2]+g$data$intercept
+    g$data <- as.data.frame(g$data)
+    if(g$aes[["group"]]=="1"){ 
+      # ggplot2 defaults to adding a group attribute
+      # which misleads for situations where there are 
+      # multiple lines with the same group. 
+      # if the group attribute conveys no additional 
+      # information, remove it.
+      ## TODO: Figure out a better way to handle this...
+      g$aes <- g$aes[-which(names(g$aes)=="group")]
+      subset.vars <- c(some.vars, g$aes[names(g$aes)=="group"])
+      g$subord <- as.list(names(subset.vars))
+      g$subvars <- as.list(subset.vars)
+    } 
     g$geom <- "segment"
   } else if(g$geom=="density" | g$geom=="area"){
     g$geom <- "ribbon"

@@ -380,6 +380,56 @@ var animint = function(to_select, json_file){
       		});
 	    }
 	    eAppend = "path";
+    }else if(g_info.geom == "segment"){
+      elements = elements.data(data); 
+      //This is a hack - why is it that geom_segment data is in its own object? 
+      eActions = function(e){
+    	  e.attr("x1",function(d){return svg.x(d["x"]);})
+  		    .attr("x2",function(d){return svg.x(d["xend"]);})
+  		    .attr("y1",function(d){return svg.y(d["y"]);})
+  		    .attr("y2",function(d){return svg.y(d["yend"]);})
+  		    .style("stroke-dasharray",get_dasharray)
+  		    .style("stroke-width",get_size)
+  		    .style("stroke",get_colour);
+    	 }
+      eAppend = "line";
+    }else if(g_info.geom == "linerange"){
+      elements = elements.data(data);
+      eActions = function(e){
+    		e.attr("x1",function(d){return svg.x(d["x"]);})
+  		    .attr("x2",function(d){return svg.x(d["x"]);})
+  		    .attr("y1",function(d){return svg.y(d["ymax"]);})
+  		    .attr("y2",function(d){return svg.y(d["ymin"]);})
+  		    .style("stroke-dasharray",get_dasharray)
+  		    .style("stroke-width",get_size)
+  		    .style("stroke",get_colour);
+    	}
+      eAppend = "line";
+    }else if(g_info.geom == "vline"){
+	    elements = elements.data(data);
+	    eActions = function(e){
+		    e.attr("x1",toXY("x","xintercept"))
+  		    .attr("x2",toXY("x","xintercept"))
+  		    .attr("y1",svg.y.range()[0])
+  		    .attr("y2",svg.y.range()[1])
+  		    .style("stroke-dasharray",get_dasharray)
+  		    .style("stroke-width",get_size)
+  		    .style("stroke",get_colour);
+	    }
+	    eAppend = "line"; 
+	    }else if(g_info.geom == "hline"){  
+	      //pretty much a copy of geom_vline with obvious modifications
+        elements = elements.data(data);
+  	    eActions = function(e){
+  	  	e.attr("y1",toXY("y","yintercept"))
+  		    .attr("y2",toXY("y","yintercept"))
+  		    .attr("x1",svg.x.range()[0]+plotdim.margin.left)
+  		    .attr("x2",svg.x.range()[1]-plotdim.margin.right)
+  		    .style("stroke-dasharray",get_dasharray)
+  		    .style("stroke-width",get_size)
+  		    .style("stroke",get_colour);
+  	    }
+  	  eAppend = "line";
   	}else if(g_info.geom == "text"){
   	    elements = elements.data(data);
   	    // TODO: how to support vjust? firefox doensn't support
@@ -439,57 +489,6 @@ var animint = function(to_select, json_file){
 		      .style("fill", get_fill);
   	    }
 	    eAppend = "rect";
-  	}else if(g_info.geom == "segment"){
-      elements = elements.data(data[1]); 
-      //This is a hack - why is it that geom_segment data is in its own object? 
-      eActions = function(e){
-  		  e.attr("x1",function(d){return svg.x(d["x"]);})
-  		    .attr("x2",function(d){return svg.x(d["xend"]);})
-  		    .attr("y1",function(d){return svg.y(d["y"]);})
-  		    .attr("y2",function(d){return svg.y(d["yend"]);})
-  		    .style("stroke-dasharray",get_dasharray)
-  		    .style("stroke-width",get_size)
-  		    .style("stroke",get_colour);
-	    }
-    eAppend = "line";
-	}else if(g_info.geom == "linerange"){
-        elements = elements.data(data);
-        eActions = function(e){
-      		e.attr("x1",function(d){return svg.x(d["x"]);})
-    		    .attr("x2",function(d){return svg.x(d["x"]);})
-    		    .attr("y1",function(d){return svg.y(d["ymax"]);})
-    		    .attr("y2",function(d){return svg.y(d["ymin"]);})
-    		    .style("stroke-dasharray",get_dasharray)
-    		    .style("stroke-width",get_size)
-    		    .style("stroke",get_colour);
-      	}
-    eAppend = "line";
-	}else if(g_info.geom == "vline"){
-	    elements = elements.data(data);
-	    eActions = function(e){
-		    e.attr("x1",toXY("x","xintercept"))
-  		    .attr("x2",toXY("x","xintercept"))
-  		    .attr("y1",svg.y.range()[0])
-  		    .attr("y2",svg.y.range()[1])
-  		    .style("stroke-dasharray",get_dasharray)
-  		    .style("stroke-width",get_size)
-  		    .style("stroke",get_colour);
-	    }
-	    eAppend = "line"; 
-	}else if(g_info.geom == "hline"){  
-	    //pretty much a copy of geom_vline with obvious modifications
-            elements = elements.data(data);
-  	    eActions = function(e){
-  	  	e.attr("y1",toXY("y","yintercept"))
-  		    .attr("y2",toXY("y","yintercept"))
-  		    .attr("x1",svg.x.range()[0]+plotdim.margin.left)
-  		    .attr("x2",svg.x.range()[1]-plotdim.margin.right)
-  		    .style("stroke-dasharray",get_dasharray)
-  		    .style("stroke-width",get_size)
-  		    .style("stroke",get_colour)
-  		;
-  	    }
-  	    eAppend = "line";
   	}else if(g_info.geom == "boxplot"){  
 	    fill = "white";
 
