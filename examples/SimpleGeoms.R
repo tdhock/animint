@@ -112,8 +112,9 @@ g11 <- ggplot() + geom_contour(data=contourdata, aes(x=x, y=y, z=z), binwidth=4,
 g11
 # gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11))
 
+contourdata2 <- floor(contourdata/3)*3
 g12 <- ggplot() + 
-  geom_tile(data=contourdata, aes(x=x, y=y, fill=z, colour=z)) + 
+  geom_tile(data=contourdata2, aes(x=x, y=y, fill=z, colour=z)) + 
   geom_contour(data=contourdata, aes(x=x, y=y, z=z), colour="black", size=.5) +
   scale_fill_continuous(low="#56B1F7", high="#132B43", trans="log") +
   scale_colour_continuous(low="#56B1F7", high="#132B43", trans="log") +
@@ -147,7 +148,7 @@ g14
 data(diamonds)
 dsmall <- diamonds[sample(nrow(diamonds), 1000), ]
 g15 <- ggplot() + xlim(c(1,3))+
-  geom_tile(data=dsmall, aes(x=carat, y=price, fill=..density.., colour=..density..), stat="density2d", contour=FALSE) +
+  geom_tile(data=dsmall, aes(x=carat, y=price, fill=..density.., colour=..density..), stat="density2d", contour=FALSE, n=30) +
   scale_fill_gradient(limits=c(1e-5,8e-4), na.value="white") + 
   scale_colour_gradient(limits=c(1e-5,8e-4), na.value="white") +
   ggtitle("geom_density2d tile")
@@ -155,8 +156,8 @@ g15
 # gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11, g12=g12, g13=g13, g14=g14, g15=g15))
   
 g16 <- ggplot() + xlim(c(1,3))+
-  geom_point(data=dsmall, aes(x=carat, y=price, size=..density..), stat="density2d", contour=FALSE) +
+  geom_point(data=dsmall, aes(x=carat, y=price, alpha=..density..), 
+             stat="density2d", contour=FALSE, n=10, size=I(.5)) +
   ggtitle("geom_density2d points")
 g16
 gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11, g12=g12, g13=g13, g14=g14, g15=g15, g16=g16))
-# doesn't work because statistics and transformations won't work with points
