@@ -54,8 +54,8 @@ var animint = function (to_select, json_file) {
       update_geom(g_name);
     });
   }
-  var axispaddingx = 30;
-  var axispaddingy = 30;
+  var axispaddingx = 60;
+  var axispaddingy = 60;
   var labelpaddingx = 35;
   var labelpaddingy = 35;
   var titlepadding = 30;
@@ -109,28 +109,59 @@ var animint = function (to_select, json_file) {
       p_info.axis.x.forEach(function (d) {
         xaxisvals.push(d);
       });
-      p_info.axis.xlab.forEach(function (d) {
-        xaxislabs.push(d);
-      });
+      if(p_info.axis.xlab){
+        p_info.axis.xlab.forEach(function (d) {
+          xaxislabs.push(d);
+          // push each label provided into the array
+        });
+      } else {
+        p_info.axis.x.forEach(function (d) {
+          xaxislabs.push(""); 
+          // push a blank string to the array for each axis tick 
+          // if the specified label is null
+        });
+      }
     } else {
       xaxisvals.push(p_info.axis.x);
-      xaxislabs.push(p_info.axis.xlab);
-    }
+      if(p_info.axis.xlab){
+        xaxislabs.push(p_info.axis.xlab);
+      } else {
+        xaxislabs.push("");
+      }
+    } 
     if (isArray(p_info.axis.y)) {
       p_info.axis.y.forEach(function (d) {
         yaxisvals.push(d);
       });
-      p_info.axis.ylab.forEach(function (d) {
-        yaxislabs.push(d);
-      });
+      if(p_info.axis.ylab){
+        p_info.axis.ylab.forEach(function (d) {
+          yaxislabs.push(d);
+          // push each label provided into the array
+        });
+      } else {
+        p_info.axis.y.forEach(function (d) {
+          yaxislabs.push(""); 
+          // push a blank string to the array for each axis tick 
+          // if the specified label is null
+        });
+      }
     } else {
       yaxisvals.push(p_info.axis.y);
-      yaxislabs.push(p_info.axis.ylab);
-    }
+      if(p_info.axis.ylab){
+        yaxislabs.push(p_info.axis.ylab);
+      } else {
+        yaxislabs.push("");
+      }
+    } 
 
-    var yaxislabwidth = Math.max(yaxislabs.map(function(entry){return measureText(entry, 11).width;}));
+    var yaxislabwidth = Math.max.apply(null, yaxislabs.map(function(entry){return measureText(entry, 11).width;}));
+    var xaxislabheight = Math.max.apply(null, xaxislabs.map(function(entry){return measureText(entry, 11).height;}));
+    titlepadding = measureText(p_info.title, 16).height;
     axispaddingy = yaxislabwidth;
+    axispaddingx = xaxislabheight;
     margin.left= labelpaddingy + axispaddingy;
+    margin.bottom = labelpaddingx + axispaddingx;
+    margin.top = titlepadding;
     plotdim.margin = margin;
     
     // calculate plot dimensions to be used in placing axes, labels, etc.
@@ -737,7 +768,7 @@ var animint = function (to_select, json_file) {
   });
 }
 
-function measureText(pText, pFontSize, pStyle) {
+var measureText = function (pText, pFontSize, pStyle) {
     var lDiv = document.createElement('lDiv');
 
     document.body.appendChild(lDiv);
