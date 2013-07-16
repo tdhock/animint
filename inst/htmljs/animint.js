@@ -154,11 +154,11 @@ var animint = function (to_select, json_file) {
       }
     } 
 
-    var yaxislabwidth = Math.max.apply(null, yaxislabs.map(function(entry){return measureText(entry, 11).width;}));
-    var xaxislabheight = Math.max.apply(null, xaxislabs.map(function(entry){return measureText(entry, 11).height;}));
     titlepadding = measureText(p_info.title, 20).height+5;
-    axispaddingy = yaxislabwidth;
-    axispaddingx = xaxislabheight;
+    axispaddingy = Math.max.apply(null, yaxislabs.map(function(entry){return measureText(entry, 11).width;}));
+    axispaddingx = Math.max.apply(null, xaxislabs.map(function(entry){return measureText(entry, 11).height;}));
+    labelpaddingy = measureText(p_info.axis.yname, 11).height;
+    labelpaddingx = measureText(p_info.axis.xname, 11).height;
     margin.left= labelpaddingy + axispaddingy;
     margin.bottom = labelpaddingx + axispaddingx;
     margin.top = titlepadding;
