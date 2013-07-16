@@ -11,16 +11,15 @@ scatterdata$xnew <- as.factor(scatterdata$xnew)
 scatterdata$class <- factor(round(scatterdata$x/10)%%2, labels=c("high", "low"))
 scatterdata$class4 <- factor(round(scatterdata$x/10)%%4, labels=c("high", "medhigh", "medlow", "low"))
 
-
-p <- qplot(data=scatterdata, x=x, y=y, geom="point")
-p
+#' qplot-style specification works for simple examples, 
+#' but may not continue to work for more complicated 
+#' combinations... 
+#' TODO: Test further.
+p <- qplot(data=scatterdata, x=x, y=y, geom="point", colour=floor(x))
 gg2animint(list(p=p))
-# This throws an error.
-## TODO: qplot specification should be feasible... how to implement?
 
-#' Must use empty ggplot() statement because of structure of ggplot/qplot object
+#' Should use empty ggplot() statement because of structure of ggplot/qplot object
 #' Must provide a named list of ggplots.
-#' Axis labels now work
 s1 <- ggplot() + geom_point(data=scatterdata, aes(x=x, y=y)) +
   xlab("very long x axis label") + 
   ylab("very long y axis label") +
@@ -29,13 +28,13 @@ s1
 # gg2animint(list(s1=s1))
 
 #' Colors, Demonstrates axis -- works with factor data
-#' Specify colors using R color names works
+#' Specify colors using R color names
 s2 <- ggplot() + geom_point(data=scatterdata, aes(x=xnew, y=y), colour="blue") +
   ggtitle("Colors are cool")
 s2
 # gg2animint(list(s1=s1, s2=s2))
 
-#' Specify colors manually using hex values works
+#' Specify colors manually using hex values
 s3 <- ggplot() + 
   geom_point(data=scatterdata, aes(x=xnew, y=y, colour=class, fill=class)) + 
   scale_colour_manual(values=c("#FF0000", "#0000FF")) + 
@@ -44,7 +43,7 @@ s3 <- ggplot() +
 s3
 # gg2animint(list(s1=s1, s2=s2, s3=s3))
 
-#' Color by x axis
+#' Categorical color scales 
 s4 <- ggplot() + geom_point(data=scatterdata, aes(x=xnew, y=y, colour=xnew, fill=xnew)) +
   ggtitle("Categorical color/fill scales")
 s4
