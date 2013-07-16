@@ -88,7 +88,7 @@ layer2list <- function(l, d, ranges){
   g <- list(geom=l$geom$objname,
             data=d)
   g$aes <- sapply(l$mapping, as.character)
-  ggaeslist <- c("colour", "fill", "size", "linetype", "")
+  
   # use un-named parameters so that they will not be exported
   # to JSON as a named object, since that causes problems with
   # e.g. colour.
@@ -109,10 +109,10 @@ layer2list <- function(l, d, ranges){
   ## in the draw method of the geoms.
   if(g$geom=="abline"){
     # "Trick" ggplot coord_transform into transforming the slope and intercept
-    g$data$x <- ranges$x.range[1]
-    g$data$xend <- ranges$x.range[2]
-    g$data$y <- g$data$slope*ranges$x.range[1]+g$data$intercept
-    g$data$yend <-  g$data$slope*ranges$x.range[2]+g$data$intercept
+    g$data[,"x"] <- ranges$x.range[1]
+    g$data[,"xend"] <- ranges$x.range[2]
+    g$data[,"y"] <- g$data$slope*ranges$x.range[1]+g$data$intercept
+    g$data[,"yend"] <-  g$data$slope*ranges$x.range[2]+g$data$intercept
     g$geom <- "segment"
   } else if(g$geom=="density" | g$geom=="area"){
     g$geom <- "ribbon"
@@ -140,7 +140,7 @@ layer2list <- function(l, d, ranges){
     g$data <- ddply(g$data, .(group), function(df) ggplot2:::stairstep(df))
     g$geom <- "path"
   } else if(g$geom=="contour" | g$geom=="density2d"){
-    g$aes$group <- "piece"
+    g$aes[["group"]] <- "piece"
     # reset g$subord, g$subvars now that group aesthetic exists.
     subset.vars <- c(some.vars, g$aes[names(g$aes)=="group"])
     g$subord <- as.list(names(subset.vars))
