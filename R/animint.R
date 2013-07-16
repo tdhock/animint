@@ -61,9 +61,9 @@ gg2list <- function(p){
   # grid 0-1 scale). This allows transformations to be used 
   # out of the box, with no additional d3 coding. 
   theme.pars <- ggplot2:::plot_theme(p)  
+  
+  ## TODO: Allow setting these elements as NULL
   plist$axis <- list(
-
-#     if("element_blank"%in%attr(theme.pars$axis.text.x, "class")) # code to get blank elements... come back later?
     x = plistextra$panel$ranges[[1]]$x.major,
     xlab = plistextra$panel$ranges[[1]]$x.labels,
     xrange = plistextra$panel$ranges[[1]]$x.range,
@@ -73,6 +73,13 @@ gg2list <- function(p){
     yrange = plistextra$panel$ranges[[1]]$y.range,
     yname = plistextra$plot$labels$y
   )
+  # Flip labels if coords are flipped - transform does not take care of this.
+  # I wonder if there is a better way to do this, though...?
+  if("flip"%in%attr(plistextra$plot$coordinates, "class")){
+    temp = plist$axis$xname
+    plist$axis$xname = plist$axis$yname
+    plist$axis$yname = temp
+  }
   plist$title <- plistextra$plot$labels$title
   plist$options <- list(width=400,height=400)
   plist
