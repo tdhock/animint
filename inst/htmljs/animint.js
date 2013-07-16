@@ -310,7 +310,7 @@ var animint = function(to_select, json_file){
   	var eActions, eAppend;
 	
   
-  	if(g_info.geom == "line" || g_info.geom == "path" || g_info.geom == "polygon" || g_info.geom == "ribbon"){
+  	if(g_info.geom=="line"||g_info.geom=="path"||g_info.geom=="polygon"||g_info.geom=="ribbon"){
       //In order to get d3 lines to play nice, bind fake "data" (group id's) -- the kv variable
       //Then each separate object is plotted using path.
 
@@ -353,7 +353,7 @@ var animint = function(to_select, json_file){
     		e.attr("d",function(d){
     		    var one_group = data[d.value];
     		    return lineThing(one_group);
-    		    })
+    		  })
 		      .style("fill", function(group_info){
             if(g_info.geom=="line" || g_info.geom=="path"){
               return("none")
@@ -361,23 +361,23 @@ var animint = function(to_select, json_file){
       			var one_group = data[group_info.value];
       			var one_row = one_group[0]; // take color for first value in the group
       			return(get_fill(one_row));
-      		  })
+      		})
 		      .style("stroke-width",size)
   		    .style("stroke", function(group_info){
       			var one_group = data[group_info.value];
       			var one_row = one_group[0]; // take color for first value in the group
       			return(get_colour(one_row));
-      		  })
+      		})
   		    .style("stroke-dasharray", function(group_info){
       			var one_group = data[group_info.value];
       			var one_row = one_group[0]; // take linetype for first value in the group
       			return(get_dasharray(one_row));
-      		  })
+      		})
   		    .style("stroke-width", function(group_info){
       			var one_group = data[group_info.value];
       			var one_row = one_group[0]; // take line size for first value in the group
       			return(get_size(one_row));
-      		  });
+      		});
 	    }
 	    eAppend = "path";
   	}else if(g_info.geom == "text"){
@@ -386,100 +386,94 @@ var animint = function(to_select, json_file){
   	    // baseline-shift... use paths?
   	    // http://commons.oreilly.com/wiki/index.php/SVG_Essentials/Text
   	    eActions = function(e){
-  		e.attr("x",toXY("x","x"))
-  		    .attr("y",toXY("y","y"))
-  		    .text(function(d){ return d.label; })
-  		    .style("text-anchor",text_anchor)
-  		;
+  		    e.attr("x",toXY("x","x"))
+    		    .attr("y",toXY("y","y"))
+    		    .text(function(d){ return d.label; })
+    		    .style("text-anchor",text_anchor);
   	    }
-  	    eAppend = "text";
+	    eAppend = "text";
   	}else if(g_info.geom == "point"){
   	    elements = elements.data(data);
   	    eActions = function(e){
-  		e.attr("cx",toXY("x","x"))
-  		    .attr("cy",toXY("y","y"))
-  		    .attr("r",get_size)
-		    .style("fill",get_fill)
-		    .style("stroke",get_colour)
-  		;
+      		e.attr("cx",toXY("x","x"))
+    		    .attr("cy",toXY("y","y"))
+    		    .attr("r",get_size)
+    		    .style("fill",get_fill)
+    		    .style("stroke",get_colour);
   	    }
-  	    eAppend = "circle";
+	    eAppend = "circle";
   	}else if(g_info.geom == "jitter"){
             elements = elements.data(data);
   	    eActions = function(e){
-  		e.attr("cx",toXY("x","x"))
-  		    .attr("cy",toXY("y","y"))
-  		    .attr("r",get_size)
-		    .style("fill",get_fill)
-		    .style("stroke",get_colour)
-  		;
+  	    	e.attr("cx",toXY("x","x"))
+    		    .attr("cy",toXY("y","y"))
+    		    .attr("r",get_size)
+    		    .style("fill",get_fill)
+    		    .style("stroke",get_colour);
   	    }
-  	    eAppend = "circle";
+	    eAppend = "circle";
   	}else if(g_info.geom == "tallrect"){
             elements = elements.data(data);
   	    eActions = function(e){
-  		e.attr("x",toXY("x","xmin"))
-  		    .attr("width",function(d){
-  		    	return svg.x(d[ "xmax" ])-svg.x(d[ "xmin" ]);
-  		    })
-  		    .attr("y", svg.y.range()[1])
-  		    .attr("height", svg.y.range()[0]-svg.y.range()[1])
-  		    .style("fill",get_fill)
-		    .style("stroke-width", get_size)
-		    .style("stroke",get_colour)
-  		;
+  		     e.attr("x",toXY("x","xmin"))
+    		    .attr("width",function(d){
+    		    	return svg.x(d[ "xmax" ])-svg.x(d[ "xmin" ]);
+    		    })
+    		    .attr("y", svg.y.range()[1])
+    		    .attr("height", svg.y.range()[0]-svg.y.range()[1])
+    		    .style("fill",get_fill)
+    		    .style("stroke-width", get_size)
+    		    .style("stroke",get_colour);
   	    }
-  	    eAppend = "rect";
+	    eAppend = "rect";
   	}else if(g_info.geom == "rect"){
             elements = elements.data(data);
   	    eActions = function(e){
     		e.attr("x",toXY("x","xmin"))
-    		 .attr("width",function(d) {return Math.abs(svg.x(d.xmax)-svg.x(d.xmin));})
+    		  .attr("width",function(d) {return Math.abs(svg.x(d.xmax)-svg.x(d.xmin));})
   		    .attr("y",toXY("y","ymax"))
   		    .attr("height",function(d) {return Math.abs(svg.y(d.ymin)-svg.y(d.ymax));})
   		    .style("stroke-dasharray",get_dasharray)
   		    .style("stroke-width",get_size)
   		    .style("stroke",get_colour)
-		    .style("fill", get_fill)
-  		;
+		      .style("fill", get_fill);
   	    }
-  	    eAppend = "rect";
+	    eAppend = "rect";
   	}else if(g_info.geom == "segment"){
-      elements = elements.data(data[1]); //This is a hack - why is it that geom_segment data is in its own object? 
+      elements = elements.data(data[1]); 
+      //This is a hack - why is it that geom_segment data is in its own object? 
       eActions = function(e){
-  		e.attr("x1",function(d){return svg.x(d["x"]);})
+  		  e.attr("x1",function(d){return svg.x(d["x"]);})
   		    .attr("x2",function(d){return svg.x(d["xend"]);})
   		    .attr("y1",function(d){return svg.y(d["y"]);})
   		    .attr("y2",function(d){return svg.y(d["yend"]);})
   		    .style("stroke-dasharray",get_dasharray)
   		    .style("stroke-width",get_size)
   		    .style("stroke",get_colour);
-  	    }
-  	    eAppend = "line";
+	    }
+    eAppend = "line";
 	}else if(g_info.geom == "linerange"){
-            elements = elements.data(data);
-            eActions = function(e){
-          		e.attr("x1",function(d){return svg.x(d["x"]);})
-          		    .attr("x2",function(d){return svg.x(d["x"]);})
-          		    .attr("y1",function(d){return svg.y(d["ymax"]);})
-          		    .attr("y2",function(d){return svg.y(d["ymin"]);})
-          		    .style("stroke-dasharray",get_dasharray)
-          		    .style("stroke-width",get_size)
-          		    .style("stroke",get_colour)
-                  ;
-          	}
-  	    eAppend = "line";
+        elements = elements.data(data);
+        eActions = function(e){
+      		e.attr("x1",function(d){return svg.x(d["x"]);})
+    		    .attr("x2",function(d){return svg.x(d["x"]);})
+    		    .attr("y1",function(d){return svg.y(d["ymax"]);})
+    		    .attr("y2",function(d){return svg.y(d["ymin"]);})
+    		    .style("stroke-dasharray",get_dasharray)
+    		    .style("stroke-width",get_size)
+    		    .style("stroke",get_colour);
+      	}
+    eAppend = "line";
 	}else if(g_info.geom == "vline"){
 	    elements = elements.data(data);
 	    eActions = function(e){
-		e.attr("x1",toXY("x","xintercept"))
-		    .attr("x2",toXY("x","xintercept"))
-		    .attr("y1",svg.y.range()[0])
-		    .attr("y2",svg.y.range()[1])
-		    .style("stroke-dasharray",get_dasharray)
-		    .style("stroke-width",get_size)
-		    .style("stroke",get_colour)
-		;
+		    e.attr("x1",toXY("x","xintercept"))
+  		    .attr("x2",toXY("x","xintercept"))
+  		    .attr("y1",svg.y.range()[0])
+  		    .attr("y2",svg.y.range()[1])
+  		    .style("stroke-dasharray",get_dasharray)
+  		    .style("stroke-width",get_size)
+  		    .style("stroke",get_colour);
 	    }
 	    eAppend = "line"; 
 	}else if(g_info.geom == "hline"){  
@@ -502,38 +496,38 @@ var animint = function(to_select, json_file){
 	    elements = elements.data(data);
 	    eActions = function(e){
     		e.append("line")
-    		    .attr("x1",function(d){return svg.x(d["x"]);})
-        		.attr("x2",function(d){return svg.x(d["x"]);})
-      		  .attr("y1",function(d){return svg.y(d["ymin"]);})
-      		  .attr("y2",function(d){return svg.y(d["lower"]);})
-      		  .style("stroke-dasharray",get_dasharray)
-      		  .style("stroke-width",get_size)
-      		  .style("stroke",get_colour);
+  		    .attr("x1",function(d){return svg.x(d["x"]);})
+      		.attr("x2",function(d){return svg.x(d["x"]);})
+    		  .attr("y1",function(d){return svg.y(d["ymin"]);})
+    		  .attr("y2",function(d){return svg.y(d["lower"]);})
+    		  .style("stroke-dasharray",get_dasharray)
+    		  .style("stroke-width",get_size)
+    		  .style("stroke",get_colour);
     		e.append("line")
-    		    .attr("x1",function(d){return svg.x(d["x"]);})
-    		    .attr("x2",function(d){return svg.x(d["x"]);})
-      		  .attr("y1",function(d){return svg.y(d["upper"]);})
-      		  .attr("y2",function(d){return svg.y(d["ymax"]);})
-      		  .style("stroke-dasharray",get_dasharray)
-      		  .style("stroke-width",get_size)
-      		  .style("stroke",get_colour);
+  		    .attr("x1",function(d){return svg.x(d["x"]);})
+  		    .attr("x2",function(d){return svg.x(d["x"]);})
+    		  .attr("y1",function(d){return svg.y(d["upper"]);})
+    		  .attr("y2",function(d){return svg.y(d["ymax"]);})
+    		  .style("stroke-dasharray",get_dasharray)
+    		  .style("stroke-width",get_size)
+    		  .style("stroke",get_colour);
     		e.append("rect")
-    		    .attr("x",function(d){return svg.x(d["xmin"]);})
-    		    .attr("width",function(d) {return svg.x(d["xmax"])-svg.x(d["xmin"]);})
-      		  .attr("y",function(d){return svg.y(d["upper"]);})
-      		  .attr("height",function(d) {return Math.abs(svg.y(d["upper"])-svg.y(d["lower"]));})
-      		  .style("stroke-dasharray",get_dasharray)
-      		  .style("stroke-width",get_size)
-      		  .style("stroke",get_colour)
-    		    .style("fill", get_fill);
+  		    .attr("x",function(d){return svg.x(d["xmin"]);})
+  		    .attr("width",function(d) {return svg.x(d["xmax"])-svg.x(d["xmin"]);})
+    		  .attr("y",function(d){return svg.y(d["upper"]);})
+    		  .attr("height",function(d) {return Math.abs(svg.y(d["upper"])-svg.y(d["lower"]));})
+    		  .style("stroke-dasharray",get_dasharray)
+    		  .style("stroke-width",get_size)
+    		  .style("stroke",get_colour)
+  		    .style("fill", get_fill);
     		e.append("line")
-    		    .attr("x1",function(d){return svg.x(d["xmin"]);})
-    		    .attr("x2",function(d){return svg.x(d["xmax"]);})
-        		    .attr("y1",function(d){return svg.y(d["middle"]);})
-      		    .attr("y2",function(d){return svg.y(d["middle"]);})
-      		    .style("stroke-dasharray",get_dasharray)
-      		    .style("stroke-width",get_size)
-      		    .style("stroke",get_colour);
+  		    .attr("x1",function(d){return svg.x(d["xmin"]);})
+  		    .attr("x2",function(d){return svg.x(d["xmax"]);})
+  		    .attr("y1",function(d){return svg.y(d["middle"]);})
+  		    .attr("y2",function(d){return svg.y(d["middle"]);})
+  		    .style("stroke-dasharray",get_dasharray)
+  		    .style("stroke-width",get_size)
+  		    .style("stroke",get_colour);
 	    }
   	}else{
   	    return "unsupported geom "+g_info.geom;
