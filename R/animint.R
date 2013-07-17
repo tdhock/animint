@@ -83,6 +83,8 @@ gg2list <- function(p){
   }
   
   plist$legend <- getLegendList(plistextra)
+  plist$legend <- plist$legend[[which(sapply(plist$legend, function(i) length(i)>0))]]
+  # only pass out legends that have guide = "legend" or guide="colorbar"
   plist$title <- plistextra$plot$labels$title
   plist$options <- list(width=400,height=400)
   plist
@@ -420,12 +422,12 @@ is.rgb <- function(x){
 toRGB <- function(x) rgb(t(col2rgb(as.character(x))), maxColorValue=255)
 
 #' Function to get legend information from ggplot
-#' @param mb output from ggplot2::ggplot_build(p)
+#' @param plistextra output from ggplot2::ggplot_build(p)
 #' @return list containing information for each legend
 #' @export
-getLegendList <- function(mb){
-  aes.scales <- which(sapply(mb$plot$scales$scales, function(i) sum(i$aesthetics%in%c("colour", "size", "fill", "linetype", "alpha"))>0))
-  lapply(aes.scales, getLegend, mb)
+getLegendList <- function(plistextra){
+  aes.scales <- which(sapply(plistextra$plot$scales$scales, function(i) sum(i$aesthetics%in%c("colour", "size", "fill", "linetype", "alpha"))>0))
+  lapply(aes.scales, getLegend, mb = plistextra)
 }
 
 #' Function to get legend information for each scale
