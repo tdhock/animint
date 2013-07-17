@@ -83,8 +83,10 @@ gg2list <- function(p){
   }
   
   plist$legend <- getLegendList(plistextra)
-  plist$legend <- plist$legend[[which(sapply(plist$legend, function(i) length(i)>0))]]
-  # only pass out legends that have guide = "legend" or guide="colorbar"
+  if(length(plist$legend)>0){
+    plist$legend <- plist$legend[which(sapply(plist$legend, function(i) length(i)>0))]
+  }  # only pass out legends that have guide = "legend" or guide="colorbar"
+  
   plist$title <- plistextra$plot$labels$title
   plist$options <- list(width=400,height=400)
   plist
@@ -358,6 +360,7 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
     result$plots[[plot.name]]$ranges <- p$ranges
     result$plots[[plot.name]]$axis <- p$axis
     result$plots[[plot.name]]$title <- p$title
+    result$plots[[plot.name]]$legend <- p$legend
   }
   ## add nextgeom so that drawing order is preserved.
   
@@ -451,6 +454,6 @@ getLegend <- function(mb, i){
     list(guide = guidetype, 
          aesthetic = sc.aes, 
          title = as.character(as.expression(mb$plot$mapping[[sc.aes]])), 
-         legend = df)
+         legend = list(values = val, labels = labels))
   }
 }
