@@ -448,6 +448,9 @@ getLegend <- function(mb, i){
   }
   df <- data.frame(breaks = bk, value = val, label = labels)
   df <- df[which(rowSums(is.na(df))==0),] # return only those entries that have breaks, values, and labels.
+  val <- val[which(rowSums(is.na(df))==0)]
+  labels <- labels[which(rowSums(is.na(df))==0)]
+  labels[is.na(labels)] <- "" # for NA labels, replace with empty string. (Useful for colorbar in particular)
   if(guidetype=="none"){
     NULL
   } else{
