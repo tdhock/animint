@@ -742,17 +742,14 @@ var animint = function (to_select, json_file) {
         var legendtab = d3.keys(p_info.legend[i].legend);
         // the legend table with breaks/value/label.
         var legendaes = p_info.legend[i].aesthetic;
-        var legend = trBelow.append("td").append("table");
-        var TR = legend.append("th").text(p_info.legend[i].title+":");
-        TR.selectAll("th.legend")
-          .data(d3.entries(p_info.legend[i].legend))
-          .enter().append("tr")
-          .classed("legend", 1)
-          .append("td").classed("legend-value", 1)
-            .text(function(d){ return setShape(legendaes, d.labels, d.value);})
-          .parent()
-          .append("td").classed("legend-label", 1)
-            .text(function(d){ return d.labels;})
+        var legend = trBelow.append("td").append("table")
+        var TR = legend.append("tr");
+        TR.append("td").text(p_info.legend[i].title+":");
+        TR.selectAll("td.legend")
+          .data(d3.entries(p_info.legend[i].legend)).enter()
+          .append("td").classed("legend", 1)
+          .text(function(d){ return setShape(legendaes, d.labels, d.value);})
+          .text(function(d){ return d.labels;})
       }
     } else if(p_info.legend.title){ 
       // case of only one legend, d3 will read in as a single obj and not an array
