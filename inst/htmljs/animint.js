@@ -17,6 +17,43 @@ var animint = function (to_select, json_file) {
   this.SVGs = SVGs;
   var Animation = {};
   this.Animation = Animation;
+  
+  var axispaddingx = 60;
+  var axispaddingy = 60;
+  var labelpaddingx = 35;
+  var labelpaddingy = 35;
+  var titlepadding = 30;
+  var margin = {
+    left: labelpaddingy + axispaddingy,
+    right: 0,
+    top: titlepadding,
+    bottom: labelpaddingx + axispaddingx
+  };
+  var plotdim = {
+    width: 0,
+    height: 0,
+    xstart: 0,
+    xend: 0,
+    ystart: 0,
+    yend: 0,
+    graph: {
+      width: 0,
+      height: 0
+    },
+    margin: margin,
+    xlab: {
+      x: 0,
+      y: 0
+    },
+    ylab: {
+      x: 0,
+      y: 0
+    },
+    title: {
+      x: 0,
+      y: 0
+    }
+  };
 
   var add_geom = function (g_name, g_info) {
     d3.csv(g_info.data, function (error, response) {
@@ -54,42 +91,6 @@ var animint = function (to_select, json_file) {
       update_geom(g_name);
     });
   }
-  var axispaddingx = 60;
-  var axispaddingy = 60;
-  var labelpaddingx = 35;
-  var labelpaddingy = 35;
-  var titlepadding = 30;
-  var margin = {
-    left: labelpaddingy + axispaddingy,
-    right: 0,
-    top: titlepadding,
-    bottom: labelpaddingx + axispaddingx
-  };
-  var plotdim = {
-    width: 0,
-    height: 0,
-    xstart: 0,
-    xend: 0,
-    ystart: 0,
-    yend: 0,
-    graph: {
-      width: 0,
-      height: 0
-    },
-    margin: margin,
-    xlab: {
-      x: 0,
-      y: 0
-    },
-    ylab: {
-      x: 0,
-      y: 0
-    },
-    title: {
-      x: 0,
-      y: 0
-    }
-  };
   var add_plot = function (p_name, p_info) {
     // initialize svg group
     var svg = element.append("svg")
@@ -97,9 +98,6 @@ var animint = function (to_select, json_file) {
       .attr("height", p_info.options.height)
       .attr("width", p_info.options.width);
 
-    function isArray(o) {
-      return Object.prototype.toString.call(o) === '[object Array]';
-    }
     //forces values to be in an array
     var xaxisvals = [];
     var xaxislabs = [];
@@ -145,6 +143,7 @@ var animint = function (to_select, json_file) {
           // if the specified label is null
         });
       }
+    
     } else {
       yaxisvals.push(p_info.axis.y);
       if(p_info.axis.ylab){
@@ -306,39 +305,7 @@ var animint = function (to_select, json_file) {
     if (g_info.params.linetype) {
       linetype = g_info.params.linetype;
     }
-    var linetypesize2dasharray = function (lt, size) {
-      var o = {
-        "blank": size * 0 + "," + size * 10,
-        "solid": 0,
-        "dashed": size * 4 + "," + size * 4,
-        "dotted": size + "," + size * 2,
-        "dotdash": size + "," + size * 2 + "," + size * 4 + "," + size * 2,
-        "longdash": size * 8 + "," + size * 4,
-        "twodash": size * 2 + "," + size * 2 + "," + size * 6 + "," + size * 2,
-        "22": size * 2 + "," + size * 2,
-        "42": size * 4 + "," + size * 2,
-        "44": size * 4 + "," + size * 4,
-        "13": size + "," + size * 3,
-        "1343": size + "," + size * 3 + "," + size * 4 + "," + size * 3,
-        "73": size * 7 + "," + size * 3,
-        "2262": size * 2 + "," + size * 2 + "," + size * 6 + "," + size * 2,
-        "12223242": size + "," + size * 2 + "," + size * 2 + "," + size * 2 + "," + size * 3 + "," + size * 2 + "," + size * 4 + "," + size * 2,
-        "F282": size * 15 + "," + size * 2 + "," + size * 8 + "," + size * 2,
-        "F4448444": size * 15 + "," + size * 4 + "," + size * 4 + "," + size * 4 + "," + size * 8 + "," + size * 4 + "," + size * 4 + "," + size * 4,
-        "224282F2": size * 2 + "," + size * 2 + "," + size * 4 + "," + size * 2 + "," + size * 8 + "," + size * 2 + "," + size * 16 + "," + size * 2,
-        "F1": size * 16 + "," + size
-      };
 
-      if (lt in o) return o[lt];
-      else return genlinetype2dasharray(lt, size);
-    }
-    var genlinetype2dasharray = function (lt, size) {
-      str = lt.split("");
-      strnum = str.map(function (d) {
-        return size * parseInt(d, 16);
-      });
-      return strnum;
-    }
     var get_dasharray = function (d) {
       var lt;
       if (aes.hasOwnProperty("linetype") && d.hasOwnProperty(
@@ -460,7 +427,6 @@ var animint = function (to_select, json_file) {
       eAppend = "path";
     } else if (g_info.geom == "segment") {
       elements = elements.data(data);
-      //This is a hack - why is it that geom_segment data is in its own object? 
       eActions = function (e) {
         e.attr("x1", function (d) {
           return svg.x(d["x"]);
@@ -734,12 +700,84 @@ var animint = function (to_select, json_file) {
     update_selector(v_name, next);
     d3.timer(animateIfInactive, Animation.ms);
   }
-
+  var add_legend = function(p_name, p_info){
+    var plot = d3.select("#"+p_name);
+    var trBelow = plot.append("table").append("tr");
+    // the table below the plot
+    
+    setShape = function(aes, label, value){
+      var svg = element.append("svg")
+      .attr("id", "legend-"+aes+"-"+label)
+      .attr("height", 14)
+      .attr("width", 14);
+      
+      var it;
+      if(aes=="fill"){
+        it = svg.append("circle").attr("cx", 7).attr("cy", 7).attr("r", 5).style("fill", value).style("stroke", value)
+      }
+      if(aes=="linetype"){
+        it = svg.append("line").attr("x1", 1).attr("x2", 13).attr("y1", 7).attr("y2", 7)
+                .style("stroke", "#000000")
+                .style("stroke-dasharray", linetypesize2dasharray(value, 2))
+                .style("stroke-width", 2)
+      }
+      if(aes=="colour"){
+        it = svg.append("line").attr("x1", 1).attr("x2", 13).attr("y1", 7).attr("y2", 7)
+                .style("stroke", value)
+                .style("stroke-width", 2)
+      }
+      if(aes=="alpha"){
+        it = svg.append("circle").attr("cx", 7).attr("cy", 7).attr("r", 5)
+                .style("opacity", value)
+                .style("fill","#000000")
+      }
+      if(aes=="size"){
+        it = svg.append("circle").attr("cx", 7).attr("cy", 7).attr("r", value)
+      }
+      return it;
+    }
+    if(isArray(p_info.legend)){
+    // case of multiple legends, d3 reads legend structure in as an array
+      for(var i=0; i<p_info.legend.length; i++){
+        var legendtab = d3.keys(p_info.legend[i].legend);
+        // the legend table with breaks/value/label.
+        var legendaes = p_info.legend[i].aesthetic;
+        var legend = trBelow.append("td").append("table");
+        var TR = legend.append("th").text(p_info.legend[i].title+":");
+        TR.selectAll("th.legend")
+          .data(d3.entries(p_info.legend[i].legend))
+          .enter().append("tr")
+          .classed("legend", 1)
+          .append("td").classed("legend-value", 1)
+            .text(function(d){ return setShape(legendaes, d.labels, d.value);})
+          .parent()
+          .append("td").classed("legend-label", 1)
+            .text(function(d){ return d.labels;})
+      }
+    } else if(p_info.legend.title){ 
+      // case of only one legend, d3 will read in as a single obj and not an array
+        var legendtab = d3.keys(p_info.legend.legend);
+        // the legend table with breaks/value/label.
+        var legendaes = p_info.legend.aesthetic;
+        var legend = trBelow.append("td").append("table");
+        var TR = legend.append("tr");
+        TR.append("td").text(p_info.legend.title+":");
+        TR.selectAll("td.legend")
+          .data(d3.entries(p_info.legend.legend))
+          .enter().append("td")
+          .classed("legend", 1)
+          .text(function(d){ return setShape(legendaes, d.labels, d.value);})
+          .append("td")
+          .classed("legend", 1)
+          .text(function(d){ return d.labels;})
+    }
+  }
   // Download the main description of the interactive plot.
   d3.json(json_file, function (error, response) {
     // Add plots.
     for (var p_name in response.plots) {
       add_plot(p_name, response.plots[p_name]);
+      add_legend(p_name, response.plots[p_name]);
     }
     // Add selectors.
     for (var s_name in response.selectors) {
@@ -793,4 +831,40 @@ var measureText = function (pText, pFontSize, pStyle) {
     lDiv = null;
 
     return lResult;
+}
+var linetypesize2dasharray = function (lt, size) {
+  var o = {
+    "blank": size * 0 + "," + size * 10,
+    "solid": 0,
+    "dashed": size * 4 + "," + size * 4,
+    "dotted": size + "," + size * 2,
+    "dotdash": size + "," + size * 2 + "," + size * 4 + "," + size * 2,
+    "longdash": size * 8 + "," + size * 4,
+    "twodash": size * 2 + "," + size * 2 + "," + size * 6 + "," + size * 2,
+    "22": size * 2 + "," + size * 2,
+    "42": size * 4 + "," + size * 2,
+    "44": size * 4 + "," + size * 4,
+    "13": size + "," + size * 3,
+    "1343": size + "," + size * 3 + "," + size * 4 + "," + size * 3,
+    "73": size * 7 + "," + size * 3,
+    "2262": size * 2 + "," + size * 2 + "," + size * 6 + "," + size * 2,
+    "12223242": size + "," + size * 2 + "," + size * 2 + "," + size * 2 + "," + size * 3 + "," + size * 2 + "," + size * 4 + "," + size * 2,
+    "F282": size * 15 + "," + size * 2 + "," + size * 8 + "," + size * 2,
+    "F4448444": size * 15 + "," + size * 4 + "," + size * 4 + "," + size * 4 + "," + size * 8 + "," + size * 4 + "," + size * 4 + "," + size * 4,
+    "224282F2": size * 2 + "," + size * 2 + "," + size * 4 + "," + size * 2 + "," + size * 8 + "," + size * 2 + "," + size * 16 + "," + size * 2,
+    "F1": size * 16 + "," + size
+  };
+
+  if (lt in o) return o[lt];
+  else return genlinetype2dasharray(lt, size);
+}
+var genlinetype2dasharray = function (lt, size) {
+  str = lt.split("");
+  strnum = str.map(function (d) {
+    return size * parseInt(d, 16);
+  });
+  return strnum;
+}
+var isArray = function(o) {
+  return Object.prototype.toString.call(o) === '[object Array]';
 }
