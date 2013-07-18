@@ -92,8 +92,18 @@ var animint = function (to_select, json_file) {
     });
   }
   var add_plot = function (p_name, p_info) {
-    // initialize svg group
-    var svg = element.append("svg")
+    // Each plot may have one or more legends. To make space for the
+    // legends, we put each plot in a table with one row and two
+    // columns: tdLeft and tdRight.
+      var plot_table = element.append("table")
+	  .style("display", "inline-block")
+      ;
+      var plot_tr = plot_table.append("tr");
+      var tdLeft = plot_tr.append("td");
+      var tdRight = plot_tr.append("td")
+	  .attr("id",p_name+"_legend")
+      ;
+    var svg = tdLeft.append("svg")
       .attr("id", p_name)
       .attr("height", p_info.options.height)
       .attr("width", p_info.options.width);
@@ -702,9 +712,11 @@ var animint = function (to_select, json_file) {
   }
   var add_legend = function(p_name, p_info){
     // case of multiple legends, d3 reads legend structure in as an array
+      var tdRight = element.select("td#"+p_name+"_legend");
     for(var i=0; i<p_info.legend.length; i++){
 	// the table that contains one row for each legend element.
-	var legend_table = element.append("table")
+	var legend_table = tdRight.append("table")
+	;
         var l_info = p_info.legend[i];
         // the legend table with breaks/value/label.
         var legendaes = l_info.aesthetic;
