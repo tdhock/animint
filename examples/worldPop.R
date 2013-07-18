@@ -105,7 +105,8 @@ popPlots3 <-
                    data=popCumSum, hjust=0) +
          scale_x_continuous(limits=c(0,1), breaks=c(0, 1), labels=NULL) +
          scale_y_continuous(limits=c(0,1), breaks=c(0, 1), labels=NULL) + 
-         xlab("") + ylab("")
+         xlab("") + ylab("") + 
+         guides(colour="none", fill="none")
        
 )
 gg2animint(popPlots3)
