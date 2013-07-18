@@ -444,6 +444,7 @@ getLegendList <- function(plistextra){
   layers = plot$layers
   default_mapping = plot$mapping
   theme <- ggplot2:::plot_theme(plot)
+  position <- theme$legend.position
   # by default, guide boxes are vertically aligned
   theme$legend.box <- if(is.null(theme$legend.box)) "vertical" else theme$legend.box
   
