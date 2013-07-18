@@ -481,12 +481,6 @@ getLegend <- function(mb){
   geoms <- sapply(mb$geoms, function(i) i$geom$objname)
   cleanData <- function(data, geom){ # colors to hexadecimal, fill<-colour if fill is undefined.
     if(nrow(data)==0) return(data.frame());
-    if("colour"%in%names(data) & "fill"%in%names(data)){
-      if(sum(is.na(data[["colour"]]))==0 & sum(!is.na(data[["fill"]]))==0){
-        data[["fill"]] <- data[["colour"]] 
-      }
-    } 
-    # if fill=NA uniformly and color is defined, fill=color (compatibility with JS)
     if("colour"%in%names(data)) data[["colour"]] <- toRGB(data[["colour"]])
     if("fill"%in%names(data)) data[["fill"]] <- toRGB(data[["fill"]])
     names(data) <- paste(geom, names(data), sep="")
