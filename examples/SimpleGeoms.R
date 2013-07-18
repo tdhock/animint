@@ -117,8 +117,8 @@ contourdata2 <- floor(contourdata/3)*3
 g12 <- ggplot() + 
   geom_tile(data=contourdata2, aes(x=x, y=y, fill=z, colour=z)) + 
   geom_contour(data=contourdata, aes(x=x, y=y, z=z), colour="black", size=.5) +
-  scale_fill_continuous(low="#56B1F7", high="#132B43", guide="legend") +
-  scale_colour_continuous(low="#56B1F7", high="#132B43", guide="legend") +
+  scale_fill_continuous("height", low="#56B1F7", high="#132B43", guide="legend") +
+  scale_colour_continuous("height", low="#56B1F7", high="#132B43", guide="legend") +
   ggtitle("geom_tile + geom_contour") 
 g12
 # gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11, g12=g12)) 
@@ -139,8 +139,7 @@ g14 <- ggplot() +
                                group=..piece..), 
                stat="density2d", alpha=.5) +
   geom_point(data=geyser, aes(x = duration, y = waiting)) + 
-  scale_fill_continuous(low="#56B1F7", high="#132B43") + 
-#   scale_colour_continuous(low="#56B1F7", high="#132B43") +
+  scale_fill_continuous("Density Level", low="#56B1F7", high="#132B43") + 
   guides(colour = guide_legend(override.aes = list(alpha = 1)), 
          fill = guide_legend(override.aes = list(alpha = 1))) + 
   scale_y_continuous(limits=c(40,110), trans="log10") +
