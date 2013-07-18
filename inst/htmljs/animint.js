@@ -292,8 +292,8 @@ var animint = function (to_select, json_file) {
     //alert(g_info.classed+" "+base_opacity);
     var get_alpha = function (d) {
       var a;
-      if (d.hasOwnProperty("alpha")) {
-        a = d.alpha;
+      if (aes.hasOwnProperty("alpha") && d.hasOwnProperty("alpha")) {
+        a = d["alpha"];
       } else {
         a = base_opacity;
       }
@@ -306,7 +306,7 @@ var animint = function (to_select, json_file) {
     }
     var get_size = function (d) {
       if (aes.hasOwnProperty("size") && d.hasOwnProperty("size")) {
-        return d.size;
+        return d["size"];
       }
       return size;
     }
@@ -321,7 +321,7 @@ var animint = function (to_select, json_file) {
       if (aes.hasOwnProperty("linetype") && d.hasOwnProperty(
         "linetype")) {
         try {
-          lt = d.linetype;
+          lt = d["linetype"];
         } catch (err) {
           lt = g_info.params.linetype;
         }
@@ -329,7 +329,7 @@ var animint = function (to_select, json_file) {
         lt = linetype;
       }
 
-      return linetypeInt2dasharray(lt, get_size(d));
+      return linetypesize2dasharray(lt, get_size(d));
     }
     var colour = "black";
     var fill = "black";
@@ -726,14 +726,16 @@ var animint = function (to_select, json_file) {
         .append("svg")
   	    .attr("id", function(d){return "legend-"+d["label"];})
   	    .attr("height", 14)
-  	    .attr("width", 14);
-      var pointscale = d3.scale.linear().domain([0,12]).range([2,7]);
-      // scale points so they are visible in the legend.
+  	    .attr("width", 20);
+      var pointscale = d3.scale.linear().domain([0,7]).range([1,4]);
+      // scale points so they are visible in the legend. (does not affect plot scaling)
+      var linescale = d3.scale.linear().domain([0,6]).range([1,4]);
+      // scale lines so they are visible in the legend. (does not affect plot scaling)
       if(legendgeoms.indexOf("polygon")>-1){ 
         // aesthetics that would draw a rect
         legend_svgs.append("rect").attr("x", 2).attr("y", 2).attr("width", 10).attr("height", 10)
           .style("stroke-width", function(d){return d["polygonsize"]||1;})
-          .style("stroke-dasharray", function(d){return linetypeInt2dasharray(d["polygonlinetype"], d["size"]);})
+          .style("stroke-dasharray", function(d){return linetypesize2dasharray(d["polygonlinetype"]||"solid", d["size"]||2);})
           .style("stroke", function(d){return d["polygoncolour"] || "#000000";})
           .style("fill", function(d){return d["polygonfill"] || "#FFFFFF";})
           .style("opacity", function(d){return d["polygonalpha"]||1;});
@@ -741,21 +743,21 @@ var animint = function (to_select, json_file) {
       if(legendgeoms.indexOf("path")>-1){
         // aesthetics that would draw a line
         legend_svgs.append("line")
-          .attr("x1", 1).attr("x2", 13).attr("y1", 7).attr("y2", 7)
-          .style("stroke-width", function(d){return 4*d["pathsize"]||2;})
-          .style("stroke-dasharray", function(d){return linetypeInt2dasharray(d["pathlinetype"]||"1", d["pathsize"] || 2);})
+          .attr("x1", 1).attr("x2", 19).attr("y1", 7).attr("y2", 7)
+          .style("stroke-width", function(d){return linescale(d["pathsize"])||2;})
+          .style("stroke-dasharray", function(d){return linetypesize2dasharray(d["pathlinetype"]||"solid", d["pathsize"] || 2);})
           .style("stroke", function(d){return d["pathcolour"] || "#000000";})
           .style("opacity", function(d){return d["pathalpha"]||1;});
       }
       if(legendgeoms.indexOf("point")>-1){
         // aesthetics that would draw a point
-        legend_svgs.append("circle").attr("cx", 7).attr("cy", 7)
+        legend_svgs.append("circle").attr("cx", 7).attr("cy", 10)
           .attr("r", function(d){return pointscale(d["pointsize"])||4;})
           .style("stroke", function(d){return d["pointcolour"] || "#000000";})
-          .style("fill", function(d){return d["pointfill"] || "#FFFFFF";})
+          .style("fill", function(d){return d["pointfill"] || "#000000";})
           .style("opacity", function(d){return d["pointalpha"]||1;});
       }
-      legend_rows.append("td").text(function(d){ return d["label"];});
+      legend_rows.append("td").attr("align", "left").text(function(d){ return d["label"];});
     }
   }
   // Download the main description of the interactive plot.
@@ -818,53 +820,54 @@ var measureText = function (pText, pFontSize, pStyle) {
 
     return lResult;
 }
-var linetypeInt2dasharray = function(lt, size){
-  var o = {
-    0: size * 0 + "," + size * 10,
-    1: 0,
-    2: size * 4 + "," + size * 4,
-    3: size + "," + size * 2,
-    4: size + "," + size * 2 + "," + size * 4 + "," + size * 2,
-    5: size * 8 + "," + size * 4,
-    6: size * 2 + "," + size * 2 + "," + size * 6 + "," + size * 2
-  };
-  if (lt in o) return o[lt];
-  else return linetypesize2dasharray(lt, size);
-}
 
 var linetypesize2dasharray = function (lt, size) {
-  var o = {
-    "blank": size * 0 + "," + size * 10,
-    "solid": 0,
-    "dashed": size * 4 + "," + size * 4,
-    "dotted": size + "," + size * 2,
-    "dotdash": size + "," + size * 2 + "," + size * 4 + "," + size * 2,
-    "longdash": size * 8 + "," + size * 4,
-    "twodash": size * 2 + "," + size * 2 + "," + size * 6 + "," + size * 2,
-    "22": size * 2 + "," + size * 2,
-    "42": size * 4 + "," + size * 2,
-    "44": size * 4 + "," + size * 4,
-    "13": size + "," + size * 3,
-    "1343": size + "," + size * 3 + "," + size * 4 + "," + size * 3,
-    "73": size * 7 + "," + size * 3,
-    "2262": size * 2 + "," + size * 2 + "," + size * 6 + "," + size * 2,
-    "12223242": size + "," + size * 2 + "," + size * 2 + "," + size * 2 + "," + size * 3 + "," + size * 2 + "," + size * 4 + "," + size * 2,
-    "F282": size * 15 + "," + size * 2 + "," + size * 8 + "," + size * 2,
-    "F4448444": size * 15 + "," + size * 4 + "," + size * 4 + "," + size * 4 + "," + size * 8 + "," + size * 4 + "," + size * 4 + "," + size * 4,
-    "224282F2": size * 2 + "," + size * 2 + "," + size * 4 + "," + size * 2 + "," + size * 8 + "," + size * 2 + "," + size * 16 + "," + size * 2,
-    "F1": size * 16 + "," + size
-  };
+  var isInt = function(n) { return typeof n === 'number' && parseFloat(n) == parseInt(n, 10) && !isNaN(n); } 
+  if(isInt(lt)){ // R integer line types.
+    var o = {
+      0: size * 0 + "," + size * 10,
+      1: 0,
+      2: size * 4 + "," + size * 4,
+      3: size + "," + size * 2,
+      4: size + "," + size * 2 + "," + size * 4 + "," + size * 2,
+      5: size * 8 + "," + size * 4,
+      6: size * 2 + "," + size * 2 + "," + size * 6 + "," + size * 2
+    };
+  } else { //R defined line types
+      var o = {
+        "blank": size * 0 + "," + size * 10,
+        "solid": 0,
+        "dashed": size * 4 + "," + size * 4,
+        "dotted": size + "," + size * 2,
+        "dotdash": size + "," + size * 2 + "," + size * 4 + "," + size * 2,
+        "longdash": size * 8 + "," + size * 4,
+        "twodash": size * 2 + "," + size * 2 + "," + size * 6 + "," + size * 2,
+        "22": size * 2 + "," + size * 2,
+        "42": size * 4 + "," + size * 2,
+        "44": size * 4 + "," + size * 4,
+        "13": size + "," + size * 3,
+        "1343": size + "," + size * 3 + "," + size * 4 + "," + size * 3,
+        "73": size * 7 + "," + size * 3,
+        "2262": size * 2 + "," + size * 2 + "," + size * 6 + "," + size * 2,
+        "12223242": size + "," + size * 2 + "," + size * 2 + "," + size * 2 + "," + size * 3 + "," + size * 2 + "," + size * 4 + "," + size * 2,
+        "F282": size * 15 + "," + size * 2 + "," + size * 8 + "," + size * 2,
+        "F4448444": size * 15 + "," + size * 4 + "," + size * 4 + "," + size * 4 + "," + size * 8 + "," + size * 4 + "," + size * 4 + "," + size * 4,
+        "224282F2": size * 2 + "," + size * 2 + "," + size * 4 + "," + size * 2 + "," + size * 8 + "," + size * 2 + "," + size * 16 + "," + size * 2,
+        "F1": size * 16 + "," + size
+      };
+  }
 
-  if (lt in o) return o[lt];
-  else return genlinetype2dasharray(lt, size);
+  if (lt in o){
+    return o[lt];
+  } else{ // manually specified line types
+    str = lt.split("");
+    strnum = str.map(function (d) {
+      return size * parseInt(d, 16);
+    });
+    return strnum;
+  }
 }
-var genlinetype2dasharray = function (lt, size) {
-  str = toString(lt).split("");
-  strnum = str.map(function (d) {
-    return size * parseInt(d, 16);
-  });
-  return strnum;
-}
+
 var isArray = function(o) {
   return Object.prototype.toString.call(o) === '[object Array]';
 }
