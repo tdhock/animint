@@ -65,9 +65,9 @@ g6
 # gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6))
 
 #' Boxplots
-boxplotdata <- rbind(data.frame(x=1:50, y=sort(rnorm(50, 3, 1)), group=1),
-                     data.frame(x=1:50, y=sort(rnorm(50, 0, 1)), group=2), 
-                     data.frame(x=1:50, y=sort(rgamma(50, 2, 1/3)), group=3))
+boxplotdata <- rbind(data.frame(x=1:50, y=sort(rnorm(50, 3, 1)), group="N(3,1)"),
+                     data.frame(x=1:50, y=sort(rnorm(50, 0, 1)), group="N(0,1)"), 
+                     data.frame(x=1:50, y=sort(rgamma(50, 2, 1/3)), group="Gamma(2,1/3)"))
 boxplotdata <- ddply(boxplotdata, .(group), transform, ymax=max(y), ymin=min(y), med=median(y))
 
 #' Boxplot does not work (7/5/13)
@@ -79,25 +79,26 @@ boxplotdata <- ddply(boxplotdata, .(group), transform, ymax=max(y), ymin=min(y),
 
 g7 <- ggplot() + 
   geom_linerange(data=boxplotdata, aes(x=factor(group), ymax=ymax, ymin=ymin, colour=factor(group))) +
-  ggtitle("geom_linerange")
+  ggtitle("geom_linerange") + scale_colour_discrete("Distribution") + xlab("Distribution")
 g7
 # gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7))
 
 g8 <- ggplot() + 
-  geom_histogram(data=subset(boxplotdata, group==3), aes(x=y, fill=..count..), binwidth=1) + 
+  geom_histogram(data=subset(boxplotdata, group=="Gamma(2,1/3)"), aes(x=y, fill=..count..), binwidth=1) + 
   ggtitle("geom_histogram")
 g8
 # gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8))
 
 g9 <- ggplot() + 
   geom_violin(data=boxplotdata, aes(x=factor(group), y=y, fill=factor(group), group=group)) +
-  ggtitle("geom_violin")
+  ggtitle("geom_violin")+ scale_colour_discrete("Distribution") + xlab("Distribution")
 g9
 # gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9))
 
 #' Step Plot
 #' Must specify group and then use colour=factor(group) to get desired effect.
 g10 <- ggplot() + geom_step(data=boxplotdata, aes(x=x, y=y, colour=factor(group), group=group)) +
+  scale_colour_discrete("Distribution") +
   ggtitle("geom_step")
 g10
 # gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10))
@@ -138,6 +139,7 @@ g14 <- ggplot() +  xlim(0.5, 6) + scale_y_log10() +
                                colour=..level.., group=..piece..), 
                stat="density2d", alpha=.5) +
   geom_point(data=geyser, aes(x = duration, y = waiting)) + 
+  scale_colour_continuous(low="#56B1F7", high="#132B43", trans="log") +
   scale_fill_continuous(low="#56B1F7", high="#132B43", trans="log") +
   xlim(0.5, 6) + ylim(40, 110) +
   ggtitle("geom_density2d polygon")
