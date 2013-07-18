@@ -9,7 +9,7 @@ scatterdata$y <- with(scatterdata, runif(100, x-5, x+5))
 scatterdata$xnew <- round(scatterdata$x/20)*20
 scatterdata$xnew <- as.factor(scatterdata$xnew)
 scatterdata$class <- factor(round(scatterdata$x/10)%%2, labels=c("high", "low"))
-scatterdata$class4 <- factor(round(scatterdata$x/10)%%4, labels=c("high", "medhigh", "medlow", "low"))
+scatterdata$class4 <- factor(rowSums(sapply(quantile(scatterdata$x)+c(0,0,0,0,.1), function(i) scatterdata$x<i)), levels=1:4, labels=c("high", "medhigh", "medlow", "low"), ordered=TRUE)
 
 #' qplot-style specification works for simple examples, 
 #' but may not continue to work for more complicated 
@@ -64,47 +64,58 @@ s6
 #' Overplotting data for testing alpha
 library(plyr)
 scatterdata2 <- data.frame(x=rnorm(1000, 0, .5), y=rnorm(1000, 0, .5))
-scatterdata2$quad <- with(scatterdata2, (3+sign(x)+2*sign(y))/2+1)
+scatterdata2$quad <- c(3, 4, 2, 1)[with(scatterdata2, (3+sign(x)+2*sign(y))/2+1)]
+scatterdata2$quad <- factor(scatterdata2$quad, labels=c("Q1", "Q2", "Q3", "Q4"), ordered=TRUE)
 scatterdata2 <- ddply(scatterdata2, .(quad), transform, str=sqrt(x^2+y^2)/4)
-qplot(data=scatterdata2, x=x, y=y, geom="point", colour=factor(quad), alpha=I(.2))
+scatterdata2.summary <- ddply(scatterdata2, .(quad), summarise, xmin=min(x), xmax=max(x), ymin=min(y), ymax=max(y), xmean=mean(x), ymean=mean(y))
+qplot(data=scatterdata2, x=x, y=y, geom="point", colour=quad)
 
-#' Single alpha value
+#' Interactive plots...
 s7 <- ggplot() + 
-  geom_point(data=scatterdata2, aes(x=x, y=y, colour=factor(quad), fill=factor(quad), 
-                                    clickSelects=quad, showSelected=quad), alpha=.6) +
-  ggtitle("Constant alpha")
+  geom_rect(data=scatterdata2.summary, aes(xmax=xmax, xmin=xmin, ymax=ymax, ymin=ymin, 
+                                           colour=quad, fill=quad,
+                                           clickSelects = quad), alpha=.3) +
+  geom_point(data=scatterdata2.summary, aes(x=xmean, y=ymean, colour=quad, fill=quad, showSelected = quad), size=5) +
+  geom_point(data=scatterdata2, aes(x=x, y=y), alpha=.15) + 
+  scale_colour_discrete(guide="legend") + scale_fill_discrete(guide="legend") +
+  scale_alpha_discrete(guide="none") +
+  ggtitle("Selects & Means")
 s7
 # gg2animint(list(s1=s1, s2=s2, s3=s3, s4=s4, s5=s5, s6=s6, s7=s7))
 
-#' Continuous alpha
-s8 <- ggplot() +
-  geom_point(data=scatterdata2, aes(x=x, y=y, colour=factor(quad), fill=factor(quad), 
-                                    alpha=str, clickSelects=quad, showSelected=quad)) +
-  scale_alpha(range=c(.6, 1), guide="none") +
-  ggtitle("Continuous alpha")
+#' Single alpha value
+s8 <- ggplot() + 
+  geom_point(data=scatterdata2, aes(x=x, y=y, colour=quad, fill=quad),alpha=.2)+
+  geom_point(data=scatterdata2, aes(x=x, y=y, colour=quad, fill=quad, 
+                                    clickSelects=quad, showSelected=quad), alpha=.6) +
+  guides(colour = guide_legend(override.aes = list(alpha = 1)), 
+         fill = guide_legend(override.aes = list(alpha = 1))) +
+  ggtitle("Constant alpha")
 s8
 # gg2animint(list(s1=s1, s2=s2, s3=s3, s4=s4, s5=s5, s6=s6, s7=s7, s8=s8))
 
-#' Categorical alpha and scale_alpha_discrete()
-#' Note, to get unselected points to show up, need to have two copies of geom_point: One for anything that isn't selected, one for only the selected points.
-s9 <- ggplot() + 
-  geom_point(data=scatterdata2, aes(x=x, y=y, colour=factor(quad), fill=factor(quad), 
-                                    alpha=factor(quad), clickSelects=quad, showSelected=quad)) + 
-  scale_alpha_discrete(range=c(.6, 1)) +
-  ggtitle("Discrete alpha")
+#' Continuous alpha
+s9 <- ggplot() +
+  geom_point(data=scatterdata2, aes(x=x, y=y, colour=quad, fill=quad),alpha=.2)+
+  geom_point(data=scatterdata2, aes(x=x, y=y, colour=quad, fill=quad, 
+                                    alpha=str, clickSelects=quad, showSelected=quad)) +
+  guides(colour = guide_legend(override.aes = list(alpha = 1)), 
+         fill = guide_legend(override.aes = list(alpha = 1))) +
+  scale_alpha(range=c(.6, 1), guide="none") +
+  ggtitle("Continuous alpha")
 s9
 # gg2animint(list(s1=s1, s2=s2, s3=s3, s4=s4, s5=s5, s6=s6, s7=s7, s8=s8, s9=s9))
 
-#' Interactive plots...
-scatterdata2.summary <- ddply(scatterdata2, .(quad), summarise, xmin=min(x), xmax=max(x), ymin=min(y), ymax=max(y), xmean=mean(x), ymean=mean(y))
+#' Categorical alpha and scale_alpha_discrete()
+#' Note, to get unselected points to show up, need to have two copies of geom_point: One for anything that isn't selected, one for only the selected points.
 s10 <- ggplot() + 
-  geom_rect(data=scatterdata2.summary, aes(xmax=xmax, xmin=xmin, ymax=ymax, ymin=ymin, 
-                                           colour=factor(quad), fill=factor(quad),
-                                           clickSelects = quad), alpha=.55) +
-  geom_point(data=scatterdata2, aes(x=x, y=y, fill=factor(quad), colour=factor(quad)), alpha=.2) + 
-  geom_point(data=scatterdata2.summary, aes(x=xmean, y=ymean, colour=factor(quad), showSelected = quad), size=5) +
-  scale_colour_discrete(guide="legend") + scale_fill_discrete(guide="legend") +
-  ggtitle("Selects & Means")
+  geom_point(data=scatterdata2, aes(x=x, y=y, colour=quad, fill=quad, alpha=quad))+
+  geom_point(data=scatterdata2, aes(x=x, y=y, colour=quad, fill=quad, 
+                                    alpha=quad, clickSelects=quad, showSelected=quad)) +
+  guides(colour = guide_legend(override.aes = list(alpha = 1)), 
+         fill = guide_legend(override.aes = list(alpha = 1))) +
+  scale_alpha_discrete(guide="none")+
+  ggtitle("Discrete alpha")
 s10
 
 # gg2animint(list(s1=s1, s2=s2, s3=s3, s4=s4, s5=s5, s6=s6, s7=s7, s8=s8, s9=s9, s10=s10))
@@ -113,8 +124,8 @@ s10
 #' Point Size Scaling
 #' Scale defaults to radius, but area is more easily interpreted by the brain (Tufte).
 s11 <- ggplot() + 
-  geom_point(data=scatterdata2, aes(x=x, y=y, colour=factor(quad), fill=factor(quad), size=str), alpha=.5) +
-  geom_point(data=scatterdata2, aes(x=x, y=y, colour=factor(quad), fill=factor(quad), 
+  geom_point(data=scatterdata2, aes(x=x, y=y, colour=quad, fill=quad, size=str), alpha=.5) +
+  geom_point(data=scatterdata2, aes(x=x, y=y, colour=quad, fill=quad, 
                                     size=str, clickSelects=quad, showSelected=quad), alpha=.3) +
   ggtitle("Scale Size")
 s11
@@ -122,7 +133,7 @@ s11
 # gg2animint(list(s1=s1, s2=s2, s3=s3, s4=s4, s5=s5, s6=s6, s7=s7, s8=s8, s9=s9, s10=s10, s11=s11))
 
 s12 <- ggplot() + 
-  geom_point(data=scatterdata2, aes(x=x, y=y, colour=factor(quad), fill=factor(quad), size=str), alpha=.5) + 
+  geom_point(data=scatterdata2, aes(x=x, y=y, colour=quad, fill=quad, size=str), alpha=.5) + 
   scale_size_area() +
   ggtitle("Scale Area")
 s12

@@ -152,15 +152,15 @@ g14
 
 data(diamonds)
 dsmall <- diamonds[sample(nrow(diamonds), 1000), ]
-g15 <- ggplot() + xlim(c(1,3))+
+g15 <- ggplot() + 
   geom_tile(data=dsmall, aes(x=carat, y=price, fill=..density.., colour=..density..), stat="density2d", contour=FALSE, n=30) +
   scale_fill_gradient(limits=c(1e-5,8e-4), na.value="white") + 
   scale_colour_gradient(limits=c(1e-5,8e-4), na.value="white") +
-  ggtitle("geom_density2d tile")
+  ggtitle("geom_density2d tile") + ylim(c(0, 19000))
 g15
 # gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11, g12=g12, g13=g13, g14=g14, g15=g15))
   
-g16 <- ggplot() + xlim(c(1,3))+
+g16 <- ggplot() + 
   geom_point(data=dsmall, aes(x=carat, y=price, alpha=..density..), 
              stat="density2d", contour=FALSE, n=10, size=I(1)) +
   scale_alpha_continuous("Density") +
