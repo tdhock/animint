@@ -335,13 +335,13 @@ var animint = function (to_select, json_file) {
     var fill = "black";
     var get_colour = function (d) {
       if (d.hasOwnProperty("colour")) {
-        return d.colour;
+        return d["colour"]
       }
       return colour;
     }
     var get_fill = function (d) {
       if (d.hasOwnProperty("fill")) {
-        return d.fill;
+        return d["fill"];
       }
       return fill;
     }
