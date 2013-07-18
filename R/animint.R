@@ -146,9 +146,14 @@ layer2list <- function(l, d, ranges){
     if(!"fill"%in%names(g$data) & "colour"%in%names(g$data)){
       g$data[["fill"]] <- g$data[["colour"]]
     }
+  } else if(g$geom=="ribbon"){
+    # Color set to match ggplot2 default of fill with no outside border.
+    if("fill"%in%names(g$data) & !"colour"%in%names(g$data)){
+      g$data[["colour"]] <- g$data[["fill"]]
+    }
   } else if(g$geom=="density" | g$geom=="area"){
     g$geom <- "ribbon"
-  } else if(g$geom=="tile" | g$geom=="raster"){
+  } else if(g$geom=="tile" | g$geom=="raster" | g$geom=="histogram" ){
     # Color set to match ggplot2 default of tile with no outside border.
     if(!"colour"%in%names(g$data) & "fill"%in%names(g$data)){
       g$data[["colour"]] <- g$data[["fill"]]
@@ -156,7 +161,7 @@ layer2list <- function(l, d, ranges){
       if(!"size"%in%names(g$data)) g$data[["size"]] <- 0 
     }
     g$geom <- "rect"
-  } else if(g$geom=="histogram" | g$geom=="bar"){
+  } else if(g$geom=="bar"){
     g$geom <- "rect"
   } else if(g$geom=="bin2d"){
     stop("bin2d is not supported in animint. Try using geom_tile() and binning the data yourself.")
@@ -429,35 +434,74 @@ toRGB <- function(x) rgb(t(col2rgb(as.character(x))), maxColorValue=255)
 #' @return list containing information for each legend
 #' @export
 getLegendList <- function(plistextra){
-  aes.scales <- which(sapply(plistextra$plot$scales$scales, function(i) sum(i$aesthetics%in%c("colour", "size", "fill", "linetype", "alpha"))>0))
-  lapply(aes.scales, getLegend, mb = plistextra)
+  plot <- plistextra$plot
+  scales = plot$scales
+  layers = plot$layers
+  default_mapping = plot$mapping
+  theme <- ggplot2:::plot_theme(plot)
+  # by default, guide boxes are vertically aligned
+  theme$legend.box <- if(is.null(theme$legend.box)) "vertical" else theme$legend.box
+  
+  # size of key (also used for bar in colorbar guide)
+  theme$legend.key.width <- if(is.null(theme$legend.key.width)) theme$legend.key.size
+  theme$legend.key.height <- if(is.null(theme$legend.key.height)) theme$legend.key.size
+  # by default, direction of each guide depends on the position of the guide.
+  theme$legend.direction <- if(is.null(theme$legend.direction)){
+    if (length(position) == 1 && position %in% c("top", "bottom", "left", "right"))
+      switch(position[1], top =, bottom = "horizontal", left =, right = "vertical")
+    else
+      "vertical"
+  }
+  # justification of legend boxes
+  theme$legend.box.just <-
+    if(is.null(theme$legend.box.just)) {
+      if (length(position) == 1 && position %in% c("top", "bottom", "left", "right"))
+        switch(position, bottom =, top = c("center", "top"), left =, right = c("left", "top"))
+      else
+        c("center", "center")
+    } 
+  
+  position <- theme$legend.position
+  guides = defaults(plot$guides, guides(colour="legend", fill="legend"))
+  labels = plot$labels
+  gdefs <- ggplot2:::guides_train(scales = scales, theme = theme, guides = guides, labels = labels)
+  if (length(gdefs) != 0) {
+    gdefs <- ggplot2:::guides_merge(gdefs)
+    gdefs <- ggplot2:::guides_geom(gdefs, layers, default_mapping)
+  } else (ggplot2:::zeroGrob())
+  names(gdefs) <- sapply(gdefs, function(i) i$title)
+  lapply(gdefs, getLegend)
 }
 
 #' Function to get legend information for each scale
-#' @param mb output from ggplot2::ggplot_build(p)
+#' @param mb single entry from ggplot2:::guides_merge() list of legend data
 #' @i index of scale containing legend-generating information. Position scales do not generate legends, and must be excluded from possible indices.
-getLegend <- function(mb, i){
-  sc <- mb$plot$scales$scales[[i]]
-  guidetype <- sc$guide
-  sc.aes <- sc$aesthetics
-  bk <- ggplot2:::scale_breaks(sc)
-  val <- ggplot2:::scale_map(sc, bk)
-  labels <- ggplot2:::scale_labels(sc)
-  if(sc.aes %in% c("colour", "fill")){
-    val <- toRGB(val)
+getLegend <- function(mb){
+  guidetype <- mb$name
+  geoms <- sapply(mb$geoms, function(i) i$geom$objname)
+  cleanData <- function(data, geom){ # colors to hexadecimal, fill<-colour if fill is undefined.
+    if(nrow(data)==0) return(data.frame());
+    if("colour"%in%names(data) & "fill"%in%names(data)){
+      if(sum(is.na(data[["colour"]]))==0 & sum(!is.na(data[["fill"]]))==0){
+        data[["fill"]] <- data[["colour"]] 
+      }
+    } 
+    # if fill=NA uniformly and color is defined, fill=color (compatibility with JS)
+    if("colour"%in%names(data)) data[["colour"]] <- toRGB(data[["colour"]])
+    if("fill"%in%names(data)) data[["fill"]] <- toRGB(data[["fill"]])
+    names(data) <- paste(geom, names(data), sep="")
+    names(data) <- gsub(paste(geom, ".", sep=""), "", names(data), fixed=TRUE)
+    data$geom <- geom
+    data
   }
-  df <- data.frame(breaks = bk, value = val, label = labels)
-  df <- df[which(rowSums(is.na(df))==0),] # return only those entries that have breaks, values, and labels.
-  val <- val[which(rowSums(is.na(df))==0)]
-  labels <- labels[which(rowSums(is.na(df))==0)]
-  labels[is.na(labels)] <- "" # for NA labels, replace with empty string. (Useful for colorbar in particular)
-  entries <- data.frame(val, labels)
+  data <- rbind.fill(lapply(mb$geoms, function(i) cleanData(merge(mb$key, i$data), i$geom$objname)))
+  data <- lapply(1:nrow(data), function(i) as.list(data[i,]))
   if(guidetype=="none"){
     NULL
   } else{
     list(guide = guidetype, 
-         aesthetic = sc.aes, 
-         title = as.character(as.expression(mb$plot$mapping[[sc.aes]])), 
-         entries = lapply(1:nrow(entries), function(i) as.list(entries[i,])))
+         geoms = geoms, 
+         title = mb$title, 
+         entries = data)
   }
 }
