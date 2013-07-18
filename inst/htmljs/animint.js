@@ -701,72 +701,59 @@ var animint = function (to_select, json_file) {
     d3.timer(animateIfInactive, Animation.ms);
   }
   var add_legend = function(p_name, p_info){
-    var plot = d3.select("#"+p_name);
-    var trBelow = plot.append("table").append("tr");
-    // the table below the plot
-    
-    setShape = function(aes, label, value){
-      var svg = element.append("svg")
-      .attr("id", "legend-"+aes+"-"+label)
-      .attr("height", 14)
-      .attr("width", 14);
-      
-      var it;
-      if(aes=="fill"){
-        it = svg.append("circle").attr("cx", 7).attr("cy", 7).attr("r", 5).style("fill", value).style("stroke", value)
-      }
-      if(aes=="linetype"){
-        it = svg.append("line").attr("x1", 1).attr("x2", 13).attr("y1", 7).attr("y2", 7)
+    // case of multiple legends, d3 reads legend structure in as an array
+    for(var i=0; i<p_info.legend.length; i++){
+	// the table that contains one row for each legend element.
+	var legend_table = element.append("table")
+        var l_info = p_info.legend[i];
+        // the legend table with breaks/value/label.
+        var legendaes = l_info.aesthetic;
+        //TR.append("td").text(p_info.legend[i].title+"-:");
+        var legend_rows = legend_table.selectAll("tr")
+              .data(l_info.entries).enter().append("tr");
+        var legend_svgs = legend_rows.append("td")
+	    .append("svg")
+	    .attr("id", function(d){return "legend-"+legendaes+"-"+d.labels;})
+	    .attr("height", 14)
+	    .attr("width", 14)
+	;
+	if(legendaes=="fill"){
+            legend_svgs.append("circle")
+		.attr("cx", 7)
+		.attr("cy", 7)
+		.attr("r", 5)
+		.style("fill", function(d){return d.val;})
+		.style("stroke", function(d){return d.val;})
+	    ;
+	}else if(legendaes=="colour"){
+            legend_svgs.append("line")
+		.attr("x1", 1).attr("x2", 13).attr("y1", 7).attr("y2", 7)
+                .style("stroke", function(d){return d.val;})
+                .style("stroke-width", 2)
+	    ;
+   // TODO: linetype, alpha and size legends!
+	}else if(legendaes=="linetype"){
+            legend_svgs.append("line")
+		.attr("x1", 1).attr("x2", 13).attr("y1", 7).attr("y2", 7)
                 .style("stroke", "#000000")
                 .style("stroke-dasharray", linetypesize2dasharray(value, 2))
                 .style("stroke-width", 2)
-      }
-      if(aes=="colour"){
-        it = svg.append("line").attr("x1", 1).attr("x2", 13).attr("y1", 7).attr("y2", 7)
-                .style("stroke", value)
-                .style("stroke-width", 2)
-      }
-      if(aes=="alpha"){
-        it = svg.append("circle").attr("cx", 7).attr("cy", 7).attr("r", 5)
+	    ;
+	}else if(legendaes=="alpha"){
+            legend_svgs.append("circle")
+		.attr("cx", 7).attr("cy", 7).attr("r", 5)
                 .style("opacity", value)
                 .style("fill","#000000")
-      }
-      if(aes=="size"){
-        it = svg.append("circle").attr("cx", 7).attr("cy", 7).attr("r", value)
-      }
-      return it;
-    }
-    if(isArray(p_info.legend)){
-    // case of multiple legends, d3 reads legend structure in as an array
-      for(var i=0; i<p_info.legend.length; i++){
-        var legendtab = d3.keys(p_info.legend[i].legend);
-        // the legend table with breaks/value/label.
-        var legendaes = p_info.legend[i].aesthetic;
-        var legend = trBelow.append("td").append("table")
-        var TR = legend.append("tr");
-        TR.append("td").text(p_info.legend[i].title+":");
-        TR.selectAll("td.legend")
-          .data(d3.entries(p_info.legend[i].legend)).enter()
-          .append("td").classed("legend", 1)
-          .text(function(d){ return setShape(legendaes, d.labels, d.value);})
+	    ;
+	}else if(legendaes=="size"){
+            legend_svgs.append("circle")
+		.attr("cx", 7).attr("cy", 7).attr("r", value)
+	    ;
+	}
+	legend_rows.append("td")
           .text(function(d){ return d.labels;})
-      }
-    } else if(p_info.legend.title){ 
-      // case of only one legend, d3 will read in as a single obj and not an array
-        var legendtab = d3.keys(p_info.legend.legend);
-        // the legend table with breaks/value/label.
-        var legendaes = p_info.legend.aesthetic;
-        var legend = trBelow.append("td").append("table");
-        var TR = legend.append("tr");
-        TR.append("td").text(p_info.legend.title+":");
-        TR.selectAll("td.legend")
-          .data(d3.entries(p_info.legend.legend))
-          .enter().append("td")
-          .classed("legend", 1)
-          .text(function(d){ return setShape(legendaes, d.labels, d.value);})
-          .append("td")
-          .classed("legend", 1)
-          .text(function(d){ return d.labels;})
+          //.style("background",function(d){return d.val;})
+	;
     }
   }
   // Download the main description of the interactive plot.

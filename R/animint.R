@@ -451,12 +451,13 @@ getLegend <- function(mb, i){
   val <- val[which(rowSums(is.na(df))==0)]
   labels <- labels[which(rowSums(is.na(df))==0)]
   labels[is.na(labels)] <- "" # for NA labels, replace with empty string. (Useful for colorbar in particular)
+  entries <- data.frame(val, labels)
   if(guidetype=="none"){
     NULL
   } else{
     list(guide = guidetype, 
          aesthetic = sc.aes, 
          title = as.character(as.expression(mb$plot$mapping[[sc.aes]])), 
-         legend = list(values = val, labels = labels))
+         entries = lapply(1:nrow(entries), function(i) as.list(entries[i,])))
   }
 }

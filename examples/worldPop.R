@@ -23,7 +23,7 @@ popPlots <-
                    data=worldPop, alpha=3/4, size=4)+
          geom_point(aes(year, population, fill=type, colour=type),
                     data=worldPop))
-gg2animint(popPlots)
+gg2animint(popPlots, "worldPop")
 
 ## we should at least see the bars in this simpler test.
 onebar <- ggplot()+
@@ -59,12 +59,12 @@ popPlots2 <-
          coord_flip(),
        lines=ggplot()+
          make_tallrect("year", worldPop)+
+         geom_point(aes(year, population, colour=type),
+                    data=worldPop, size=4, alpha=1/4)+
+         ##scale_colour_manual(values=c("black", "red"))+
          geom_line(aes(year, population, group=subcontinent,
                        clickSelects=subcontinent),
-                   data=worldPop, size=4, alpha=3/4)+
-         geom_point(aes(year, populations, clickSelects=subcontinent, colour=type),
-                    data=worldPop, size=4, alpha=3/4)+
-         scale_colour_manual(values=c("black", "red")))
+                   data=worldPop, size=4, alpha=3/4))
 gg2animint(popPlots2)
 
 
