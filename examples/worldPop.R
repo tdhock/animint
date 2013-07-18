@@ -75,6 +75,7 @@ popCumSum <- ddply(worldPop[order(worldPop$year, worldPop$subcontinent),], .(yea
 popCumSum$cumCenter = rowMeans(popCumSum[,c("cumPop", "cumPop.lower")])
 popCumSum$subcontinent.names <- factor(as.character(popCumSum$subcontinent)) # alphabetize
 popCumSum$subcontinent.lab.height <- 1-as.numeric(popCumSum$subcontinent.names)/15
+
 popPlots3 <-
   list(bars=ggplot()+
          geom_bar(aes(x=subcontinent, y=population,
@@ -95,22 +96,15 @@ popPlots3 <-
          scale_colour_manual(values=c("black", "red")),
        stack=ggplot()+ 
          geom_rect(aes(xmin=0, xmax=0.4, ymin=cumPop.lower, ymax=cumPop, fill=factor(subcontinent), 
-                      showSelected=year, clickSelects=subcontinent),
-                  data=popCumSum, colour="#000000")+
-         geom_point(aes(x=.5, y=subcontinent.lab.height, colour=factor(subcontinent), 
-                        showSelected=year, clickSelects=subcontinent), 
-                    data=popCumSum, size=4)+
-         geom_text(aes(x=.55, y=subcontinent.lab.height, label=subcontinent, 
-                       showSelected=year, clickSelects=subcontinent), 
-                   data=popCumSum, hjust=0) +
-         scale_x_continuous(limits=c(0,1), breaks=c(0, 1), labels=NULL) +
+                       showSelected=year, clickSelects=subcontinent),
+                   data=popCumSum, colour="#000000")+
          scale_y_continuous(limits=c(0,1), breaks=c(0, 1), labels=NULL) + 
-         xlab("") + ylab("") + 
-         guides(colour="none", fill="none")
-       
-)
+         scale_x_continuous(labels=NULL) + 
+         scale_fill_discrete("Subcontinent") +
+         xlab("") + ylab(""),
+      width=list(bars = 400, lines = 400, stack = 200), height=list(400)
+  )
 gg2animint(popPlots3)
-
 ## TODO: separate bar stacks for different divisions: What's there replicates polycharts.js, 
 ## but it's not correct (i.e. N. America and The Americas in the same stack). 
 
