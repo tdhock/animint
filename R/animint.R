@@ -484,22 +484,23 @@ getLegendList <- function(plistextra){
 getLegend <- function(mb){
   guidetype <- mb$name
   geoms <- sapply(mb$geoms, function(i) i$geom$objname)
-  cleanData <- function(data, geom){
+  cleanData <- function(data, key, geom){
     if(nrow(data)==0) return(data.frame()); # if no rows, return an empty df.
+    data$order <- 1:nrow(data)
+    data <- merge(data, key)
+    data <- data[order(data$order),]
     if(!".label"%in%names(data)) return(data.frame()); # if there are no labels, return an empty df.
     data <- data[,which(colSums(!is.na(data))>0)] # remove cols that are entirely na
     if("colour"%in%names(data)) data[["colour"]] <- toRGB(data[["colour"]]) # color hex values
     if("fill"%in%names(data)) data[["fill"]] <- toRGB(data[["fill"]]) # fill hex values
     names(data) <- paste(geom, names(data), sep="") # aesthetics by geom
     names(data) <- gsub(paste(geom, ".", sep=""), "", names(data), fixed=TRUE) # label isn't geom-specific
-    data$order <- 1:nrow(data) # plotting order - not yet utilized...
     data
   }
 #   conflict <- sapply(mb$geoms, function(i) i$geom$objname)
-  dataframes <- lapply(mb$geoms, function(i) cleanData(merge(mb$key, i$data), i$geom$objname))
+  dataframes <- lapply(mb$geoms, function(i) cleanData(i$data, mb$key, i$geom$objname))
   dataframes <- dataframes[which(sapply(dataframes, nrow)>0)]
   data <- merge_recurse(dataframes)
-  data <- data[order(data$order),]
   data <- lapply(1:nrow(data), function(i) as.list(data[i,]))
   if(guidetype=="none"){
     NULL

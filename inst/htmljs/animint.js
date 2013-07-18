@@ -723,7 +723,7 @@ var animint = function (to_select, json_file) {
       // the legend table with breaks/value/label.
       var legendgeoms = l_info.geoms;
       var legend_rows = legend_table.selectAll("tr")
-            .data(l_info.entries).enter().append("tr");
+            .data(l_info.entries).sort(function(d) {return d["order"];}).enter().append("tr");
       var legend_svgs = legend_rows.append("td")
         .append("svg")
   	    .attr("id", function(d){return "legend-"+d["label"];})
