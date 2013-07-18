@@ -716,7 +716,9 @@ var animint = function (to_select, json_file) {
     var legendkeys = d3.keys(p_info.legend);
     for(var i=0; i<legendkeys.length; i++){
 	    // the table that contains one row for each legend element.
-	    var legend_table = tdRight.append("table").append("tr").append("th").text(p_info.legend[legendkeys[i]].title);
+	    var legend_table = tdRight.append("table").append("tr")
+                                .append("th").attr("align", "left")
+                                .text(p_info.legend[legendkeys[i]].title);
       var l_info = p_info.legend[legendkeys[i]];
       // the legend table with breaks/value/label.
       var legendgeoms = l_info.geoms;
@@ -751,7 +753,7 @@ var animint = function (to_select, json_file) {
       }
       if(legendgeoms.indexOf("point")>-1){
         // aesthetics that would draw a point
-        legend_svgs.append("circle").attr("cx", 7).attr("cy", 10)
+        legend_svgs.append("circle").attr("cx", function(d){return (10-pointscale(d["pointsize"])||4)}).attr("cy", 7)
           .attr("r", function(d){return pointscale(d["pointsize"])||4;})
           .style("stroke", function(d){return d["pointcolour"] || "#000000";})
           .style("fill", function(d){return d["pointfill"] || "#000000";})

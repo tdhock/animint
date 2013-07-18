@@ -277,10 +277,6 @@ layer2list <- function(l, d, ranges){
 #' \itemize{
 #' \item shape. Open and closed circles can be represented by manipulating fill and colour scales and using default (circle) points, but d3 does not support many R shape types, so mapping between the two is difficult.
 #' }
-#' TODO: 
-#' \itemize{
-#' \item add legends
-#' }
 #' 
 #' @title gg2animint
 #' @param plot.list list of named ggplots with showSelected and clickSelects aesthetics. Input must be a list, so to use a single ggplot named g, it must be passed to the function as plot.list = list(g=g).
@@ -348,12 +344,21 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
         xsplit <- sapply(x, function(i) sum(is.na(strtoi(strsplit(i,"")[[1]],16)))==0)
         return(namedlinetype | xsplit)
       }
-      g$types <- as.list(sapply(g$data, class))
+      g$types <- as.list(sapply(g$data, function(i) paste(class(i), collapse="-")))
       charidx <- which(g$types=="character")
       g$types[charidx] <- sapply(charidx, function(i) 
         if(sum(!is.rgb(g$data[[i]]))==0){"rgb"
         }else if(sum(!is.linetype(g$data[[i]]))==0){"linetype"
         }else "character")
+      
+      # convert ordered factors to unordered factors so javascript doesn't flip out.
+      ordfactidx <- which(g$types=="ordered-factor")
+      if(length(ordfactidx)>0){
+        for(i in ordfactidx){
+          g$data[[i]] <- factor(as.character(g$data[[i]]))
+          g$types[[i]] <- "factor"
+        }
+      }
       
       g$data <- csv.name
       ## Finally save to the master geom list.
@@ -479,16 +484,22 @@ getLegendList <- function(plistextra){
 getLegend <- function(mb){
   guidetype <- mb$name
   geoms <- sapply(mb$geoms, function(i) i$geom$objname)
-  cleanData <- function(data, geom){ # colors to hexadecimal, fill<-colour if fill is undefined.
-    if(nrow(data)==0) return(data.frame());
-    if("colour"%in%names(data)) data[["colour"]] <- toRGB(data[["colour"]])
-    if("fill"%in%names(data)) data[["fill"]] <- toRGB(data[["fill"]])
-    names(data) <- paste(geom, names(data), sep="")
-    names(data) <- gsub(paste(geom, ".", sep=""), "", names(data), fixed=TRUE)
-    data$geom <- geom
+  cleanData <- function(data, geom){
+    if(nrow(data)==0) return(data.frame()); # if no rows, return an empty df.
+    if(!".label"%in%names(data)) return(data.frame()); # if there are no labels, return an empty df.
+    data <- data[,which(colSums(!is.na(data))>0)] # remove cols that are entirely na
+    if("colour"%in%names(data)) data[["colour"]] <- toRGB(data[["colour"]]) # color hex values
+    if("fill"%in%names(data)) data[["fill"]] <- toRGB(data[["fill"]]) # fill hex values
+    names(data) <- paste(geom, names(data), sep="") # aesthetics by geom
+    names(data) <- gsub(paste(geom, ".", sep=""), "", names(data), fixed=TRUE) # label isn't geom-specific
+    data$order <- 1:nrow(data) # plotting order - not yet utilized...
     data
   }
-  data <- rbind.fill(lapply(mb$geoms, function(i) cleanData(merge(mb$key, i$data), i$geom$objname)))
+#   conflict <- sapply(mb$geoms, function(i) i$geom$objname)
+  dataframes <- lapply(mb$geoms, function(i) cleanData(merge(mb$key, i$data), i$geom$objname))
+  dataframes <- dataframes[which(sapply(dataframes, nrow)>0)]
+  data <- merge_recurse(dataframes)
+  data <- data[order(data$order),]
   data <- lapply(1:nrow(data), function(i) as.list(data[i,]))
   if(guidetype=="none"){
     NULL
@@ -497,5 +508,23 @@ getLegend <- function(mb){
          geoms = geoms, 
          title = mb$title, 
          entries = data)
+  }
+}
+
+#' Function to merge a list of data frames (from the reshape package)
+#' @param dfs list of data frames
+#' @param ... other arguments to merge
+#' @return data frame of merged lists
+merge_recurse = function (dfs, ...) 
+{
+  if (length(dfs) == 1) {
+    dfs[[1]]
+  }
+  else if (length(dfs) == 2) {
+    merge(dfs[[1]], dfs[[2]], all.x = TRUE, sort = FALSE, ...)
+  }
+  else {
+    merge(dfs[[1]], Recall(dfs[-1]), all.x = TRUE, sort = FALSE, 
+          ...)
   }
 }
