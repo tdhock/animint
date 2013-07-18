@@ -14,7 +14,7 @@ g1
 
 #' ribbon: should show two overlapping ribbons, with the same basic shape, one translated up by one unit.
 ribbondata <- data.frame(x=seq(0, 1, .1), ymin=runif(11, 0, 1), ymax=runif(11, 1, 2))
-ribbondata <- rbind(cbind(ribbondata, group=1), cbind(ribbondata, group=2))
+ribbondata <- rbind(cbind(ribbondata, group="low"), cbind(ribbondata, group="high"))
 ribbondata[12:22,2:3] <- ribbondata[12:22,2:3]+1
 g2 <- ggplot() + 
   geom_ribbon(data=ribbondata, aes(x=x, ymin=ymin, ymax=ymax, group=group, fill=group), alpha=.5) + 
@@ -23,8 +23,13 @@ g2
 # gg2animint(list(g1=g1, g2=g2))
 
 #' density: should show an exponential density curve in blue and a normal(ish) density curve in pink.
-densdata <- data.frame(x=c(rnorm(100), rexp(100)), group=rep(1:2, each=100))
-g3 <- ggplot() + geom_density(data=densdata, aes(x=x, group=group, fill=factor(group)), alpha=.5) +
+boxplotdata <- rbind(data.frame(x=1:50, y=sort(rnorm(50, 3, 1)), group="N(3,1)"),
+                     data.frame(x=1:50, y=sort(rnorm(50, 0, 1)), group="N(0,1)"), 
+                     data.frame(x=1:50, y=sort(rgamma(50, 2, 1/3)), group="Gamma(2,1/3)"))
+boxplotdata <- ddply(boxplotdata, .(group), transform, ymax=max(y), ymin=min(y), med=median(y))
+
+g3 <- ggplot() + geom_density(data=boxplotdata, aes(x=y, group=group, fill=group), alpha=.5) +
+  scale_fill_discrete("Distribution") + xlab("x") + 
   ggtitle("geom_density")
 g3
 # gg2animint(list(g1=g1, g2=g2, g3=g3))
@@ -65,11 +70,6 @@ g6
 # gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6))
 
 #' Boxplots
-boxplotdata <- rbind(data.frame(x=1:50, y=sort(rnorm(50, 3, 1)), group="N(3,1)"),
-                     data.frame(x=1:50, y=sort(rnorm(50, 0, 1)), group="N(0,1)"), 
-                     data.frame(x=1:50, y=sort(rgamma(50, 2, 1/3)), group="Gamma(2,1/3)"))
-boxplotdata <- ddply(boxplotdata, .(group), transform, ymax=max(y), ymin=min(y), med=median(y))
-
 #' Boxplot does not work (7/5/13)
 # g7 <- ggplot() + 
 #   geom_boxplot(data=boxplotdata, aes(y=y, x=factor(group))) +
@@ -90,8 +90,8 @@ g8
 # gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8))
 
 g9 <- ggplot() + 
-  geom_violin(data=boxplotdata, aes(x=factor(group), y=y, fill=factor(group), group=group)) +
-  ggtitle("geom_violin")+ scale_colour_discrete("Distribution") + xlab("Distribution")
+  geom_violin(data=boxplotdata, aes(x=group, y=y, fill=group, group=group)) +
+  ggtitle("geom_violin")+ scale_fill_discrete("Distribution") + xlab("Distribution")
 g9
 # gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9))
 
@@ -117,8 +117,8 @@ contourdata2 <- floor(contourdata/3)*3
 g12 <- ggplot() + 
   geom_tile(data=contourdata2, aes(x=x, y=y, fill=z, colour=z)) + 
   geom_contour(data=contourdata, aes(x=x, y=y, z=z), colour="black", size=.5) +
-  scale_fill_continuous(low="#56B1F7", high="#132B43", trans="log") +
-  scale_colour_continuous(low="#56B1F7", high="#132B43", trans="log") +
+  scale_fill_continuous(low="#56B1F7", high="#132B43", guide="legend") +
+  scale_colour_continuous(low="#56B1F7", high="#132B43", guide="legend") +
   ggtitle("geom_tile + geom_contour") 
 g12
 # gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11, g12=g12)) 
@@ -128,20 +128,23 @@ data(geyser,package="MASS")
 g13 <- ggplot() +  
   geom_point(data=geyser, aes(x = duration, y = waiting)) + 
   geom_contour(data=geyser, aes(x = duration, y = waiting), colour="blue", size=.5, stat="density2d") + 
-  xlim(0.5, 6) + scale_y_log10() +
+  xlim(0.5, 6) + scale_y_log10(limits=c(40,110)) +
   ggtitle("geom_contour 2d density")
 g13
 # gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11, g12=g12, g13=g13))
 # geom_point disappears because it does not get transformed.
 
-g14 <- ggplot() +  xlim(0.5, 6) + scale_y_log10() +
+g14 <- ggplot() +  
   geom_polygon(data=geyser,aes(x=duration, y=waiting, fill=..level.., 
-                               colour=..level.., group=..piece..), 
+                               group=..piece..), 
                stat="density2d", alpha=.5) +
   geom_point(data=geyser, aes(x = duration, y = waiting)) + 
-  scale_colour_continuous(low="#56B1F7", high="#132B43", trans="log") +
-  scale_fill_continuous(low="#56B1F7", high="#132B43", trans="log") +
-  xlim(0.5, 6) + ylim(40, 110) +
+  scale_fill_continuous(low="#56B1F7", high="#132B43") + 
+#   scale_colour_continuous(low="#56B1F7", high="#132B43") +
+  guides(colour = guide_legend(override.aes = list(alpha = 1)), 
+         fill = guide_legend(override.aes = list(alpha = 1))) + 
+  scale_y_continuous(limits=c(40,110), trans="log10") +
+  scale_x_continuous(limits=c(.5, 6)) +
   ggtitle("geom_density2d polygon")
 g14
 # gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11, g12=g12, g13=g13, g14=g14))
@@ -159,7 +162,8 @@ g15
   
 g16 <- ggplot() + xlim(c(1,3))+
   geom_point(data=dsmall, aes(x=carat, y=price, alpha=..density..), 
-             stat="density2d", contour=FALSE, n=10, size=I(.5)) +
+             stat="density2d", contour=FALSE, n=10, size=I(1)) +
+  scale_alpha_continuous("Density") +
   ggtitle("geom_density2d points")
 g16
 # gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11, g12=g12, g13=g13, g14=g14, g15=g15, g16=g16))
