@@ -453,16 +453,16 @@ getLegendList <- function(plistextra){
   theme$legend.key.height <- if(is.null(theme$legend.key.height)) theme$legend.key.size
   # by default, direction of each guide depends on the position of the guide.
   theme$legend.direction <- if(is.null(theme$legend.direction)){
-    if (length(position) == 1 && position %in% c("top", "bottom", "left", "right"))
-      switch(position[1], top =, bottom = "horizontal", left =, right = "vertical")
+    if (length(legend$position) == 1 && legend$position %in% c("top", "bottom", "left", "right"))
+      switch(legend$position[1], top =, bottom = "horizontal", left =, right = "vertical")
     else
       "vertical"
   }
   # justification of legend boxes
   theme$legend.box.just <-
     if(is.null(theme$legend.box.just)) {
-      if (length(position) == 1 && position %in% c("top", "bottom", "left", "right"))
-        switch(position, bottom =, top = c("center", "top"), left =, right = c("left", "top"))
+      if (length(legend$position) == 1 && legend$position %in% c("top", "bottom", "left", "right"))
+        switch(legend$position, bottom =, top = c("center", "top"), left =, right = c("left", "top"))
       else
         c("center", "center")
     } 
