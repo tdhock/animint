@@ -402,7 +402,8 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
   if(is.list(olist$time)){
     v.name <- olist$time$variable
     geom.names <- result$selectors[[v.name]]$subset
-    u.list <- lapply(geom.names,function(g)unique(df.list[[g]][,v.name]))
+    aes.names <- lapply(geom.names, function(g) names(result$geoms[[g]]$aes)[which(result$geoms[[g]]$aes==v.name)])
+    u.list <- lapply(1:length(geom.names),function(g) unique(df.list[[geom.names[[i]]]][,aes.names[[i]]]))
     olist$time$sequence <- sort(unique(unlist(u.list)))
     result$time <- olist$time
   }
