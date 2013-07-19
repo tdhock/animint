@@ -400,11 +400,27 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
     }
   }
   if(is.list(olist$time)){
+    stopifnot(is.numeric(olist$ms))
+    stopifnot(length(olist$ms)==1)
+    ## NOTE: although we do not use olist$ms for anything in the R
+    ## code, it is used to control the number of milliseconds between
+    ## animation frames in the JS code.
     v.name <- olist$time$variable
+    stopifnot(is.character(v.name))
+    stopifnot(length(v.name)==1)
+    ## These geoms need to be updated when the v.name variable is
+    ## animated, so let's make a list of all possible values to cycle
+    ## through, from all the values used in those geoms.
     geom.names <- result$selectors[[v.name]]$subset
-    aes.names <- lapply(geom.names, function(g) names(result$geoms[[g]]$aes)[which(result$geoms[[g]]$aes==v.name)])
-    u.list <- lapply(1:length(geom.names),function(g) unique(df.list[[geom.names[[i]]]][,aes.names[[i]]]))
-    olist$time$sequence <- sort(unique(unlist(u.list)))
+    anim.values <- list()
+    for(g.name in geom.names){
+      g <- result$geoms[[g.name]]
+      click.or.show <- names(g$aes) %in% c("clickSelects","showSelected")
+      anim.cols <- names(g$aes)[g$aes==v.name & click.or.show]
+      g.data <- df.list[[g.name]][,anim.cols,drop=FALSE]
+      anim.values[[g.name]] <- unique(unlist(g.data))
+    }
+    olist$time$sequence <- sort(unique(unlist(anim.values)))
     result$time <- olist$time
   }
   ## Finally, copy html/js/json files to out.dir.
