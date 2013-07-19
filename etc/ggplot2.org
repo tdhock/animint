@@ -1,0 +1,44 @@
+Non-exported ggplot2 functions used by animint
+
+The following table describes some ggplot2 which have proven useful
+for parsing the ggplot object and extracting data in order to make
+interactive animations.
+
+* =ggplot_build(ggplot_object)=
+
+- returns a list with separate data.frames for each panel, scale and
+  coord info, etc. These data.frames have their aes already
+  evaluated. For example, if =aes(x=percent/100)= and your original
+  data.frame had a column named percent, then these data.frames with
+  have a numeric variable named x.
+
+* =coord_transform(coords, data, scales)=
+
+- =coords= is a =list(limits=list(x=NULL,y=NULL))= with class
+  e.g. =c("cartesian","coord")=, from =ggplot_build()$plot$coord=.
+
+- data is a data.frame with columns e.g. x, y, colour, from
+  =ggplot_build()$data=.
+
+- scales is a list of 12 from =ggplot_build()$ranges=.
+
+- it returns a data.frame which is more suitable for plotting. For
+  example, if coord has class "flip" then the x and y axes are
+  flipped.
+
+* =ggplot2:::scale_map(sc, ggplot2:::scale_breaks(sc))=
+
+- Used to get scales for maps.
+
+* =plot_theme(ggplot_object)=
+
+- We do not actually use it but we could to get the non-data info.
+
+* =stairstep(df)=
+
+- Used in =geom_step=, returns a data.frame that can be rendered as a
+  path.
+
+* =guides_merge=, =guides_train=, =guides_geom=
+
+- Used to get information about which legends to render.
