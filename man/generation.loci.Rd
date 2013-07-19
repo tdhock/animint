@@ -16,6 +16,8 @@ Evolution simulation
     \item{\code{population}}{a numeric vector}
     \item{\code{generation}}{a numeric vector}
     \item{\code{frequency}}{a numeric vector}
+    \item{\code{color}}{factor: blue, red, or neutral}
+    \item{\code{type}}{factor: balancing, none, or positive}
   }
 }
 \source{
