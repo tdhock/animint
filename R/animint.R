@@ -400,8 +400,9 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
     }
   }
   if(is.list(olist$time)){
-    stopifnot(is.numeric(olist$ms))
-    stopifnot(length(olist$ms)==1)
+    ms <- olist$time$ms
+    stopifnot(is.numeric(ms))
+    stopifnot(length(ms)==1)
     ## NOTE: although we do not use olist$ms for anything in the R
     ## code, it is used to control the number of milliseconds between
     ## animation frames in the JS code.
