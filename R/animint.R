@@ -481,7 +481,7 @@ getLegendList <- function(plistextra){
 
 #' Function to get legend information for each scale
 #' @param mb single entry from ggplot2:::guides_merge() list of legend data
-#' @i index of scale containing legend-generating information. Position scales do not generate legends, and must be excluded from possible indices.
+#' @return list of legend information, NULL if guide=FALSE.
 getLegend <- function(mb){
   guidetype <- mb$name
   geoms <- sapply(mb$geoms, function(i) i$geom$objname)
