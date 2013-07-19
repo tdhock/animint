@@ -1,22 +1,23 @@
-| Name          | main idea           | level | learning                       | custom plots | animation | interaction |
-|---------------+---------------------+-------+--------------------------------+--------------+-----------+-------------|
-| animint       | ggplot -> D3        | high  | clickSelects, showSelected     | R            | yes       | yes         |
-| [[http://ramnathv.github.io/rCharts/][rCharts]]       | R -> html/svg/js    | high  | rPlot()                        | html/js      |           | yes         |
-| [[http://rwiki.sciviews.org/doku.php?id%3Ddevelopers:projects:gsoc2013:right][RIGHT]]         | R -> html/svg/js    | high  | plot.RIGHT(), hist.RIGHT()     |              |           | yes         |
-| [[https://github.com/nachocab/clickme/wiki][clickme]]       | R -> html/svg/js    | high  | clickme(), ractives            | html/js      |           | yes         |
-| [[http://cran.r-project.org/web/packages/googleVis/index.html][googleVis]]     | R -> html/js        | high  | gvisMotionChart(), gvisMerge() | no           | yes       | yes         |
-| [[https://github.com/rstudio/gigvis][gigvis]]        | R -> json/vega      | high  | node(), mark_point()           | R            |           | yes         |
-| [[https://github.com/ggobi/cranvas][cranvas]]       | Qt                  | high  | qscatter(), qpar()             | no           | yes          | yes         |
-| [[http://www.rforge.net/Acinonyx/][Acinonyx]]      | OpenGL              | high  | iplot(), ilines(), idev()      |              | no        | yes         |
-| [[http://www.rforge.net/canvas/][canvas]]        | R -> <canvas>       | low   | easy, canvas() gr. device      | R            | no        | no          |
-| [[https://github.com/yihui/animation][animation]]     | R plots in sequence | low   | ani.start(), saveHTML()        | R            | yes       | no          |
-| [[http://www.omegahat.org/SVGAnnotation/SVGAnnotationPaper/SVGAnnotationPaper.html][SVGAnnotation]] | R -> SVG            | low   | addECMAScripts()               | html/svg/js  | yes       | yes         |
-| [[http://sjp.co.nz/projects/gridsvg/][gridSVG]]       | R -> SVG            | low   | grid.animate(), grid.script()  | R/js         | yes       | yes         |
-|---------------+---------------------+-------+--------------------------------+--------------+-----------+-------------|
-| [[http://www.rstudio.com/shiny/][Shiny]]         | R server            | high  | LOTS, shinyServer(), shinyUI() | R            | no        | widgets     |
-| [[http://rapache.net/][RApache]]       | R server            | low   | cat(html), GET, POST           | R            | no        | widgets     |
-|---------------+---------------------+-------+--------------------------------+--------------+-----------+-------------|
-| [[http://polychartjs.com/][polychart]]     | js -> SVG           | high  | polyjs.chart(spec)             | js             |  yes         | yes         |
-| [[http://trifacta.github.io/vega/][Vega]]          | json -> D3          | high  | LOTS -> json format!           | json         |           | yes         |
-| [[http://d3js.org/][D3]]            | js -> SVG           | low   | d3.select(), selection.data()  | js           | yes       | yes         |
-| [[http://kineticjs.com/][KineticJS]]     | js -> <canvas>      | low   | Kinetic.Stage() Kinetic.Rect() | js           | yes       | yes         |
+| Name          | main idea           | level | learning                              | custom plots | animation | interaction |
+|---------------+---------------------+-------+---------------------------------------+--------------+-----------+-------------|
+| animint       | ggplot -> D3        | high  | clickSelects, showSelected            | R            | yes       | yes         |
+| [[http://ramnathv.github.io/rCharts/][rCharts]]       | R -> html/svg/js    | high  | rPlot()                               | html/js      |           | yes         |
+| [[http://rwiki.sciviews.org/doku.php?id%3Ddevelopers:projects:gsoc2013:right][RIGHT]]         | R -> html/svg/js    | high  | plot.RIGHT(), hist.RIGHT()            |              |           | yes         |
+| [[https://github.com/nachocab/clickme/wiki][clickme]]       | R -> html/svg/js    | high  | clickme(), ractives                   | html/js      |           | yes         |
+| [[http://cran.r-project.org/web/packages/googleVis/index.html][googleVis]]     | R -> html/js        | high  | gvisMotionChart(), gvisMerge()        | no           | yes       | yes         |
+| [[https://github.com/rstudio/gigvis][gigvis]]        | R -> json/vega      | high  | node(), mark_point()                  | R            |           | yes         |
+| [[https://github.com/ggobi/cranvas][cranvas]]       | Qt                  | high  | qscatter(), qpar()                    | no           | yes       | yes         |
+| [[http://www.rforge.net/Acinonyx/][Acinonyx]]      | OpenGL              | high  | iplot(), ilines(), idev()             |              | no        | yes         |
+| [[http://www.rforge.net/canvas/][canvas]]        | R -> <canvas>       | low   | easy, canvas() gr. device             | R            | no        | no          |
+| [[https://github.com/yihui/animation][animation]]     | R plots in sequence | low   | ani.start(), saveHTML()               | R            | yes       | no          |
+| [[http://www.omegahat.org/SVGAnnotation/SVGAnnotationPaper/SVGAnnotationPaper.html][SVGAnnotation]] | R -> SVG            | low   | addECMAScripts()                      | html/svg/js  | yes       | yes         |
+| [[https://r-forge.r-project.org/scm/viewvc.php/pkg/?root=svgmaps][svgmaps]]       | R -> SVG            | low   | igeom_polygon(aes(tooltip,highlight)) | html/svg/js  | yes       | yes         |
+| [[http://sjp.co.nz/projects/gridsvg/][gridSVG]]       | R -> SVG            | low   | grid.animate(), grid.script()         | R/js         | yes       | yes         |
+|---------------+---------------------+-------+---------------------------------------+--------------+-----------+-------------|
+| [[http://www.rstudio.com/shiny/][Shiny]]         | R server            | high  | LOTS, shinyServer(), shinyUI()        | R            | no        | widgets     |
+| [[http://rapache.net/][RApache]]       | R server            | low   | cat(html), GET, POST                  | R            | no        | widgets     |
+|---------------+---------------------+-------+---------------------------------------+--------------+-----------+-------------|
+| [[http://polychartjs.com/][polychart]]     | js -> SVG           | high  | polyjs.chart(spec)                    | js           | yes       | yes         |
+| [[http://trifacta.github.io/vega/][Vega]]          | json -> D3          | high  | LOTS -> json format!                  | json         |           | yes         |
+| [[http://d3js.org/][D3]]            | js -> SVG           | low   | d3.select(), selection.data()         | js           | yes       | yes         |
+| [[http://kineticjs.com/][KineticJS]]     | js -> <canvas>      | low   | Kinetic.Stage() Kinetic.Rect()        | js           | yes       | yes         |
