@@ -11,7 +11,7 @@
 | [[http://www.rforge.net/canvas/][canvas]]        | R -> <canvas>       | low   | easy, canvas() gr. device             | R            | no        | no          |
 | [[https://github.com/yihui/animation][animation]]     | R plots in sequence | low   | ani.start(), saveHTML()               | R            | yes       | no          |
 | [[http://www.omegahat.org/SVGAnnotation/SVGAnnotationPaper/SVGAnnotationPaper.html][SVGAnnotation]] | R -> SVG            | low   | addECMAScripts()                      | html/svg/js  | yes       | yes         |
-| [[https://r-forge.r-project.org/scm/viewvc.php/pkg/?root=svgmaps][svgmaps]]       | R -> SVG            | low   | igeom_polygon(aes(tooltip,highlight)) | html/svg/js  | yes       | yes         |
+| [[https://r-forge.r-project.org/scm/viewvc.php/pkg/?root=svgmaps][svgmaps]]       | R -> SVG            | low   | igeom_polygon(aes(tooltip,highlight)) | R            | no     | yes         |
 | [[http://sjp.co.nz/projects/gridsvg/][gridSVG]]       | R -> SVG            | low   | grid.animate(), grid.script()         | R/js         | yes       | yes         |
 |---------------+---------------------+-------+---------------------------------------+--------------+-----------+-------------|
 | [[http://www.rstudio.com/shiny/][Shiny]]         | R server            | high  | LOTS, shinyServer(), shinyUI()        | R            | no        | widgets     |
