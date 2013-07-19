@@ -2,12 +2,13 @@
 \alias{layer2list}
 \title{Convert a layer to a list. Called from gg2list()}
 \usage{
-  layer2list(i, plistextra)
+  layer2list(l, d, ranges)
 }
 \arguments{
-  \item{i}{index of layer, in order of call.}
+  \item{l}{one layer of the ggplot object}
 
-  \item{plistextra}{output from ggplot2::ggplot_build(p)}
+  \item{d}{one layer of calculated data from
+  ggplot2::ggplot_build(p)}
 }
 \value{
   list representing a layer, with corresponding aesthetics,

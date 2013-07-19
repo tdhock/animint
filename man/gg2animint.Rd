@@ -36,21 +36,26 @@
   this package) \item segment \item hline \item vline \item
   bar \item text \item tile \item raster \item ribbon \item
   abline \item density \item path \item polygon \item
-  histogram \item violin \item linerange \item step }
-  Currently unsupported (TODO): \itemize{ \item area \item
-  freqpoly \item smooth \item rug \item quantile \item
-  boxplot \item crossbar \item pointrange \item dotplot
-  \item contour \item density2d \item bin2d \item hex \item
-  map } Supported scales: \itemize{ \item alpha, \item
-  fill/colour (brewer, gradient, identity, manual) \item
-  linetype \item x and y axis scales, manual break
-  specification, label formatting \item area \item size }
-  Unsupported scales: \itemize{ \item shape. Open and
-  closed circles can be represented by manipulating fill
-  and colour scales and using default (circle) points, but
-  d3 does not support many R shape types, so mapping
-  between the two is difficult. } TODO: \itemize{ \item add
-  legends }
+  histogram \item violin \item linerange \item step \item
+  contour \item density2d \item area \item freqpoly }
+  Unsupported geoms: \itemize{ \item rug \item dotplot
+  \item hex \item quantile - should *theoretically* work
+  but in practice does not work \item smooth - can be
+  created using geom_line and geom_ribbon \item boxplot -
+  can be created using geom_rect and geom_segment \item
+  crossbar - can be created using geom_rect and
+  geom_segment \item pointrange - can be created using
+  geom_linerange and geom_point \item bin2d - bin using
+  ddply() and then use geom_tile() \item map - can be
+  created using geom_polygon or geom_path } Supported
+  scales: \itemize{ \item alpha, \item fill/colour (brewer,
+  gradient, identity, manual) \item linetype \item x and y
+  axis scales, manual break specification, label formatting
+  \item area \item size } Unsupported scales: \itemize{
+  \item shape. Open and closed circles can be represented
+  by manipulating fill and colour scales and using default
+  (circle) points, but d3 does not support many R shape
+  types, so mapping between the two is difficult. }
 }
 \examples{
 library(animint)
