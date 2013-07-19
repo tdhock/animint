@@ -468,7 +468,7 @@ getLegendList <- function(plistextra){
     } 
   
   position <- theme$legend.position
-  guides = defaults(plot$guides, guides(colour="legend", fill="legend"))
+  guides = plyr::defaults(plot$guides, guides(colour="legend", fill="legend"))
   labels = plot$labels
   gdefs <- ggplot2:::guides_train(scales = scales, theme = theme, guides = guides, labels = labels)
   if (length(gdefs) != 0) {
