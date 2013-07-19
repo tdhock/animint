@@ -1,6 +1,6 @@
 Package: animint
 Maintainer: Toby Dylan Hocking <toby@sg.cs.titech.ac.jp>
-Author: Toby Dylan Hocking
+Author: Toby Dylan Hocking, Susan VanderPlas
 Version: 1.0
 License: GPL-3
 Title: Interactive animations
