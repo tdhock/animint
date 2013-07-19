@@ -18,7 +18,7 @@ names(data) <- c("ID", "year", "month", "day", "date", "time", "tz", "state", "f
 continentalUS <- function(lat, long){
   apply(cbind(lat>25.2, lat<49.4, long> -124.7, long< -67.1), 1, prod)
 }
-data3 <- sapply(1:nrow(data), function(i){ 
+data3 <- sapply(1:nrow(data), function(i){ # will do this faster later...
   df <- data[i,]
   # if tornado was <.2 miles long and coords are missing, set start=end or end=start.
   if(df[16]==0 & df[18]!=0 & df[20]<.2){ df[16] = df[18] }
