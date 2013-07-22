@@ -12,7 +12,7 @@ library(ggplot2)
 library(animint)
 
 # url <- "http://www.spc.noaa.gov/wcm/data/1950-2012_torn.csv"
-data <- read.csv("./data/1950-2012_torn.csv", header=FALSE)
+data <- read.csv("../data/1950-2012_torn.csv", header=FALSE)
 names(data) <- c("ID", "year", "month", "day", "date", "time", "tz", "state", "fips", "state.tnum", "f", "injuries", "fatalities", "propertyLoss", "cropLoss", "startLat", "startLong", "endLat", "endLong", "trackLength", "trackWidth", "numStatesAffected", "stateNumber", "segmentNumber", "FipsCounty1", "FipsCounty2", "FipsCounty3", "FipsCounty4")
 
 continentalUS <- function(lat, long){
@@ -64,6 +64,50 @@ statemap <- ggplot() + geom_polygon(data=states_map, aes(x=long, y=lat, group=gr
   scale_alpha_continuous("Strength (F or EF scale)", range=c(.3, 1)) + 
   ggtitle("Tornado Paths, 1950-2006")
 
+## BUG! interactive version... geom_bar + stat_bin does not work!
+USpolygons <- states_map
+UStornadoes <- data3
+tornado.bar <- list(map=ggplot()+
+     geom_polygon(aes(x=long, y=lat, group=group),
+                  data=USpolygons, fill="black", colour="grey") +
+     geom_segment(aes(x=startLong, y=startLat, xend=endLong, yend=endLat,
+                      showSelected=year),
+                  colour="#55B1F7", data=UStornadoes),
+     ts=ggplot()+
+     geom_bar(aes(year, clickSelects=year),data=UStornadoes))
+gg2animint(tornado.bar, "tornado-bar")
+
+## OK: interactive version with lines instead of bars!
+UStornadoCounts <-
+  ddply(UStornadoes, .(state, year), summarize, count=length(state))
+tornado.ts <-
+  list(map=ggplot()+
+       geom_polygon(aes(x=long, y=lat, group=group, clickSelects=state),
+                    data=USpolygons, fill="black", colour="grey") +
+       geom_segment(aes(x=startLong, y=startLat, xend=endLong, yend=endLat,
+                        showSelected=year),
+                    colour="#55B1F7", data=UStornadoes),
+       ts=ggplot()+
+       make_tallrect("year", UStornadoCounts)+
+       geom_line(aes(year, count, clickSelects=state, group=state),
+                 data=UStornadoCounts, alpha=3/5, size=4))
+gg2animint(tornado.ts, "tornado")
+
+## TODO: why doesn't this animation work?
+tornado.anim <-
+  list(map=ggplot()+
+       geom_polygon(aes(x=long, y=lat, group=group, clickSelects=state),
+                    data=USpolygons, fill="black", colour="grey") +
+       geom_segment(aes(x=startLong, y=startLat, xend=endLong, yend=endLat,
+                        showSelected=year),
+                    colour="#55B1F7", data=UStornadoes),
+       ts=ggplot()+
+       make_tallrect("year", UStornadoCounts)+
+       geom_line(aes(year, count, clickSelects=state, group=state),
+                 data=UStornadoCounts, alpha=3/5, size=4),
+       time=list(variable="year",ms=2000))
+gg2animint(tornado.ts, "tornado-anim")
+
 # Works with geom_freqpoly
 timehist <- ggplot() + geom_freqpoly(data=data3, aes(x=year, group=f, fill=f, colour=f)) + xlab("Time") + ylab("Recorded Tornadoes") + ggtitle("Recorded Tornadoes over Time")
 
@@ -71,6 +115,7 @@ statehist <- ggplot() + geom_freqpoly(data=data3, aes(x=state, group=factor(f), 
 
 gg2animint(list(mapa=timehist))
 gg2animint(list(mapa=statehist))
+gg2animint(list(mapa=statemap))
 
 
 timehist <- ggplot() + geom_histogram(data=data3, aes(x=year, group=f, fill=f, colour=f)) + xlab("Time") + ylab("Recorded Tornadoes") + ggtitle("Recorded Tornadoes over Time")
