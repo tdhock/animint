@@ -4,8 +4,8 @@ Author: Toby Dylan Hocking, Susan VanderPlas
 Version: 1.0
 License: GPL-3
 Title: Interactive animations
-Description: Interactive animations can be defined using the
-    clickSelects and showSelected aesthetics.
+Description: An interactive animations can be defined using a list of
+ ggplots with clickSelects and showSelected aesthetics.
 Depends:
     RJSONIO,
     ggplot2,
