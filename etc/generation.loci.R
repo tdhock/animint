@@ -1,5 +1,5 @@
 ## Make some data that represent an evolution simulation.
-works_with_R("2.15.2",nicholsonppp="1.0",reshape2="1.2.2",ggplot2="0.9.3")
+works_with_R("3.0.1",nicholsonppp="1.0",reshape2="1.2.2",ggplot2="0.9.3.1")
 
 set.seed(1)
 a <- sim.drift.selection(s=0.1,generations=100)
@@ -26,9 +26,13 @@ merged <- with(test,{
              sorted.id=sorted.s$sorted.id)
 })
 
-generation.loci <- with(merged,{
-  data.frame(locus=sorted.id,population,generation,frequency=value)
+type.info <- sorted.s[,c("locus","type")]
+with.type <- merge(merged, type.info)
+generation.loci <- with(with.type,{
+  data.frame(locus=sorted.id,population,generation,frequency=value,color,type)
 })
+generation.loci <-
+  generation.loci[with(generation.loci,order(locus,population,generation)),]
 save(generation.loci,file=file.path("..","data","generation.loci.RData"),
      compress="xz")
 

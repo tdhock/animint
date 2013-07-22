@@ -19,6 +19,39 @@ two.selectors.not.animated <-
   )
 gg2animint(two.selectors.not.animated)
 
+## Example: 2 plots, 2 selectors, with color legends.
+colormap <- c(blue="blue",red="red",ancestral="black",neutral="grey30")
+ancestral <- subset(generation.loci,population==1 & generation==1)
+ancestral$color <- "ancestral"
+two.selectors.color <- 
+  list(ts=ggplot()+
+       make_tallrect("generation", generation.loci)+
+       geom_text(aes(generation,frequency,showSelected=locus,
+                     label=sprintf("locus %d",locus)),
+                 data=data.frame(loci,generation=50,frequency=1.05))+
+       scale_colour_manual(values=colormap)+
+       geom_line(aes(generation, frequency, group=population,
+                     colour=color, showSelected=locus),
+                 data=generation.loci)+
+       geom_point(aes(generation, frequency, showSelected=locus),
+                  data=ancestral),
+       loci=ggplot()+
+       make_tallrect("locus", generation.loci)+
+       ## TODO: why do we have to specify color AND fill to get the
+       ## points and legend to look right?
+       scale_fill_manual(values=colormap)+
+       scale_colour_manual(values=colormap)+
+       geom_point(aes(locus, frequency, colour=color, fill=color,
+                      showSelected=generation),
+                  data=generation.loci, pch=21)+
+       geom_point(aes(locus, frequency, colour=color, fill=color),
+                  data=ancestral, pch=21)+
+       geom_text(aes(locus,frequency,showSelected=generation,
+                     label=sprintf("generation %d",generation)),
+                 data=data.frame(generations,locus=35,frequency=1)),
+       duration=list(generation=1000))
+gg2animint(two.selectors.color)
+
 ## Example: 3 plots, 1 selector.
 first <- subset(generation.loci,generation==1)
 ancestral <- do.call(rbind,lapply(split(first,first$locus),with,{
