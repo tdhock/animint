@@ -417,7 +417,11 @@ var animint = function (to_select, json_file) {
             var one_row = one_group[0]; // take color for first value in the group
             return (get_fill(one_row));
           })
-          .style("stroke-width", size)
+          .style("stroke-width", function (group_info) {
+            var one_group = data[group_info.value];
+            var one_row = one_group[0]; // take size for first value in the group
+            return (get_size(one_row));
+          })
           .style("stroke", function (group_info) {
             var one_group = data[group_info.value];
             var one_row = one_group[0]; // take color for first value in the group
