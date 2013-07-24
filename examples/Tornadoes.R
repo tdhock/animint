@@ -37,6 +37,8 @@ data2$endLong[idx] <- data2$startLong[idx]
 data2$time <- data2$year + (data2$month-.5)/12
 save("data2", file="./data/Tornadoes.RData")
 
+load("../data/Tornadoes.RData")
+
 data3 <- subset(data2, continentalUS(startLat, startLong) & continentalUS(endLat, endLong) & f>=0)
 
 states_map <- map_data("state")
