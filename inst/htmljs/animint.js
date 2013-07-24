@@ -113,55 +113,44 @@ var animint = function (to_select, json_file) {
     var xaxislabs = [];
     var yaxisvals = [];
     var yaxislabs = [];
-    if (isArray(p_info.axis.x)) {
-      p_info.axis.x.forEach(function (d) {
-        xaxisvals.push(d);
-      });
-      if(p_info.axis.xlab){
-        p_info.axis.xlab.forEach(function (d) {
-          xaxislabs.push(d);
-          // push each label provided into the array
-        });
-      } else {
-        p_info.axis.x.forEach(function (d) {
-          xaxislabs.push(""); 
-          // push a blank string to the array for each axis tick 
-          // if the specified label is null
-        });
-      }
-    } else {
-      xaxisvals.push(p_info.axis.x);
-      if(p_info.axis.xlab){
-        xaxislabs.push(p_info.axis.xlab);
-      } else {
-        xaxislabs.push("");
-      }
-    } 
-    if (isArray(p_info.axis.y)) {
-      p_info.axis.y.forEach(function (d) {
-        yaxisvals.push(d);
-      });
-      if(p_info.axis.ylab){
-        p_info.axis.ylab.forEach(function (d) {
-          yaxislabs.push(d);
-          // push each label provided into the array
-        });
-      } else {
-        p_info.axis.y.forEach(function (d) {
-          yaxislabs.push(""); 
-          // push a blank string to the array for each axis tick 
-          // if the specified label is null
-        });
-      }
     
-    } else {
-      yaxisvals.push(p_info.axis.y);
-      if(p_info.axis.ylab){
-        yaxislabs.push(p_info.axis.ylab);
+    var axislabs = function(breaks, labs, axis){
+      if(axis=="x"){
+        outbreaks = xaxisvals;
+        outlabs = xaxislabs;
       } else {
-        yaxislabs.push("");
+        outbreaks = yaxisvals;
+        outlabs = yaxislabs;
+      } // set appropriate variable names
+      
+      if (isArray(breaks)) {
+        breaks.forEach(function (d) {
+          outbreaks.push(d);
+        });
+        if(labs){
+          labs.forEach(function (d) {
+            outlabs.push(d);
+            // push each label provided into the array
+          });
+        } else {
+          breaks.forEach(function (d) {
+            outlabs.push(""); 
+            // push a blank string to the array for each axis tick 
+            // if the specified label is null
+          });
+        }
+      } else {
+        outbreaks.push(breaks);
+        if(labs){
+          outlabs.push(labs);
+        } else {
+          outlabs.push("");
+        }
       }
-    } 
+    }    
+    
+    axislabs(p_info.axis.x, p_info.axis.xlab, "x");
+    axislabs(p_info.axis.y, p_info.axis.ylab, "y");
 
     titlepadding = measureText(p_info.title, 20).height+5;
     axispaddingy = 5 + Math.max.apply(null, yaxislabs.map(function(entry){return measureText(entry, 11).width;}));
