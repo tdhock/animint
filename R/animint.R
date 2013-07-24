@@ -250,6 +250,25 @@ layer2list <- function(l, d, ranges){
     g$geom
   }
   
+  ## idea: if geom is calculated, group is not meaningful - 
+  ## it has already been used in the calculation stage, and 
+  ## will only confuse the issue later.
+  if("group"%in%names(g$data)){
+    if(length(unique(g$data$group))==nrow(g$data)){
+      g$data$group <- 1
+      ## if each line in the dataset has a different group,
+      ## reset the group aesthetic to the group = 1 standard
+      ## for geoms that are not calculated.
+      g$aes[names(g$aes)=="group"] <- NULL
+      ## remove group from aes listing
+      subset.vars <- c(some.vars, g$aes[names(g$aes)=="group"])
+      ## recalculate subord/subvars.
+      g$subord <- as.list(names(subset.vars))
+      g$subvars <- as.list(subset.vars)
+    }
+  }
+  
+  
   ## Check g$data for color/fill - convert to hexadecimal so JS can parse correctly.
   for(color.var in c("colour", "color", "fill")){
     if(color.var %in% names(g$data)){
