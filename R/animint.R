@@ -64,15 +64,22 @@ gg2list <- function(p){
   theme.pars <- ggplot2:::plot_theme(p)  
   
   ## TODO: Allow setting these elements as NULL
+  is.blank <- function(x){
+    "element_blank"%in%attr(x,"class")
+  }
   plist$axis <- list(
     x = plistextra$panel$ranges[[1]]$x.major,
-    xlab = plistextra$panel$ranges[[1]]$x.labels,
+    xlab = if(is.blank(theme.pars$axis.text.x)) NULL else plistextra$panel$ranges[[1]]$x.labels,
     xrange = plistextra$panel$ranges[[1]]$x.range,
-    xname = plistextra$plot$labels$x,
+    xname = if(is.blank(theme.pars$axis.title.x)) "" else plistextra$plot$labels$x,
+    xline = !is.blank(ggplot2::calc_element("axis.line.x", p$theme)),
+    xticks = !is.blank(ggplot2::calc_element("axis.ticks.x", p$theme)),
     y = plistextra$panel$ranges[[1]]$y.major,
-    ylab = plistextra$panel$ranges[[1]]$y.labels,
+    ylab = if(is.blank(theme.pars$axis.text.y)) NULL else plistextra$panel$ranges[[1]]$y.labels,
     yrange = plistextra$panel$ranges[[1]]$y.range,
-    yname = plistextra$plot$labels$y
+    yname = if(is.blank(theme.pars$axis.title.y)) "" else plistextra$plot$labels$y,
+    yline = !is.blank(ggplot2::calc_element("axis.line.y", p$theme)),
+    yticks=!is.blank(ggplot2::calc_element("axis.ticks.y", p$theme))
   )
   # Flip labels if coords are flipped - transform does not take care of this.
   # I wonder if there is a better way to do this, though...?
@@ -87,7 +94,12 @@ gg2list <- function(p){
     plist$legend <- plist$legend[which(sapply(plist$legend, function(i) length(i)>0))]
   }  # only pass out legends that have guide = "legend" or guide="colorbar"
   
-  plist$title <- plistextra$plot$labels$title
+  if("element_blank"%in%attr(theme.pars$axis.title, "class")){
+    plist$title <- ""
+  } else {
+    plist$title <- plistextra$plot$labels$title
+  }
+  
   plist$options <- list(width=400,height=400)
   plist
 }
