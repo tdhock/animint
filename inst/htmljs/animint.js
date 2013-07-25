@@ -20,7 +20,7 @@ var animint = function (to_select, json_file) {
   
   var css = document.createElement('style');
   css.type = 'text/css';
-  styles = [".axis path{fill: none;stroke: black;shape-rendering: crispEdges;}", 
+  var styles = [".axis path{fill: none;stroke: black;shape-rendering: crispEdges;}", 
             ".axis line{fill: none;stroke: black;shape-rendering: crispEdges;}",
             ".axis text {font-family: sans-serif;font-size: 11px;}"];
 
@@ -103,7 +103,7 @@ var animint = function (to_select, json_file) {
     // legends, we put each plot in a table with one row and two
     // columns: tdLeft and tdRight.
       var plot_table = element.append("table")
-	  .style("display", "inline-block")
+	      .style("display", "inline-block")
       ;
       var plot_tr = plot_table.append("tr");
       var tdLeft = plot_tr.append("td");
@@ -241,6 +241,13 @@ var animint = function (to_select, json_file) {
         "," + (-plotdim.ylab.x) + ")")
     // translate coordinates are specified in (-y, -x)
     ;
+    
+    if(!p_info.axis.xline) styles.push("#"+p_name+" #xaxis"+" path{stroke:none;}");
+    if(!p_info.axis.xticks) styles.push("#"+p_name+" #xaxis .tick"+" line{stroke:none;}");
+    if(!p_info.axis.yline) styles.push("#"+p_name+" #yaxis"+" path{stroke:none;}");
+    if(!p_info.axis.yticks) styles.push("#"+p_name+" #yaxis .tick"+" line{stroke:none;}");
+    
+
     svg.append("text")
       .text(p_info.title)
       .attr("class", "title")
@@ -765,16 +772,15 @@ var animint = function (to_select, json_file) {
     }
   }
   
-  // Append style sheet to document head.
-  css.appendChild(document.createTextNode(styles.join(" ")));
-  document.head.appendChild(css);   
-  
   // Download the main description of the interactive plot.
   d3.json(json_file, function (error, response) {
     // Add plots.
     for (var p_name in response.plots) {
       add_plot(p_name, response.plots[p_name]);
       add_legend(p_name, response.plots[p_name]);
+      // Append style sheet to document head.
+      css.appendChild(document.createTextNode(styles.join(" ")));
+      document.head.appendChild(css);   
     }
     // Add selectors.
     for (var s_name in response.selectors) {
