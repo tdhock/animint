@@ -18,6 +18,13 @@ var animint = function (to_select, json_file) {
   var Animation = {};
   this.Animation = Animation;
   
+  var css = document.createElement('style');
+  css.type = 'text/css';
+  styles = [".axis path{fill: none;stroke: black;shape-rendering: crispEdges;}", 
+            ".axis line{fill: none;stroke: black;shape-rendering: crispEdges;}",
+            ".axis text {font-family: sans-serif;font-size: 11px;}"];
+
+ 
   var axispaddingx = 60;
   var axispaddingy = 60;
   var labelpaddingx = 35;
@@ -114,6 +121,7 @@ var animint = function (to_select, json_file) {
     var yaxisvals = [];
     var yaxislabs = [];
     
+    //function to write labels and breaks to their respective arrays
     var axislabs = function(breaks, labs, axis){
       if(axis=="x"){
         outbreaks = xaxisvals;
@@ -195,7 +203,6 @@ var animint = function (to_select, json_file) {
     svg.y_fake = d3.scale.linear()
       .domain([p_info.axis.yrange[1], p_info.axis.yrange[0]])
       .range([plotdim.ystart, plotdim.yend]);
-
     var xaxis = d3.svg.axis()
       .scale(svg.x)
       .tickValues(xaxisvals)
@@ -205,6 +212,7 @@ var animint = function (to_select, json_file) {
       .orient("bottom");
     svg.append("g")
       .attr("class", "axis")
+      .attr("id", "xaxis")
       .attr("transform", "translate(0," + plotdim.yend + ")")
       .call(xaxis)
       .append("text")
@@ -222,6 +230,7 @@ var animint = function (to_select, json_file) {
       .orient("left");
     svg.append("g")
       .attr("class", "axis")
+      .attr("id", "yaxis")
       .attr("transform", "translate(" + (plotdim.xstart) + ",0)")
       .call(yaxis)
       .append("text")
@@ -755,6 +764,11 @@ var animint = function (to_select, json_file) {
       legend_rows.append("td").attr("align", "left").text(function(d){ return d["label"];});
     }
   }
+  
+  // Append style sheet to document head.
+  css.appendChild(document.createTextNode(styles.join(" ")));
+  document.head.appendChild(css);   
+  
   // Download the main description of the interactive plot.
   d3.json(json_file, function (error, response) {
     // Add plots.
