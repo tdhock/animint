@@ -14,5 +14,5 @@ Depends:
     grid
 Collate:
     'animint.R'
-    'geom_tallrect.R'
+    'geoms.R'
     'transformShape.R'

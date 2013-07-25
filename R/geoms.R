@@ -159,3 +159,8 @@ make_tallrect <- function(x.name, data, alpha=1/2){
   geom_tallrect(a, df, alpha=alpha)
 }
 
+### Convenience function for an interactive bar.
+make_bar <- function(x.name, data, alpha=1){
+  stat_summary(aes_string(x=x.name, y=x.name, clickSelects=x.name),
+               data=data, alpha=alpha, fun.y=length, geom="bar")
+}
