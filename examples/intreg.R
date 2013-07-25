@@ -81,7 +81,7 @@ mmir.plot <-
                        data=intreg$selection,
                        alpha=1/2),
        width=list(800),
-       height=list(signal=300,regression=150,error=50,segments=100))
+       height=list(signal=300,regression=150,error=100,segments=100))
 ## This is a normal ggplot of all the data, subsets of which can be
 ## shown by clicking the plots.
 sig.facets <- mmir.plot$sig+
