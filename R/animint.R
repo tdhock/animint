@@ -62,7 +62,8 @@ gg2list <- function(p){
   # grid 0-1 scale). This allows transformations to be used 
   # out of the box, with no additional d3 coding. 
   theme.pars <- ggplot2:::plot_theme(p)  
-
+  
+  ## TODO: Allow setting these elements as NULL
   is.blank <- function(x){
     "element_blank"%in%attr(x,"class")
   }
@@ -78,7 +79,7 @@ gg2list <- function(p){
     yrange = plistextra$panel$ranges[[1]]$y.range,
     yname = if(is.blank(theme.pars$axis.title.y)) "" else plistextra$plot$labels$y,
     yline = !is.blank(ggplot2::calc_element("axis.line.y", p$theme)),
-    yticks=!is.blank(ggplot2::calc_element("axis.ticks.y", p$theme))
+    yticks= !is.blank(ggplot2::calc_element("axis.ticks.y", p$theme))
   )
   # Flip labels if coords are flipped - transform does not take care of this.
   # I wonder if there is a better way to do this, though...?
@@ -266,10 +267,8 @@ layer2list <- function(l, d, ranges){
   ## will only confuse the issue later.
   if("group"%in%names(g$data)){
     if(length(unique(g$data$group))==nrow(g$data)){
-      g$data$group <- 1
       ## if each line in the dataset has a different group,
-      ## reset the group aesthetic to the group = 1 standard
-      ## for geoms that are not calculated.
+      ## reset the group aesthetic for geoms that are not calculated.
       g$aes[names(g$aes)=="group"] <- NULL
       ## remove group from aes listing
       subset.vars <- c(some.vars, g$aes[names(g$aes)=="group"])
@@ -343,6 +342,7 @@ layer2list <- function(l, d, ranges){
 #' \item fill/colour (brewer, gradient, identity, manual)
 #' \item linetype
 #' \item x and y axis scales, manual break specification, label formatting
+#' \item x and y axis theme elements: axis.line, axis.ticks, axis.text, axis.title can be set to element_blank(); other theme modifications not supported at this time, but would be possible with custom css files.
 #' \item area 
 #' \item size
 #' }
