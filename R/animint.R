@@ -62,8 +62,7 @@ gg2list <- function(p){
   # grid 0-1 scale). This allows transformations to be used 
   # out of the box, with no additional d3 coding. 
   theme.pars <- ggplot2:::plot_theme(p)  
-  
-  ## TODO: Allow setting these elements as NULL
+
   is.blank <- function(x){
     "element_blank"%in%attr(x,"class")
   }
