@@ -265,11 +265,12 @@ layer2list <- function(l, d, ranges){
   ## idea: if geom is calculated, group is not meaningful - 
   ## it has already been used in the calculation stage, and 
   ## will only confuse the issue later.
-  if("group"%in%names(g$data)){
-    if(length(unique(g$data$group))==nrow(g$data)){
-      ## if each line in the dataset has a different group,
-      ## reset the group aesthetic for geoms that are not calculated.
-      g$aes[names(g$aes)=="group"] <- NULL
+  geom.aes.vars = g$aes[which(names(g$aes)%in%c("fill", "colour", "alpha", "size"))]
+  if("group"%in%names(g$data) & length(geom.aes.vars)>0){
+    if(g$aes[["group"]]%in%geom.aes.vars){
+      ## if the group aesthetic is also mapped to another visual aesthetic, 
+      ## then remove the group aesthetic
+      g$aes <- g$aes[-which(names(g$aes)=="group")]
       ## remove group from aes listing
       subset.vars <- c(some.vars, g$aes[names(g$aes)=="group"])
       ## recalculate subord/subvars.
