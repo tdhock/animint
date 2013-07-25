@@ -113,7 +113,8 @@ gg2list <- function(p){
 layer2list <- function(l, d, ranges){
   g <- list(geom=l$geom$objname,
             data=d)
-  g$aes <- sapply(l$mapping, as.character)
+  g$aes <- sapply(l$mapping, function(k) as.character(as.expression(k))) # needed for when group, etc. is an expression
+  
   ## TODO: in these next lines, we set the special animint aesthetics
   ## if for some reason they are not present in the exported
   ## data. e.g. geom_bin(aes(x=var,clickSelects=var)) works with
@@ -266,16 +267,19 @@ layer2list <- function(l, d, ranges){
   ## it has already been used in the calculation stage, and 
   ## will only confuse the issue later.
   geom.aes.vars = g$aes[which(names(g$aes)%in%c("fill", "colour", "alpha", "size"))]
-  if("group"%in%names(g$data) & length(geom.aes.vars)>0){
-    if(g$aes[["group"]]%in%geom.aes.vars){
-      ## if the group aesthetic is also mapped to another visual aesthetic, 
-      ## then remove the group aesthetic
-      g$aes <- g$aes[-which(names(g$aes)=="group")]
-      ## remove group from aes listing
-      subset.vars <- c(some.vars, g$aes[names(g$aes)=="group"])
-      ## recalculate subord/subvars.
-      g$subord <- as.list(names(subset.vars))
-      g$subvars <- as.list(subset.vars)
+  grpidx <- which(names(g$aes)=="group")
+  if(length(grpidx)>0){
+    if(length(geom.aes.vars)>0 & nrow(g$data)!=nrow(l$data)){
+      if(g$aes[grpidx]%in%geom.aes.vars){
+        ## if the group aesthetic is also mapped to another visual aesthetic, 
+        ## then remove the group aesthetic
+        g$aes <- g$aes[-which(names(g$aes)=="group")]
+        ## remove group from aes listing
+        subset.vars <- c(some.vars, g$aes[names(g$aes)=="group"])
+        ## recalculate subord/subvars.
+        g$subord <- as.list(names(subset.vars))
+        g$subvars <- as.list(subset.vars)
+      }
     }
   }
   
