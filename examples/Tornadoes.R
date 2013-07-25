@@ -124,12 +124,13 @@ timehist <- ggplot() + geom_histogram(data=data3, aes(x=year, group=f, fill=f, c
 
 statehist <- ggplot() + geom_histogram(data=data3, aes(x=state, group=interaction(f, state), fill=f, colour=f, weight=weight), stat="bin") + xlab("State") + ylab("Tornadoes per Square Mile") + ggtitle("Recorded Tornadoes by State") + coord_flip()
 
-## how to get gg2animint to play nice with computed stuff... just pass in the computed data without groups specified. So, either user has to compute stuff using ggplot_build or ddply, and then pass into animint, or we figure out how to determine whether group is important or not.
 
 ## Side comment: I still like the bar plot better than the line plot, since there is not a relationship between subsequent observations, as alphabetic ordering of states doesn't have any geographic meaning. A bar plot is much more informative. 
-temp <- ggplot2::ggplot_build(statehist)
-statehist <- ggplot() + geom_rect(data=temp$data[[1]], aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, fill=fill, colour=colour)) + scale_fill_identity() + scale_colour_identity() + scale_x_continuous(breaks=unique(temp$data[[1]]$x), labels=unique(data3$state)) + coord_flip()
-gg2animint(list(mapa=statehist, width=list(420), height=list(600)))
+
+## how to get gg2animint to play nice with computed stuff... just pass in the computed data without groups specified. So, either user has to compute stuff using ggplot_build or ddply, and then pass into animint, or we figure out how to determine whether group is important or not. Attempt at determining importance is implemented in animint.R - if group is a one-to-one function of line number, then remove group from subord, subvars, and aes.
+# temp <- ggplot2::ggplot_build(statehist)
+# statehist <- ggplot() + geom_rect(data=temp$data[[1]], aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, fill=fill, colour=colour)) + scale_fill_identity() + scale_colour_identity() + scale_x_continuous(breaks=unique(temp$data[[1]]$x), labels=unique(data3$state)) + coord_flip()
+# gg2animint(list(mapa=statehist, width=list(420), height=list(600)))
 
 gg2animint(list(mapa=timehist))
 
