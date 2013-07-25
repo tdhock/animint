@@ -66,23 +66,62 @@ statemap <- ggplot() + geom_polygon(data=states_map, aes(x=long, y=lat, group=gr
   scale_alpha_continuous("Strength (F or EF scale)", range=c(.3, 1)) + 
   ggtitle("Tornado Paths, 1950-2006")
 
-## BUG! interactive version... geom_bar + stat_bin does not work!
+## ERROR: geom_bar + stat_bin + clickSelects does not make sense! We
+## should stop with an error!
 USpolygons <- states_map
 UStornadoes <- data3
-tornado.bar <- list(map=ggplot()+
-     geom_polygon(aes(x=long, y=lat, group=group),
-                  data=USpolygons, fill="black", colour="grey") +
-     geom_segment(aes(x=startLong, y=startLat, xend=endLong, yend=endLat,
-                      showSelected=year),
-                  colour="#55B1F7", data=UStornadoes),
-     ts=ggplot()+
-     geom_bar(aes(year, clickSelects=year),data=UStornadoes))
+tornado.bar <-
+  list(map=ggplot()+
+       geom_polygon(aes(x=long, y=lat, group=group),
+                    data=USpolygons, fill="black", colour="grey") +
+       geom_segment(aes(x=startLong, y=startLat, xend=endLong, yend=endLat,
+                        showSelected=year),
+                    colour="#55B1F7", data=UStornadoes),
+       ts=ggplot()+
+       geom_bar(aes(year, clickSelects=year),data=UStornadoes))
 gg2animint(tornado.bar, "tornado-bar")
 
-## OK: interactive version with lines instead of bars!
+## OK: stat_summary + clickSelects ensures unique x values.
+tornado.bar <-
+  list(map=ggplot()+
+       geom_polygon(aes(x=long, y=lat, group=group),
+                    data=USpolygons, fill="black", colour="grey") +
+       geom_segment(aes(x=startLong, y=startLat, xend=endLong, yend=endLat,
+                        showSelected=year),
+                    colour="#55B1F7", data=UStornadoes),
+       ts=ggplot()+
+       stat_summary(aes(year, year, clickSelects=year),
+                    data=UStornadoes, fun.y=length, geom="bar"))
+gg2animint(tornado.bar, "tornado-bar")
+
+## Same plot, using make_bar abbreviation.
+tornado.bar <-
+  list(map=ggplot()+
+       geom_polygon(aes(x=long, y=lat, group=group),
+                    data=USpolygons, fill="black", colour="grey") +
+       geom_segment(aes(x=startLong, y=startLat, xend=endLong, yend=endLat,
+                        showSelected=year),
+                    colour="#55B1F7", data=UStornadoes),
+       ts=ggplot()+
+       make_bar("year", UStornadoes))
+gg2animint(tornado.bar, "tornado-bar")
+
 UStornadoCounts <-
   ddply(UStornadoes, .(state, year), summarize, count=length(state))
-tornado.ts <-
+## OK: select state to show that subset of bars!
+tornado.ts.bar <-
+  list(map=ggplot()+
+       geom_polygon(aes(x=long, y=lat, group=group, clickSelects=state),
+                    data=USpolygons, fill="black", colour="grey") +
+       geom_segment(aes(x=startLong, y=startLat, xend=endLong, yend=endLat,
+                        showSelected=year),
+                    colour="#55B1F7", data=UStornadoes),
+       ts=ggplot()+
+       geom_bar(aes(year, count, clickSelects=year, showSelected=state),
+                data=UStornadoCounts, stat="identity", position="identity"))
+gg2animint(tornado.ts.bar, "tornado-ts-bar")
+## OK: interactive version with lines instead of bars!
+tornado.ts.line <-
   list(map=ggplot()+
        geom_polygon(aes(x=long, y=lat, group=group, clickSelects=state),
                     data=USpolygons, fill="black", colour="grey") +
@@ -93,7 +132,7 @@ tornado.ts <-
        make_tallrect("year", UStornadoCounts)+
        geom_line(aes(year, count, clickSelects=state, group=state),
                  data=UStornadoCounts, alpha=3/5, size=4))
-gg2animint(tornado.ts, "tornado")
+gg2animint(tornado.ts.line, "tornado-ts-line")
 
 ## TODO: why doesn't this animation work?
 tornado.anim <-
