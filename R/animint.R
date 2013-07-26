@@ -69,15 +69,15 @@ gg2list <- function(p){
   }
   plist$axis <- list(
     x = plistextra$panel$ranges[[1]]$x.major,
-    xlab = if(is.blank(theme.pars$axis.text.x)) NULL else plistextra$panel$ranges[[1]]$x.labels,
+    xlab = if(is.blank(ggplot2::calc_element("axis.text.x", p$theme))) NULL else plistextra$panel$ranges[[1]]$x.labels,
     xrange = plistextra$panel$ranges[[1]]$x.range,
-    xname = if(is.blank(theme.pars$axis.title.x)) "" else plistextra$plot$labels$x,
+    xname = if(is.blank(ggplot2::calc_element("axis.title.x", p$theme))) "" else plistextra$plot$labels$x,
     xline = !is.blank(ggplot2::calc_element("axis.line.x", p$theme)),
     xticks = !is.blank(ggplot2::calc_element("axis.ticks.x", p$theme)),
     y = plistextra$panel$ranges[[1]]$y.major,
-    ylab = if(is.blank(theme.pars$axis.text.y)) NULL else plistextra$panel$ranges[[1]]$y.labels,
+    ylab = if(is.blank(ggplot2::calc_element("axis.text.y", p$theme))) NULL else plistextra$panel$ranges[[1]]$y.labels,
     yrange = plistextra$panel$ranges[[1]]$y.range,
-    yname = if(is.blank(theme.pars$axis.title.y)) "" else plistextra$plot$labels$y,
+    yname = if(is.blank(ggplot2::calc_element("axis.title.y", p$theme))) "" else plistextra$plot$labels$y,
     yline = !is.blank(ggplot2::calc_element("axis.line.y", p$theme)),
     yticks= !is.blank(ggplot2::calc_element("axis.ticks.y", p$theme))
   )
