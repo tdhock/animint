@@ -35,22 +35,22 @@
  "geom1_rect_g3" 
 ],
 "scales": {
- "fill": [ "grey50", "#4A9AD8", "#3D7FB4", "#306591", "#234B6F", "#17334F" ] 
+ "fill": [ "grey50", "#4690CB", "#326A97", "#204567", "grey50" ] 
 },
 "options": {
  "width":    400,
 "height":    400 
 },
 "axis": {
- "x": [ 0.068182, 0.29545, 0.52273,   0.75, 0.97727 ],
-"xlab": [ "-10", "-5", "0", "5", "10" ],
-"xrange": [  -11.5,   10.5 ],
+ "x": [ 0.020202, 0.27273, 0.52525, 0.77778 ],
+"xlab": [ "-10", "-5", "0", "5" ],
+"xrange": [  -10.4,    9.4 ],
 "xname": "x",
 "xline": true,
 "xticks": true,
-"y": [ 0.02862, 0.19697, 0.36532, 0.53367, 0.70202, 0.87037 ],
-"ylab": [ "-15", "-10", "-5", "0", "5", "10" ],
-"yrange": [ -15.85,  13.85 ],
+"y": [ 0.1633, 0.33165,    0.5, 0.66835, 0.8367 ],
+"ylab": [ "-10", "-5", "0", "5", "10" ],
+"yrange": [ -14.85,  14.85 ],
 "yname": "y",
 "yline": true,
 "yticks": true 
@@ -63,35 +63,21 @@
 "title": "n",
 "entries": [
  {
- "polygonfill": "#17334F",
-"polygonsize":    0.1,
-"polygonlinetype":      1,
-"polygonorder": 5,
-"label": [ "25" ] 
-},
-{
- "polygonfill": "#234B6F",
-"polygonsize":    0.1,
-"polygonlinetype":      1,
-"polygonorder": 4,
-"label": [ "20" ] 
-},
-{
- "polygonfill": "#306591",
+ "polygonfill": "#204567",
 "polygonsize":    0.1,
 "polygonlinetype":      1,
 "polygonorder": 3,
 "label": [ "15" ] 
 },
 {
- "polygonfill": "#3D7FB4",
+ "polygonfill": "#326A97",
 "polygonsize":    0.1,
 "polygonlinetype":      1,
 "polygonorder": 2,
 "label": [ "10" ] 
 },
 {
- "polygonfill": "#4A9AD8",
+ "polygonfill": "#4690CB",
 "polygonsize":    0.1,
 "polygonlinetype":      1,
 "polygonorder": 1,
