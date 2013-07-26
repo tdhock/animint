@@ -66,7 +66,7 @@ tornado.bar <-
                         showSelected=year),
                     colour="#55B1F7", data=UStornadoes),
        ts=ggplot()+
-       make_bar("year", UStornadoes))
+       make_bar(UStornadoes, "year"))
 gg2animint(tornado.bar, "tornado-bar")
 
 UStornadoCounts <-
@@ -74,12 +74,14 @@ UStornadoCounts <-
 ## OK: select state to show that subset of bars!
 tornado.ts.bar <-
   list(map=ggplot()+
+       make_text(UStornadoCounts, -100, 50, "year", "Tornadoes in %d")+
        geom_polygon(aes(x=long, y=lat, group=group, clickSelects=state),
                     data=USpolygons, fill="black", colour="grey") +
        geom_segment(aes(x=startLong, y=startLat, xend=endLong, yend=endLat,
                         showSelected=year),
                     colour="#55B1F7", data=UStornadoes),
        ts=ggplot()+
+       make_text(UStornadoes, 1980, 200, "state")+
        geom_bar(aes(year, count, clickSelects=year, showSelected=state),
                 data=UStornadoCounts, stat="identity", position="identity"))
 gg2animint(tornado.ts.bar, "tornado-ts-bar")
@@ -92,7 +94,7 @@ tornado.ts.line <-
                         showSelected=year),
                     colour="#55B1F7", data=UStornadoes),
        ts=ggplot()+
-       make_tallrect("year", UStornadoCounts)+
+       make_tallrect(UStornadoCounts, "year")+
        geom_line(aes(year, count, clickSelects=state, group=state),
                  data=UStornadoCounts, alpha=3/5, size=4))
 gg2animint(tornado.ts.line, "tornado-ts-line")
@@ -106,7 +108,7 @@ tornado.anim <-
                         showSelected=year),
                     colour="#55B1F7", data=UStornadoes),
        ts=ggplot()+
-       make_tallrect("year", UStornadoCounts)+
+       make_tallrect(UStornadoCounts, "year")+
        geom_line(aes(year, count, clickSelects=state, group=state),
                  data=UStornadoCounts, alpha=3/5, size=4),
        time=list(variable="year",ms=2000))

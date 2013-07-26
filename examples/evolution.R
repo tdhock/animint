@@ -25,7 +25,7 @@ ancestral <- subset(generation.loci,population==1 & generation==1)
 ancestral$color <- "ancestral"
 two.selectors.color <- 
   list(ts=ggplot()+
-       make_tallrect("generation", generation.loci)+
+       make_tallrect(generation.loci, "generation")+
        geom_text(aes(generation,frequency,showSelected=locus,
                      label=sprintf("locus %d",locus)),
                  data=data.frame(loci,generation=50,frequency=1.05))+
@@ -36,7 +36,7 @@ two.selectors.color <-
        geom_point(aes(generation, frequency, showSelected=locus),
                   data=ancestral),
        loci=ggplot()+
-       make_tallrect("locus", generation.loci)+
+       make_tallrect(generation.loci, "locus")+
        ## TODO: why do we have to specify color AND fill to get the
        ## points and legend to look right?
        scale_fill_manual(values=colormap)+

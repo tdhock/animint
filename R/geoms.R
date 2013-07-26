@@ -138,7 +138,7 @@ geom_tallrect <- function(mapping=NULL, data=NULL, stat="identity", position="id
 ##'             data=worldPop, size=4)
 ##' print(popPlot)
 ##' gg2animint(list(popPlot=popPlot))
-make_tallrect <- function(x.name, data, alpha=1/2){
+make_tallrect <- function(data, x.name, alpha=1/2){
   stopifnot(is.data.frame(data))
   stopifnot(is.character(x.name))
   stopifnot(length(x.name)==1)
@@ -160,7 +160,44 @@ make_tallrect <- function(x.name, data, alpha=1/2){
 }
 
 ### Convenience function for an interactive bar.
-make_bar <- function(x.name, data, alpha=1){
+make_bar <- function(data, x.name, alpha=1){
+  stopifnot(is.data.frame(data))
+  stopifnot(is.character(x.name))
+  stopifnot(length(x.name)==1)
+  x <- data[,x.name]
+  stopifnot(is.numeric(x))
   stat_summary(aes_string(x=x.name, y=x.name, clickSelects=x.name),
                data=data, alpha=alpha, fun.y=length, geom="bar")
+}
+
+### Convenvience function for a showSelected plot label.
+make_text <- function(data, x, y, label.var, format=NULL){
+  stopifnot(is.data.frame(data))
+  stopifnot(length(x)==1)
+  stopifnot(length(y)==1)
+  ## TODO: position based on the data?
+  ## if(is.character(x) && x %in% names(data)){
+  ##   x <- data[,x]
+  ##   x <- (min(x)+max(x))/2
+  ## }
+  ## if(is.character(y) && y %in% names(data)){
+  ##   y <- max(data[,y])
+  ## }
+  data <- unique(data[,label.var,drop=FALSE])
+  data$x <- x
+  data$y <- y
+  if(is.null(format)){
+    data[,label.var] <- as.character(data[,label.var])
+    format <- paste(label.var,"= %s")
+  }
+  if(is.character(format)){
+    fstring <- format
+    format <- function(val){
+      sprintf(fstring, val)
+    }
+  }
+  stopifnot(is.function(format))
+  data$label <- format(data[,label.var])
+  a <- aes_string(x="x",y="y",label="label",showSelected=label.var)
+  geom_text(a, data)
 }
