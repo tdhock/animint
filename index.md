@@ -27,7 +27,7 @@ g1 <- ggplot() + geom_density(data = boxplotdata, aes(x = y, group = group,
 g1
 ```
 
-![plot of chunk unnamed-chunk-1](figure/unnamed-chunk-1.png) 
+![plot of chunk density](figure/density.png) 
 
 ```r
 gg2animint(list(plot1 = g1), out.dir = "./g1")

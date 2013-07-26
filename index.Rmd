@@ -8,7 +8,7 @@ Introduction
 ---------------------------------------------------------
 Let's start with a reasonably common comparison of distributions: two normal distributions with different centers, and a gamma distribution. 
 
-```{r fig.width=6, fig.height=4, message=FALSE, warning=FALSE}
+```{r density, fig.width=6, fig.height=4, message=FALSE, warning=FALSE}
 library(ggplot2)
 library(animint)
 library(plyr)
@@ -38,7 +38,7 @@ This example will demonstrate the new aesthetics, **clickSelects** and **showSel
 
 Animint includes a dataset from the US National Oceanic and Atmospheric Administration, listing all recorded tornadoes in the US from 1950 - 2006 with GIS information. The data can be found [here](http://www.spc.noaa.gov/wcm/#data) or loaded into R using the command "data(Tornadoes)". 
 
-```{r, message=FALSE, warning=FALSE}
+```{r tornadobar, message=FALSE, warning=FALSE}
 library(maps)
 data(Tornadoes) # load the Tornadoes data from the animint package
 
@@ -77,7 +77,7 @@ Syntax is
 **make\_bar(data, x.name, alpha=1)**  
 where x.name is the variable for x and clickSelects. 
 
-```{r, message=FALSE, warning=FALSE}
+```{r tornadobar2, message=FALSE, warning=FALSE}
 ts <- ggplot() + make_bar(UStornadoes, "year") + 
   ggtitle("Number of Tornadoes recorded in the US, 1950-2006") + 
   ylab("Number of Tornadoes") + 
@@ -93,7 +93,7 @@ This code produces the [same plot](tornado-bar2/index.html), but with a much mor
 We typically do not want plot axes and labels displayed on a map, because it's obvious what the x and y axes are. While animint does not support all of ggplot2's theme() options, it does support removing the axes, labels, and axis titles. 
 
 To fully remove all evidence of the axes, we must separately remove axis lines, ticks, text (axis break labels), and titles. 
-```{r, message=FALSE, warning=FALSE}
+```{r tornadotheme, message=FALSE, warning=FALSE}
 map <- ggplot() + 
   geom_polygon(aes(x=long, y=lat, group=group), data=USpolygons, fill="black", colour="grey") +
   geom_segment(aes(x=startLong, y=startLat, xend=endLong, yend=endLat, showSelected=year), 
@@ -109,7 +109,7 @@ You can see the resulting d3 plot [here](tornado-bar2/index.html). Notice that t
 
 
 We may want to allow users to select a state as well as a year, so that the bar chart shows the number of tornadoes over time for a specific state, and the map shows the tornadoes that occurred during the selected year. To do this, we will need to create a summarized dataset using the **plyr** package. We'll create a data frame that contains the number of tornadoes occurring in each state for each year in the dataset. 
-```{r,message=FALSE, warning=FALSE}
+```{r tornadocounts,message=FALSE, warning=FALSE}
 UStornadoCounts <-
   ddply(UStornadoes, .(state, year), summarize, count=length(state))
 ```
@@ -120,7 +120,7 @@ The make\_text function included in animint makes it easy to create text describ
 Syntax is  
 **make\_text(data, x, y, label.var, format=NULL)**  
 where format can be specified using a string containing %d, %f, etc. to represent the variable value.
-```{r, message=FALSE,warning=FALSE, cache=TRUE}
+```{r tornadotsbar, message=FALSE,warning=FALSE, cache=TRUE}
 map <- ggplot() + 
   make_text(UStornadoCounts, -100, 50, "year", "Tornadoes in %d") +
   geom_polygon(aes(x=long, y=lat, group=group, clickSelects=state),
@@ -151,7 +151,7 @@ Animint also allows you to automatically change the selection or data shown so t
 This example also demonstrates the make\_tallrect function, which populates a graph with bars spanning the entire y range located at each value of the variable passed in, with clickSelects element to match. Syntax is  
 make\_tallrect(x.name, data, alpha=1/2)
 
-```{r, warning=FALSE, message=FALSE}
+```{r tornadoanimation, warning=FALSE, message=FALSE}
 map <- ggplot()+
   geom_polygon(aes(x=long, y=lat, group=group, clickSelects=state),
                data=USpolygons, fill="black", colour="grey") +
