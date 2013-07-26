@@ -2,6 +2,8 @@ Geoms in Animint
 ========================================================
 
 
+
+
 ```r
 library(ggplot2)
 library(plyr)
@@ -223,8 +225,8 @@ gg2animint(list(g12 = g12), out.dir = "geoms/contour2")
 
 [Animint plot](geoms/contour2/index.html). You may have to wait a moment to see the tiles - as each tile is a separate d3 object, it can take a few seconds to load all of the tiles. 
 
-While stat\_density2d does not always work reliably, we can still use the statistic within another geom, such as geom\_contour. 
 ### scale\_y\_log10 and geom\_contour with stat\_density2d
+While stat\_density2d does not always work reliably, we can still use the statistic within another geom, such as geom\_contour. 
 
 ```r
 library("MASS")

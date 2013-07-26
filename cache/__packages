@@ -3,6 +3,8 @@ base
 ggplot2
 knitr
 maps
+MASS
 plyr
 proto
+reshape2
 RJSONIO
