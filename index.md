@@ -89,6 +89,21 @@ Clicking on a specific bar causes the subset of data corresponding to that year 
 
 The syntax for this example is slightly tricky, because the standard specification of geom\_bar(aes(x=year, clickSelects=year), data=UStornadoes, stat="bin") does not work with animint at this time. This is because clickSelects is not a ggplot2 aesthetic, and so the binning algorithm does not behave properly when clickSelects is specified. Using stat\_summary allows us to avoid this behavior. 
 
+
+### Simpler bar plots
+In order to make bar plots with stat\_bin somewhat easier, animint includes a make\_bar function, which helps facilitate bar charts with clickSelects aesthetics. 
+
+
+```r
+ts <- ggplot() + make_bar(UStornadoes, "year") + ggtitle("Number of Tornadoes recorded in the US, 1950-2006")
+
+tornado.bar <- list(map = map, ts = ts, width = list(map = 970, ts = 400), height = list(400))
+
+gg2animint(tornado.bar, "tornado-bar2")
+```
+
+This code produces the [same plot](tornado-bar2/index.html), but with a much more intuitive syntax. 
+
 ### Plot Themes
 We typically do not want plot axes and labels displayed on a map, because it's obvious what the x and y axes are. While animint does not support all of ggplot2's theme() options, it does support removing the axes, labels, and axis titles. 
 
@@ -102,9 +117,8 @@ map <- ggplot() + geom_polygon(aes(x = long, y = lat, group = group), data = USp
     axis.text = element_blank(), axis.ticks = element_blank(), axis.title = element_blank())
 
 tornado.bar <- list(map = map, ts = ts, width = list(map = 970, ts = 400), height = list(400))
-gg2animint(tornado.bar, out.dir = "tornado-bar2")
+gg2animint(tornado.bar, out.dir = "tornado-bar3")
 ```
 
 You can see the resulting d3 plot [here](tornado-bar2/index.html). Notice that the axes have been removed from the map, leaving only the data displayed on that plot. 
-
 

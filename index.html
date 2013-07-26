@@ -256,6 +256,19 @@ gg2animint(tornado.bar, out.dir = &quot;tornado-bar&quot;)
 
 <p>The syntax for this example is slightly tricky, because the standard specification of geom_bar(aes(x=year, clickSelects=year), data=UStornadoes, stat=&ldquo;bin&rdquo;) does not work with animint at this time. This is because clickSelects is not a ggplot2 aesthetic, and so the binning algorithm does not behave properly when clickSelects is specified. Using stat_summary allows us to avoid this behavior. </p>
 
+<h3>Simpler bar plots</h3>
+
+<p>In order to make bar plots with stat_bin somewhat easier, animint includes a make_bar function, which helps facilitate bar charts with clickSelects aesthetics. </p>
+
+<pre><code class="r">ts &lt;- ggplot() + make_bar(UStornadoes, &quot;year&quot;) + ggtitle(&quot;Number of Tornadoes recorded in the US, 1950-2006&quot;)
+
+tornado.bar &lt;- list(map = map, ts = ts, width = list(map = 970, ts = 400), height = list(400))
+
+gg2animint(tornado.bar, &quot;tornado-bar2&quot;)
+</code></pre>
+
+<p>This code produces the <a href="tornado-bar2/index.html">same plot</a>, but with a much more intuitive syntax. </p>
+
 <h3>Plot Themes</h3>
 
 <p>We typically do not want plot axes and labels displayed on a map, because it&#39;s obvious what the x and y axes are. While animint does not support all of ggplot2&#39;s theme() options, it does support removing the axes, labels, and axis titles. </p>
@@ -269,7 +282,7 @@ gg2animint(tornado.bar, out.dir = &quot;tornado-bar&quot;)
     axis.text = element_blank(), axis.ticks = element_blank(), axis.title = element_blank())
 
 tornado.bar &lt;- list(map = map, ts = ts, width = list(map = 970, ts = 400), height = list(400))
-gg2animint(tornado.bar, out.dir = &quot;tornado-bar2&quot;)
+gg2animint(tornado.bar, out.dir = &quot;tornado-bar3&quot;)
 </code></pre>
 
 <p>You can see the resulting d3 plot <a href="tornado-bar2/index.html">here</a>. Notice that the axes have been removed from the map, leaving only the data displayed on that plot. </p>

@@ -115,19 +115,19 @@
 },
 "axis": {
  "x": [ 0.11924, 0.4345, 0.74975 ],
-"xlab": [ "-120", "-100", "-80" ],
+"xlab": null,
 "xrange": [ -127.57, -64.124 ],
-"xname": "long",
-"xline": true,
-"xticks": true,
+"xname": "",
+"xline": false,
+"xticks": false,
 "y": [ 0.040584,  0.228, 0.41542, 0.60283, 0.79025, 0.97766 ],
-"ylab": [ "25", "30", "35", "40", "45", "50" ],
+"ylab": null,
 "yrange": [ 23.917, 50.596 ],
-"yname": "lat",
-"yline": true,
-"yticks": true 
+"yname": "",
+"yline": false,
+"yticks": false 
 },
-"title": "Tornadoes in the US",
+"title": "",
 "legend": {} 
 },
 "ts": {
