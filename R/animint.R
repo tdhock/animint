@@ -366,7 +366,7 @@ layer2list <- function(l, d, ranges){
 #' @return invisible list of ggplots in list format
 #' @export 
 #' @seealso \code{\link{ggplot2}}
-#' @example examples/breakpointExamples.R
+#' @example examples/SimpleGeoms.R
 gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()){
   ## Check that it is a list and every element is named.
   stopifnot(is.list(plot.list))
