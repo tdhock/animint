@@ -48,3 +48,4 @@ gg2animint(list(plot1 = g1), out.dir = "./g1")
 You can see the resulting d3 plot [here](g1/index.html).
 
 Animint requires a list of named plots - each plot must be a ggplot2 object and must have a name, such as "plot1" in the example above. You can also specify the output directory - this allows you to control where the generated webpage is stored. If the output directory is not specified, then typically R will create a temporary directory on your computer to store the generated webpage. 
+
