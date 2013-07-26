@@ -5,7 +5,7 @@ Version: 2013.7.26
 License: GPL-3
 Title: Interactive animations
 Description: An interactive animation can be defined using a list of
- ggplots with clickSelects and showSelected aesthetics.
+    ggplots with clickSelects and showSelected aesthetics.
 Depends:
     RJSONIO,
     ggplot2,

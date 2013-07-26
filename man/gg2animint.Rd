@@ -51,249 +51,229 @@
   scales: \itemize{ \item alpha, \item fill/colour (brewer,
   gradient, identity, manual) \item linetype \item x and y
   axis scales, manual break specification, label formatting
-  \item area \item size } Unsupported scales: \itemize{
-  \item shape. Open and closed circles can be represented
-  by manipulating fill and colour scales and using default
-  (circle) points, but d3 does not support many R shape
-  types, so mapping between the two is difficult. }
+  \item x and y axis theme elements: axis.line, axis.ticks,
+  axis.text, axis.title can be set to element_blank();
+  other theme modifications not supported at this time, but
+  would be possible with custom css files. \item area \item
+  size } Unsupported scales: \itemize{ \item shape. Open
+  and closed circles can be represented by manipulating
+  fill and colour scales and using default (circle) points,
+  but d3 does not support many R shape types, so mapping
+  between the two is difficult. }
 }
 \examples{
+#' Tests for each geom
+library(ggplot2)
+library(plyr)
 library(animint)
 
-data(generation.loci)
-## Example: 2 plots, 2 selectors.
-generations <- data.frame(generation=unique(generation.loci$generation))
-loci <- data.frame(locus=unique(generation.loci$locus))
-two.selectors.not.animated <- 
-  list(ts=ggplot()+
-         geom_vline(aes(xintercept=generation, clickSelects=generation),
-                    data=generations, alpha=1/2, lwd=4)+
-         geom_line(aes(generation, frequency, group=population,
-                       showSelected=locus), data=generation.loci),
-       loci=ggplot()+
-         geom_vline(aes(xintercept=locus, clickSelects=locus),
-                    data=loci, alpha=1/2, size=4)+
-         geom_point(aes(locus, frequency, showSelected=generation),
-                    data=generation.loci),
-       duration=list(generation=1000)
+#' abline: should show two lines: one running through the points, the other with an intercept of 0 and slope of 2.
+xydata <- data.frame(x=sort(runif(50, 0, 10)))
+xydata$y <- 3+2*xydata$x + rnorm(50, 0, 1)
+g1 <- ggplot() + geom_point(data=xydata, aes(x=x, y=y)) + 
+  geom_abline(data=data.frame(intercept=c(3, 0), slope=c(2,1)), aes(intercept=intercept, slope=slope)) +
+  ggtitle("geom_abline")
+g1
+# gg2animint(list(g1=g1))
+
+#' ribbon: should show two overlapping ribbons, with the same basic shape, one translated up by one unit.
+ribbondata <- data.frame(x=seq(0, 1, .1), ymin=runif(11, 0, 1), ymax=runif(11, 1, 2))
+ribbondata <- rbind(cbind(ribbondata, group="low"), cbind(ribbondata, group="high"))
+ribbondata[12:22,2:3] <- ribbondata[12:22,2:3]+1
+g2 <- ggplot() + 
+  geom_ribbon(data=ribbondata, aes(x=x, ymin=ymin, ymax=ymax, group=group, fill=group), alpha=.5) + 
+  ggtitle("geom_ribbon")
+g2
+# gg2animint(list(g1=g1, g2=g2))
+
+#' density: should show two normal distributions, centered at 0 and 3, and a gamma distribution with mode approximately 5
+boxplotdata <- rbind(data.frame(x=1:50, y=sort(rnorm(50, 3, 1)), group="N(3,1)"),
+                     data.frame(x=1:50, y=sort(rnorm(50, 0, 1)), group="N(0,1)"), 
+                     data.frame(x=1:50, y=sort(rgamma(50, 2, 1/3)), group="Gamma(2,1/3)"))
+boxplotdata <- ddply(boxplotdata, .(group), transform, ymax=max(y), ymin=min(y), med=median(y))
+
+g3 <- ggplot() + geom_density(data=boxplotdata, aes(x=y, group=group, fill=group), alpha=.5) +
+  scale_fill_discrete("Distribution") + xlab("x") + 
+  ggtitle("geom_density")
+g3
+# gg2animint(list(g1=g1, g2=g2, g3=g3))
+
+
+#' tile: should show an approximately bivariate normal distribution.
+tiledata <- data.frame(x=rnorm(1000, 0, 3))
+tiledata$y <- rnorm(1000, tiledata$x, 3)
+tiledata$rx <- round(tiledata$x)
+tiledata$ry <- round(tiledata$y)
+tiledata <- ddply(tiledata, .(rx,ry), summarise, n=length(rx))
+
+g4 <- ggplot() + geom_tile(data=tiledata, aes(x=rx, y=ry, fill=n)) +
+  scale_fill_gradient(low="#56B1F7", high="#132B43") + 
+  xlab("x") + ylab("y") + ggtitle("geom_tile")
+g4
+# gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4))
+
+#' path: should show a two-dimensional random walk, where x and y are position, z is time.
+pathdata <- data.frame(x=rnorm(30, 0, .5), y=rnorm(30, 0, .5), z=1:30)
+g5 <- ggplot() + geom_path(data=pathdata, aes(x=x, y=y), alpha=.5) +
+  geom_text(data=pathdata, aes(x=x, y=y, label=z)) + 
+  ggtitle("geom_path")
+g5
+# gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5))
+
+#' Polygons
+polydata <- rbind(
+  data.frame(x=c(0, .5, 1, .5, 0), y=c(0, 0, 1, 1, 0), group="parallelogram", fill="blue", xc=.5, yc=.5),
+  data.frame(x=c(.5, .75, 1, .5), y=c(.5, 0, .5, .5), group="triangle", fill="red", xc=.75, yc=.33)
   )
-gg2animint(two.selectors.not.animated)
+g6 <- ggplot() + 
+  geom_polygon(data=polydata, aes(x=x, y=y, group=group, fill=fill, colour=fill), alpha=.5)+
+  scale_colour_identity() + scale_fill_identity()+
+  geom_text(data=polydata, aes(x=xc, y=yc, label=group)) +
+  ggtitle("geom_polygon")
+g6
+# gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6))
 
-## Example: 3 plots, 1 selector.
-first <- subset(generation.loci,generation==1)
-ancestral <- do.call(rbind,lapply(split(first,first$locus),with,{
-  stopifnot(all(frequency==frequency[1]))
-  data.frame(locus=locus[1],ancestral=frequency[1])
-}))
-gl.list <- split(generation.loci,
-                 with(generation.loci,list(generation,locus)))
-generation.pop <- do.call(rbind,lapply(gl.list,with,{
-  data.frame(generation=generation[1], locus=locus[1],
-             estimated=mean(frequency))
-}))
-generation.pop$ancestral <- ancestral$ancestral[generation.pop$locus]
+#' Boxplots
+#' Boxplot does not work (7/5/13)
+# g7 <- ggplot() + 
+#   geom_boxplot(data=boxplotdata, aes(y=y, x=factor(group))) +
+#   ggtitle("geom_boxplot")
+# g7
+# gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7))
 
-## Calculate the subset for just the last generation, to plot.
-generation.loci.last <- subset(generation.loci,generation==max(generation))
-generation.pop.last <- subset(generation.pop,generation==max(generation))
-one.selector.not.animated <- 
-  list(ts=ggplot()+
-         geom_line(aes(generation, frequency, group=population,
-                       showSelected=locus), data=generation.loci),
-       predictions=ggplot()+
-         geom_point(aes(ancestral, estimated, clickSelects=locus),
-                    data=generation.pop.last, size=4, alpha=3/4),
-       loci=ggplot()+
-         geom_vline(aes(xintercept=locus, clickSelects=locus),
-                    data=loci, alpha=1/2, lwd=4)+
-         geom_point(aes(locus, frequency), data=generation.loci.last)
-  )
-gg2animint(one.selector.not.animated)
+g7 <- ggplot() + 
+  geom_linerange(data=boxplotdata, aes(x=factor(group), ymax=ymax, ymin=ymin, colour=factor(group))) +
+  ggtitle("geom_linerange") + scale_colour_discrete("Distribution") + xlab("Distribution")
+g7
+# gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7))
 
-## Example: 2 plots, 2 selectors, but only interacting with 1 plot.
-data(breakpoints)
-only.error <- subset(breakpoints$error,type=="E")
-only.segments <- subset(only.error,bases.per.probe==bases.per.probe[1])
-signal.colors <- c(estimate="#0adb0a",
-                   latent="#0098ef")
-breakpointError <- 
-  list(signal=ggplot()+
-         geom_point(aes(position, signal, showSelected=bases.per.probe),
-                    data=breakpoints$signals)+
-         geom_line(aes(position, signal), colour=signal.colors[["latent"]],
-                   data=breakpoints$imprecision)+
-         geom_segment(aes(first.base, mean, xend=last.base, yend=mean,
-                          showSelected=segments,
-                          showSelected2=bases.per.probe),
-                      colour=signal.colors[["estimate"]],
-                      data=breakpoints$segments)+
-         geom_vline(aes(xintercept=base,
-                        showSelected=segments,
-                        showSelected2=bases.per.probe),
-                    colour=signal.colors[["estimate"]],
-                    linetype="dashed",
-                    data=breakpoints$breaks),
-       error=ggplot()+
-         geom_vline(aes(xintercept=segments, clickSelects=segments),
-                    data=only.segments, lwd=17, alpha=1/2)+
-         geom_line(aes(segments, error, group=bases.per.probe,
-                       clickSelects=bases.per.probe),
-                   data=only.error, lwd=4))
-gg2animint(breakpointError)
+g8 <- ggplot() + 
+  geom_histogram(data=subset(boxplotdata, group=="Gamma(2,1/3)"), aes(x=y, fill=..count..), binwidth=1) + 
+  ggtitle("geom_histogram")
+g8
+# gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8))
 
-## Example: animated time series with 3 plots and 2 selectors.
-two.selectors.animated <- 
-  list(ts=ggplot()+
-         geom_vline(aes(xintercept=generation,
-                        clickSelects=generation),
-                    data=generations, alpha=1/2, lwd=4)+
-         geom_line(aes(generation, frequency, group=population,
-                       showSelected=locus), data=generation.loci),
-       predictions=ggplot()+
-         geom_point(aes(ancestral, estimated, showSelected=generation,
-                        clickSelects=locus),
-                    data=generation.pop, size=4, alpha=3/4),
-       loci=ggplot()+
-         geom_vline(aes(xintercept=locus, clickSelects=locus),
-                    data=loci, alpha=1/2, lwd=4)+
-         geom_point(aes(locus, frequency, showSelected=generation),
-                    data=generation.loci),
-       duration=list(generation=1000),
-       time=list(variable="generation",ms=2000))
-gg2animint(two.selectors.animated)
+g9 <- ggplot() + 
+  geom_violin(data=boxplotdata, aes(x=group, y=y, fill=group, group=group)) +
+  ggtitle("geom_violin")+ scale_fill_discrete("Distribution") + xlab("Distribution")
+g9
+# gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9))
 
-## Example: 4 plots, 2 selectors.
-data(intreg)
-signal.colors <- c(estimate="#0adb0a", latent="#0098ef")
-breakpoint.colors <- c("1breakpoint"="#ff7d7d", "0breakpoints"='#f6f4bf')
-model.linetypes <- c(margin="dotted",limit="dashed",regression="solid")
-intreg$annotations$logratio <- max(intreg$sig$log)
-## To get the bottom 3 plots to line up properly, we need to plot some
-## geom_blanks bigger than the x range, so we calculate that here.
-blank.items <- with(intreg,{
-  list(segments=list(data=selection,x="min.L",y="segments"),
-       error=list(data=selection,x="max.L",y="cost"),
-       regression=list(data=model,x=c("min.L","max.L"),
-                       y=c("min.feature","max.feature")),
-       intervals=list(data=intervals,x=c("min.L","max.L"),y="feature"))
-})
-Lrange <- c()
-for(N in names(blank.items)){
-  L <- blank.items[[N]]
-  Lrange <- range(c(Lrange,unlist(L$data[,L$x])),finite=TRUE)
-  blank.items[[N]]$yrange <- range(unlist(L$data[,L$y]))
-}
-Lrange[1] <- Lrange[1]-1
-Lrange[2] <- Lrange[2]+1
-for(N in names(blank.items)){
-  L <- blank.items[[N]]
-  blank.items[[N]]$blank <- data.frame(x=Lrange, y=L$yrange)
-}
+#' Step Plot
+#' Must specify group and then use colour=factor(group) to get desired effect.
+g10 <- ggplot() + geom_step(data=boxplotdata, aes(x=x, y=y, colour=factor(group), group=group)) +
+  scale_colour_discrete("Distribution") +
+  ggtitle("geom_step")
+g10
+# gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10))
 
-mmir.plot <- 
-  list(signal=ggplot()+
-         scale_x_continuous("position on chromosome (mega base pairs)",
-                            breaks=c(100,200))+
-         geom_tallrect(aes(xmin=first.base/1e6, xmax=last.base/1e6,
-                           fill=annotation,
-                           showSelected=signal),
-                       data=intreg$ann)+
-         scale_fill_manual(values=breakpoint.colors,guide="none")+
-         geom_text(aes((first.base+last.base)/2e6, logratio+1/8,
-                       label=annotation,
-                       showSelected=signal),
-                   data=intreg$ann)+
-         geom_blank(aes(first.base/1e6, logratio+2/8), data=intreg$ann)+
-         geom_point(aes(base/1e6, logratio,
-                        showSelected=signal),
-                    data=intreg$sig)+
-         geom_segment(aes(first.base/1e6, mean, xend=last.base/1e6, yend=mean,
-                          showSelected=signal,
-                          showSelected2=segments),
-                      data=intreg$seg, colour=signal.colors[["estimate"]])+
-         geom_vline(aes(xintercept=base/1e6,
-                        showSelected=signal,
-                        showSelected2=segments),
-                    colour=signal.colors[["estimate"]],
-                    linetype="dashed",
-                    data=intreg$breaks),
-       regression=ggplot()+
-         geom_blank(aes(x,y), data=blank.items$regression$blank)+
-         geom_segment(aes(x=min.L, y=feature, xend=max.L, yend=feature,
-                          clickSelects=signal),
-                      size=5,
-                      data=intreg$int)+
-         geom_segment(aes(min.L, min.feature, xend=max.L, yend=max.feature,
-                          linetype=line),
-                      colour="red",
-                      size=3,
-                      data=intreg$model)+
-         scale_linetype_manual(values=model.linetypes),
-       error=ggplot()+
-         geom_blank(aes(x,y), data=blank.items$error$blank)+
-         geom_segment(aes(min.L, cost, xend=max.L, yend=cost,
-                          showSelected=signal), data=intreg$selection),
-       segments=ggplot()+
-         geom_blank(aes(x,y), data=blank.items$segments$blank)+
-         geom_segment(aes(min.L, segments, xend=max.L, yend=segments,
-                          showSelected=signal), data=intreg$selection)+
-         geom_tallrect(aes(xmin=min.L, xmax=max.L,
-                           showSelected=signal,
-                           clickSelects=segments),
-                       data=intreg$selection,
-                       alpha=1/2),
-       width=list(800),
-       height=list(signal=300,regression=150,error=50,segments=100))
-## This is a normal ggplot of all the data, subsets of which can be
-## shown by clicking the plots.
-sig.facets <- mmir.plot$sig+
-  facet_grid(segments~signal, scales="free", space="free_x")+
-  theme_bw()+
-  theme(panel.margin=unit(0,"cm"))
-print(sig.facets)
-gg2animint(mmir.plot)
+#' contour plot
+library(reshape2) # for melt
+contourdata <- melt(volcano)
+names(contourdata) <- c("x", "y", "z")
+g11 <- ggplot() + geom_contour(data=contourdata, aes(x=x, y=y, z=z), binwidth=4, size=0.5) + 
+  geom_contour(data=contourdata, aes(x=x, y=y, z=z), binwidth=10, size=1) +
+  ggtitle("geom_contour")
+g11
+# gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11))
 
-## TODO: mmir.plot is way too complicated, since facets are not yet
-## implemented in animint. The easier facetted version would look
-## like this:
-mmir.facet <- 
-  list(signal=mmir.plot$signal,
-       penalty=ggplot()+
-         geom_segment(aes(min.L, feature, xend=max.L, yend=feature,
-                          clickSelects=signal),
-                      size=5,
-                      data=data.frame(intreg$int, what="regression"))+
-         geom_segment(aes(min.L, min.feature, xend=max.L, yend=max.feature,
-                          linetype=line),
-                      colour="red",
-                      size=3,
-                      data=data.frame(intreg$model, what="regression"))+
-         scale_linetype_manual(values=model.linetypes)+
-         geom_segment(aes(min.L, cost, xend=max.L, yend=cost,
-                          showSelected=signal),
-                      data=data.frame(intreg$selection, what="error"))+
-         geom_segment(aes(min.L, segments, xend=max.L, yend=segments,
-                          showSelected=signal),
-                      data=data.frame(intreg$selection, what="segments"))+
-         geom_tallrect(aes(xmin=min.L, xmax=max.L,
-                           showSelected=signal,
-                           clickSelects=segments),
-                       data=data.frame(intreg$selection, what="segments"),
-                       alpha=1/2)+
-         ylab("")+
-         xlab("penalty value $L=f(x)$")+ # TODO: mathjax.
-         facet_grid(what~.,scales="free"),
-       width=list(800),
-       height=list(signal=300,regression=150,error=50,segments=100))
-gg2animint(mmir.facet) # doesn't work yet.
-## This plot has an additional facet for signal, which would not be
-## present in the interactive plot, but is useful here to see all
-## the data in regular ggplot2.
-too.many.facets <- mmir.facet$penalty+
-  facet_grid(what~signal, scales="free")+
-  theme_bw()+
-  theme(panel.margin=unit(0, "cm"))
-print(too.many.facets)
+contourdata2 <- floor(contourdata/3)*3
+g12 <- ggplot() + 
+  geom_tile(data=contourdata2, aes(x=x, y=y, fill=z, colour=z)) + 
+  geom_contour(data=contourdata, aes(x=x, y=y, z=z), colour="black", size=.5) +
+  scale_fill_continuous("height", low="#56B1F7", high="#132B43", guide="legend") +
+  scale_colour_continuous("height", low="#56B1F7", high="#132B43", guide="legend") +
+  ggtitle("geom_tile + geom_contour") 
+g12
+# gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11, g12=g12)) 
+
+library("MASS")
+data(geyser,package="MASS")
+g13 <- ggplot() +  
+  geom_point(data=geyser, aes(x = duration, y = waiting)) + 
+  geom_contour(data=geyser, aes(x = duration, y = waiting), colour="blue", size=.5, stat="density2d") + 
+  xlim(0.5, 6) + scale_y_log10(limits=c(40,110)) +
+  ggtitle("geom_contour 2d density")
+g13
+# gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11, g12=g12, g13=g13))
+
+g14 <- ggplot() +  
+  geom_polygon(data=geyser,aes(x=duration, y=waiting, fill=..level.., 
+                               group=..piece..), 
+               stat="density2d", alpha=.5) +
+  geom_point(data=geyser, aes(x = duration, y = waiting)) + 
+  scale_fill_continuous("Density Level", low="#56B1F7", high="#132B43") + 
+  guides(colour = guide_legend(override.aes = list(alpha = 1)), 
+         fill = guide_legend(override.aes = list(alpha = 1))) + 
+  scale_y_continuous(limits=c(40,110), trans="log10") +
+  scale_x_continuous(limits=c(.5, 6)) +
+  ggtitle("geom_density2d polygon")
+g14
+# gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11, g12=g12, g13=g13, g14=g14))
+
+
+data(diamonds)
+dsmall <- diamonds[sample(nrow(diamonds), 1000), ]
+g15 <- ggplot() + 
+  geom_tile(data=dsmall, aes(x=carat, y=price, fill=..density.., colour=..density..), stat="density2d", contour=FALSE, n=30) +
+  scale_fill_gradient(limits=c(1e-5,8e-4), na.value="white") + 
+  scale_colour_gradient(limits=c(1e-5,8e-4), na.value="white") +
+  ggtitle("geom_density2d tile") + ylim(c(0, 19000))
+g15
+# gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11, g12=g12, g13=g13, g14=g14, g15=g15))
+  
+g16 <- ggplot() + 
+  geom_point(data=dsmall, aes(x=carat, y=price, alpha=..density..), 
+             stat="density2d", contour=FALSE, n=10, size=I(1)) +
+  scale_alpha_continuous("Density") +
+  ggtitle("geom_density2d points")
+g16
+# gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11, g12=g12, g13=g13, g14=g14, g15=g15, g16=g16))
+
+
+#' geom_map using geom_polygon and merge
+crimes <- data.frame(state = tolower(rownames(USArrests)), USArrests)
+library(reshape2) # for melt
+crimesm <- melt(crimes, id = 1)
+library(maps)
+states_map <- map_data("state")
+assault.map <- merge(states_map, subset(crimesm, variable=="Assault"), by.x="region", by.y="state")
+assault.map <- assault.map[order(assault.map$group, assault.map$order),]
+g17 <- ggplot() + 
+  geom_polygon(data=assault.map, aes(x=long, y=lat, group=group, fill=value, colour=value)) +
+  expand_limits(x = states_map$long, y = states_map$lat) + 
+  ggtitle("geom_polygon map") + ylim(c(12, 63)) + 
+  geom_text(data=data.frame(x=-95.84, y=55, label="Arrests for Assault"), hjust=.5, aes(x=x, y=y, label=label))
+g17  
+# gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, 
+#                 g9=g9, g10=g10, g11=g11, g12=g12, g13=g13, g14=g14, g15=g15, 
+#                 g16 = g16, g17=g17))
+
+#' geom_bar stacked
+data(mtcars)
+g18 <- ggplot() + geom_bar(data=mtcars, aes(x=factor(cyl), fill=factor(vs))) + ggtitle("geom_bar stacked")
+g18
+# gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, 
+#                 g9=g9, g10=g10, g11=g11, g12=g12, g13=g13, g14=g14, g15=g15, 
+#                 g16 = g16, g17=g17, g18=g18))
+
+#' geom_area
+data(diamonds)
+g19 <- ggplot() + 
+  geom_area(data=diamonds, aes(x=clarity, y=..count.., group=cut, colour=cut, fill=cut), stat="density") +
+  ggtitle("geom_area")
+g19
+# gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, 
+#                 g9=g9, g10=g10, g11=g11, g12=g12, g13=g13, g14=g14, g15=g15, 
+#                 g16 = g16, g17=g17, g18=g18, g19=g19))
+
+g20 <- ggplot() + 
+  geom_freqpoly(data=diamonds, aes(x=clarity, group=cut, colour=cut)) +
+  ggtitle("geom_freqpoly")
+g20
+gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, 
+                g9=g9, g10=g10, g11=g11, g12=g12, g13=g13, g14=g14, g15=g15, 
+                g16 = g16, g17=g17, g18=g18, g19=g19, g20=g20))
 }
 \seealso{
   \code{\link{ggplot2}}
