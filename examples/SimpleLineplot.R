@@ -14,14 +14,14 @@ data$y <- rnorm(length(data$x), data$x, .5) + rep(rnorm(5, 0, 2), each=10)
 p1 <- ggplot() + geom_line(data=data, aes(x=x, y=y, group=group)) + 
   ggtitle("geom_line")
 p1
-# gg2animint(list(p1=p1), out.dir="./junk")
+# gg2animint(list(p1=p1))
 
 
 #' Simple line plot with colors...
 p2 <- ggplot() + geom_line(data=data, aes(x=x, y=y, colour=group, group=group)) +
   ggtitle("geom_line + scale_colour_discrete")
 p2
-# gg2animint(list(p1=p1, p2=p2), out.dir="./junk")
+# gg2animint(list(p1=p1, p2=p2))
 
 #' Simple line plot with colors and linetype
 p3 <- ggplot() + geom_line(data=data, aes(x=x, y=y, colour=group, group=group, linetype=lt)) +
