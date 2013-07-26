@@ -188,18 +188,7 @@ hljs.initHighlightingOnLoad();
 
 <pre><code class="r">library(ggplot2)
 library(animint)
-</code></pre>
-
-<pre><code>## Loading required package: RJSONIO
-</code></pre>
-
-<pre><code>## Loading required package: proto
-</code></pre>
-
-<pre><code>## Loading required package: grid
-</code></pre>
-
-<pre><code class="r">library(plyr)
+library(plyr)
 set.seed(33)
 
 boxplotdata &lt;- rbind(data.frame(x = 1:50, y = sort(rnorm(50, 3, 1)), group = &quot;N(3,1)&quot;), 
@@ -286,6 +275,29 @@ gg2animint(tornado.bar, out.dir = &quot;tornado-bar3&quot;)
 </code></pre>
 
 <p>You can see the resulting d3 plot <a href="tornado-bar2/index.html">here</a>. Notice that the axes have been removed from the map, leaving only the data displayed on that plot. </p>
+
+<h3>Text that responds to clickSelects</h3>
+
+<p>The make_text function included in animint makes it easy to create text describing what has been selected. In this case, we would like to display the year underneath the map, show the selected state on the bar chart, and display the tornadoes per year in a specific state in that bar chart. </p>
+
+<pre><code class="r">UStornadoCounts &lt;- ddply(UStornadoes, .(state, year), summarize, count = length(state))
+
+map &lt;- ggplot() + make_text(UStornadoCounts, -100, 50, &quot;year&quot;, &quot;Tornadoes in %d&quot;) + 
+    geom_polygon(aes(x = long, y = lat, group = group, clickSelects = state), 
+        data = USpolygons, fill = &quot;black&quot;, colour = &quot;grey&quot;) + geom_segment(aes(x = startLong, 
+    y = startLat, xend = endLong, yend = endLat, showSelected = year), colour = &quot;#55B1F7&quot;, 
+    data = UStornadoes) + theme(axis.line = element_blank(), axis.text = element_blank(), 
+    axis.ticks = element_blank(), axis.title = element_blank())
+ts &lt;- ggplot() + make_text(UStornadoes, 1980, 200, &quot;state&quot;) + geom_bar(aes(year, 
+    count, clickSelects = year, showSelected = state), data = UStornadoCounts, 
+    stat = &quot;identity&quot;, position = &quot;identity&quot;)
+
+tornado.ts.bar &lt;- list(map = map, ts = ts, width = list(map = 970, ts = 400), 
+    height = list(400))
+gg2animint(tornado.ts.bar, &quot;tornado-ts-bar&quot;)
+</code></pre>
+
+<p><a href="tornado-ts-bar/index.html">Here</a> is the resulting d3 plot.</p>
 
 </body>
 

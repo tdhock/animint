@@ -12,21 +12,6 @@ Let's start with a reasonably common comparison of distributions: two normal dis
 ```r
 library(ggplot2)
 library(animint)
-```
-
-```
-## Loading required package: RJSONIO
-```
-
-```
-## Loading required package: proto
-```
-
-```
-## Loading required package: grid
-```
-
-```r
 library(plyr)
 set.seed(33)
 
@@ -122,3 +107,25 @@ gg2animint(tornado.bar, out.dir = "tornado-bar3")
 
 You can see the resulting d3 plot [here](tornado-bar2/index.html). Notice that the axes have been removed from the map, leaving only the data displayed on that plot. 
 
+### Text that responds to clickSelects
+The make\_text function included in animint makes it easy to create text describing what has been selected. In this case, we would like to display the year underneath the map, show the selected state on the bar chart, and display the tornadoes per year in a specific state in that bar chart. 
+
+```r
+UStornadoCounts <- ddply(UStornadoes, .(state, year), summarize, count = length(state))
+
+map <- ggplot() + make_text(UStornadoCounts, -100, 50, "year", "Tornadoes in %d") + 
+    geom_polygon(aes(x = long, y = lat, group = group, clickSelects = state), 
+        data = USpolygons, fill = "black", colour = "grey") + geom_segment(aes(x = startLong, 
+    y = startLat, xend = endLong, yend = endLat, showSelected = year), colour = "#55B1F7", 
+    data = UStornadoes) + theme(axis.line = element_blank(), axis.text = element_blank(), 
+    axis.ticks = element_blank(), axis.title = element_blank())
+ts <- ggplot() + make_text(UStornadoes, 1980, 200, "state") + geom_bar(aes(year, 
+    count, clickSelects = year, showSelected = state), data = UStornadoCounts, 
+    stat = "identity", position = "identity")
+
+tornado.ts.bar <- list(map = map, ts = ts, width = list(map = 970, ts = 400), 
+    height = list(400))
+gg2animint(tornado.ts.bar, "tornado-ts-bar")
+```
+
+[Here](tornado-ts-bar/index.html) is the resulting d3 plot.
