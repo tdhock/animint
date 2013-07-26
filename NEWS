@@ -1,0 +1,19 @@
+TODO
+
+facets
+
+coord_equal
+
+stop with an error when stat_bin is used to put several clickSelects
+or showSelected values in the same bin!
+
+multiple selection? ex, if 1 bin contains multiple values of
+clickSelects, then can we select all of the corresponding geoms? This
+would require rewriting a substantial amount of JS code, so let's just
+ignore this for the time being.
+
+2013.7.26
+
+bugfix for animations: before, we assumed that the animation variable
+takes values in 1..n, but now this is treated properly by looking at
+the actual values.

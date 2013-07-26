@@ -17,6 +17,8 @@ var animint = function (to_select, json_file) {
   this.SVGs = SVGs;
   var Animation = {};
   this.Animation = Animation;
+  var all_geom_names = {};
+  this.all_geom_names = all_geom_names;
   
   var css = document.createElement('style');
   css.type = 'text/css';
@@ -716,9 +718,15 @@ var animint = function (to_select, json_file) {
     var v_name = Animation.variable;
     var cur = Selectors[v_name].selected;
     var next = Animation.next[cur];
-    update_selector(v_name, next);
-    d3.timer(animateIfInactive, Animation.ms);
-  }
+    // Before starting the animation, make sure all the geoms have
+    // loaded.
+    var geomLoaded = function(x){
+      return d3.keys(Geoms).indexOf(x)!=-1;
+    }
+    if(all_geom_names.every(geomLoaded)){
+	update_selector(v_name, next);
+    }
+ } 
   var add_legend = function(p_name, p_info){
     // case of multiple legends, d3 reads legend structure in as an array
     var tdRight = element.select("td#"+p_name+"_legend");
@@ -798,14 +806,16 @@ var animint = function (to_select, json_file) {
       var i, prev, cur, seq = response.time.sequence;
       for (i = 0; i < seq.length; i++) {
         if (i == 0) {
-          prev = seq.length;
+          prev = seq[seq.length-1];
         } else {
           prev = seq[i - 1];
         }
         cur = seq[i];
         Animation.next[prev] = cur;
       }
-      d3.timer(animateIfInactive, Animation.ms);
+      all_geom_names = d3.keys(response.geoms);
+      // as shown on http://bl.ocks.org/mbostock/3808234
+      setInterval(animateIfInactive, Animation.ms);
     }
   });
 }

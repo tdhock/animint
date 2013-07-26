@@ -40,7 +40,7 @@ popPlots$bars+
 ## simpler example using make_tallrect.
 data(worldPop)
 popPlot <- ggplot()+
-  make_tallrect("year", worldPop)+
+  make_tallrect(worldPop, "year")+
   geom_line(aes(year, population, group=subcontinent),
             data=worldPop, size=4)
 print(popPlot)
@@ -58,7 +58,7 @@ popPlots2 <-
                    data=years) +
          coord_flip(),
        lines=ggplot()+
-         make_tallrect("year", worldPop)+
+         make_tallrect(worldPop, "year")+
          geom_point(aes(year, population, colour=type),
                     data=worldPop, size=4, alpha=1/4)+
          ##scale_colour_manual(values=c("black", "red"))+
@@ -86,7 +86,7 @@ popPlots3 <-
                    data=years) +
          coord_flip(),
        lines=ggplot()+
-         make_tallrect("year", worldPop)+
+         make_tallrect(worldPop, "year")+
          geom_line(aes(year, population, group=subcontinent,
                        clickSelects=subcontinent),
                    data=worldPop, size=4, alpha=3/4)+
