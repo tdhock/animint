@@ -60,7 +60,7 @@ You can see the resulting d3 plot [here](tornado-bar/index.html).
 ```{r mapoutput,fig.width=9.5, fig.height=4}
 map
 ```
-```{r tsoutput,fig.width=4, fig.height=4}
+```{r tsoutput,fig.width=5, fig.height=5}
 ts
 ```
 
