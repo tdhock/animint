@@ -147,7 +147,7 @@ statehist <- ggplot() + geom_histogram(data=UStornadoes, aes(x=state, fill=f, gr
 
 statebyyear <- ddply(UStornadoes, .(year, state), summarise, count=length(f), f = mean(f))
 
-statetimeline <- ggplot() + geom_line(data=statebyyear, aes(x=year, y=count, group = state, colour=f, showSelected=state))
+statetimeline <- ggplot() + geom_line(data=statebyyear, aes(x=year, y=count, group = state, colour=f, clickSelects=state))
 
 gg2animint(list(p1=timehist, p2=statehist, p3=statetimeline, width=list(500), height=list(500)))
 
