@@ -163,7 +163,7 @@ ts <- ggplot()+
 
 time <- list(variable="year", ms=2000) # new part of the list passed to gg2animint().
 
-tornado.anim <- list(map=map, ts=ts, time=time) # pass the time object in as another object in the main list. 
+tornado.anim <- list(map=map, ts=ts, time=time, width=list(map = 970, ts = 400),  height=list(400)) # pass the time object in as another object in the main list. 
 
 gg2animint(tornado.anim, "tornado-anim")
 ```

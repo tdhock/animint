@@ -250,7 +250,7 @@ gg2animint(tornado.bar, out.dir = &quot;tornado-bar&quot;)
 <p>In order to make bar plots with stat_bin somewhat easier, animint includes a make_bar function, which helps facilitate bar charts with clickSelects aesthetics. </p>
 
 <p>Syntax is<br/>
-make_bar(data, x.name, alpha=1)<br/>
+<strong>make_bar(data, x.name, alpha=1)</strong><br/>
 where x.name is the variable for x and clickSelects. </p>
 
 <pre><code class="r">ts &lt;- ggplot() + make_bar(UStornadoes, &quot;year&quot;) + ggtitle(&quot;Number of Tornadoes recorded in the US, 1950-2006&quot;)
@@ -290,7 +290,7 @@ gg2animint(tornado.bar, out.dir = &quot;tornado-bar3&quot;)
 <p>The make_text function included in animint makes it easy to create text describing what has been selected. In this case, we would like to display the year on the US map, and we would like to show the state on the bar chart. This interactivity does not work with ggtitle() at this time, but we can create a &ldquo;title&rdquo; element on the plot itself instead using make_text.  </p>
 
 <p>Syntax is<br/>
-make_text(data, x, y, label.var, format=NULL)<br/>
+<strong>make_text(data, x, y, label.var, format=NULL)</strong><br/>
 where format can be specified using a string containing %d, %f, etc. to represent the variable value.</p>
 
 <pre><code class="r">map &lt;- ggplot() + make_text(UStornadoCounts, -100, 50, &quot;year&quot;, &quot;Tornadoes in %d&quot;) + 
@@ -336,10 +336,13 @@ ts &lt;- ggplot() + make_tallrect(UStornadoCounts, &quot;year&quot;) + make_text
 
 time &lt;- list(variable = &quot;year&quot;, ms = 2000)  # new part of the list passed to gg2animint().
 
-tornado.anim &lt;- list(map = map, ts = ts, time = time)  # pass the time object in as another object in the main list. 
+tornado.anim &lt;- list(map = map, ts = ts, time = time, width = list(map = 970, 
+    ts = 400), height = list(400))  # pass the time object in as another object in the main list. 
 
 gg2animint(tornado.anim, &quot;tornado-anim&quot;)
 </code></pre>
+
+<p><a href="tornado-anim/index.html">Here</a> is the resulting d3 plot with animation.</p>
 
 </body>
 

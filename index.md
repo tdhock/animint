@@ -79,7 +79,7 @@ The syntax for this example is slightly tricky, because the standard specificati
 In order to make bar plots with stat\_bin somewhat easier, animint includes a make\_bar function, which helps facilitate bar charts with clickSelects aesthetics. 
 
 Syntax is  
-make\_bar(data, x.name, alpha=1)  
+**make\_bar(data, x.name, alpha=1)**  
 where x.name is the variable for x and clickSelects. 
 
 
@@ -123,7 +123,7 @@ UStornadoCounts <- ddply(UStornadoes, .(state, year), summarize, count = length(
 The make\_text function included in animint makes it easy to create text describing what has been selected. In this case, we would like to display the year on the US map, and we would like to show the state on the bar chart. This interactivity does not work with ggtitle() at this time, but we can create a "title" element on the plot itself instead using make\_text.  
 
 Syntax is  
-make\_text(data, x, y, label.var, format=NULL)  
+**make\_text(data, x, y, label.var, format=NULL)**  
 where format can be specified using a string containing %d, %f, etc. to represent the variable value.
 
 ```r
@@ -168,8 +168,11 @@ ts <- ggplot() + make_tallrect(UStornadoCounts, "year") + make_text(UStornadoes,
 
 time <- list(variable = "year", ms = 2000)  # new part of the list passed to gg2animint().
 
-tornado.anim <- list(map = map, ts = ts, time = time)  # pass the time object in as another object in the main list. 
+tornado.anim <- list(map = map, ts = ts, time = time, width = list(map = 970, 
+    ts = 400), height = list(400))  # pass the time object in as another object in the main list. 
 
 gg2animint(tornado.anim, "tornado-anim")
 ```
 
+
+[Here](tornado-anim/index.html) is the resulting d3 plot with animation.
