@@ -22,7 +22,7 @@ g2 <- ggplot() +
 g2
 # gg2animint(list(g1=g1, g2=g2))
 
-#' density: should show an exponential density curve in blue and a normal(ish) density curve in pink.
+#' density: should show two normal distributions, centered at 0 and 3, and a gamma distribution with mode approximately 5
 boxplotdata <- rbind(data.frame(x=1:50, y=sort(rnorm(50, 3, 1)), group="N(3,1)"),
                      data.frame(x=1:50, y=sort(rnorm(50, 0, 1)), group="N(0,1)"), 
                      data.frame(x=1:50, y=sort(rgamma(50, 2, 1/3)), group="Gamma(2,1/3)"))
@@ -132,7 +132,6 @@ g13 <- ggplot() +
   ggtitle("geom_contour 2d density")
 g13
 # gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, g9=g9, g10=g10, g11=g11, g12=g12, g13=g13))
-# geom_point disappears because it does not get transformed.
 
 g14 <- ggplot() +  
   geom_polygon(data=geyser,aes(x=duration, y=waiting, fill=..level.., 
