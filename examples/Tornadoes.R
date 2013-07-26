@@ -99,7 +99,7 @@ tornado.ts.line <-
                  data=UStornadoCounts, alpha=3/5, size=4))
 gg2animint(tornado.ts.line, "tornado-ts-line")
 
-## TODO: why doesn't this animation work?
+
 tornado.anim <-
   list(map=ggplot()+
        geom_polygon(aes(x=long, y=lat, group=group, clickSelects=state),
@@ -113,54 +113,3 @@ tornado.anim <-
                  data=UStornadoCounts, alpha=3/5, size=4),
        time=list(variable="year",ms=2000))
 gg2animint(tornado.anim, "tornado-anim")
-
-
-## how to get gg2animint to play nice with computed stuff... just pass in the computed data without groups specified. So, either user has to compute stuff using ggplot_build or ddply, and then pass into animint, or we figure out how to determine whether group is important or not. Attempt at determining importance is implemented in animint.R - if there are different numbers of rows in plot$layer[[i]]$data and plistextra$data[[i]], this means geom is calculated. If geom is calculated and group overlaps with another aesthetic (color, etc.), then remove group from subord, subvars, and aes.
-# temp <- ggplot2::ggplot_build(statehist)
-# statehist <- ggplot() + geom_rect(data=temp$data[[1]], aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, fill=fill, colour=colour)) + scale_fill_identity() + scale_colour_identity() + scale_x_continuous(breaks=unique(temp$data[[1]]$x), labels=unique(UStornadoes$state)) + coord_flip()
-# gg2animint(list(mapa=statehist, width=list(420), height=list(600)))
-
-
-## Side comment: I still like the bar plot better than the line plot, since there is not a relationship between subsequent observations, as alphabetic ordering of states doesn't have any geographic meaning. A bar plot is much more informative. 
-
-timehist <- ggplot() + geom_histogram(data=UStornadoes, aes(x=year, group=f, fill=f, colour=f, clickSelects=f)) + xlab("Time") + ylab("Recorded Tornadoes") + ggtitle("Recorded Tornadoes over Time")
-
-statehist <- ggplot() + geom_histogram(data=UStornadoes, aes(x=state, fill=f, group = f, colour=f, showSelected=f, weight=weight), stat="bin", position="identity") + xlab("State") + ylab("Tornadoes per Square Mile") + ggtitle("Recorded Tornadoes by State") + coord_flip()
-
-gg2animint(list(p1=timehist, p2=statehist, width=list(500), height=list(500)))
-# while it would be nice to select state and have tornadoes shown over time, we would have to use group = interaction(f,state) or something to that effect, which would not work as the group aesthetic must be shared by at least one other scalable aesthetic. 
-
-timehist <- ggplot() + geom_histogram(data=UStornadoes, aes(x=year, group=f, fill=f, colour=f, clickSelects=f)) + xlab("Time") + ylab("Recorded Tornadoes") + ggtitle("Recorded Tornadoes over Time")
-
-statehist <- ggplot() + geom_histogram(data=UStornadoes, aes(x=state, fill=f, group = f, colour=f, showSelected=f, clickSelects=state, weight=weight), stat="bin", position="identity") + xlab("State") + ylab("Tornadoes per Square Mile") + ggtitle("Recorded Tornadoes by State") + coord_flip()
-
-statebyyear <- ddply(UStornadoes, .(year, state), summarise, count=length(f))
-
-statetimeline <- ggplot() + geom_line(data=statebyyear, aes(x=year, y=count, group=state, showSelected=state))
-
-gg2animint(list(p1=timehist, p2=statehist, p3=statetimeline, width=list(500), height=list(500)))
-## Can't handle two clickSelects floating around...
-
-
-timehist <- ggplot() + geom_histogram(data=UStornadoes, aes(x=year, group=f, fill=f, colour=f)) + xlab("Time") + ylab("Recorded Tornadoes") + ggtitle("Recorded Tornadoes over Time")
-
-statehist <- ggplot() + geom_histogram(data=UStornadoes, aes(x=state, fill=f, group = f, colour=f, clickSelects=state, weight=weight), stat="bin", position="stack") + xlab("State") + ylab("Tornadoes per Square Mile") + ggtitle("Recorded Tornadoes by State") + coord_flip()
-# clickSelects won't work unless group=state, but then stat_bin doesn't work. :(
-
-## workaround: bin the data yourself and use geom_bar!
-UStornadoCountsF <-
-  ddply(UStornadoes, .(state, f), summarize, count=length(state))
-statehist <- ggplot()+
-  geom_bar(aes(state, count, fill=f, clickSelects=state),
-           stat="identity", position="stack", data=UStornadoCountsF)+
-  coord_flip()
-
-statebyyear <- ddply(UStornadoes, .(year, state), summarise, count=length(f), f = mean(f))
-
-statetimeline <- ggplot() + geom_line(data=statebyyear, aes(x=year, y=count, group = state, colour=f, clickSelects=state), size=3, alpha=1/2)
-
-gg2animint(list(p1=timehist, p2=statehist, p3=statetimeline, width=list(500), height=list(500)))
-
-
-
-
