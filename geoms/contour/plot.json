@@ -1,0 +1,102 @@
+{
+ "geoms": {
+ "geom1_path_g11": {
+ "geom": "path",
+"data": "geom1_path_g11.csv",
+"aes": {
+ "x": "x",
+"y": "y",
+"z": "z",
+"group": "piece" 
+},
+"params": {
+ "lineend": "butt",
+"linejoin": "round",
+"linemitre":      1,
+"na.rm": false,
+"size":    0.5 
+},
+"update": "",
+"subord": [
+ "group" 
+],
+"subvars": {
+ "group": "piece" 
+},
+"classed": "geom1_path_g11",
+"types": {
+ "order": "numeric",
+"level": "numeric",
+"x": "numeric",
+"y": "numeric",
+"piece": "integer",
+"group": "factor",
+"PANEL": "integer" 
+},
+"nextgeom": "geom2_path_g11" 
+},
+"geom2_path_g11": {
+ "geom": "path",
+"data": "geom2_path_g11.csv",
+"aes": {
+ "x": "x",
+"y": "y",
+"z": "z",
+"group": "piece" 
+},
+"params": {
+ "lineend": "butt",
+"linejoin": "round",
+"linemitre":      1,
+"na.rm": false,
+"size":      1 
+},
+"update": "",
+"subord": [
+ "group" 
+],
+"subvars": {
+ "group": "piece" 
+},
+"classed": "geom2_path_g11",
+"types": {
+ "order": "numeric",
+"level": "numeric",
+"x": "numeric",
+"y": "numeric",
+"piece": "integer",
+"group": "factor",
+"PANEL": "integer" 
+} 
+} 
+},
+"selectors": [],
+"plots": {
+ "g11": {
+ "geoms": [
+ "geom1_path_g11",
+"geom2_path_g11" 
+],
+"options": {
+ "width":    400,
+"height":    400 
+},
+"axis": {
+ "x": [ 0.034884, 0.29915, 0.56342, 0.8277 ],
+"xlab": [ "0", "25", "50", "75" ],
+"xrange": [   -3.3,   91.3 ],
+"xname": "x",
+"xline": true,
+"xticks": true,
+"y": [ 0.030303, 0.33333, 0.63636, 0.93939 ],
+"ylab": [ "0", "20", "40", "60" ],
+"yrange": [     -2,     64 ],
+"yname": "y",
+"yline": true,
+"yticks": true 
+},
+"title": "geom_contour",
+"legend": {} 
+} 
+} 
+}

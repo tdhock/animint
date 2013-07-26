@@ -1,0 +1,78 @@
+{
+ "geoms": {
+ "geom1_point_g1": {
+ "geom": "point",
+"data": "geom1_point_g1.csv",
+"aes": {
+ "x": "x",
+"y": "y" 
+},
+"params": {
+ "na.rm": false 
+},
+"update": "",
+"subord": [],
+"subvars": [],
+"classed": "geom1_point_g1",
+"types": {
+ "x": "numeric",
+"y": "numeric",
+"PANEL": "integer",
+"group": "integer" 
+},
+"nextgeom": "geom2_segment_g1" 
+},
+"geom2_segment_g1": {
+ "geom": "segment",
+"data": "geom2_segment_g1.csv",
+"aes": {
+ "intercept": "intercept",
+"slope": "slope" 
+},
+"params": [],
+"update": "",
+"subord": [],
+"subvars": [],
+"classed": "geom2_segment_g1",
+"types": {
+ "intercept": "numeric",
+"slope": "numeric",
+"group": "integer",
+"PANEL": "integer",
+"x": "numeric",
+"xend": "numeric",
+"y": "numeric",
+"yend": "numeric" 
+} 
+} 
+},
+"selectors": [],
+"plots": {
+ "g1": {
+ "geoms": [
+ "geom1_point_g1",
+"geom2_segment_g1" 
+],
+"options": {
+ "width":    400,
+"height":    400 
+},
+"axis": {
+ "x": [ 0.03685, 0.26775, 0.49865, 0.72955, 0.96044 ],
+"xlab": [ "0.0", "2.5", "5.0", "7.5", "10.0" ],
+"xrange": [ -0.39899, 10.428 ],
+"xname": "x",
+"xline": true,
+"xticks": true,
+"y": [ 0.14381, 0.35794, 0.57208, 0.78621 ],
+"ylab": [ "5", "10", "15", "20" ],
+"yrange": [  1.642, 24.992 ],
+"yname": "y",
+"yline": true,
+"yticks": true 
+},
+"title": "geom_abline",
+"legend": {} 
+} 
+} 
+}

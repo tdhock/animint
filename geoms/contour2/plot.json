@@ -1,0 +1,140 @@
+{
+ "geoms": {
+ "geom1_rect_g12": {
+ "geom": "rect",
+"data": "geom1_rect_g12.csv",
+"aes": {
+ "x": "x",
+"y": "y",
+"fill": "z",
+"colour": "z" 
+},
+"params": [],
+"update": "",
+"subord": [],
+"subvars": [],
+"classed": "geom1_rect_g12",
+"types": {
+ "fill": "rgb",
+"colour": "rgb",
+"x": "numeric",
+"y": "numeric",
+"PANEL": "integer",
+"group": "integer",
+"xmin": "numeric",
+"xmax": "numeric",
+"ymin": "numeric",
+"ymax": "numeric" 
+},
+"nextgeom": "geom2_path_g12" 
+},
+"geom2_path_g12": {
+ "geom": "path",
+"data": "geom2_path_g12.csv",
+"aes": {
+ "x": "x",
+"y": "y",
+"z": "z",
+"group": "piece" 
+},
+"params": {
+ "lineend": "butt",
+"linejoin": "round",
+"linemitre":      1,
+"na.rm": false,
+"colour": "black",
+"size":    0.5 
+},
+"update": "",
+"subord": [
+ "group" 
+],
+"subvars": {
+ "group": "piece" 
+},
+"classed": "geom2_path_g12",
+"types": {
+ "order": "numeric",
+"level": "numeric",
+"x": "numeric",
+"y": "numeric",
+"piece": "integer",
+"group": "factor",
+"PANEL": "integer" 
+} 
+} 
+},
+"selectors": [],
+"plots": {
+ "g12": {
+ "geoms": [
+ "geom1_rect_g12",
+"geom2_path_g12" 
+],
+"scales": {
+ "fill": [ "#51A6E9", "#3F83BA", "#2E628D", "#1E4262", "grey50" ],
+"colour": [ "#51A6E9", "#3F83BA", "#2E628D", "#1E4262", "grey50" ] 
+},
+"options": {
+ "width":    400,
+"height":    400 
+},
+"axis": {
+ "x": [ 0.060606, 0.31313, 0.56566, 0.81818 ],
+"xlab": [ "0", "25", "50", "75" ],
+"xrange": [     -6,     93 ],
+"xname": "x",
+"xline": true,
+"xticks": true,
+"y": [ 0.0671, 0.3557, 0.6443, 0.9329 ],
+"ylab": [ "0", "20", "40", "60" ],
+"yrange": [  -4.65,  64.65 ],
+"yname": "y",
+"yline": true,
+"yticks": true 
+},
+"title": "geom_tile + geom_contour",
+"legend": {
+ "height": {
+ "guide": "legend",
+"geoms": "polygon",
+"title": "height",
+"entries": [
+ {
+ "polygonfill": "#1E4262",
+"polygoncolour": "#1E4262",
+"polygonsize":    0.1,
+"polygonlinetype":      1,
+"polygonorder": 4,
+"label": [ "175" ] 
+},
+{
+ "polygonfill": "#2E628D",
+"polygoncolour": "#2E628D",
+"polygonsize":    0.1,
+"polygonlinetype":      1,
+"polygonorder": 3,
+"label": [ "150" ] 
+},
+{
+ "polygonfill": "#3F83BA",
+"polygoncolour": "#3F83BA",
+"polygonsize":    0.1,
+"polygonlinetype":      1,
+"polygonorder": 2,
+"label": [ "125" ] 
+},
+{
+ "polygonfill": "#51A6E9",
+"polygoncolour": "#51A6E9",
+"polygonsize":    0.1,
+"polygonlinetype":      1,
+"polygonorder": 1,
+"label": [ "100" ] 
+} 
+] 
+} 
+} 
+} 
+} 
+}

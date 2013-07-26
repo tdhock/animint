@@ -1,0 +1,88 @@
+{
+ "geoms": {
+ "geom1_point_g13": {
+ "geom": "point",
+"data": "geom1_point_g13.csv",
+"aes": {
+ "x": "duration",
+"y": "waiting" 
+},
+"params": {
+ "na.rm": false 
+},
+"update": "",
+"subord": [],
+"subvars": [],
+"classed": "geom1_point_g13",
+"types": {
+ "x": "numeric",
+"y": "numeric",
+"PANEL": "integer",
+"group": "integer" 
+},
+"nextgeom": "geom2_path_g13" 
+},
+"geom2_path_g13": {
+ "geom": "path",
+"data": "geom2_path_g13.csv",
+"aes": {
+ "x": "duration",
+"y": "waiting",
+"group": "piece" 
+},
+"params": {
+ "lineend": "butt",
+"linejoin": "round",
+"linemitre":      1,
+"na.rm": false,
+"colour": "blue",
+"size":    0.5 
+},
+"update": "",
+"subord": [
+ "group" 
+],
+"subvars": {
+ "group": "piece" 
+},
+"classed": "geom2_path_g13",
+"types": {
+ "level": "numeric",
+"x": "numeric",
+"y": "numeric",
+"piece": "integer",
+"group": "factor",
+"PANEL": "integer" 
+} 
+} 
+},
+"selectors": [],
+"plots": {
+ "g13": {
+ "geoms": [
+ "geom1_point_g13",
+"geom2_path_g13" 
+],
+"options": {
+ "width":    400,
+"height":    400 
+},
+"axis": {
+ "x": [ 0.29339, 0.62397, 0.95455 ],
+"xlab": [ "2", "4", "6" ],
+"xrange": [  0.225,  6.275 ],
+"xname": "duration",
+"xline": true,
+"xticks": true,
+"y": 0.86889,
+"ylab": "100",
+"yrange": [ 1.5801, 2.0634 ],
+"yname": "waiting",
+"yline": true,
+"yticks": true 
+},
+"title": "geom_contour 2d density",
+"legend": {} 
+} 
+} 
+}
