@@ -28,6 +28,7 @@ library(animint)
 
 ```r
 library(plyr)
+set.seed(33)
 
 boxplotdata <- rbind(data.frame(x = 1:50, y = sort(rnorm(50, 3, 1)), group = "N(3,1)"), 
     data.frame(x = 1:50, y = sort(rnorm(50, 0, 1)), group = "N(0,1)"), data.frame(x = 1:50, 
