@@ -47,10 +47,12 @@ USpolygons$state = state.abb[match(USpolygons$region, tolower(state.name))]
 map <- ggplot() + 
   geom_polygon(aes(x=long, y=lat, group=group), data=USpolygons, fill="black", colour="grey") +
   geom_segment(aes(x=startLong, y=startLat, xend=endLong, yend=endLat, showSelected=year), 
-               colour="#55B1F7", data=UStornadoes)
+               colour="#55B1F7", data=UStornadoes) +
+  ggtitle("Tornadoes in the US")
 
 ts <- ggplot() + 
-  stat_summary(aes(year, year, clickSelects=year), data=UStornadoes, fun.y=length, geom="bar")
+  stat_summary(aes(year, year, clickSelects=year), data=UStornadoes, fun.y=length, geom="bar") + 
+  ggtitle("Number of Tornadoes recorded in the US, 1950-2006")
 
 tornado.bar <- list(map = map, ts = ts, width=list(map = 970, ts = 400),  height=list(400)) 
 # specify plot widths to be 970px and 400px respectively, 
@@ -64,5 +66,22 @@ Clicking on a specific bar causes the subset of data corresponding to that year 
 
 The syntax for this example is slightly tricky, because the standard specification of geom\_bar(aes(x=year, clickSelects=year), data=UStornadoes, stat="bin") does not work with animint at this time. This is because clickSelects is not a ggplot2 aesthetic, and so the binning algorithm does not behave properly when clickSelects is specified. Using stat\_summary allows us to avoid this behavior. 
 
+### Plot Themes
+We typically do not want plot axes and labels displayed on a map, because it's obvious what the x and y axes are. While animint does not support all of ggplot2's theme() options, it does support removing the axes, labels, and axis titles. 
+
+To fully remove all evidence of the axes, we must separately remove axis lines, ticks, text (axis break labels), and titles. 
+```{r}
+map <- ggplot() + 
+  geom_polygon(aes(x=long, y=lat, group=group), data=USpolygons, fill="black", colour="grey") +
+  geom_segment(aes(x=startLong, y=startLat, xend=endLong, yend=endLat, showSelected=year), 
+               colour="#55B1F7", data=UStornadoes) +
+  ggtitle("Tornadoes in the US") + 
+  theme(axis.line=element_blank(), axis.text=element_blank(), 
+        axis.ticks=element_blank(), axis.title=element_blank())
+
+tornado.bar <- list(map = map, ts = ts, width=list(map = 970, ts = 400),  height=list(400)) 
+gg2animint(tornado.bar, out.dir = "tornado-bar2")
+```
+You can see the resulting d3 plot [here](tornado-bar2/index.html). Notice that the axes have been removed from the map, leaving only the data displayed on that plot. 
 
 
