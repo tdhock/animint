@@ -269,7 +269,9 @@ layer2list <- function(l, d, ranges){
   geom.aes.vars = g$aes[which(names(g$aes)%in%c("fill", "colour", "alpha", "size"))]
   grpidx <- which(names(g$aes)=="group")
   if(length(grpidx)>0){
-    if(length(geom.aes.vars)>0 & nrow(g$data)!=nrow(l$data)){
+    if(length(geom.aes.vars)>0 & nrow(g$data)!=nrow(l$data) & !g$geom%in%c("ribbon","polygon","line", "path")){
+      # need to exclude geom_ribbon and geom_violin, since they are coded to allow group aesthetics
+      # because they use the d3 path setup.
       if(g$aes[grpidx]%in%geom.aes.vars){
         ## if the group aesthetic is also mapped to another visual aesthetic, 
         ## then remove the group aesthetic
