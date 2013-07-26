@@ -59,7 +59,8 @@ map <- ggplot() + geom_polygon(aes(x = long, y = lat, group = group), data = USp
     data = UStornadoes) + ggtitle("Tornadoes in the US")
 
 ts <- ggplot() + stat_summary(aes(year, year, clickSelects = year), data = UStornadoes, 
-    fun.y = length, geom = "bar") + ggtitle("Number of Tornadoes recorded in the US, 1950-2006")
+    fun.y = length, geom = "bar") + ggtitle("Number of Tornadoes recorded in the US, 1950-2006") + 
+    ylab("Number of Tornadoes") + xlab("Year")
 
 tornado.bar <- list(map = map, ts = ts, width = list(map = 970, ts = 400), height = list(400))
 # specify plot widths to be 970px and 400px respectively, and specify 400
@@ -84,7 +85,8 @@ where x.name is the variable for x and clickSelects.
 
 
 ```r
-ts <- ggplot() + make_bar(UStornadoes, "year") + ggtitle("Number of Tornadoes recorded in the US, 1950-2006")
+ts <- ggplot() + make_bar(UStornadoes, "year") + ggtitle("Number of Tornadoes recorded in the US, 1950-2006") + 
+    ylab("Number of Tornadoes") + xlab("Year")
 
 tornado.bar <- list(map = map, ts = ts, width = list(map = 970, ts = 400), height = list(400))
 
@@ -135,7 +137,8 @@ map <- ggplot() + make_text(UStornadoCounts, -100, 50, "year", "Tornadoes in %d"
     axis.ticks = element_blank(), axis.title = element_blank())
 ts <- ggplot() + make_text(UStornadoes, 1980, 200, "state") + geom_bar(aes(year, 
     count, clickSelects = year, showSelected = state), data = UStornadoCounts, 
-    stat = "identity", position = "identity")
+    stat = "identity", position = "identity") + ylab("Number of Tornadoes") + 
+    xlab("Year")
 
 tornado.ts.bar <- list(map = map, ts = ts, width = list(map = 970, ts = 400), 
     height = list(400))
@@ -164,7 +167,8 @@ map <- ggplot() + geom_polygon(aes(x = long, y = lat, group = group, clickSelect
 
 ts <- ggplot() + make_tallrect(UStornadoCounts, "year") + make_text(UStornadoes, 
     1980, 200, "state") + geom_line(aes(year, count, clickSelects = state, group = state), 
-    data = UStornadoCounts, alpha = 3/5, size = 4)
+    data = UStornadoCounts, alpha = 3/5, size = 4) + ylab("Number of Tornadoes") + 
+    xlab("Year")
 
 time <- list(variable = "year", ms = 2000)  # new part of the list passed to gg2animint().
 

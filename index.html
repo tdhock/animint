@@ -230,7 +230,8 @@ map &lt;- ggplot() + geom_polygon(aes(x = long, y = lat, group = group), data = 
     data = UStornadoes) + ggtitle(&quot;Tornadoes in the US&quot;)
 
 ts &lt;- ggplot() + stat_summary(aes(year, year, clickSelects = year), data = UStornadoes, 
-    fun.y = length, geom = &quot;bar&quot;) + ggtitle(&quot;Number of Tornadoes recorded in the US, 1950-2006&quot;)
+    fun.y = length, geom = &quot;bar&quot;) + ggtitle(&quot;Number of Tornadoes recorded in the US, 1950-2006&quot;) + 
+    ylab(&quot;Number of Tornadoes&quot;) + xlab(&quot;Year&quot;)
 
 tornado.bar &lt;- list(map = map, ts = ts, width = list(map = 970, ts = 400), height = list(400))
 # specify plot widths to be 970px and 400px respectively, and specify 400
@@ -253,7 +254,8 @@ gg2animint(tornado.bar, out.dir = &quot;tornado-bar&quot;)
 <strong>make_bar(data, x.name, alpha=1)</strong><br/>
 where x.name is the variable for x and clickSelects. </p>
 
-<pre><code class="r">ts &lt;- ggplot() + make_bar(UStornadoes, &quot;year&quot;) + ggtitle(&quot;Number of Tornadoes recorded in the US, 1950-2006&quot;)
+<pre><code class="r">ts &lt;- ggplot() + make_bar(UStornadoes, &quot;year&quot;) + ggtitle(&quot;Number of Tornadoes recorded in the US, 1950-2006&quot;) + 
+    ylab(&quot;Number of Tornadoes&quot;) + xlab(&quot;Year&quot;)
 
 tornado.bar &lt;- list(map = map, ts = ts, width = list(map = 970, ts = 400), height = list(400))
 
@@ -301,7 +303,8 @@ where format can be specified using a string containing %d, %f, etc. to represen
     axis.ticks = element_blank(), axis.title = element_blank())
 ts &lt;- ggplot() + make_text(UStornadoes, 1980, 200, &quot;state&quot;) + geom_bar(aes(year, 
     count, clickSelects = year, showSelected = state), data = UStornadoCounts, 
-    stat = &quot;identity&quot;, position = &quot;identity&quot;)
+    stat = &quot;identity&quot;, position = &quot;identity&quot;) + ylab(&quot;Number of Tornadoes&quot;) + 
+    xlab(&quot;Year&quot;)
 
 tornado.ts.bar &lt;- list(map = map, ts = ts, width = list(map = 970, ts = 400), 
     height = list(400))
@@ -332,7 +335,8 @@ make_tallrect(x.name, data, alpha=&frac12;)</p>
 
 ts &lt;- ggplot() + make_tallrect(UStornadoCounts, &quot;year&quot;) + make_text(UStornadoes, 
     1980, 200, &quot;state&quot;) + geom_line(aes(year, count, clickSelects = state, group = state), 
-    data = UStornadoCounts, alpha = 3/5, size = 4)
+    data = UStornadoCounts, alpha = 3/5, size = 4) + ylab(&quot;Number of Tornadoes&quot;) + 
+    xlab(&quot;Year&quot;)
 
 time &lt;- list(variable = &quot;year&quot;, ms = 2000)  # new part of the list passed to gg2animint().
 
