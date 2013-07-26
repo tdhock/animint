@@ -266,10 +266,11 @@ layer2list <- function(l, d, ranges){
   ## idea: if geom is calculated, group is not meaningful - 
   ## it has already been used in the calculation stage, and 
   ## will only confuse the issue later.
-  geom.aes.vars = g$aes[which(names(g$aes)%in%c("fill", "colour", "alpha", "size"))]
+  geom.aes.vars = g$aes[which(names(g$aes)%in%c("x", "y", "fill", "colour", "alpha", "size"))]
   grpidx <- which(names(g$aes)=="group")
   if(length(grpidx)>0){
-    if(length(geom.aes.vars)>0 & nrow(g$data)!=nrow(l$data) & !g$geom%in%c("ribbon","polygon","line", "path")){
+    if(length(geom.aes.vars)>0 & nrow(g$data)!=nrow(l$data) & 
+         !g$geom%in%c("ribbon","polygon","line", "path")){
       # need to exclude geom_ribbon and geom_violin, since they are coded to allow group aesthetics
       # because they use the d3 path setup.
       if(g$aes[grpidx]%in%geom.aes.vars){
