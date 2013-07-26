@@ -1,15 +1,8 @@
 animint
 base
-datasets
 ggplot2
-graphics
-grDevices
-grid
 knitr
 maps
-methods
 plyr
 proto
 RJSONIO
-stats
-utils

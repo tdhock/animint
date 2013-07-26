@@ -249,6 +249,10 @@ gg2animint(tornado.bar, out.dir = &quot;tornado-bar&quot;)
 
 <p>In order to make bar plots with stat_bin somewhat easier, animint includes a make_bar function, which helps facilitate bar charts with clickSelects aesthetics. </p>
 
+<p>Syntax is<br/>
+make_bar(data, x.name, alpha=1)<br/>
+where x.name is the variable for x and clickSelects. </p>
+
 <pre><code class="r">ts &lt;- ggplot() + make_bar(UStornadoes, &quot;year&quot;) + ggtitle(&quot;Number of Tornadoes recorded in the US, 1950-2006&quot;)
 
 tornado.bar &lt;- list(map = map, ts = ts, width = list(map = 970, ts = 400), height = list(400))
@@ -276,13 +280,20 @@ gg2animint(tornado.bar, out.dir = &quot;tornado-bar3&quot;)
 
 <p>You can see the resulting d3 plot <a href="tornado-bar2/index.html">here</a>. Notice that the axes have been removed from the map, leaving only the data displayed on that plot. </p>
 
-<h3>Text that responds to clickSelects</h3>
-
-<p>The make_text function included in animint makes it easy to create text describing what has been selected. In this case, we would like to display the year underneath the map, show the selected state on the bar chart, and display the tornadoes per year in a specific state in that bar chart. </p>
+<p>We may want to allow users to select a state as well as a year, so that the bar chart shows the number of tornadoes over time for a specific state, and the map shows the tornadoes that occurred during the selected year. To do this, we will need to create a summarized dataset using the <strong>plyr</strong> package. We&#39;ll create a data frame that contains the number of tornadoes occurring in each state for each year in the dataset. </p>
 
 <pre><code class="r">UStornadoCounts &lt;- ddply(UStornadoes, .(state, year), summarize, count = length(state))
+</code></pre>
 
-map &lt;- ggplot() + make_text(UStornadoCounts, -100, 50, &quot;year&quot;, &quot;Tornadoes in %d&quot;) + 
+<h3>Text that responds to clickSelects</h3>
+
+<p>The make_text function included in animint makes it easy to create text describing what has been selected. In this case, we would like to display the year on the US map, and we would like to show the state on the bar chart. This interactivity does not work with ggtitle() at this time, but we can create a &ldquo;title&rdquo; element on the plot itself instead using make_text.  </p>
+
+<p>Syntax is<br/>
+make_text(data, x, y, label.var, format=NULL)<br/>
+where format can be specified using a string containing %d, %f, etc. to represent the variable value.</p>
+
+<pre><code class="r">map &lt;- ggplot() + make_text(UStornadoCounts, -100, 50, &quot;year&quot;, &quot;Tornadoes in %d&quot;) + 
     geom_polygon(aes(x = long, y = lat, group = group, clickSelects = state), 
         data = USpolygons, fill = &quot;black&quot;, colour = &quot;grey&quot;) + geom_segment(aes(x = startLong, 
     y = startLat, xend = endLong, yend = endLat, showSelected = year), colour = &quot;#55B1F7&quot;, 
@@ -298,6 +309,37 @@ gg2animint(tornado.ts.bar, &quot;tornado-ts-bar&quot;)
 </code></pre>
 
 <p><a href="tornado-ts-bar/index.html">Here</a> is the resulting d3 plot.</p>
+
+<h3>Animation</h3>
+
+<p>Animint also allows you to automatically change the selection or data shown so that the plot is animated. The <strong>time</strong> argument in the list provided to <strong>gg2animint</strong> allows you to set the following arguments: </p>
+
+<ul>
+<li>the <strong>variable</strong> that will advance over time</li>
+<li><strong>ms</strong>, the length of time in milliseconds between transitions</li>
+<li><strong>duration</strong>, the time used to switch between values (in milliseconds).</li>
+</ul>
+
+<p>This example also demonstrates the make_tallrect function, which populates a graph with bars spanning the entire y range located at each value of the variable passed in, with clickSelects element to match. Syntax is<br/>
+make_tallrect(x.name, data, alpha=&frac12;)</p>
+
+<pre><code class="r">map &lt;- ggplot() + geom_polygon(aes(x = long, y = lat, group = group, clickSelects = state), 
+    data = USpolygons, fill = &quot;black&quot;, colour = &quot;grey&quot;) + geom_segment(aes(x = startLong, 
+    y = startLat, xend = endLong, yend = endLat, showSelected = year), colour = &quot;#55B1F7&quot;, 
+    data = UStornadoes) + make_text(UStornadoCounts, -100, 50, &quot;year&quot;, &quot;Tornadoes in %d&quot;) + 
+    theme(axis.line = element_blank(), axis.text = element_blank(), axis.ticks = element_blank(), 
+        axis.title = element_blank())
+
+ts &lt;- ggplot() + make_tallrect(UStornadoCounts, &quot;year&quot;) + make_text(UStornadoes, 
+    1980, 200, &quot;state&quot;) + geom_line(aes(year, count, clickSelects = state, group = state), 
+    data = UStornadoCounts, alpha = 3/5, size = 4)
+
+time &lt;- list(variable = &quot;year&quot;, ms = 2000)  # new part of the list passed to gg2animint().
+
+tornado.anim &lt;- list(map = map, ts = ts, time = time)  # pass the time object in as another object in the main list. 
+
+gg2animint(tornado.anim, &quot;tornado-anim&quot;)
+</code></pre>
 
 </body>
 
