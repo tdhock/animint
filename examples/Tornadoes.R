@@ -66,7 +66,7 @@ tornado.bar <-
                         showSelected=year),
                     colour="#55B1F7", data=UStornadoes),
        ts=ggplot()+
-       make_bar("year", UStornadoes))
+       make_bar(UStornadoes, "year"))
 gg2animint(tornado.bar, "tornado-bar")
 
 UStornadoCounts <-
@@ -74,12 +74,14 @@ UStornadoCounts <-
 ## OK: select state to show that subset of bars!
 tornado.ts.bar <-
   list(map=ggplot()+
+       make_text(UStornadoCounts, -100, 50, "year", "Tornadoes in %d")+
        geom_polygon(aes(x=long, y=lat, group=group, clickSelects=state),
                     data=USpolygons, fill="black", colour="grey") +
        geom_segment(aes(x=startLong, y=startLat, xend=endLong, yend=endLat,
                         showSelected=year),
                     colour="#55B1F7", data=UStornadoes),
        ts=ggplot()+
+       make_text(UStornadoes, 1980, 200, "state")+
        geom_bar(aes(year, count, clickSelects=year, showSelected=state),
                 data=UStornadoCounts, stat="identity", position="identity"))
 gg2animint(tornado.ts.bar, "tornado-ts-bar")
@@ -92,7 +94,7 @@ tornado.ts.line <-
                         showSelected=year),
                     colour="#55B1F7", data=UStornadoes),
        ts=ggplot()+
-       make_tallrect("year", UStornadoCounts)+
+       make_tallrect(UStornadoCounts, "year")+
        geom_line(aes(year, count, clickSelects=state, group=state),
                  data=UStornadoCounts, alpha=3/5, size=4))
 gg2animint(tornado.ts.line, "tornado-ts-line")
@@ -106,11 +108,11 @@ tornado.anim <-
                         showSelected=year),
                     colour="#55B1F7", data=UStornadoes),
        ts=ggplot()+
-       make_tallrect("year", UStornadoCounts)+
+       make_tallrect(UStornadoCounts, "year")+
        geom_line(aes(year, count, clickSelects=state, group=state),
                  data=UStornadoCounts, alpha=3/5, size=4),
        time=list(variable="year",ms=2000))
-gg2animint(tornado.ts, "tornado-anim")
+gg2animint(tornado.anim, "tornado-anim")
 
 
 ## how to get gg2animint to play nice with computed stuff... just pass in the computed data without groups specified. So, either user has to compute stuff using ggplot_build or ddply, and then pass into animint, or we figure out how to determine whether group is important or not. Attempt at determining importance is implemented in animint.R - if there are different numbers of rows in plot$layer[[i]]$data and plistextra$data[[i]], this means geom is calculated. If geom is calculated and group overlaps with another aesthetic (color, etc.), then remove group from subord, subvars, and aes.
@@ -145,9 +147,17 @@ timehist <- ggplot() + geom_histogram(data=UStornadoes, aes(x=year, group=f, fil
 statehist <- ggplot() + geom_histogram(data=UStornadoes, aes(x=state, fill=f, group = f, colour=f, clickSelects=state, weight=weight), stat="bin", position="stack") + xlab("State") + ylab("Tornadoes per Square Mile") + ggtitle("Recorded Tornadoes by State") + coord_flip()
 # clickSelects won't work unless group=state, but then stat_bin doesn't work. :(
 
+## workaround: bin the data yourself and use geom_bar!
+UStornadoCountsF <-
+  ddply(UStornadoes, .(state, f), summarize, count=length(state))
+statehist <- ggplot()+
+  geom_bar(aes(state, count, fill=f, clickSelects=state),
+           stat="identity", position="stack", data=UStornadoCountsF)+
+  coord_flip()
+
 statebyyear <- ddply(UStornadoes, .(year, state), summarise, count=length(f), f = mean(f))
 
-statetimeline <- ggplot() + geom_line(data=statebyyear, aes(x=year, y=count, group = state, colour=f, clickSelects=state))
+statetimeline <- ggplot() + geom_line(data=statebyyear, aes(x=year, y=count, group = state, colour=f, clickSelects=state), size=3, alpha=1/2)
 
 gg2animint(list(p1=timehist, p2=statehist, p3=statetimeline, width=list(500), height=list(500)))
 
