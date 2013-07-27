@@ -1,0 +1,489 @@
+{
+ "geoms": {
+ "geom1_line_p3": {
+ "geom": "line",
+"data": "geom1_line_p3.csv",
+"aes": {
+ "x": "x",
+"y": "y",
+"colour": "group",
+"group": "group",
+"linetype": "lt" 
+},
+"params": [],
+"update": "",
+"subord": [
+ "group" 
+],
+"subvars": {
+ "group": "group" 
+},
+"classed": "geom1_line_p3",
+"types": {
+ "colour": "rgb",
+"linetype": "linetype",
+"x": "numeric",
+"y": "numeric",
+"group": "integer",
+"PANEL": "integer" 
+},
+"nextgeom": "geom2_line_p4" 
+},
+"geom2_line_p4": {
+ "geom": "line",
+"data": "geom2_line_p4.csv",
+"aes": {
+ "x": "x",
+"y": "y",
+"colour": "group",
+"group": "group",
+"linetype": "group" 
+},
+"params": [],
+"update": "",
+"subord": [
+ "group" 
+],
+"subvars": {
+ "group": "group" 
+},
+"classed": "geom2_line_p4",
+"types": {
+ "colour": "rgb",
+"linetype": "linetype",
+"x": "numeric",
+"y": "numeric",
+"group": "integer",
+"PANEL": "integer" 
+},
+"nextgeom": "geom3_line_p5" 
+},
+"geom3_line_p5": {
+ "geom": "line",
+"data": "geom3_line_p5.csv",
+"aes": {
+ "x": "x",
+"y": "y",
+"colour": "group",
+"group": "group",
+"linetype": "lt" 
+},
+"params": [],
+"update": "",
+"subord": [
+ "group" 
+],
+"subvars": {
+ "group": "group" 
+},
+"classed": "geom3_line_p5",
+"types": {
+ "linetype": "linetype",
+"colour": "rgb",
+"x": "numeric",
+"y": "numeric",
+"group": "integer",
+"PANEL": "integer" 
+},
+"nextgeom": "geom4_segment_p6" 
+},
+"geom4_segment_p6": {
+ "geom": "segment",
+"data": "geom4_segment_p6.csv",
+"aes": {
+ "x": "x",
+"y": "y",
+"xend": "xend",
+"yend": "yend",
+"linetype": "lt" 
+},
+"params": {
+ "lineend": "butt",
+"na.rm": false 
+},
+"update": "",
+"subord": [],
+"subvars": [],
+"classed": "geom4_segment_p6",
+"types": {
+ "linetype": "linetype",
+"x": "numeric",
+"xend": "numeric",
+"y": "numeric",
+"yend": "numeric",
+"PANEL": "integer",
+"group": "integer" 
+},
+"nextgeom": "geom5_text_p6" 
+},
+"geom5_text_p6": {
+ "geom": "text",
+"data": "geom5_text_p6.csv",
+"aes": {
+ "x": "lx",
+"y": "y",
+"label": "lt" 
+},
+"params": {
+ "parse": false,
+"hjust":      0 
+},
+"update": "",
+"subord": [],
+"subvars": [],
+"classed": "geom5_text_p6",
+"types": {
+ "x": "numeric",
+"y": "numeric",
+"label": "factor",
+"PANEL": "integer",
+"group": "integer" 
+},
+"nextgeom": "geom6_segment_p7" 
+},
+"geom6_segment_p7": {
+ "geom": "segment",
+"data": "geom6_segment_p7.csv",
+"aes": {
+ "x": "x",
+"y": "y",
+"xend": "xend",
+"yend": "yend",
+"linetype": "lt" 
+},
+"params": {
+ "lineend": "butt",
+"na.rm": false 
+},
+"update": "",
+"subord": [],
+"subvars": [],
+"classed": "geom6_segment_p7",
+"types": {
+ "linetype": "linetype",
+"x": "numeric",
+"xend": "numeric",
+"y": "numeric",
+"yend": "numeric",
+"PANEL": "integer",
+"group": "integer" 
+},
+"nextgeom": "geom7_text_p7" 
+},
+"geom7_text_p7": {
+ "geom": "text",
+"data": "geom7_text_p7.csv",
+"aes": {
+ "x": "lx",
+"y": "y",
+"label": "lt" 
+},
+"params": {
+ "parse": false,
+"hjust":      0 
+},
+"update": "",
+"subord": [],
+"subvars": [],
+"classed": "geom7_text_p7",
+"types": {
+ "x": "numeric",
+"y": "numeric",
+"label": "factor",
+"PANEL": "integer",
+"group": "integer" 
+} 
+} 
+},
+"selectors": [],
+"plots": {
+ "p3": {
+ "geoms": [
+ "geom1_line_p3" 
+],
+"scales": {
+ "colour": [ "#F8766D", "#A3A500", "#00BF7D", "#00B0F6", "#E76BF3" ],
+"linetype": [ "solid", "22" ] 
+},
+"options": {
+ "width":    400,
+"height":    400 
+},
+"axis": {
+ "x": [ 0.19697, 0.44949, 0.70202, 0.95455 ],
+"xlab": [ "2.5", "5.0", "7.5", "10.0" ],
+"xrange": [   0.55,  10.45 ],
+"xname": "x",
+"xline": true,
+"xticks": true,
+"y": [ 0.15489, 0.3652, 0.5755, 0.7858, 0.9961 ],
+"ylab": [ "0.0", "2.5", "5.0", "7.5", "10.0" ],
+"yrange": [ -1.8413, 10.046 ],
+"yname": "y",
+"yline": true,
+"yticks": true 
+},
+"title": "geom_line + scale_linetype_manual",
+"legend": {
+ "lt": {
+ "guide": "legend",
+"geoms": "path",
+"title": "lt",
+"entries": [
+ {
+ "pathlinetype": "22",
+"pathcolour": "#000000",
+"pathsize":    0.5,
+"pathorder": 2,
+"label": [ "odd" ] 
+},
+{
+ "pathlinetype": "solid",
+"pathcolour": "#000000",
+"pathsize":    0.5,
+"pathorder": 1,
+"label": [ "even" ] 
+} 
+] 
+},
+"group": {
+ "guide": "legend",
+"geoms": "path",
+"title": "group",
+"entries": [
+ {
+ "pathcolour": "#E76BF3",
+"pathsize":    0.5,
+"pathlinetype":      1,
+"pathorder": 5,
+"label": [ "5" ] 
+},
+{
+ "pathcolour": "#00B0F6",
+"pathsize":    0.5,
+"pathlinetype":      1,
+"pathorder": 4,
+"label": [ "4" ] 
+},
+{
+ "pathcolour": "#00BF7D",
+"pathsize":    0.5,
+"pathlinetype":      1,
+"pathorder": 3,
+"label": [ "3" ] 
+},
+{
+ "pathcolour": "#A3A500",
+"pathsize":    0.5,
+"pathlinetype":      1,
+"pathorder": 2,
+"label": [ "2" ] 
+},
+{
+ "pathcolour": "#F8766D",
+"pathsize":    0.5,
+"pathlinetype":      1,
+"pathorder": 1,
+"label": [ "1" ] 
+} 
+] 
+} 
+} 
+},
+"p4": {
+ "geoms": [
+ "geom2_line_p4" 
+],
+"scales": {
+ "colour": [ "#F8766D", "#A3A500", "#00BF7D", "#00B0F6", "#E76BF3" ],
+"linetype": [ "solid", "22", "42", "44", "13" ] 
+},
+"options": {
+ "width":    400,
+"height":    400 
+},
+"axis": {
+ "x": [ 0.19697, 0.44949, 0.70202, 0.95455 ],
+"xlab": [ "2.5", "5.0", "7.5", "10.0" ],
+"xrange": [   0.55,  10.45 ],
+"xname": "x",
+"xline": true,
+"xticks": true,
+"y": [ 0.15489, 0.3652, 0.5755, 0.7858, 0.9961 ],
+"ylab": [ "0.0", "2.5", "5.0", "7.5", "10.0" ],
+"yrange": [ -1.8413, 10.046 ],
+"yname": "y",
+"yline": true,
+"yticks": true 
+},
+"title": "geom_line + scale_linetype automatic",
+"legend": {
+ "group": {
+ "guide": "legend",
+"geoms": "path",
+"title": "group",
+"entries": [
+ {
+ "pathcolour": "#E76BF3",
+"pathlinetype": "13",
+"pathsize":    0.5,
+"pathorder": 5,
+"label": [ "5" ] 
+},
+{
+ "pathcolour": "#00B0F6",
+"pathlinetype": "44",
+"pathsize":    0.5,
+"pathorder": 4,
+"label": [ "4" ] 
+},
+{
+ "pathcolour": "#00BF7D",
+"pathlinetype": "42",
+"pathsize":    0.5,
+"pathorder": 3,
+"label": [ "3" ] 
+},
+{
+ "pathcolour": "#A3A500",
+"pathlinetype": "22",
+"pathsize":    0.5,
+"pathorder": 2,
+"label": [ "2" ] 
+},
+{
+ "pathcolour": "#F8766D",
+"pathlinetype": "solid",
+"pathsize":    0.5,
+"pathorder": 1,
+"label": [ "1" ] 
+} 
+] 
+} 
+} 
+},
+"p5": {
+ "geoms": [
+ "geom3_line_p5" 
+],
+"scales": {
+ "colour": [ "#F8766D", "#A3A500", "#00BF7D", "#00B0F6", "#E76BF3" ] 
+},
+"options": {
+ "width":    400,
+"height":    400 
+},
+"axis": {
+ "x": [ 0.19697, 0.44949, 0.70202, 0.95455 ],
+"xlab": [ "2.5", "5.0", "7.5", "10.0" ],
+"xrange": [   0.55,  10.45 ],
+"xname": "x",
+"xline": true,
+"xticks": true,
+"y": [ 0.15489, 0.3652, 0.5755, 0.7858, 0.9961 ],
+"ylab": [ "0.0", "2.5", "5.0", "7.5", "10.0" ],
+"yrange": [ -1.8413, 10.046 ],
+"yname": "y",
+"yline": true,
+"yticks": true 
+},
+"title": "Manual Linetypes: dash-space length",
+"legend": {
+ "group": {
+ "guide": "legend",
+"geoms": "path",
+"title": "group",
+"entries": [
+ {
+ "pathcolour": "#E76BF3",
+"pathlinetype": "solid",
+"pathsize":    0.5,
+"pathorder": 5,
+"label": [ "5" ] 
+},
+{
+ "pathcolour": "#00B0F6",
+"pathlinetype": "F2F4",
+"pathsize":    0.5,
+"pathorder": 4,
+"label": [ "4" ] 
+},
+{
+ "pathcolour": "#00BF7D",
+"pathlinetype": "331323",
+"pathsize":    0.5,
+"pathorder": 3,
+"label": [ "3" ] 
+},
+{
+ "pathcolour": "#A3A500",
+"pathlinetype": "2423",
+"pathsize":    0.5,
+"pathorder": 2,
+"label": [ "2" ] 
+},
+{
+ "pathcolour": "#F8766D",
+"pathlinetype": "2415",
+"pathsize":    0.5,
+"pathorder": 1,
+"label": [ "1" ] 
+} 
+] 
+} 
+} 
+},
+"p6": {
+ "geoms": [
+ "geom4_segment_p6",
+"geom5_text_p6" 
+],
+"options": {
+ "width":    400,
+"height":    400 
+},
+"axis": {
+ "x": [ 0.10606, 0.34848, 0.59091, 0.83333 ],
+"xlab": [ "-0.1", "0.0", "0.1", "0.2" ],
+"xrange": [ -0.14375, 0.26875 ],
+"xname": "x",
+"xline": true,
+"xticks": true,
+"y": [ 0.34848, 0.72727 ],
+"ylab": [ "5", "10" ],
+"yrange": [    0.4,   13.6 ],
+"yname": "y",
+"yline": true,
+"yticks": true 
+},
+"title": "Scales package: all linetypes",
+"legend": {} 
+},
+"p7": {
+ "geoms": [
+ "geom6_segment_p7",
+"geom7_text_p7" 
+],
+"options": {
+ "width":    400,
+"height":    400 
+},
+"axis": {
+ "x": [ 0.10606, 0.34848, 0.59091, 0.83333 ],
+"xlab": [ "-0.1", "0.0", "0.1", "0.2" ],
+"xrange": [ -0.14375, 0.26875 ],
+"xname": "x",
+"xline": true,
+"xticks": true,
+"y": [ 0.22727, 0.59091, 0.95455 ],
+"ylab": [ "2", "4", "6" ],
+"yrange": [   0.75,   6.25 ],
+"yname": "y",
+"yline": true,
+"yticks": true 
+},
+"title": "Named linetypes",
+"legend": {} 
+} 
+} 
+}

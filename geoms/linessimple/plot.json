@@ -1,0 +1,154 @@
+{
+ "geoms": {
+ "geom1_line_p1": {
+ "geom": "line",
+"data": "geom1_line_p1.csv",
+"aes": {
+ "x": "x",
+"y": "y",
+"group": "group" 
+},
+"params": [],
+"update": "",
+"subord": [
+ "group" 
+],
+"subvars": {
+ "group": "group" 
+},
+"classed": "geom1_line_p1",
+"types": {
+ "x": "numeric",
+"y": "numeric",
+"group": "integer",
+"PANEL": "integer" 
+},
+"nextgeom": "geom2_line_p2" 
+},
+"geom2_line_p2": {
+ "geom": "line",
+"data": "geom2_line_p2.csv",
+"aes": {
+ "x": "x",
+"y": "y",
+"colour": "group",
+"group": "group" 
+},
+"params": [],
+"update": "",
+"subord": [
+ "group" 
+],
+"subvars": {
+ "group": "group" 
+},
+"classed": "geom2_line_p2",
+"types": {
+ "colour": "rgb",
+"x": "numeric",
+"y": "numeric",
+"group": "integer",
+"PANEL": "integer" 
+} 
+} 
+},
+"selectors": [],
+"plots": {
+ "p1": {
+ "geoms": [
+ "geom1_line_p1" 
+],
+"options": {
+ "width":    400,
+"height":    400 
+},
+"axis": {
+ "x": [ 0.19697, 0.44949, 0.70202, 0.95455 ],
+"xlab": [ "2.5", "5.0", "7.5", "10.0" ],
+"xrange": [   0.55,  10.45 ],
+"xname": "x",
+"xline": true,
+"xticks": true,
+"y": [ 0.15489, 0.3652, 0.5755, 0.7858, 0.9961 ],
+"ylab": [ "0.0", "2.5", "5.0", "7.5", "10.0" ],
+"yrange": [ -1.8413, 10.046 ],
+"yname": "y",
+"yline": true,
+"yticks": true 
+},
+"title": "geom_line",
+"legend": {} 
+},
+"p2": {
+ "geoms": [
+ "geom2_line_p2" 
+],
+"scales": {
+ "colour": [ "#F8766D", "#A3A500", "#00BF7D", "#00B0F6", "#E76BF3" ] 
+},
+"options": {
+ "width":    400,
+"height":    400 
+},
+"axis": {
+ "x": [ 0.19697, 0.44949, 0.70202, 0.95455 ],
+"xlab": [ "2.5", "5.0", "7.5", "10.0" ],
+"xrange": [   0.55,  10.45 ],
+"xname": "x",
+"xline": true,
+"xticks": true,
+"y": [ 0.15489, 0.3652, 0.5755, 0.7858, 0.9961 ],
+"ylab": [ "0.0", "2.5", "5.0", "7.5", "10.0" ],
+"yrange": [ -1.8413, 10.046 ],
+"yname": "y",
+"yline": true,
+"yticks": true 
+},
+"title": "geom_line + scale_colour_discrete",
+"legend": {
+ "group": {
+ "guide": "legend",
+"geoms": "path",
+"title": "group",
+"entries": [
+ {
+ "pathcolour": "#E76BF3",
+"pathsize":    0.5,
+"pathlinetype":      1,
+"pathorder": 5,
+"label": [ "5" ] 
+},
+{
+ "pathcolour": "#00B0F6",
+"pathsize":    0.5,
+"pathlinetype":      1,
+"pathorder": 4,
+"label": [ "4" ] 
+},
+{
+ "pathcolour": "#00BF7D",
+"pathsize":    0.5,
+"pathlinetype":      1,
+"pathorder": 3,
+"label": [ "3" ] 
+},
+{
+ "pathcolour": "#A3A500",
+"pathsize":    0.5,
+"pathlinetype":      1,
+"pathorder": 2,
+"label": [ "2" ] 
+},
+{
+ "pathcolour": "#F8766D",
+"pathsize":    0.5,
+"pathlinetype":      1,
+"pathorder": 1,
+"label": [ "1" ] 
+} 
+] 
+} 
+} 
+} 
+} 
+}

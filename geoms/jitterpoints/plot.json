@@ -1,0 +1,101 @@
+{
+ "geoms": {
+ "geom1_jitter_s5": {
+ "geom": "jitter",
+"data": "geom1_jitter_s5.csv",
+"aes": {
+ "x": "xnew",
+"y": "y",
+"colour": "class4",
+"fill": "class4" 
+},
+"params": {
+ "na.rm": false 
+},
+"update": "",
+"subord": [],
+"subvars": [],
+"classed": "geom1_jitter_s5",
+"types": {
+ "colour": "rgb",
+"fill": "rgb",
+"x": "numeric",
+"y": "numeric",
+"PANEL": "integer",
+"group": "integer" 
+} 
+} 
+},
+"selectors": [],
+"plots": {
+ "s5": {
+ "geoms": [
+ "geom1_jitter_s5" 
+],
+"scales": {
+ "colour": [ "#F8766D", "#7CAE00", "#00BFC4", "#C77CFF" ],
+"fill": [ "#F8766D", "#7CAE00", "#00BFC4", "#C77CFF" ] 
+},
+"options": {
+ "width":    400,
+"height":    400 
+},
+"axis": {
+ "x": [ 0.14286, 0.38095, 0.61905, 0.85714 ],
+"xlab": [ "20", "40", "60", "80" ],
+"xrange": [    0.4,    4.6 ],
+"xname": "xnew",
+"xline": true,
+"xticks": true,
+"y": [ 0.19193, 0.48168, 0.77144 ],
+"ylab": [ "25", "50", "75" ],
+"yrange": [ 8.4399, 94.721 ],
+"yname": "y",
+"yline": true,
+"yticks": true 
+},
+"title": "geom_jitter",
+"legend": {
+ "class4": {
+ "guide": "legend",
+"geoms": "point",
+"title": "class4",
+"entries": [
+ {
+ "pointcolour": "#C77CFF",
+"pointfill": "#C77CFF",
+"pointshape":     16,
+"pointsize":      2,
+"pointorder": 4,
+"label": [ "low" ] 
+},
+{
+ "pointcolour": "#00BFC4",
+"pointfill": "#00BFC4",
+"pointshape":     16,
+"pointsize":      2,
+"pointorder": 3,
+"label": [ "medlow" ] 
+},
+{
+ "pointcolour": "#7CAE00",
+"pointfill": "#7CAE00",
+"pointshape":     16,
+"pointsize":      2,
+"pointorder": 2,
+"label": [ "medhigh" ] 
+},
+{
+ "pointcolour": "#F8766D",
+"pointfill": "#F8766D",
+"pointshape":     16,
+"pointsize":      2,
+"pointorder": 1,
+"label": [ "high" ] 
+} 
+] 
+} 
+} 
+} 
+} 
+}
