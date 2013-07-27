@@ -33,8 +33,7 @@ countries <- subset(countries, ((-long)>54)&((-long)<118))
 
 temp.seq <- ggplot() + 
   make_tallrect(data=climate, "time2") + 
-  geom_line(data=climate, aes(x=time2, y=temperature, group=id, clickSelects = id, colour=lat), alpha=.4) + 
-  scale_colour_gradient2(low="purple", mid="white", high="orange")
+  geom_line(data=climate, aes(x=time2, y=temperature, showSelected=id))
 
 clouds.high <- ggplot() + 
   geom_tile(data=climate, aes(x=long, y=lat, fill=cloudhigh, clickSelects=id, showSelected=time2), colour="grey") + 
