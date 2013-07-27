@@ -12,7 +12,7 @@ library(animint)
 example(gg2animint)
 ```
 
-For more examples, see breakpoints.R evolution.R intreg.R and
+For more examples, see [the animint tutorial](http://tdhock.github.io/animint/) or look at breakpoints.R evolution.R intreg.R and
 Tornadoes.R in the examples folder.
 
 A list of implemented features and TODOs can be found on the
