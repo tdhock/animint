@@ -1,5 +1,6 @@
 library(animint)
 library(ggplot2)
+library(plyr)
 
 #' Demonstrates line plots in animint, debugging, serves as an example
 
