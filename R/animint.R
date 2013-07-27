@@ -532,7 +532,7 @@ is.rgb <- function(x){
 #' @return hexadecimal color value (if is.na(x), return "none" for compatibility with JavaScript)
 #' @export
 toRGB <- function(x){
-  if(!is.na(x)) rgb(t(col2rgb(as.character(x))), maxColorValue=255) else "none"  
+  sapply(x, function(i) if(!is.na(i)) rgb(t(col2rgb(as.character(i))), maxColorValue=255) else "none")
 } 
 
 #' Function to get legend information from ggplot
