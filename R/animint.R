@@ -529,9 +529,11 @@ is.rgb <- function(x){
 
 #' Convert R colors to RGB hexadecimal color values
 #' @param x character
-#' @return hexadecimal color value
+#' @return hexadecimal color value (if is.na(x), return "none" for compatibility with JavaScript)
 #' @export
-toRGB <- function(x) rgb(t(col2rgb(as.character(x))), maxColorValue=255)
+toRGB <- function(x){
+  if(!is.na(x)) rgb(t(col2rgb(as.character(x))), maxColorValue=255) else "none"  
+} 
 
 #' Function to get legend information from ggplot
 #' @param plistextra output from ggplot2::ggplot_build(p)
