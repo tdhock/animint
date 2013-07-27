@@ -1,0 +1,108 @@
+{
+ "geoms": {
+ "geom1_line_g20": {
+ "geom": "line",
+"data": "geom1_line_g20.csv",
+"aes": {
+ "x": "clarity",
+"group": "cut",
+"colour": "cut" 
+},
+"params": [],
+"update": "",
+"subord": [
+ "group" 
+],
+"subvars": {
+ "group": "group" 
+},
+"classed": "geom1_line_g20",
+"types": {
+ "colour": "rgb",
+"y": "numeric",
+"count": "numeric",
+"x": "numeric",
+"width": "numeric",
+"ndensity": "numeric",
+"ncount": "numeric",
+"density": "numeric",
+"group": "integer",
+"PANEL": "integer" 
+} 
+} 
+},
+"selectors": [],
+"plots": {
+ "g20": {
+ "geoms": [
+ "geom1_line_g20" 
+],
+"scales": {
+ "colour": [ "#F8766D", "#A3A500", "#00BF7D", "#00B0F6", "#E76BF3" ] 
+},
+"options": {
+ "width":    400,
+"height":    400 
+},
+"axis": {
+ "x": [ 0.073171, 0.19512, 0.31707, 0.43902, 0.56098, 0.68293, 0.80488, 0.92683 ],
+"xlab": [ "I1", "SI2", "SI1", "VS2", "VS1", "VVS2", "VVS1", "IF" ],
+"xrange": [    0.4,    8.6 ],
+"xname": "clarity",
+"xline": true,
+"xticks": true,
+"y": [ 0.043838, 0.22343, 0.40302, 0.58261, 0.7622, 0.94179 ],
+"ylab": [ "0", "1000", "2000", "3000", "4000", "5000" ],
+"yrange": [ -244.1, 5324.1 ],
+"yname": "count",
+"yline": true,
+"yticks": true 
+},
+"title": "geom_freqpoly",
+"legend": {
+ "cut": {
+ "guide": "legend",
+"geoms": "path",
+"title": "cut",
+"entries": [
+ {
+ "pathcolour": "#E76BF3",
+"pathsize":    0.5,
+"pathlinetype":      1,
+"pathorder": 5,
+"label": [ "Ideal" ] 
+},
+{
+ "pathcolour": "#00B0F6",
+"pathsize":    0.5,
+"pathlinetype":      1,
+"pathorder": 4,
+"label": [ "Premium" ] 
+},
+{
+ "pathcolour": "#00BF7D",
+"pathsize":    0.5,
+"pathlinetype":      1,
+"pathorder": 3,
+"label": [ "Very Good" ] 
+},
+{
+ "pathcolour": "#A3A500",
+"pathsize":    0.5,
+"pathlinetype":      1,
+"pathorder": 2,
+"label": [ "Good" ] 
+},
+{
+ "pathcolour": "#F8766D",
+"pathsize":    0.5,
+"pathlinetype":      1,
+"pathorder": 1,
+"label": [ "Fair" ] 
+} 
+] 
+} 
+} 
+} 
+} 
+}
