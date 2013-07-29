@@ -24,7 +24,7 @@ library(animint)
 library(ggplot2)
 library(maps)
 data(climate)
-climate$time2 <- climate$year + climate$month/12-1/24 # create continuous time variable.
+climate$time2 <- round(climate$year + climate$month/12-1/24,1) # create continuous time variable.
 
 countries <- map_data("world")
 countries <- subset(countries, (lat < 38)&(lat>-24))
@@ -64,5 +64,5 @@ gg2animint(list(temperature=temp.seq,
                 cloudsmid=clouds.mid, 
                 cloudshigh=clouds.high, 
                 ozone = ozone.map,
-                time = list(variable="time2", ms=2000)
+                time = list(variable="time2", ms=5000)
                 ))
