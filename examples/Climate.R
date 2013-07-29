@@ -23,9 +23,12 @@
 library(animint)
 library(ggplot2)
 library(maps)
-data(climate)
-climate$time2 <- round(climate$year + climate$month/12-1/24,1) # create continuous time variable.
+library(lubridate)
+library(plyr)
 
+data(climate)
+# climate$time2 <- climate$year + floor(climate$month/3)/4 
+climate$time2 <- decimal_date(ymd(as.character(climate$date)))
 countries <- map_data("world")
 countries <- subset(countries, (lat < 38)&(lat>-24))
 countries <- subset(countries, ((-long)>54)&((-long)<118))
@@ -59,10 +62,20 @@ ozone.map <- ggplot() +
   geom_path(data=countries, aes(x=long, y=lat, group=group)) + 
   ggtitle("Ozone Concentration")
 
-gg2animint(list(temperature=temp.seq, 
+# Create variable showing temp-avg.monthly.temp at that location
+climate <- ddply(climate, .(id, month), transform, tempdev = temperature - mean(temperature))
+
+temperature.map <- ggplot() + 
+  geom_tile(data=climate, aes(x=long, y=lat, fill=tempdev, clickSelects=id, showSelected=time2), colour="grey") + 
+  scale_fill_gradient2("Temperature", low="blue", mid="white", high="red", limits=c(-20, 20), midpoint=0) + 
+  geom_path(data=countries, aes(x=long, y=lat, group=group)) + 
+  ggtitle("Temperature Deviation from Monthly Norm")
+
+gg2animint(list(temperature = temp.seq, 
                 cloudslow = clouds.low, 
-                cloudsmid=clouds.mid, 
-                cloudshigh=clouds.high, 
+                cloudsmid = clouds.mid, 
+                cloudshigh = clouds.high, 
                 ozone = ozone.map,
-                time = list(variable="time2", ms=5000)
+                tempmap = temperature.map,
+                time = list(variable="time2", ms=3000)
                 ))
