@@ -5,10 +5,10 @@
   make_bar(data, x.name, alpha = 1)
 }
 \arguments{
-  \item{x.name}{variable to be used for x, clickSelects.}
-
   \item{data}{data.frame to analyze for unique x.name
   values.}
+
+  \item{x.name}{variable to be used for x, clickSelects.}
 
   \item{alpha}{transparency of selected bar, default 1.}
 }
