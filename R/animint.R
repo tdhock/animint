@@ -502,14 +502,14 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
       g.data <- df.list[[g.name]][,anim.cols,drop=FALSE]
       anim.values[[g.name]] <- unique(unlist(g.data))
     }
-    olist$time$sequence <- format(sort(unique(unlist(anim.values))))
+    olist$time$sequence <- as.character(sort(unique(unlist(anim.values))))
     result$time <- olist$time
   }
   ## Finally, copy html/js/json files to out.dir.
   src.dir <- system.file("htmljs",package="animint")
   to.copy <- Sys.glob(file.path(src.dir, "*"))
   file.copy(to.copy, out.dir, overwrite=TRUE)
-  json <- RJSONIO::toJSON(result, .na="null", digits=6)
+  json <- RJSONIO::toJSON(result)
   cat(json,file=file.path(out.dir,"plot.json"))
   if(open.browser){
     browseURL(sprintf("%s/index.html",out.dir))
