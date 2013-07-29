@@ -4,6 +4,9 @@ facets
 
 coord_equal
 
+round to significant digits or stop with an error when a
+clickSelects/showSelected variable is numeric with lots of decimals?
+
 stop with an error when stat_bin is used to put several clickSelects
 or showSelected values in the same bin!
 
@@ -17,3 +20,7 @@ ignore this for the time being.
 bugfix for animations: before, we assumed that the animation variable
 takes values in 1..n, but now this is treated properly by looking at
 the actual values.
+
+make_text for quick labels.
+
+make_*(data, ...)
