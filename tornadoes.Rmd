@@ -22,7 +22,7 @@ This example will demonstrate the new aesthetics, **clickSelects** and **showSel
 Animint includes a dataset from the US National Oceanic and Atmospheric Administration, listing all recorded tornadoes in the US from 1950 - 2006 with GIS information. The data can be found [here](http://www.spc.noaa.gov/wcm/#data) or loaded into R using the command "data(Tornadoes)". 
 
 ```{r setup,echo=FALSE, message=FALSE, warning=FALSE}
-opts_chunk$set(cache=TRUE, message=FALSE, warning=FALSE)
+opts_chunk$set(cache=TRUE, message=FALSE, warning=FALSE, tidy=FALSE)
 library(ggplot2)
 library(animint)
 library(plyr)
@@ -82,7 +82,7 @@ ts <- ggplot() + make_bar(UStornadoes, "year") +
   ylab("Number of Tornadoes") + 
   xlab("Year")
 
-tornado.bar <- list(map = map, ts = ts, width=list(map = 970, ts = 400),  height=list(400)) 
+tornado.bar <- list(map = map, ts = ts, width=list(map = 970, ts = 500),  height=list(500)) 
 
 gg2animint(tornado.bar, "tornado-bar2")
 ```
@@ -102,10 +102,10 @@ map <- ggplot() +
   theme(axis.line=element_blank(), axis.text=element_blank(), 
         axis.ticks=element_blank(), axis.title=element_blank())
 
-tornado.bar <- list(map = map, ts = ts, width=list(map = 970, ts = 400),  height=list(400)) 
+tornado.bar <- list(map = map, ts = ts, width=list(map = 970, ts = 500),  height=list(500)) 
 gg2animint(tornado.bar, out.dir = "tornado-bar3")
 ```
-You can see the resulting d3 plot [here](tornado-bar2/index.html). Notice that the axes have been removed from the map, leaving only the data displayed on that plot. 
+You can see the resulting d3 plot [here](tornado-bar3/index.html). Notice that the axes have been removed from the map, leaving only the data displayed on that plot. 
 
 
 We may want to allow users to select a state as well as a year, so that the bar chart shows the number of tornadoes over time for a specific state, and the map shows the tornadoes that occurred during the selected year. To do this, we will need to create a summarized dataset using the **plyr** package. We'll create a data frame that contains the number of tornadoes occurring in each state for each year in the dataset. 
@@ -137,7 +137,7 @@ ts <- ggplot() +
   ylab("Number of Tornadoes") + 
   xlab("Year")
 
-tornado.ts.bar <- list(map = map, ts = ts, width=list(map = 970, ts = 400),  height=list(400)) 
+tornado.ts.bar <- list(map = map, ts = ts, width=list(map = 970, ts = 500),  height=list(500)) 
 gg2animint(tornado.ts.bar, "tornado-ts-bar")
 ```
 [Here](tornado-ts-bar/index.html) is the resulting d3 plot.

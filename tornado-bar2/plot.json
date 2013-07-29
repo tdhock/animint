@@ -111,7 +111,7 @@
 ],
 "options": {
  "width":    970,
-"height":    400 
+"height":    500 
 },
 "axis": {
  "x": [ 0.11924, 0.4345, 0.74975 ],
@@ -135,8 +135,8 @@
  "geom3_rect_ts" 
 ],
 "options": {
- "width":    400,
-"height":    400 
+ "width":    500,
+"height":    500 
 },
 "axis": {
  "x": [ 0.19649, 0.48555, 0.77461 ],

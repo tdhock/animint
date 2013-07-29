@@ -9,7 +9,7 @@ This section also includes discussions of problem statistics and some unimplemen
 
 
 ```{r setup,echo=FALSE}
-opts_chunk$set(fig.width=6, fig.height=4,cache=TRUE)
+opts_chunk$set(fig.width=6, fig.height=4,cache=TRUE, tidy=FALSE)
 ```
 <a name="lines"/>
 Lines

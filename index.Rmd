@@ -13,7 +13,7 @@ Contents
 Introduction 
 ---------------------------------------------------------
 Let's start with a reasonably common comparison of distributions: two normal distributions with different centers, and a gamma distribution. 
-```{r setup,echo=FALSE}
+```{r setup,echo=FALSE, tidy=FALSE, message=FALSE, warning=FALSE}
 opts_chunk$set(fig.width=6, fig.height=4,cache=TRUE, message=FALSE, warning=FALSE)
 library(ggplot2)
 library(animint)

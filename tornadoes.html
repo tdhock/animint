@@ -210,23 +210,26 @@ hljs.initHighlightingOnLoad();
 library(plyr)
 library(animint)
 library(maps)
-data(Tornadoes)  # load the Tornadoes data from the animint package
+data(Tornadoes) # load the Tornadoes data from the animint package
 
 USpolygons &lt;- map_data(&quot;state&quot;)
 USpolygons$state = state.abb[match(USpolygons$region, tolower(state.name))]
 
-map &lt;- ggplot() + geom_polygon(aes(x = long, y = lat, group = group), data = USpolygons, 
-    fill = &quot;black&quot;, colour = &quot;grey&quot;) + geom_segment(aes(x = startLong, y = startLat, 
-    xend = endLong, yend = endLat, showSelected = year), colour = &quot;#55B1F7&quot;, 
-    data = UStornadoes) + ggtitle(&quot;Tornadoes in the US&quot;)
+map &lt;- ggplot() + 
+  geom_polygon(aes(x=long, y=lat, group=group), data=USpolygons, fill=&quot;black&quot;, colour=&quot;grey&quot;) +
+  geom_segment(aes(x=startLong, y=startLat, xend=endLong, yend=endLat, showSelected=year), 
+               colour=&quot;#55B1F7&quot;, data=UStornadoes) +
+  ggtitle(&quot;Tornadoes in the US&quot;)
 
-ts &lt;- ggplot() + stat_summary(aes(year, year, clickSelects = year), data = UStornadoes, 
-    fun.y = length, geom = &quot;bar&quot;) + ggtitle(&quot;Number of Recorded Tornadoes, 1950-2006&quot;) + 
-    ylab(&quot;Number of Tornadoes&quot;) + xlab(&quot;Year&quot;)
+ts &lt;- ggplot() + 
+  stat_summary(aes(year, year, clickSelects=year), data=UStornadoes, fun.y=length, geom=&quot;bar&quot;) + 
+  ggtitle(&quot;Number of Recorded Tornadoes, 1950-2006&quot;) + 
+  ylab(&quot;Number of Tornadoes&quot;) + 
+  xlab(&quot;Year&quot;)
 
-tornado.bar &lt;- list(map = map, ts = ts, width = list(map = 970, ts = 400), height = list(400))
-# specify plot widths to be 970px and 400px respectively, and specify 400
-# px as the plot height for both plots
+tornado.bar &lt;- list(map = map, ts = ts, width=list(map = 970, ts = 400),  height=list(400)) 
+# specify plot widths to be 970px and 400px respectively, 
+# and specify 400 px as the plot height for both plots
 
 gg2animint(tornado.bar, out.dir = &quot;tornado-bar&quot;)
 </code></pre>
@@ -257,10 +260,12 @@ gg2animint(tornado.bar, out.dir = &quot;tornado-bar&quot;)
 <strong>make_bar(data, x.name, alpha=1)</strong><br/>
 where x.name is the variable for x and clickSelects. </p>
 
-<pre><code class="r">ts &lt;- ggplot() + make_bar(UStornadoes, &quot;year&quot;) + ggtitle(&quot;Number of Recorded Tornadoes, 1950-2006&quot;) + 
-    ylab(&quot;Number of Tornadoes&quot;) + xlab(&quot;Year&quot;)
+<pre><code class="r">ts &lt;- ggplot() + make_bar(UStornadoes, &quot;year&quot;) + 
+  ggtitle(&quot;Number of Recorded Tornadoes, 1950-2006&quot;) + 
+  ylab(&quot;Number of Tornadoes&quot;) + 
+  xlab(&quot;Year&quot;)
 
-tornado.bar &lt;- list(map = map, ts = ts, width = list(map = 970, ts = 400), height = list(400))
+tornado.bar &lt;- list(map = map, ts = ts, width=list(map = 970, ts = 500),  height=list(500)) 
 
 gg2animint(tornado.bar, &quot;tornado-bar2&quot;)
 </code></pre>
@@ -275,21 +280,24 @@ gg2animint(tornado.bar, &quot;tornado-bar2&quot;)
 
 <p>To fully remove all evidence of the axes, we must separately remove axis lines, ticks, text (axis break labels), and titles. </p>
 
-<pre><code class="r">map &lt;- ggplot() + geom_polygon(aes(x = long, y = lat, group = group), data = USpolygons, 
-    fill = &quot;black&quot;, colour = &quot;grey&quot;) + geom_segment(aes(x = startLong, y = startLat, 
-    xend = endLong, yend = endLat, showSelected = year), colour = &quot;#55B1F7&quot;, 
-    data = UStornadoes) + ggtitle(&quot;Tornadoes in the US&quot;) + theme(axis.line = element_blank(), 
-    axis.text = element_blank(), axis.ticks = element_blank(), axis.title = element_blank())
+<pre><code class="r">map &lt;- ggplot() + 
+  geom_polygon(aes(x=long, y=lat, group=group), data=USpolygons, fill=&quot;black&quot;, colour=&quot;grey&quot;) +
+  geom_segment(aes(x=startLong, y=startLat, xend=endLong, yend=endLat, showSelected=year), 
+               colour=&quot;#55B1F7&quot;, data=UStornadoes) +
+  ggtitle(&quot;Tornadoes in the US&quot;) + 
+  theme(axis.line=element_blank(), axis.text=element_blank(), 
+        axis.ticks=element_blank(), axis.title=element_blank())
 
-tornado.bar &lt;- list(map = map, ts = ts, width = list(map = 970, ts = 400), height = list(400))
+tornado.bar &lt;- list(map = map, ts = ts, width=list(map = 970, ts = 500),  height=list(500)) 
 gg2animint(tornado.bar, out.dir = &quot;tornado-bar3&quot;)
 </code></pre>
 
-<p>You can see the resulting d3 plot <a href="tornado-bar2/index.html">here</a>. Notice that the axes have been removed from the map, leaving only the data displayed on that plot. </p>
+<p>You can see the resulting d3 plot <a href="tornado-bar3/index.html">here</a>. Notice that the axes have been removed from the map, leaving only the data displayed on that plot. </p>
 
 <p>We may want to allow users to select a state as well as a year, so that the bar chart shows the number of tornadoes over time for a specific state, and the map shows the tornadoes that occurred during the selected year. To do this, we will need to create a summarized dataset using the <strong>plyr</strong> package. We&#39;ll create a data frame that contains the number of tornadoes occurring in each state for each year in the dataset. </p>
 
-<pre><code class="r">UStornadoCounts &lt;- ddply(UStornadoes, .(state, year), summarize, count = length(state))
+<pre><code class="r">UStornadoCounts &lt;-
+  ddply(UStornadoes, .(state, year), summarize, count=length(state))
 </code></pre>
 
 <p><a name="maketext"/></p>
@@ -302,19 +310,23 @@ gg2animint(tornado.bar, out.dir = &quot;tornado-bar3&quot;)
 <strong>make_text(data, x, y, label.var, format=NULL)</strong><br/>
 where format can be specified using a string containing %d, %f, etc. to represent the variable value.</p>
 
-<pre><code class="r">map &lt;- ggplot() + make_text(UStornadoCounts, -100, 50, &quot;year&quot;, &quot;Tornadoes in %d&quot;) + 
-    geom_polygon(aes(x = long, y = lat, group = group, clickSelects = state), 
-        data = USpolygons, fill = &quot;black&quot;, colour = &quot;grey&quot;) + geom_segment(aes(x = startLong, 
-    y = startLat, xend = endLong, yend = endLat, showSelected = year), colour = &quot;#55B1F7&quot;, 
-    data = UStornadoes) + theme(axis.line = element_blank(), axis.text = element_blank(), 
-    axis.ticks = element_blank(), axis.title = element_blank())
-ts &lt;- ggplot() + make_text(UStornadoes, 1980, 200, &quot;state&quot;) + geom_bar(aes(year, 
-    count, clickSelects = year, showSelected = state), data = UStornadoCounts, 
-    stat = &quot;identity&quot;, position = &quot;identity&quot;) + ylab(&quot;Number of Tornadoes&quot;) + 
-    xlab(&quot;Year&quot;)
+<pre><code class="r">map &lt;- ggplot() + 
+  make_text(UStornadoCounts, -100, 50, &quot;year&quot;, &quot;Tornadoes in %d&quot;) +
+  geom_polygon(aes(x=long, y=lat, group=group, clickSelects=state),
+               data=USpolygons, fill=&quot;black&quot;, colour=&quot;grey&quot;) +
+  geom_segment(aes(x=startLong, y=startLat, xend=endLong, yend=endLat,
+                   showSelected=year),
+               colour=&quot;#55B1F7&quot;, data=UStornadoes) + 
+  theme(axis.line=element_blank(), axis.text=element_blank(), 
+        axis.ticks=element_blank(), axis.title=element_blank())
+ts &lt;- ggplot() + 
+  make_text(UStornadoes, 1980, 200, &quot;state&quot;) +
+  geom_bar(aes(year, count, clickSelects=year, showSelected=state),
+           data=UStornadoCounts, stat=&quot;identity&quot;, position=&quot;identity&quot;) + 
+  ylab(&quot;Number of Tornadoes&quot;) + 
+  xlab(&quot;Year&quot;)
 
-tornado.ts.bar &lt;- list(map = map, ts = ts, width = list(map = 970, ts = 400), 
-    height = list(400))
+tornado.ts.bar &lt;- list(map = map, ts = ts, width=list(map = 970, ts = 500),  height=list(500)) 
 gg2animint(tornado.ts.bar, &quot;tornado-ts-bar&quot;)
 </code></pre>
 
@@ -336,22 +348,27 @@ gg2animint(tornado.ts.bar, &quot;tornado-ts-bar&quot;)
 This example also demonstrates the make_tallrect function, which populates a graph with bars spanning the entire y range located at each value of the variable passed in, with clickSelects element to match. Syntax is<br/>
 make_tallrect(x.name, data, alpha=&frac12;)</p>
 
-<pre><code class="r">map &lt;- ggplot() + geom_polygon(aes(x = long, y = lat, group = group, clickSelects = state), 
-    data = USpolygons, fill = &quot;black&quot;, colour = &quot;grey&quot;) + geom_segment(aes(x = startLong, 
-    y = startLat, xend = endLong, yend = endLat, showSelected = year), colour = &quot;#55B1F7&quot;, 
-    data = UStornadoes) + make_text(UStornadoCounts, -100, 50, &quot;year&quot;, &quot;Tornadoes in %d&quot;) + 
-    theme(axis.line = element_blank(), axis.text = element_blank(), axis.ticks = element_blank(), 
-        axis.title = element_blank())
+<pre><code class="r">map &lt;- ggplot()+
+  geom_polygon(aes(x=long, y=lat, group=group, clickSelects=state),
+               data=USpolygons, fill=&quot;black&quot;, colour=&quot;grey&quot;) +
+  geom_segment(aes(x=startLong, y=startLat, xend=endLong, yend=endLat,
+                   showSelected=year),
+               colour=&quot;#55B1F7&quot;, data=UStornadoes) + 
+  make_text(UStornadoCounts, -100, 50, &quot;year&quot;, &quot;Tornadoes in %d&quot;) +
+  theme(axis.line=element_blank(), axis.text=element_blank(), 
+        axis.ticks=element_blank(), axis.title=element_blank())
 
-ts &lt;- ggplot() + make_tallrect(UStornadoCounts, &quot;year&quot;) + make_text(UStornadoes, 
-    1980, 200, &quot;state&quot;) + geom_line(aes(year, count, clickSelects = state, group = state), 
-    data = UStornadoCounts, alpha = 3/5, size = 4) + ylab(&quot;Number of Tornadoes&quot;) + 
-    xlab(&quot;Year&quot;)
+ts &lt;- ggplot()+
+  make_tallrect(UStornadoCounts, &quot;year&quot;)+
+  make_text(UStornadoes, 1980, 200, &quot;state&quot;) +
+  geom_line(aes(year, count, clickSelects=state, group=state),
+            data=UStornadoCounts, alpha=3/5, size=4) + 
+  ylab(&quot;Number of Tornadoes&quot;) + 
+  xlab(&quot;Year&quot;)
 
-time &lt;- list(variable = &quot;year&quot;, ms = 2000)  # new part of the list passed to gg2animint().
+time &lt;- list(variable=&quot;year&quot;, ms=2000) # new part of the list passed to gg2animint().
 
-tornado.anim &lt;- list(map = map, ts = ts, time = time, width = list(map = 970, 
-    ts = 400), height = list(400))  # pass the time object in as another object in the main list. 
+tornado.anim &lt;- list(map=map, ts=ts, time=time, width=list(map = 970, ts = 400),  height=list(400)) # pass the time object in as another object in the main list. 
 
 gg2animint(tornado.anim, &quot;tornado-anim&quot;)
 </code></pre>

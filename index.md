@@ -6,13 +6,15 @@ This tutorial is designed to demonstrate animint, a package that converts ggplot
 Contents
 ---------------------------------------------------------
 * [Introduction](#intro)
-* [Tornado Example](tornadoes.html) - see what animint can do, including explanations of clickSelects, showSelected, and animations. 
+* [Tornado Example](tornadoes.html#tornadoes) - see what animint can do, including explanations of clickSelects, showSelected, and animations. 
 * [Examples of Geoms](geoms.html) - explanations of how to use statistics and certain geoms in animint, demonstrations of most geoms that animint supports. 
 
 <a name="intro"/>
 Introduction 
 ---------------------------------------------------------
 Let's start with a reasonably common comparison of distributions: two normal distributions with different centers, and a gamma distribution. 
+
+
 
 
 ```r
