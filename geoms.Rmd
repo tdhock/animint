@@ -1,10 +1,18 @@
-Geoms in Animint
+Animint Tutorial
 ========================================================
-Contents:
-* [Lines](#lines)
-* [Points](#points)
-  * [Interactive Points](#interactive points) - short introduction to clickSelects and showSelected with familiar geoms.
-* [Other Geoms](#othergeoms) - abline, area, bar, contour, density,...  
+
+This tutorial is designed to demonstrate animint, a package that converts ggplot2 plots into d3 javascript graphics. Animint allows you to make interactive web-based graphics using familiar R methods. In addition, animint allows graphics to be animated and respond to user clicks.
+
+Contents
+---------------------------------------------------------
+* [Introduction](index.html#intro)
+* [Tornado Example](tornadoes.html#tornadoes) - see what animint can do, including explanations of clickSelects, showSelected, and animations. 
+* [Climate Example](climate.html) - another demonstration of using animint with multiple linked plots and animation.
+* [Examples of Geoms](geoms.html) - explanations of how to use statistics and certain geoms in animint, demonstrations of most geoms that animint supports. 
+  * [Lines](#lines)
+  * [Points](#points)
+    * [Interactive Points](#interactive points) - short introduction to clickSelects and showSelected with familiar geoms.
+  * [Other Geoms](#othergeoms) - abline, area, bar, contour, density,...  
 This section also includes discussions of problem statistics and some unimplemented geoms and how to get around them.
 
 
@@ -549,3 +557,5 @@ g20
 gg2animint(list(g20=g20), out.dir="geoms/freqpoly")
 ```
 [Animint plot](geoms/freqpoly/index.html)
+
+<sub>Tutorial created by Susan VanderPlas on 7/29/2013 using animint version 0.1.0 and ggplot2 0.9.3.1</sub>

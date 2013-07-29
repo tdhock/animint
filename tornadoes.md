@@ -164,8 +164,8 @@ Animint also allows you to automatically change the selection or data shown so t
 * **duration**, the time used to switch between values (in milliseconds).
 
 <a name="maketallrect"/>
-This example also demonstrates the make\_tallrect function, which populates a graph with bars spanning the entire y range located at each value of the variable passed in, with clickSelects element to match. Syntax is  
-make\_tallrect(x.name, data, alpha=1/2)
+This example also demonstrates the **make\_tallrect** function, which populates a graph with bars spanning the entire y range located at each value of the variable passed in, with clickSelects element to match. Syntax is  
+make\_tallrect(data, x.name, alpha=1/2)
 
 
 ```r
@@ -196,3 +196,5 @@ gg2animint(tornado.anim, "tornado-anim")
 
 
 [Here](tornado-anim/index.html) is the resulting d3 plot with animation.
+
+<sub>Tutorial created by Susan VanderPlas on 7/29/2013 using animint version 0.1.0 and ggplot2 0.9.3.1</sub>

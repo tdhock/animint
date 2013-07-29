@@ -2,6 +2,7 @@ animint
 base
 ggplot2
 knitr
+lubridate
 maps
 MASS
 plyr

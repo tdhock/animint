@@ -345,8 +345,8 @@ gg2animint(tornado.ts.bar, &quot;tornado-ts-bar&quot;)
 </ul>
 
 <p><a name="maketallrect"/>
-This example also demonstrates the make_tallrect function, which populates a graph with bars spanning the entire y range located at each value of the variable passed in, with clickSelects element to match. Syntax is<br/>
-make_tallrect(x.name, data, alpha=&frac12;)</p>
+This example also demonstrates the <strong>make_tallrect</strong> function, which populates a graph with bars spanning the entire y range located at each value of the variable passed in, with clickSelects element to match. Syntax is<br/>
+make_tallrect(data, x.name, alpha=&frac12;)</p>
 
 <pre><code class="r">map &lt;- ggplot()+
   geom_polygon(aes(x=long, y=lat, group=group, clickSelects=state),
@@ -374,6 +374,8 @@ gg2animint(tornado.anim, &quot;tornado-anim&quot;)
 </code></pre>
 
 <p><a href="tornado-anim/index.html">Here</a> is the resulting d3 plot with animation.</p>
+
+<p><sub>Tutorial created by Susan VanderPlas on 7/29/2013 using animint version 0.1.0 and ggplot2 0.9.3.1</sub></p>
 
 </body>
 
