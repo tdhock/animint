@@ -216,15 +216,22 @@ countries &lt;- subset(countries, (lat &lt; 38) &amp; (lat &gt; -24))
 countries &lt;- subset(countries, ((-long) &gt; 54) &amp; ((-long) &lt; 118))
 
 # Create variable showing temp-avg.monthly.temp at that location
-climate &lt;- ddply(climate, .(id, month), transform, tempdev = temperature - mean(temperature))
+climate &lt;- ddply(climate, .(id, month), transform, tempdev = temperature - mean(temperature), 
+    surfdev = surftemp - mean(surftemp))
 climate &lt;- climate[order(climate$date, climate$id), ]
+
+# data frame with formatted labels
+dates &lt;- ddply(climate, .(date), summarise, month = month[1], year = year[1], 
+    time2 = time2[1], textdate = paste(month.name[month], year))
+dates &lt;- dates[order(dates$date), ]
 </code></pre>
 
 <p>As data consists of both time-sequence and spatial data, we might want to link some sort of time-series plot to maps displaying the spatial data. We might also want to be able to click on a portion of the map and see the relevant time series. This suggests that we will need at least two selectors: <strong>id</strong>, which identifies the spatial location, and <strong>time2</strong>, which is a continuous numerical representation of the time sequence, starting at 1995.000. </p>
 
 <pre><code class="r">
 tempseq &lt;- ggplot() + make_tallrect(data = climate, &quot;time2&quot;) + geom_line(data = climate, 
-    aes(x = time2, y = temperature, group = id, showSelected = id))
+    aes(x = time2, y = temperature, group = id, showSelected = id)) + geom_text(data = dates, 
+    aes(x = 1998, y = -5, label = textdate, showSelected = time2))
 </code></pre>
 
 <p>This code chunk defines a plot that shows the temperature over time for a selected spatial location, and contains many <strong>tallrect</strong> objects (rectangles spanning the y range that break up the x axis) that select a specific point in time. If we view this plot in R, <strong>showSelected</strong> is not a recognized aesthetic, and so ggplot displays all of the lines at once, and all of the tallrects are also displayed in the background. It&#39;s a pretty messy plot!</p>
@@ -239,12 +246,13 @@ tempseq &lt;- ggplot() + make_tallrect(data = climate, &quot;time2&quot;) + geom
 <pre><code class="r">airtemp &lt;- ggplot() + geom_tile(data = climate, aes(x = long, y = lat, fill = tempdev, 
     clickSelects = id, showSelected = time2)) + scale_fill_gradient2(&quot;deg. C&quot;, 
     low = &quot;blue&quot;, mid = &quot;white&quot;, high = &quot;red&quot;, limits = c(-20, 20), midpoint = 0) + 
-    geom_path(data = countries, aes(x = long, y = lat, group = group)) + ggtitle(&quot;Temperature Deviation from Monthly Norm&quot;) + 
+    geom_path(data = countries, aes(x = long, y = lat, group = group)) + geom_text(data = dates, 
+    aes(x = -86, y = 39, label = textdate, showSelected = time2)) + ggtitle(&quot;Temperature Deviation from Monthly Norm&quot;) + 
     theme(axis.line = element_blank(), axis.text = element_blank(), axis.ticks = element_blank(), 
         axis.title = element_blank())
 </code></pre>
 
-<p>The theme() statement removes the axis, axis labels, and axis title from the plot, since maps are fairly self-explanatory and longitude and latitude values don&#39;t provide much additional information.</p>
+<p>The theme() statement removes the axis, axis labels, and axis title from the plot, since maps are fairly self-explanatory and longitude and latitude values don&#39;t provide much additional information. The <strong>geom_text</strong> statement is used where one would typically use a <strong>make_text</strong> statement, but in this case, we want a format that is not easily derived from the showSelected variable. </p>
 
 <p>Now that we have both plot types that we need for the selectors we&#39;ve chosen, we can add animation and output to animint:</p>
 
@@ -261,34 +269,40 @@ tempseq &lt;- ggplot() + make_tallrect(data = climate, &quot;time2&quot;) + geom
 <pre><code class="r">surftemp &lt;- ggplot() + geom_tile(data = climate, aes(x = long, y = lat, fill = surftemp, 
     clickSelects = id, showSelected = time2)) + scale_fill_gradient2(&quot;deg. C&quot;, 
     low = &quot;blue&quot;, mid = &quot;white&quot;, high = &quot;red&quot;, limits = c(-10, 45), midpoint = 0) + 
-    geom_path(data = countries, aes(x = long, y = lat, group = group)) + ggtitle(&quot;Surface Temperature&quot;) + 
+    geom_path(data = countries, aes(x = long, y = lat, group = group)) + geom_text(data = dates, 
+    aes(x = -86, y = 39, label = textdate, showSelected = time2)) + ggtitle(&quot;Surface Temperature&quot;) + 
     theme(axis.line = element_blank(), axis.text = element_blank(), axis.ticks = element_blank(), 
         axis.title = element_blank())
 
 ozone &lt;- ggplot() + geom_tile(data = climate, aes(x = long, y = lat, fill = ozone, 
     clickSelects = id, showSelected = time2), colour = &quot;grey&quot;) + scale_fill_gradient(&quot;Concentration&quot;, 
     low = &quot;white&quot;, high = &quot;brown&quot;) + geom_path(data = countries, aes(x = long, 
-    y = lat, group = group)) + ggtitle(&quot;Ozone Concentration&quot;) + theme(axis.line = element_blank(), 
-    axis.text = element_blank(), axis.ticks = element_blank(), axis.title = element_blank())
+    y = lat, group = group)) + geom_text(data = dates, aes(x = -86, y = 39, 
+    label = textdate, showSelected = time2)) + ggtitle(&quot;Ozone Concentration&quot;) + 
+    theme(axis.line = element_blank(), axis.text = element_blank(), axis.ticks = element_blank(), 
+        axis.title = element_blank())
 
 cloudshigh &lt;- ggplot() + geom_tile(data = climate, aes(x = long, y = lat, fill = cloudhigh, 
     clickSelects = id, showSelected = time2), colour = &quot;grey&quot;) + scale_fill_gradient(&quot;Coverage&quot;, 
     low = &quot;skyblue&quot;, high = &quot;white&quot;, limits = c(0, 75)) + geom_path(data = countries, 
-    aes(x = long, y = lat, group = group)) + ggtitle(&quot;High Altitute Cloud Cover&quot;) + 
+    aes(x = long, y = lat, group = group)) + geom_text(data = dates, aes(x = -86, 
+    y = 39, label = textdate, showSelected = time2)) + ggtitle(&quot;High Altitute Cloud Cover&quot;) + 
     theme(axis.line = element_blank(), axis.text = element_blank(), axis.ticks = element_blank(), 
         axis.title = element_blank())
 
 cloudsmid &lt;- ggplot() + geom_tile(data = climate, aes(x = long, y = lat, fill = cloudmid, 
     clickSelects = id, showSelected = time2), colour = &quot;grey&quot;) + scale_fill_gradient(&quot;Coverage&quot;, 
     low = &quot;skyblue&quot;, high = &quot;white&quot;, limits = c(0, 75)) + geom_path(data = countries, 
-    aes(x = long, y = lat, group = group)) + ggtitle(&quot;Mid Altitute Cloud Cover&quot;) + 
+    aes(x = long, y = lat, group = group)) + geom_text(data = dates, aes(x = -86, 
+    y = 39, label = textdate, showSelected = time2)) + ggtitle(&quot;Mid Altitute Cloud Cover&quot;) + 
     theme(axis.line = element_blank(), axis.text = element_blank(), axis.ticks = element_blank(), 
         axis.title = element_blank())
 
 cloudslow &lt;- ggplot() + geom_tile(data = climate, aes(x = long, y = lat, fill = cloudlow, 
     clickSelects = id, showSelected = time2), colour = &quot;grey&quot;) + scale_fill_gradient(&quot;Coverage&quot;, 
     low = &quot;skyblue&quot;, high = &quot;white&quot;, limits = c(0, 75)) + geom_path(data = countries, 
-    aes(x = long, y = lat, group = group)) + ggtitle(&quot;Low Altitute Cloud Cover&quot;) + 
+    aes(x = long, y = lat, group = group)) + geom_text(data = dates, aes(x = -86, 
+    y = 39, label = textdate, showSelected = time2)) + ggtitle(&quot;Low Altitute Cloud Cover&quot;) + 
     theme(axis.line = element_blank(), axis.text = element_blank(), axis.ticks = element_blank(), 
         axis.title = element_blank())
 
@@ -298,6 +312,8 @@ gg2animint(list(timeseriestemp = tempseq, airtemp = airtemp, surftemp = surftemp
         airtemp = 450, surftemp = 450, ozone = 450, cloudslow = 450, cloudsmid = 450, 
         cloudshigh = 450), height = list(450)))
 </code></pre>
+
+<p>Here is the <a href="climate/onemap/index.html">animint-generated webpage</a>. This page may take longer to load due to the increased amount of data d3 must process.</p>
 
 <p><sub>Tutorial created by Susan VanderPlas on 7/29/2013 using animint version 0.1.0 and ggplot2 0.9.3.1</sub></p>
 
