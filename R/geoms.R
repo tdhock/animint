@@ -37,6 +37,7 @@ geom_tallrect <- function(mapping=NULL, data=NULL, stat="identity", position="id
 #' case of selecting a particular x value.
 #' @param data data.frame to analyze for unique x.name values.
 #' @param x.name variable to be used for x, clickSelects.
+#' @param even Logical parameter, should tallrects be of even width?
 #' @param alpha transparency of a selected tallrect, default 1/2.
 #' @return a geom_tallrect layer.
 #' @author Toby Dylan Hocking
@@ -49,14 +50,14 @@ geom_tallrect <- function(mapping=NULL, data=NULL, stat="identity", position="id
 #'             data=worldPop, size=4)
 #' print(popPlot)
 #' gg2animint(list(popPlot=popPlot))
-make_tallrect <- function(data, x.name, alpha=1/2){
+make_tallrect <- function(data, x.name, even=FALSE, alpha=1/2){
   stopifnot(is.data.frame(data))
   stopifnot(is.character(x.name))
   stopifnot(length(x.name)==1)
   x <- data[,x.name]
   stopifnot(is.numeric(x))
   vals <- sort(unique(x))
-  Delta <- diff(vals)/2
+  Delta <- if(even) rep(ggplot2:::resolution(vals), length(vals)-1)/2 else diff(vals)/2
   breaks <- c(vals[1] - Delta[1],
               vals[-1] - Delta,
               vals[length(vals)]+Delta[length(Delta)])
@@ -71,8 +72,8 @@ make_tallrect <- function(data, x.name, alpha=1/2){
 }
 
 #' Convenience function for an interactive bar that might otherwise be created using stat_bin. 
-#' @param x.name variable to be used for x, clickSelects.
 #' @param data data.frame to analyze for unique x.name values.
+#' @param x.name variable to be used for x, clickSelects.
 #' @param alpha transparency of selected bar, default 1.
 #' @return a geom_bar layer.
 #' @author Toby Dylan Hocking
