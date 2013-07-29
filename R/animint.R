@@ -94,7 +94,7 @@ gg2list <- function(p){
     plist$legend <- plist$legend[which(sapply(plist$legend, function(i) length(i)>0))]
   }  # only pass out legends that have guide = "legend" or guide="colorbar"
   
-  if("element_blank"%in%attr(theme.pars$axis.title, "class")){
+  if("element_blank"%in%attr(theme.pars$plot.title, "class")){
     plist$title <- ""
   } else {
     plist$title <- plistextra$plot$labels$title
