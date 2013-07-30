@@ -724,7 +724,7 @@ var animint = function (to_select, json_file) {
       return d3.keys(Geoms).indexOf(x)!=-1;
     }
     if(all_geom_names.every(geomLoaded)){
-	update_selector(v_name, next);
+	    update_selector(v_name, next);
     }
  } 
   var add_legend = function(p_name, p_info){
@@ -803,7 +803,7 @@ var animint = function (to_select, json_file) {
       Animation.next = {};
       Animation.ms = response.time.ms;
       Animation.variable = response.time.variable;
-      var i, prev, cur, seq = response.time.sequence;
+      var i, prev, cur, seq = response.time.sequence.map(function(d){return parseFloat(d)});
       for (i = 0; i < seq.length; i++) {
         if (i == 0) {
           prev = seq[seq.length-1];

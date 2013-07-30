@@ -12,6 +12,7 @@ Contents
   * [make\_tallrect](#maketallrect) function to tile a graph with selectable rectangles for easy interactivity
   * [Theme elements](#themes) from ggplot2 that are implemented in animint
   * [Animation](#animation) 
+* [Climate Example](climate.html) - another demonstration of using animint with multiple linked plots and animation.
 * [Examples of Geoms](geoms.html) - explanations of how to use statistics and certain geoms in animint, demonstrations of most geoms that animint supports. 
 
 <a name="tornadoes"/>

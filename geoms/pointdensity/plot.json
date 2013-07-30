@@ -35,22 +35,22 @@
  "geom1_point_g16" 
 ],
 "scales": {
- "alpha": [    0.1, 0.10045 ] 
+ "alpha": [    0.1, 0.10049 ] 
 },
 "options": {
  "width":    400,
 "height":    400 
 },
 "axis": {
- "x": [ 0.15652, 0.3622, 0.56787, 0.77355, 0.97923 ],
-"xlab": [ "0.5", "1.0", "1.5", "2.0", "2.5" ],
-"xrange": [ 0.1195, 2.5505 ],
+ "x": [ 0.32274, 0.67375 ],
+"xlab": [ "1", "2" ],
+"xrange": [ 0.0805, 2.9295 ],
 "xname": "carat",
 "xline": true,
 "xticks": true,
-"y": [ 0.027319, 0.27712, 0.52693, 0.77673 ],
+"y": [ 0.027048, 0.27379, 0.52053, 0.76727 ],
 "ylab": [ "0", "5000", "10000", "15000" ],
-"yrange": [ -546.8,  19469 ],
+"yrange": [ -548.1,  19716 ],
 "yname": "price",
 "yline": true,
 "yticks": true 
@@ -63,7 +63,15 @@
 "title": "Density",
 "entries": [
  {
- "pointalpha": 0.8272,
+ "pointalpha": 0.9334,
+"pointshape":     16,
+"pointcolour": "#000000",
+"pointsize":      1,
+"pointorder": 5,
+"label": [ "5e-04" ] 
+},
+{
+ "pointalpha": 0.7678,
 "pointshape":     16,
 "pointcolour": "#000000",
 "pointsize":      1,
@@ -71,7 +79,7 @@
 "label": [ "4e-04" ] 
 },
 {
- "pointalpha": 0.6454,
+ "pointalpha": 0.6004,
 "pointshape":     16,
 "pointcolour": "#000000",
 "pointsize":      1,
@@ -79,7 +87,7 @@
 "label": [ "3e-04" ] 
 },
 {
- "pointalpha": 0.4636,
+ "pointalpha":  0.433,
 "pointshape":     16,
 "pointcolour": "#000000",
 "pointsize":      1,
@@ -87,7 +95,7 @@
 "label": [ "2e-04" ] 
 },
 {
- "pointalpha": 0.2818,
+ "pointalpha": 0.2674,
 "pointshape":     16,
 "pointcolour": "#000000",
 "pointsize":      1,

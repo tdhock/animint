@@ -158,9 +158,9 @@
 "xname": "x",
 "xline": true,
 "xticks": true,
-"y": [ 0.14649, 0.36933, 0.59218, 0.81503 ],
+"y": [ 0.16032, 0.37875, 0.59718, 0.8156 ],
 "ylab": [ "0", "5", "10", "15" ],
-"yrange": [ -3.2867,  19.15 ],
+"yrange": [ -3.6699, 19.221 ],
 "yname": "y",
 "yline": true,
 "yticks": true 
@@ -183,9 +183,9 @@
 "xname": "x",
 "xline": true,
 "xticks": true,
-"y": [ 0.14896, 0.37725, 0.60555, 0.83384 ],
+"y": [ 0.11753, 0.39478, 0.67203, 0.94928 ],
 "ylab": [ "0", "5", "10", "15" ],
-"yrange": [ -3.2624, 18.639 ],
+"yrange": [ -2.1195, 15.915 ],
 "yname": "y",
 "yline": true,
 "yticks": true 
@@ -198,7 +198,7 @@
  "geom3_line_p10" 
 ],
 "scales": {
- "alpha": [ 1.3955, 7.1575 ],
+ "alpha": [ 1.3846,  6.138 ],
 "linetype": [ "solid", "22" ] 
 },
 "options": {
@@ -212,9 +212,9 @@
 "xname": "x",
 "xline": true,
 "xticks": true,
-"y": [ 0.14896, 0.37725, 0.60555, 0.83384 ],
+"y": [ 0.11753, 0.39478, 0.67203, 0.94928 ],
 "ylab": [ "0", "5", "10", "15" ],
-"yrange": [ -3.2624, 18.639 ],
+"yrange": [ -2.1195, 15.915 ],
 "yname": "y",
 "yline": true,
 "yticks": true 
@@ -248,7 +248,7 @@
 "title": "maxy",
 "entries": [
  {
- "pathalpha": 0.4264,
+ "pathalpha": 0.4968,
 "pathcolour": "#000000",
 "pathsize":    0.5,
 "pathlinetype":      1,
@@ -256,7 +256,7 @@
 "label": [ "15" ] 
 },
 {
- "pathalpha": 0.3432,
+ "pathalpha":  0.396,
 "pathcolour": "#000000",
 "pathsize":    0.5,
 "pathlinetype":      1,
@@ -264,7 +264,7 @@
 "label": [ "12" ] 
 },
 {
- "pathalpha":   0.26,
+ "pathalpha": 0.2952,
 "pathcolour": "#000000",
 "pathsize":    0.5,
 "pathlinetype":      1,
@@ -272,7 +272,7 @@
 "label": [ "9" ] 
 },
 {
- "pathalpha": 0.1768,
+ "pathalpha": 0.1936,
 "pathcolour": "#000000",
 "pathsize":    0.5,
 "pathlinetype":      1,
@@ -288,7 +288,7 @@
  "geom4_line_p11" 
 ],
 "scales": {
- "size": [      3, 4.3333 ] 
+ "size": [ 2.3333, 4.3333 ] 
 },
 "options": {
  "width":    400,
@@ -301,9 +301,9 @@
 "xname": "x",
 "xline": true,
 "xticks": true,
-"y": [ 0.02712, 0.33157, 0.63602, 0.94046 ],
-"ylab": [ "0", "5", "10", "15" ],
-"yrange": [ -0.4454, 15.978 ],
+"y": [ 0.074076, 0.35941, 0.64475, 0.93009 ],
+"ylab": [ "0", "4", "8", "12" ],
+"yrange": [ -1.0384,  12.98 ],
 "yname": "y",
 "yline": true,
 "yticks": true 
@@ -316,32 +316,32 @@
 "title": "Line Size",
 "entries": [
  {
- "pathsize":    2.8,
+ "pathsize":  2.668,
 "pathcolour": "#000000",
 "pathlinetype":      1,
 "pathorder": 4,
-"label": [ "1.6" ] 
+"label": [ "1.50" ] 
 },
 {
- "pathsize":    2.2,
+ "pathsize":  2.168,
 "pathcolour": "#000000",
 "pathlinetype":      1,
 "pathorder": 3,
-"label": [ "1.4" ] 
+"label": [ "1.25" ] 
 },
 {
- "pathsize":    1.6,
+ "pathsize":  1.668,
 "pathcolour": "#000000",
 "pathlinetype":      1,
 "pathorder": 2,
-"label": [ "1.2" ] 
+"label": [ "1.00" ] 
 },
 {
- "pathsize":      1,
+ "pathsize":  1.168,
 "pathcolour": "#000000",
 "pathlinetype":      1,
 "pathorder": 1,
-"label": [ "1.0" ] 
+"label": [ "0.75" ] 
 } 
 ] 
 } 
@@ -352,8 +352,8 @@
  "geom5_line_p12" 
 ],
 "scales": {
- "alpha": [ -0.35338, 0.98273 ],
-"colour": [ "grey50", "#1F4363", "#336A98", "#4895D1", "grey50" ] 
+ "alpha": [ -0.42588, 1.0279 ],
+"colour": [ "grey50", "#1D3F5F", "#316895", "#4793CF", "grey50" ] 
 },
 "options": {
  "width":    400,
@@ -366,9 +366,9 @@
 "xname": "x",
 "xline": true,
 "xticks": true,
-"y": [ 0.14649, 0.36933, 0.59218, 0.81503 ],
+"y": [ 0.16032, 0.37875, 0.59718, 0.8156 ],
 "ylab": [ "0", "5", "10", "15" ],
-"yrange": [ -3.2867,  19.15 ],
+"yrange": [ -3.6699, 19.221 ],
 "yname": "y",
 "yline": true,
 "yticks": true 
@@ -381,21 +381,21 @@
 "title": "maxy",
 "entries": [
  {
- "pathcolour": "#4895D1",
+ "pathcolour": "#4793CF",
 "pathsize":    0.5,
 "pathlinetype":      1,
 "pathorder": 3,
 "label": [ "15" ] 
 },
 {
- "pathcolour": "#336A98",
+ "pathcolour": "#316895",
 "pathsize":    0.5,
 "pathlinetype":      1,
 "pathorder": 2,
 "label": [ "10" ] 
 },
 {
- "pathcolour": "#1F4363",
+ "pathcolour": "#1D3F5F",
 "pathsize":    0.5,
 "pathlinetype":      1,
 "pathorder": 1,
@@ -409,7 +409,7 @@
 "title": "miny",
 "entries": [
  {
- "pathalpha": 0.2876,
+ "pathalpha": 0.2824,
 "pathcolour": "#000000",
 "pathsize":    0.5,
 "pathlinetype":      1,
@@ -417,7 +417,7 @@
 "label": [ "4" ] 
 },
 {
- "pathalpha": 0.2276,
+ "pathalpha": 0.2272,
 "pathcolour": "#000000",
 "pathsize":    0.5,
 "pathlinetype":      1,
@@ -425,7 +425,7 @@
 "label": [ "2" ] 
 },
 {
- "pathalpha":  0.168,
+ "pathalpha": 0.1724,
 "pathcolour": "#000000",
 "pathsize":    0.5,
 "pathlinetype":      1,
@@ -433,7 +433,7 @@
 "label": [ "0" ] 
 },
 {
- "pathalpha":  0.108,
+ "pathalpha": 0.1172,
 "pathcolour": "#000000",
 "pathsize":    0.5,
 "pathlinetype":      1,
