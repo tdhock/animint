@@ -12,7 +12,7 @@ Contents
 
 ```{r setup,echo=FALSE, tidy=FALSE, message=FALSE, warning=FALSE}
 require(knitr)
-opts_chunk$set(fig.width=6, fig.height=4,cache=TRUE, message=FALSE, warning=FALSE)
+opts_chunk$set(fig.width=6, fig.height=4,cache=TRUE, message=FALSE, warning=FALSE, tidy=FALSE)
 library(ggplot2)
 library(animint)
 library(plyr)
@@ -69,14 +69,22 @@ tempseq
 In order to be able to select an ID, we must have at least one other plot in our animint plot list. Let's start with a plot that shows how each location compares to its average monthly temperature. Note that this quantity was computed in the code chunk at the beginning of this section. 
 
 ```{r tempmap}
-airtemp <- ggplot() + 
-  geom_tile(data=climate, aes(x=long, y=lat, fill=tempdev, clickSelects=id, showSelected=time2))+ 
-  scale_fill_gradient2("deg. C", low="blue", mid="white", high="red", limits=c(-20, 20), midpoint=0) + 
-  geom_path(data=countries, aes(x=long, y=lat, group=group)) + 
-  geom_text(data=dates, aes(x=-86, y=39, label=textdate, showSelected=time2)) +
-  ggtitle("Temperature Deviation from Monthly Norm")+ 
+# we will re-use this set of elements, so let's define a function to add them to a plot p with tiles.
+# we can't define the base plot first because the path must be drawn on top of the tiles.
+plainmap <- function(p){
+  p + geom_path(data=countries, aes(x=long, y=lat, group=group)) + 
+  geom_text(data=dates, aes(x=-86, y=39, label=textdate, showSelected=time2))+ 
   theme(axis.line=element_blank(), axis.text=element_blank(), 
         axis.ticks=element_blank(), axis.title=element_blank())
+}
+
+# tiles with temperature data to serve as the background for the plot.
+temptiles <- ggplot() + 
+  geom_tile(data=climate, aes(x=long, y=lat, fill=tempdev, clickSelects=id, showSelected=time2))+ 
+  scale_fill_gradient2("deg. C", low="blue", mid="white", high="red", limits=c(-20, 20), midpoint=0) + 
+  ggtitle("Temperature Deviation from Monthly Norm")
+
+airtemp <- plainmap(temptiles)
 ```
 The theme() statement removes the axis, axis labels, and axis title from the plot, since maps are fairly self-explanatory and longitude and latitude values don't provide much additional information. The **geom_text** statement is used where one would typically use a **make_text** statement, but in this case, we want a format that is not easily derived from the showSelected variable. 
 
@@ -97,50 +105,30 @@ Here is the [animint-generated webpage](climate/onemap/index.html). Click on the
 We can also add additional maps. The dataset contains ozone data, surface temperature data, and cloud cover data. 
 
 ```{r surftempmap}
-surftemp <- ggplot() + 
+surftemp <- plainmap(p = ggplot() + 
   geom_tile(data=climate, aes(x=long, y=lat, fill=surftemp, clickSelects=id, showSelected=time2))+ 
   scale_fill_gradient2("deg. C", low="blue", mid="white", high="red", limits=c(-10, 45), midpoint=0) + 
-  geom_path(data=countries, aes(x=long, y=lat, group=group)) + 
-  geom_text(data=dates, aes(x=-86, y=39, label=textdate, showSelected=time2)) +  
-  ggtitle("Surface Temperature")+ 
-  theme(axis.line=element_blank(), axis.text=element_blank(), 
-        axis.ticks=element_blank(), axis.title=element_blank())
+  ggtitle("Surface Temperature"))
 
-ozone <- ggplot() + 
-  geom_tile(data=climate, aes(x=long, y=lat, fill=ozone, clickSelects=id, showSelected=time2), colour="grey")+ 
+ozone <- plainmap(p = ggplot() + 
+  geom_tile(data=climate, aes(x=long, y=lat, fill=ozone, clickSelects=id, showSelected=time2))+ 
   scale_fill_gradient("Concentration", low="white", high="brown") + 
-  geom_path(data=countries, aes(x=long, y=lat, group=group)) + 
-  geom_text(data=dates, aes(x=-86, y=39, label=textdate, showSelected=time2)) +
-  ggtitle("Ozone Concentration")+ 
-  theme(axis.line=element_blank(), axis.text=element_blank(), 
-        axis.ticks=element_blank(), axis.title=element_blank())
+  ggtitle("Ozone Concentration"))
 
-cloudshigh <- ggplot() + 
-  geom_tile(data=climate, aes(x=long, y=lat, fill=cloudhigh, clickSelects=id, showSelected=time2), colour="grey")+ 
+cloudshigh <- plainmap(p = ggplot() + 
+  geom_tile(data=climate, aes(x=long, y=lat, fill=cloudhigh, clickSelects=id, showSelected=time2))+ 
   scale_fill_gradient("Coverage", low="skyblue", high="white", limits=c(0, 75)) + 
-  geom_path(data=countries, aes(x=long, y=lat, group=group)) + 
-  geom_text(data=dates, aes(x=-86, y=39, label=textdate, showSelected=time2)) +
-  ggtitle("High Altitute Cloud Cover")+ 
-  theme(axis.line=element_blank(), axis.text=element_blank(), 
-        axis.ticks=element_blank(), axis.title=element_blank())
+  ggtitle("High Altitute Cloud Cover"))
 
-cloudsmid <- ggplot() + 
+cloudsmid <- plainmap(p = ggplot() + 
   geom_tile(data=climate, aes(x=long, y=lat, fill=cloudmid, clickSelects=id, showSelected=time2), colour="grey")+ 
   scale_fill_gradient("Coverage", low="skyblue", high="white", limits=c(0, 75)) + 
-  geom_path(data=countries, aes(x=long, y=lat, group=group)) + 
-  geom_text(data=dates, aes(x=-86, y=39, label=textdate, showSelected=time2)) +
-  ggtitle("Mid Altitute Cloud Cover")+ 
-  theme(axis.line=element_blank(), axis.text=element_blank(), 
-        axis.ticks=element_blank(), axis.title=element_blank())
+  ggtitle("Mid Altitute Cloud Cover"))
 
-cloudslow <- ggplot() + 
+cloudslow <- plainmap(p = ggplot() + 
   geom_tile(data=climate, aes(x=long, y=lat, fill=cloudlow, clickSelects=id, showSelected=time2), colour="grey")+ 
   scale_fill_gradient("Coverage", low="skyblue", high="white", limits=c(0, 75)) + 
-  geom_path(data=countries, aes(x=long, y=lat, group=group)) + 
-  geom_text(data=dates, aes(x=-86, y=39, label=textdate, showSelected=time2)) +
-  ggtitle("Low Altitute Cloud Cover")+ 
-  theme(axis.line=element_blank(), axis.text=element_blank(), 
-        axis.ticks=element_blank(), axis.title=element_blank())
+  ggtitle("Low Altitute Cloud Cover"))
 
 gg2animint(list(timeseriestemp = tempseq,
                 airtemp = airtemp,
@@ -160,4 +148,4 @@ Here is the [animint-generated webpage](climate/onemap/index.html). This page ma
 
 
 
-<sub>Tutorial created by Susan VanderPlas on 7/29/2013 using animint version 0.1.0 and ggplot2 0.9.3.1</sub>
+<sub>Tutorial created by Susan VanderPlas on 7/30/2013 using animint version 0.1.0 and ggplot2 0.9.3.1</sub>
