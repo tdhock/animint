@@ -31,7 +31,7 @@ library(ggplot2)
 library(plyr)
 library(animint)
 library(maps)
-data(Tornadoes) # load the Tornadoes data from the animint package
+data(UStornadoes) # load the Tornadoes data from the animint package
 
 USpolygons <- map_data("state")
 USpolygons$state = state.abb[match(USpolygons$region, tolower(state.name))]
