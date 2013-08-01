@@ -11,7 +11,7 @@ library(maps)
 library(plyr)
 library(ggplot2)
 library(animint)
-data(Tornadoes)
+data(UStornadoes)
 stateOrder <- data.frame(state = unique(UStornadoes$state)[order(unique(UStornadoes$TornadoesSqMile), decreasing=T)], rank = 1:49) # order states by tornadoes per square mile
 UStornadoes$state <- factor(UStornadoes$state, levels=stateOrder$state, ordered=TRUE)
 UStornadoes$weight <- 1/UStornadoes$LandArea
