@@ -129,7 +129,7 @@ layer2list <- function(l, d, ranges){
   g$subord <- as.list(names(subset.vars))
   g$subvars <- as.list(subset.vars)
 
-  if("stat"%in%names(d))
+  if(!is.null(l$stat))
     if(d$stat$objname=="bin" & ("clickSelects"%in%names(g$aes) | "showSelected"%in%names(g$aes)))
       warning("stat_bin is unpredictable when used with clickSelects/showSelected. 
               Use ddply to get the data in a format that can be understood or use stat_identity.")
