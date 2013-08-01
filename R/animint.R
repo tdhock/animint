@@ -129,10 +129,18 @@ layer2list <- function(l, d, ranges){
   g$subord <- as.list(names(subset.vars))
   g$subvars <- as.list(subset.vars)
 
-  if(!is.null(l$stat))
-    if(d$stat$objname=="bin" & ("clickSelects"%in%names(g$aes) | "showSelected"%in%names(g$aes)))
-      warning("stat_bin is unpredictable when used with clickSelects/showSelected. 
-              Use ddply to do the binning or use make_bar if using geom_bar/geom_histogram.")
+  ## Warn if stat_bin is used with animint aes.
+  stat <- l$stat
+  if(!is.null(stat)){
+    is.bin <- stat$objname=="bin"
+    has.animint.aes <- any(c("clickSelects","showSelected")%in%names(g$aes))
+    if(is.bin & has.animint.aes){
+      warning(paste0("stat_bin is unpredictable ",
+                    "when used with clickSelects/showSelected.\n",
+                     "Use ddply to do the binning ",
+                     "or use make_bar if using geom_bar/geom_histogram."))
+    }
+  }
   
   ## Pre-process some complex geoms so that they are treated as
   ## special cases of basic geoms. In ggplot2, this processing is done
