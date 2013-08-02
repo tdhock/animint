@@ -468,9 +468,10 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
       click.or.show <- names(g$aes) %in% c("clickSelects","showSelected")
       anim.cols <- names(g$aes)[g$aes==v.name & click.or.show]
       g.data <- df.list[[g.name]][,anim.cols,drop=FALSE]
-      anim.values[[g.name]] <- unique(unlist(g.data))
+      g.vec <- unlist(g.data)
+      anim.values[[g.name]] <- as.character(sort(unique(g.vec)))
     }
-    olist$time$sequence <- as.character(sort(unique(unlist(anim.values))))
+    olist$time$sequence <- unique(unlist(anim.values))
     result$time <- olist$time
   }
   ## Finally, copy html/js/json files to out.dir.
