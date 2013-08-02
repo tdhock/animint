@@ -3,19 +3,32 @@ Animint Tutorial
 
 This tutorial is designed to demonstrate animint, a package that converts ggplot2 plots into d3 javascript graphics. Animint allows you to make interactive web-based graphics using familiar R methods. In addition, animint allows graphics to be animated and respond to user clicks.
 
+
+
 Contents
 ---------------------------------------------------------
+* [Installation](#install)
 * [Introduction](#intro)
 * [Tornado Example](tornadoes.html#tornadoes) - see what animint can do, including explanations of clickSelects, showSelected, and animations. 
 * [Climate Example](climate.html) - another demonstration of using animint with multiple linked plots and animation.
 * [Examples of Geoms](geoms.html) - explanations of how to use statistics and certain geoms in animint, demonstrations of most geoms that animint supports. 
 
+<a name="install"/>
+Installation instructions
+---------------------------------------------------------
+The animint package is available on [github](https://github.com/tdhock/animint). 
+
+```r
+library(devtools)  # devtools package, allows you to install from github repositories
+install_github("animint", "tdhock")
+```
+
+You can also download a zip file of the package and install it normally using install_packages() if you do not want to install the devtools package.
+
 <a name="intro"/>
 Introduction 
 ---------------------------------------------------------
 Let's start with a reasonably common comparison of distributions: two normal distributions with different centers, and a gamma distribution. 
-
-
 
 
 ```r

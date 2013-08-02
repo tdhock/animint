@@ -1,5 +1,6 @@
 animint
 base
+devtools
 ggplot2
 knitr
 lubridate
