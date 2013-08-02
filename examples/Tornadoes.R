@@ -27,10 +27,6 @@ statemap <- ggplot() + geom_polygon(data=USpolygons, aes(x=long, y=lat, group=gr
   scale_alpha_continuous("Strength (F or EF scale)", range=c(.3, 1)) + 
   ggtitle("Tornado Paths, 1950-2006")
 
-## BUG! interactive version... geom_bar + stat_bin does not work!
-USpolygons <- USpolygons
-UStornadoes <- UStornadoes
-
 ## ERROR: geom_bar + stat_bin + clickSelects does not make sense! We
 ## should stop with an error!
 tornado.bar <-
