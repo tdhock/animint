@@ -25,6 +25,10 @@ install_github("animint", "tdhock")
 
 You can also download a zip file of the package and install it normally using install_packages() if you do not want to install the devtools package.
 
+### A Note about using Google Chrome
+
+Google Chrome blocks local file access by default. To get around this, you must close all chrome instances and then restart chrome using the flag --allow-file-access-from-files. In Windows, you do this using cmd, the command prompt. Alternately, Firefox will work by default.
+
 <a name="intro"/>
 Introduction 
 ---------------------------------------------------------
