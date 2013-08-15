@@ -326,6 +326,9 @@ layer2list <- function(l, d, ranges){
 #' \itemize{
 #' \item shape. Open and closed circles can be represented by manipulating fill and colour scales and using default (circle) points, but d3 does not support many R shape types, so mapping between the two is difficult.
 #' }
+#' Note: If you are using chrome, you must first close all windows, then start 
+#' chrome with the option --allow-file-access-from-files, which will allow you 
+#' to load local pages. Alternately, use Firefox when loading local pages.
 #' 
 #' @title gg2animint
 #' @param plot.list list of named ggplots with showSelected and clickSelects aesthetics. Input must be a list, so to use a single ggplot named g, it must be passed to the function as plot.list = list(g=g).
