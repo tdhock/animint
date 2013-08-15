@@ -11,7 +11,11 @@ Depends:
     ggplot2,
     R (>= 2.10),
     proto,
-    grid
+    grid,
+    plyr,
+    maps,
+    reshape2,
+    MASS
 Collate:
     'animint.R'
     'geoms.R'
