@@ -134,15 +134,15 @@
 "height":    400 
 },
 "axis": {
- "x": [ 0.28215, 0.56824, 0.85434 ],
-"xlab": [ "40", "60", "80" ],
-"xrange": [ 20.276, 90.183 ],
+ "x": [ 0.042135, 0.33215, 0.62216, 0.91217 ],
+"xlab": [ "20", "40", "60", "80" ],
+"xrange": [ 17.094, 86.057 ],
 "xname": "very long x axis label",
 "xline": true,
 "xticks": true,
-"y": [ 0.027028, 0.29613, 0.56523, 0.83432 ],
-"ylab": [ "20", "40", "60", "80" ],
-"yrange": [ 17.991, 92.313 ],
+"y": [ 0.21305, 0.47388, 0.7347, 0.99553 ],
+"ylab": [ "30", "50", "70", "90" ],
+"yrange": [ 13.664, 90.343 ],
 "yname": "very long y axis label",
 "yline": true,
 "yticks": true 
@@ -165,9 +165,9 @@
 "xname": "xnew",
 "xline": true,
 "xticks": true,
-"y": [ 0.027028, 0.29613, 0.56523, 0.83432 ],
-"ylab": [ "20", "40", "60", "80" ],
-"yrange": [ 17.991, 92.313 ],
+"y": [ 0.21305, 0.47388, 0.7347, 0.99553 ],
+"ylab": [ "30", "50", "70", "90" ],
+"yrange": [ 13.664, 90.343 ],
 "yname": "y",
 "yline": true,
 "yticks": true 
@@ -194,9 +194,9 @@
 "xname": "xnew",
 "xline": true,
 "xticks": true,
-"y": [ 0.027028, 0.29613, 0.56523, 0.83432 ],
-"ylab": [ "20", "40", "60", "80" ],
-"yrange": [ 17.991, 92.313 ],
+"y": [ 0.21305, 0.47388, 0.7347, 0.99553 ],
+"ylab": [ "30", "50", "70", "90" ],
+"yrange": [ 13.664, 90.343 ],
 "yname": "y",
 "yline": true,
 "yticks": true 
@@ -247,9 +247,9 @@
 "xname": "xnew",
 "xline": true,
 "xticks": true,
-"y": [ 0.027028, 0.29613, 0.56523, 0.83432 ],
-"ylab": [ "20", "40", "60", "80" ],
-"yrange": [ 17.991, 92.313 ],
+"y": [ 0.21305, 0.47388, 0.7347, 0.99553 ],
+"ylab": [ "30", "50", "70", "90" ],
+"yrange": [ 13.664, 90.343 ],
 "yname": "y",
 "yline": true,
 "yticks": true 
@@ -302,23 +302,23 @@
  "geom5_point_s6" 
 ],
 "scales": {
- "colour": [ "grey50", "#204465", "#326997", "#4691CC", "grey50" ],
-"fill": [ "grey50", "#204465", "#326997", "#4691CC", "grey50" ] 
+ "colour": [ "grey50", "#21486A", "#346E9D", "#4997D4", "grey50" ],
+"fill": [ "grey50", "#21486A", "#346E9D", "#4997D4", "grey50" ] 
 },
 "options": {
  "width":    400,
 "height":    400 
 },
 "axis": {
- "x": [ 0.28215, 0.56824, 0.85434 ],
-"xlab": [ "40", "60", "80" ],
-"xrange": [ 20.276, 90.183 ],
+ "x": [ 0.042135, 0.33215, 0.62216, 0.91217 ],
+"xlab": [ "20", "40", "60", "80" ],
+"xrange": [ 17.094, 86.057 ],
 "xname": "x",
 "xline": true,
 "xticks": true,
-"y": [ 0.027028, 0.29613, 0.56523, 0.83432 ],
-"ylab": [ "20", "40", "60", "80" ],
-"yrange": [ 17.991, 92.313 ],
+"y": [ 0.21305, 0.47388, 0.7347, 0.99553 ],
+"ylab": [ "30", "50", "70", "90" ],
+"yrange": [ 13.664, 90.343 ],
 "yname": "y",
 "yline": true,
 "yticks": true 
@@ -331,24 +331,24 @@
 "title": "x * y",
 "entries": [
  {
- "pointcolour": "#4691CC",
-"pointfill": "#4691CC",
+ "pointcolour": "#4997D4",
+"pointfill": "#4997D4",
 "pointshape":     16,
 "pointsize":      2,
 "pointorder": 3,
 "label": [ "6000" ] 
 },
 {
- "pointcolour": "#326997",
-"pointfill": "#326997",
+ "pointcolour": "#346E9D",
+"pointfill": "#346E9D",
 "pointshape":     16,
 "pointsize":      2,
 "pointorder": 2,
 "label": [ "4000" ] 
 },
 {
- "pointcolour": "#204465",
-"pointfill": "#204465",
+ "pointcolour": "#21486A",
+"pointfill": "#21486A",
 "pointshape":     16,
 "pointsize":      2,
 "pointorder": 1,

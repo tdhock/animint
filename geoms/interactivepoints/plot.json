@@ -421,15 +421,15 @@
 "height":    400 
 },
 "axis": {
- "x": [ 0.1688, 0.47365, 0.7785 ],
+ "x": [ 0.19226, 0.49998, 0.80769 ],
 "xlab": [ "-1", "0", "1" ],
-"xrange": [ -1.5537, 1.7266 ],
+"xrange": [ -1.6248, 1.6249 ],
 "xname": "xmean",
 "xline": true,
 "xticks": true,
-"y": [ 0.20751, 0.47673, 0.74595 ],
+"y": [  0.203, 0.50564, 0.80827 ],
 "ylab": [ "-1", "0", "1" ],
-"yrange": [ -1.7708, 1.9436 ],
+"yrange": [ -1.6708, 1.6335 ],
 "yname": "ymean",
 "yline": true,
 "yticks": true 
@@ -515,15 +515,15 @@
 "height":    400 
 },
 "axis": {
- "x": [ 0.1688, 0.47365, 0.7785 ],
+ "x": [ 0.19226, 0.49998, 0.80769 ],
 "xlab": [ "-1", "0", "1" ],
-"xrange": [ -1.5537, 1.7266 ],
+"xrange": [ -1.6248, 1.6249 ],
 "xname": "x",
 "xline": true,
 "xticks": true,
-"y": [ 0.20751, 0.47673, 0.74595 ],
+"y": [  0.203, 0.50564, 0.80827 ],
 "ylab": [ "-1", "0", "1" ],
-"yrange": [ -1.7708, 1.9436 ],
+"yrange": [ -1.6708, 1.6335 ],
 "yname": "y",
 "yline": true,
 "yticks": true 
@@ -581,7 +581,7 @@
 "geom8_point_s9" 
 ],
 "scales": {
- "alpha": [ 0.60129, 0.78458 ],
+ "alpha": [ 0.60166, 0.77996 ],
 "colour": [ "#F8766D", "#7CAE00", "#00BFC4", "#C77CFF" ],
 "fill": [ "#F8766D", "#7CAE00", "#00BFC4", "#C77CFF" ] 
 },
@@ -590,15 +590,15 @@
 "height":    400 
 },
 "axis": {
- "x": [ 0.1688, 0.47365, 0.7785 ],
+ "x": [ 0.19226, 0.49998, 0.80769 ],
 "xlab": [ "-1", "0", "1" ],
-"xrange": [ -1.5537, 1.7266 ],
+"xrange": [ -1.6248, 1.6249 ],
 "xname": "x",
 "xline": true,
 "xticks": true,
-"y": [ 0.20751, 0.47673, 0.74595 ],
+"y": [  0.203, 0.50564, 0.80827 ],
 "ylab": [ "-1", "0", "1" ],
-"yrange": [ -1.7708, 1.9436 ],
+"yrange": [ -1.6708, 1.6335 ],
 "yname": "y",
 "yline": true,
 "yticks": true 
@@ -664,15 +664,15 @@
 "height":    400 
 },
 "axis": {
- "x": [ 0.1688, 0.47365, 0.7785 ],
+ "x": [ 0.19226, 0.49998, 0.80769 ],
 "xlab": [ "-1", "0", "1" ],
-"xrange": [ -1.5537, 1.7266 ],
+"xrange": [ -1.6248, 1.6249 ],
 "xname": "x",
 "xline": true,
 "xticks": true,
-"y": [ 0.20751, 0.47673, 0.74595 ],
+"y": [  0.203, 0.50564, 0.80827 ],
 "ylab": [ "-1", "0", "1" ],
-"yrange": [ -1.7708, 1.9436 ],
+"yrange": [ -1.6708, 1.6335 ],
 "yname": "y",
 "yline": true,
 "yticks": true 
@@ -732,22 +732,22 @@
 "scales": {
  "colour": [ "#F8766D", "#7CAE00", "#00BFC4", "#C77CFF" ],
 "fill": [ "#F8766D", "#7CAE00", "#00BFC4", "#C77CFF" ],
-"size": [ 1.0161, 3.3073 ] 
+"size": [ 1.0207, 3.2495 ] 
 },
 "options": {
  "width":    400,
 "height":    400 
 },
 "axis": {
- "x": [ 0.1688, 0.47365, 0.7785 ],
+ "x": [ 0.19226, 0.49998, 0.80769 ],
 "xlab": [ "-1", "0", "1" ],
-"xrange": [ -1.5537, 1.7266 ],
+"xrange": [ -1.6248, 1.6249 ],
 "xname": "x",
 "xline": true,
 "xticks": true,
-"y": [ 0.20751, 0.47673, 0.74595 ],
+"y": [  0.203, 0.50564, 0.80827 ],
 "ylab": [ "-1", "0", "1" ],
-"yrange": [ -1.7708, 1.9436 ],
+"yrange": [ -1.6708, 1.6335 ],
 "yname": "y",
 "yline": true,
 "yticks": true 
@@ -760,7 +760,7 @@
 "title": "str",
 "entries": [
  {
- "pointsize":   5.33,
+ "pointsize":   5.44,
 "pointshape":     16,
 "pointcolour": "#000000",
 "pointalpha":    0.5,
@@ -768,7 +768,7 @@
 "label": [ "0.4" ] 
 },
 {
- "pointsize":   4.24,
+ "pointsize":   4.32,
 "pointshape":     16,
 "pointcolour": "#000000",
 "pointalpha":    0.5,
@@ -776,7 +776,7 @@
 "label": [ "0.3" ] 
 },
 {
- "pointsize":   3.15,
+ "pointsize":    3.2,
 "pointshape":     16,
 "pointcolour": "#000000",
 "pointalpha":    0.5,
@@ -784,7 +784,7 @@
 "label": [ "0.2" ] 
 },
 {
- "pointsize":   2.06,
+ "pointsize":   2.08,
 "pointshape":     16,
 "pointcolour": "#000000",
 "pointalpha":    0.5,
@@ -851,15 +851,15 @@
 "height":    400 
 },
 "axis": {
- "x": [ 0.1688, 0.47365, 0.7785 ],
+ "x": [ 0.19226, 0.49998, 0.80769 ],
 "xlab": [ "-1", "0", "1" ],
-"xrange": [ -1.5537, 1.7266 ],
+"xrange": [ -1.6248, 1.6249 ],
 "xname": "x",
 "xline": true,
 "xticks": true,
-"y": [ 0.20751, 0.47673, 0.74595 ],
+"y": [  0.203, 0.50564, 0.80827 ],
 "ylab": [ "-1", "0", "1" ],
-"yrange": [ -1.7708, 1.9436 ],
+"yrange": [ -1.6708, 1.6335 ],
 "yname": "y",
 "yline": true,
 "yticks": true 
@@ -872,7 +872,7 @@
 "title": "str",
 "entries": [
  {
- "pointsize": 5.5835,
+ "pointsize": 5.6604,
 "pointshape":     16,
 "pointcolour": "#000000",
 "pointalpha":    0.5,
@@ -880,7 +880,7 @@
 "label": [ "0.4" ] 
 },
 {
- "pointsize": 4.8374,
+ "pointsize": 4.8965,
 "pointshape":     16,
 "pointcolour": "#000000",
 "pointalpha":    0.5,
@@ -888,7 +888,7 @@
 "label": [ "0.3" ] 
 },
 {
- "pointsize": 3.9527,
+ "pointsize":  3.998,
 "pointshape":     16,
 "pointcolour": "#000000",
 "pointalpha":    0.5,
@@ -896,7 +896,7 @@
 "label": [ "0.2" ] 
 },
 {
- "pointsize": 2.7885,
+ "pointsize":  2.827,
 "pointshape":     16,
 "pointcolour": "#000000",
 "pointalpha":    0.5,

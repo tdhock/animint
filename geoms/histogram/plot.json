@@ -38,22 +38,22 @@
  "geom1_rect_g7" 
 ],
 "scales": {
- "fill": [ "#132B43", "#244C70", "#3671A2", "#4998D6", "grey50" ] 
+ "fill": [ "#132B43", "#244D72", "#3773A5", "#4B9CDB", "grey50" ] 
 },
 "options": {
  "width":    400,
 "height":    400 
 },
 "axis": {
- "x": [ 0.10606, 0.40909, 0.71212 ],
-"xlab": [ "0", "5", "10" ],
-"xrange": [  -1.75,  14.75 ],
+ "x": [ 0.09596, 0.34848, 0.60101, 0.85354 ],
+"xlab": [ "0", "5", "10", "15" ],
+"xrange": [   -1.9,   17.9 ],
 "xname": "y",
 "xline": true,
 "xticks": true,
-"y": [ 0.045455, 0.29798, 0.55051, 0.80303 ],
-"ylab": [ "0.0", "2.5", "5.0", "7.5" ],
-"yrange": [  -0.45,   9.45 ],
+"y": [ 0.045455, 0.30519, 0.56494, 0.82468 ],
+"ylab": [ "0", "2", "4", "6" ],
+"yrange": [  -0.35,   7.35 ],
 "yname": "count",
 "yline": true,
 "yticks": true 
@@ -66,28 +66,28 @@
 "title": "count",
 "entries": [
  {
- "polygonfill": "#4998D6",
+ "polygonfill": "#4B9CDB",
 "polygonsize":    0.5,
 "polygonlinetype":      1,
 "polygonweight":      1,
 "polygonorder": 4,
-"label": [ "7.5" ] 
+"label": [ "6" ] 
 },
 {
- "polygonfill": "#3671A2",
+ "polygonfill": "#3773A5",
 "polygonsize":    0.5,
 "polygonlinetype":      1,
 "polygonweight":      1,
 "polygonorder": 3,
-"label": [ "5.0" ] 
+"label": [ "4" ] 
 },
 {
- "polygonfill": "#244C70",
+ "polygonfill": "#244D72",
 "polygonsize":    0.5,
 "polygonlinetype":      1,
 "polygonweight":      1,
 "polygonorder": 2,
-"label": [ "2.5" ] 
+"label": [ "2" ] 
 },
 {
  "polygonfill": "#132B43",
@@ -95,7 +95,7 @@
 "polygonlinetype":      1,
 "polygonweight":      1,
 "polygonorder": 1,
-"label": [ "0.0" ] 
+"label": [ "0" ] 
 } 
 ] 
 } 

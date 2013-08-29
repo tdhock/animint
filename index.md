@@ -68,4 +68,5 @@ Animint requires a list of named plots - each plot must be a ggplot2 object and 
 [Next, we'll look at a specific dataset and demonstrate the functions and aesthetics animint adds to ggplot2.](tornadoes.html)
 
 
-<sub>Tutorial created by Susan VanderPlas on 7/29/2013 using animint version 0.1.0 and ggplot2 0.9.3.1</sub>
+
+<sub>Tutorial created by Susan VanderPlas on 8/29/2013 using animint version 0.1.0 and ggplot2 0.9.3.1</sub>

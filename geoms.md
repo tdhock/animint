@@ -413,15 +413,8 @@ gg2animint(list(s7=s7, s8=s8, s9=s9, s10=s10, s11=s11, s12=s12), out.dir="geoms/
 ```
 
 ```
-## Warning: Duplicated override.aes is ignored.
-```
-
-```
-## Warning: Duplicated override.aes is ignored.
-```
-
-```
-## Warning: Duplicated override.aes is ignored.
+## Warning: Duplicated override.aes is ignored. Warning: Duplicated
+## override.aes is ignored. Warning: Duplicated override.aes is ignored.
 ```
 
 [Animint plots](geoms/interactivepoints/index.html)
@@ -846,4 +839,23 @@ gg2animint(list(g20=g20), out.dir="geoms/freqpoly")
 
 [Animint plot](geoms/freqpoly/index.html)
 
-<sub>Tutorial created by Susan VanderPlas on 7/29/2013 using animint version 0.1.0 and ggplot2 0.9.3.1</sub>
+
+### **geom\_hex**
+
+```r
+g21 <- ggplot() + 
+  geom_hex(data=dsmall, aes(x=carat, y=price)) +
+  scale_fill_gradient(low="#56B1F7", high="#132B43") + 
+  xlab("x") + ylab("y") + ggtitle("geom_hex")
+g21
+```
+
+![plot of chunk hex](figure/hex.png) 
+
+```r
+gg2animint(list(g21=g21), out.dir="geoms/hex")
+```
+
+[Animint plot](geoms/hex/index.html)
+
+<sub>Tutorial created by Susan VanderPlas on 8/29/2013 using animint version 0.1.0 and ggplot2 0.9.3.1</sub>

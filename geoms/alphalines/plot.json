@@ -158,9 +158,9 @@
 "xname": "x",
 "xline": true,
 "xticks": true,
-"y": [ 0.16032, 0.37875, 0.59718, 0.8156 ],
-"ylab": [ "0", "5", "10", "15" ],
-"yrange": [ -3.6699, 19.221 ],
+"y": [ 0.15766, 0.36134, 0.56503, 0.76871, 0.9724 ],
+"ylab": [ "0", "5", "10", "15", "20" ],
+"yrange": [ -3.8702, 20.678 ],
 "yname": "y",
 "yline": true,
 "yticks": true 
@@ -183,9 +183,9 @@
 "xname": "x",
 "xline": true,
 "xticks": true,
-"y": [ 0.11753, 0.39478, 0.67203, 0.94928 ],
+"y": [ 0.17071, 0.40346, 0.6362, 0.86895 ],
 "ylab": [ "0", "5", "10", "15" ],
-"yrange": [ -2.1195, 15.915 ],
+"yrange": [ -3.6673, 17.815 ],
 "yname": "y",
 "yline": true,
 "yticks": true 
@@ -198,7 +198,7 @@
  "geom3_line_p10" 
 ],
 "scales": {
- "alpha": [ 1.3846,  6.138 ],
+ "alpha": [ 0.37627, 6.8355 ],
 "linetype": [ "solid", "22" ] 
 },
 "options": {
@@ -212,9 +212,9 @@
 "xname": "x",
 "xline": true,
 "xticks": true,
-"y": [ 0.11753, 0.39478, 0.67203, 0.94928 ],
+"y": [ 0.17071, 0.40346, 0.6362, 0.86895 ],
 "ylab": [ "0", "5", "10", "15" ],
-"yrange": [ -2.1195, 15.915 ],
+"yrange": [ -3.6673, 17.815 ],
 "yname": "y",
 "yline": true,
 "yticks": true 
@@ -248,15 +248,15 @@
 "title": "maxy",
 "entries": [
  {
- "pathalpha": 0.4968,
+ "pathalpha": 0.4792,
 "pathcolour": "#000000",
 "pathsize":    0.5,
 "pathlinetype":      1,
 "pathorder": 4,
-"label": [ "15" ] 
+"label": [ "16" ] 
 },
 {
- "pathalpha":  0.396,
+ "pathalpha":   0.38,
 "pathcolour": "#000000",
 "pathsize":    0.5,
 "pathlinetype":      1,
@@ -264,20 +264,20 @@
 "label": [ "12" ] 
 },
 {
- "pathalpha": 0.2952,
+ "pathalpha": 0.2808,
 "pathcolour": "#000000",
 "pathsize":    0.5,
 "pathlinetype":      1,
 "pathorder": 2,
-"label": [ "9" ] 
+"label": [ "8" ] 
 },
 {
- "pathalpha": 0.1936,
+ "pathalpha": 0.1816,
 "pathcolour": "#000000",
 "pathsize":    0.5,
 "pathlinetype":      1,
 "pathorder": 1,
-"label": [ "6" ] 
+"label": [ "4" ] 
 } 
 ] 
 } 
@@ -301,9 +301,9 @@
 "xname": "x",
 "xline": true,
 "xticks": true,
-"y": [ 0.074076, 0.35941, 0.64475, 0.93009 ],
-"ylab": [ "0", "4", "8", "12" ],
-"yrange": [ -1.0384,  12.98 ],
+"y": [ 0.099638, 0.41117, 0.7227 ],
+"ylab": [ "0", "5", "10" ],
+"yrange": [ -1.5992, 14.451 ],
 "yname": "y",
 "yline": true,
 "yticks": true 
@@ -352,8 +352,8 @@
  "geom5_line_p12" 
 ],
 "scales": {
- "alpha": [ -0.42588, 1.0279 ],
-"colour": [ "grey50", "#1D3F5F", "#316895", "#4793CF", "grey50" ] 
+ "alpha": [ -0.45087, 0.88077 ],
+"colour": [ "grey50", "#204668", "#326996", "#448DC7", "grey50" ] 
 },
 "options": {
  "width":    400,
@@ -366,58 +366,22 @@
 "xname": "x",
 "xline": true,
 "xticks": true,
-"y": [ 0.16032, 0.37875, 0.59718, 0.8156 ],
-"ylab": [ "0", "5", "10", "15" ],
-"yrange": [ -3.6699, 19.221 ],
+"y": [ 0.15766, 0.36134, 0.56503, 0.76871, 0.9724 ],
+"ylab": [ "0", "5", "10", "15", "20" ],
+"yrange": [ -3.8702, 20.678 ],
 "yname": "y",
 "yline": true,
 "yticks": true 
 },
 "title": "Continuous Alpha and Colour",
 "legend": {
- "maxy": {
- "guide": "legend",
-"geoms": "path",
-"title": "maxy",
-"entries": [
- {
- "pathcolour": "#4793CF",
-"pathsize":    0.5,
-"pathlinetype":      1,
-"pathorder": 3,
-"label": [ "15" ] 
-},
-{
- "pathcolour": "#316895",
-"pathsize":    0.5,
-"pathlinetype":      1,
-"pathorder": 2,
-"label": [ "10" ] 
-},
-{
- "pathcolour": "#1D3F5F",
-"pathsize":    0.5,
-"pathlinetype":      1,
-"pathorder": 1,
-"label": [ "5" ] 
-} 
-] 
-},
-"miny": {
+ "miny": {
  "guide": "legend",
 "geoms": "path",
 "title": "miny",
 "entries": [
  {
- "pathalpha": 0.2824,
-"pathcolour": "#000000",
-"pathsize":    0.5,
-"pathlinetype":      1,
-"pathorder": 4,
-"label": [ "4" ] 
-},
-{
- "pathalpha": 0.2272,
+ "pathalpha": 0.2428,
 "pathcolour": "#000000",
 "pathsize":    0.5,
 "pathlinetype":      1,
@@ -425,7 +389,7 @@
 "label": [ "2" ] 
 },
 {
- "pathalpha": 0.1724,
+ "pathalpha": 0.1828,
 "pathcolour": "#000000",
 "pathsize":    0.5,
 "pathlinetype":      1,
@@ -433,12 +397,40 @@
 "label": [ "0" ] 
 },
 {
- "pathalpha": 0.1172,
+ "pathalpha": 0.1228,
 "pathcolour": "#000000",
 "pathsize":    0.5,
 "pathlinetype":      1,
 "pathorder": 1,
 "label": [ "-2" ] 
+} 
+] 
+},
+"maxy": {
+ "guide": "legend",
+"geoms": "path",
+"title": "maxy",
+"entries": [
+ {
+ "pathcolour": "#448DC7",
+"pathsize":    0.5,
+"pathlinetype":      1,
+"pathorder": 3,
+"label": [ "15" ] 
+},
+{
+ "pathcolour": "#326996",
+"pathsize":    0.5,
+"pathlinetype":      1,
+"pathorder": 2,
+"label": [ "10" ] 
+},
+{
+ "pathcolour": "#204668",
+"pathsize":    0.5,
+"pathlinetype":      1,
+"pathorder": 1,
+"label": [ "5" ] 
 } 
 ] 
 } 
