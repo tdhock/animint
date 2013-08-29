@@ -226,6 +226,28 @@ layer2list <- function(l, d, ranges){
     subset.vars <- c(some.vars, group="group")
     g$subord <- as.list(names(subset.vars))
     g$subvars <- as.list(subset.vars)
+  } else if(g$geom=="hex"){
+    g$geom <- "polygon"
+    dx <- ggplot2::resolution(g$data$x, FALSE)
+    dy <- ggplot2::resolution(g$data$y, FALSE)
+    hex <- as.data.frame(hexcoords(dx, dy))[,1:2]
+    hex <- rbind(hex, hex[1,]) # to join hexagon back to first point
+    g$data$group <- as.numeric(interaction(g$data$group, 1:nrow(g$data)))
+    ## this has the potential to be a bad assumption - 
+    ##   by default, group is identically 1, if the user 
+    ##   specifies group, polygons aren't possible to plot
+    ##   using d3, because group will have a different meaning
+    ##   than "one single polygon".
+    newdata <- ddply(g$data, .(group), function(df){
+      df$xcenter <- df$x
+      df$ycenter <- df$y
+      cbind(x=df$x+hex$x, y=df$y+hex$y, df[,-which(names(df)%in%c("x", "y"))])
+    })
+    g$data <- newdata
+    # reset g$subord, g$subvars now that group aesthetic exists.
+    subset.vars <- c(some.vars, group="group")
+    g$subord <- as.list(names(subset.vars))
+    g$subvars <- as.list(subset.vars)    
   } else { 
     ## all other geoms are basic, and keep the same name.
     g$geom

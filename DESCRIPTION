@@ -15,7 +15,8 @@ Depends:
     plyr,
     maps,
     reshape2,
-    MASS
+    MASS,
+    hexbin
 Collate:
     'animint.R'
     'geoms.R'
