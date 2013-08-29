@@ -207,6 +207,15 @@ g20 <- ggplot() +
   geom_freqpoly(data=diamonds, aes(x=clarity, group=cut, colour=cut)) +
   ggtitle("geom_freqpoly")
 g20
+# gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, 
+#                 g9=g9, g10=g10, g11=g11, g12=g12, g13=g13, g14=g14, g15=g15, 
+#                 g16 = g16, g17=g17, g18=g18, g19=g19, g20=g20))
+
+g21 <- ggplot() + 
+  geom_hex(data=dsmall, aes(x=carat, y=price, colour=..count.., fill=..count..)) +
+  scale_fill_gradient(low="#56B1F7", high="#132B43") + 
+  xlab("x") + ylab("y") + ggtitle("geom_hex")
+gg2animint(list(g=g21))
 gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, 
                 g9=g9, g10=g10, g11=g11, g12=g12, g13=g13, g14=g14, g15=g15, 
-                g16 = g16, g17=g17, g18=g18, g19=g19, g20=g20))
+                g16 = g16, g17=g17, g18=g18, g19=g19, g20=g20, g21=g21))

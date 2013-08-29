@@ -4,6 +4,9 @@ facets
 
 coord_equal
 
+Include d3 plots directly in knitr html output e.g.
+http://zvfak.blogspot.jp/2013/08/using-javascript-visualization.html
+
 round to significant digits or stop with an error when a
 clickSelects/showSelected variable is numeric with lots of decimals?
 

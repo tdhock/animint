@@ -229,7 +229,7 @@ layer2list <- function(l, d, ranges){
   } else if(g$geom=="hex"){
     g$geom <- "polygon"
     dx <- ggplot2::resolution(g$data$x, FALSE)
-    dy <- ggplot2::resolution(g$data$y, FALSE)
+    dy <- ggplot2::resolution(g$data$y, FALSE) / sqrt(3) / 2 * 1.15
     hex <- as.data.frame(hexcoords(dx, dy))[,1:2]
     hex <- rbind(hex, hex[1,]) # to join hexagon back to first point
     g$data$group <- as.numeric(interaction(g$data$group, 1:nrow(g$data)))
@@ -244,6 +244,12 @@ layer2list <- function(l, d, ranges){
       cbind(x=df$x+hex$x, y=df$y+hex$y, df[,-which(names(df)%in%c("x", "y"))])
     })
     g$data <- newdata
+    # Color set to match ggplot2 default of tile with no outside border.
+    if(!"colour"%in%names(g$data) & "fill"%in%names(g$data)){
+      g$data[["colour"]] <- g$data[["fill"]]
+      # Make outer border of 0 size if size isn't already specified.
+      if(!"size"%in%names(g$data)) g$data[["size"]] <- 0 
+    }
     # reset g$subord, g$subvars now that group aesthetic exists.
     subset.vars <- c(some.vars, group="group")
     g$subord <- as.list(names(subset.vars))
