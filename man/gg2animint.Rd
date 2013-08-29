@@ -37,29 +37,33 @@
   bar \item text \item tile \item raster \item ribbon \item
   abline \item density \item path \item polygon \item
   histogram \item violin \item linerange \item step \item
-  contour \item density2d \item area \item freqpoly }
-  Unsupported geoms: \itemize{ \item rug \item dotplot
-  \item hex \item quantile - should *theoretically* work
-  but in practice does not work \item smooth - can be
-  created using geom_line and geom_ribbon \item boxplot -
+  contour \item density2d \item area \item freqpoly \item
+  hex } Unsupported geoms: \itemize{ \item rug \item
+  dotplot \item quantile - should *theoretically* work but
+  in practice does not work \item smooth - can be created
+  using geom_line and geom_ribbon \item boxplot - can be
+  created using geom_rect and geom_segment \item crossbar -
   can be created using geom_rect and geom_segment \item
-  crossbar - can be created using geom_rect and
-  geom_segment \item pointrange - can be created using
-  geom_linerange and geom_point \item bin2d - bin using
-  ddply() and then use geom_tile() \item map - can be
-  created using geom_polygon or geom_path } Supported
-  scales: \itemize{ \item alpha, \item fill/colour (brewer,
-  gradient, identity, manual) \item linetype \item x and y
-  axis scales, manual break specification, label formatting
-  \item x and y axis theme elements: axis.line, axis.ticks,
-  axis.text, axis.title can be set to element_blank();
-  other theme modifications not supported at this time, but
-  would be possible with custom css files. \item area \item
-  size } Unsupported scales: \itemize{ \item shape. Open
-  and closed circles can be represented by manipulating
-  fill and colour scales and using default (circle) points,
-  but d3 does not support many R shape types, so mapping
-  between the two is difficult. }
+  pointrange - can be created using geom_linerange and
+  geom_point \item bin2d - bin using ddply() and then use
+  geom_tile() \item map - can be created using geom_polygon
+  or geom_path } Supported scales: \itemize{ \item alpha,
+  \item fill/colour (brewer, gradient, identity, manual)
+  \item linetype \item x and y axis scales, manual break
+  specification, label formatting \item x and y axis theme
+  elements: axis.line, axis.ticks, axis.text, axis.title
+  can be set to element_blank(); other theme modifications
+  not supported at this time, but would be possible with
+  custom css files. \item area \item size } Unsupported
+  scales: \itemize{ \item shape. Open and closed circles
+  can be represented by manipulating fill and colour scales
+  and using default (circle) points, but d3 does not
+  support many R shape types, so mapping between the two is
+  difficult. } Note: If you are using chrome, you must
+  first close all windows, then start chrome with the
+  option --allow-file-access-from-files, which will allow
+  you to load local pages. Alternately, use Firefox when
+  loading local pages.
 }
 \examples{
 #' Tests for each geom
@@ -271,9 +275,17 @@ g20 <- ggplot() +
   geom_freqpoly(data=diamonds, aes(x=clarity, group=cut, colour=cut)) +
   ggtitle("geom_freqpoly")
 g20
+# gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, 
+#                 g9=g9, g10=g10, g11=g11, g12=g12, g13=g13, g14=g14, g15=g15, 
+#                 g16 = g16, g17=g17, g18=g18, g19=g19, g20=g20))
+
+g21 <- ggplot() + 
+  geom_hex(data=dsmall, aes(x=carat, y=price)) +
+  scale_fill_gradient(low="#56B1F7", high="#132B43") + 
+  xlab("x") + ylab("y") + ggtitle("geom_hex")
 gg2animint(list(g1=g1, g2=g2, g3=g3, g4=g4, g5=g5, g6=g6, g7=g7, g8=g8, 
                 g9=g9, g10=g10, g11=g11, g12=g12, g13=g13, g14=g14, g15=g15, 
-                g16 = g16, g17=g17, g18=g18, g19=g19, g20=g20))
+                g16 = g16, g17=g17, g18=g18, g19=g19, g20=g20, g21=g21))
 }
 \seealso{
   \code{\link{ggplot2}}

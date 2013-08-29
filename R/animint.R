@@ -228,6 +228,7 @@ layer2list <- function(l, d, ranges){
     g$subvars <- as.list(subset.vars)
   } else if(g$geom=="hex"){
     g$geom <- "polygon"
+    g$aes[["group"]] <- "group"
     dx <- ggplot2::resolution(g$data$x, FALSE)
     dy <- ggplot2::resolution(g$data$y, FALSE) / sqrt(3) / 2 * 1.15
     hex <- as.data.frame(hexcoords(dx, dy))[,1:2]
@@ -326,12 +327,12 @@ layer2list <- function(l, d, ranges){
 #' \item density2d
 #' \item area
 #' \item freqpoly
+#' \item hex
 #' }
 #' Unsupported geoms: 
 #' \itemize{
 #' \item rug
 #' \item dotplot
-#' \item hex
 #' \item quantile - should *theoretically* work but in practice does not work
 #' \item smooth - can be created using geom_line and geom_ribbon
 #' \item boxplot - can be created using geom_rect and geom_segment
