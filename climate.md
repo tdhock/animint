@@ -149,7 +149,7 @@ gg2animint(list(timeseriestemp = tempseq,
                              airtemp=450, surftemp=450, ozone=450, 
                              cloudslow=450, cloudsmid=450, cloudshigh=450),
                 height = list(450)
-                ))
+                ), out.dir="climate/lotsofmaps")
 ```
 
 Here is the [animint-generated webpage](climate/onemap/index.html). This page may take longer to load due to the increased amount of data d3 must process.
