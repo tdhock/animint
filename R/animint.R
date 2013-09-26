@@ -334,11 +334,16 @@ layer2list <- function(l, d, ranges){
   g
 }
 
-#' Workhorse function for the animint package.
-#' Convert a list of ggplots to a d3-ready graphic. 
-#' Adds aesthetics clickSelects and updateSelected to utilize 
-#' d3's mouseover and interactivity features for multiple linked plots,
-#' and allows animated sequences of graphics. 
+#' Convert a list of ggplots to an interactive animation
+#' that can be viewed in a web browser. 
+#' Two new aesthetics control interactivity:
+#' \itemize{
+#' \item \code{aes(showSelected=variable)} means that
+#'   only the subset of the data that corresponds to
+#'   the selected value of variable will be shown.
+#' \item \code{aes(clickSelects=variable)} means that clicking
+#'   this geom will change the currently selected value of variable.
+#' }
 #' 
 #' Supported ggplot2 geoms: 
 #' \itemize{
@@ -400,13 +405,14 @@ layer2list <- function(l, d, ranges){
 #' to load local pages. Alternately, use Firefox when loading local pages.
 #' 
 #' @title gg2animint
-#' @param plot.list list of named ggplots with showSelected and clickSelects aesthetics. Input must be a list, so to use a single ggplot named g, it must be passed to the function as plot.list = list(g=g).
-#' @param out.dir directory to store html/js/csv files 
-#' @param open.browser Should R open a browser? Note: Chrome will not display local html files unless you are running a local webserver or have launched chrome with the option --allow-file-access-from-files. Firefox should display local html files (including those containing javascript).
-#' @return invisible list of ggplots in list format
+#' @aliases animint
+#' @param plot.list a named list of ggplots and option lists.
+#' @param out.dir directory to store html/js/csv files.
+#' @param open.browser Should R open a browser? Note: Chrome will not display local html files unless you are running a local webserver or have launched chrome with the option --allow-file-access-from-files. Firefox should display local html files.
+#' @return invisible list of ggplots in list format.
 #' @export 
 #' @seealso \code{\link{ggplot2}}
-#' @example examples/SimpleGeoms.R
+#' @example examples/gg2animint.R
 gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()){
   ## Check that it is a list and every element is named.
   stopifnot(is.list(plot.list))
