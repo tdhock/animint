@@ -174,6 +174,21 @@ examples <-
          height=list(signal=300,regression=150,error=50,segments=100))
 })
 
+## There are in fact several levels of testing:
+
+## (1) does the list of ggplots actually contain valid ggplots?
+
+## (2) does the R code generate the required csv/js/html files?
+
+## And (3) do those files render/animate/interact correctly in the
+## browser. 
+
+## I test for (1) and (2) below --- I print() every ggplot to test if
+## it is valid, and I called gg2animint to at least check if it
+## returns without an error.
+
+## For (3) there is no solution currently.
+
 for(plot.list in examples){
   for(p in plot.list){
     ## we should be able to print these as regular, overplotted

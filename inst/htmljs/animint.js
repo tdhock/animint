@@ -370,10 +370,61 @@ var animint = function (to_select, json_file) {
 
     if (g_info.geom == "line" || g_info.geom == "path" || g_info.geom ==
       "polygon" || g_info.geom == "ribbon") {
-      //In order to get d3 lines to play nice, bind fake "data" (group id's) -- the kv variable
-      //Then each separate object is plotted using path.
 
-      // case of only 1 thing and no groups.
+      // Lines, paths, polygons, and ribbons are a bit special. For
+      // every unique value of the group variable, we take the
+      // corresponding data rows and make 1 path. The tricky part is
+      // that to use d3 I do a data-bind of some "fake" data which are
+      // just group ids, which is the kv variable in the code below
+
+      // // case of only 1 line and no groups.
+      // if(!aes.hasOwnProperty("group")){
+      //     kv = [{"key":0,"value":0}];
+      //     data = {0:data};
+      // }else{
+      //     // we need to use a path for each group.
+      //     var kv = d3.entries(d3.keys(data));
+      //     kv = kv.map(function(d){
+      // 	d[aes.group] = d.value;
+      // 	return d;
+      //     });
+      // }
+
+      // For an example consider breakpointError$error which is
+      // defined using this R code
+
+      // geom_line(aes(segments, error, group=bases.per.probe,
+      //    clickSelects=bases.per.probe), data=only.error, lwd=4)
+
+      // Inside update_geom the variables take the following values
+      // (pseudo-Javascript code)
+
+      // var kv = [{"key":"0","value":"133","bases.per.probe":"133"}, 
+      //           {"key":"1","value":"2667","bases.per.probe":"2667"}];
+      // var data = {"133":[array of 20 points used to draw the line for group 133],
+      //             "2667":[array of 20 points used to draw the line for group 2667]};
+
+      // I do elements.data(kv) so that when I set the d attribute of
+      // each path, I need to select the correct group before
+      // returning anything.
+
+      // e.attr("d",function(group_info){
+      //     var one_group = data[group_info.value];
+      //     return lineThing(one_group);
+      // })
+
+      // To make color work I think you just have to select the group
+      // and take the color of the first element, e.g.
+
+      // .style("stroke",function(group_info){
+      //     var one_group = data[group_info.value];
+      //     var one_row = one_group[0];
+      //     return get_color(one_row);
+      // }
+
+      //In order to get d3 lines to play nice, bind fake "data" (group
+      //id's) -- the kv variable. Then each separate object is plotted
+      //using path (case of only 1 thing and no groups).
       if (!aes.hasOwnProperty("group")) {
         kv = [{
           "key": 0,
@@ -577,6 +628,15 @@ var animint = function (to_select, json_file) {
       }
       eAppend = "rect";
     } else if (g_info.geom == "boxplot") {
+
+      // TODO: currently boxplots are unsupported (we intentionally
+      // stop with an error in the R code). The reason why is that
+      // boxplots are drawn using multiple geoms and it is not
+      // straightforward to deal with that using our current JS
+      // code. After all, a boxplot could be produced by combing 3
+      // other geoms (rects, lines, and points) if you really wanted
+      // it.
+
       fill = "white";
 
       elements = elements.data(data);
@@ -658,7 +718,35 @@ var animint = function (to_select, json_file) {
         return selectedOpacity(d, g_info.aes.clickSelects,
           get_alpha(d), get_alpha(d) - 1 / 2);
       }
-      //elements.style("opacity",notOver);
+      // My original design for clicking/interactivity/transparency:
+      // Basically I wanted a really simple way to show which element
+      // in a group of clickable geom elements is currently
+      // selected. So I decided that all the non-selected elements
+      // should have alpha transparency 0.5 less than normal, and the
+      // selected element should have normal alpha transparency. Also,
+      // the element currently under the mouse has normal alpha
+      // transparency, to visually indicate that it can be
+      // clicked. Looking at my examples, you will see that I
+      // basically use this in two ways:
+
+      // 1. By specifying
+      // geom_vline(aes(clickSelects=variable),alpha=0.5), which
+      // implies a normal alpha transparency of 0.5. So all the vlines
+      // are hidden (normal alpha 0.5 - 0.5 = 0), except the current
+      // selection and the current element under the mouse pointer are
+      // drawn a bit faded with alpha=0.5.
+
+      // 2. By specifying e.g. geom_point(aes(clickSelects=variable)),
+      // that implies a normal alpha=1. Thus the current selection and
+      // the current element under the mouse pointer are fully drawn
+      // with alpha=1 and the others are shown but a bit faded with
+      // alpha=0.5 (normal alpha 1 - 0.5 = 0.5).
+
+      // TODO: defining a penalty of 0.5 alpha for non-selected geoms
+      // is somewhat arbitrary and so this should be configurable
+      // (e.g. somebody may want to change color instead of
+      // transparency).
+
       elements.style("opacity", notOver)
         .on("mouseover", function (d) {
           d3.select(this).style("opacity", function (d) {
@@ -670,6 +758,12 @@ var animint = function (to_select, json_file) {
           d3.select(this).style("opacity", notOver);
         })
         .on("click", function (d) {
+	  // The main idea of how clickSelects works: when we click
+	  // something, we calls update_selector and then
+	  // update_geom. Inside, I select the relevant subset of data
+	  // and store it in the data variable, which is
+	  // e.g. [{row1},{row2},...]. These are bound to SVG elements
+	  // using D3 to update the plot.
           var v_name = g_info.aes.clickSelects;
           update_selector(v_name, d.clickSelects);
         })
@@ -727,6 +821,14 @@ var animint = function (to_select, json_file) {
 	    update_selector(v_name, next);
     }
  } 
+
+  //The main idea of how legends work:
+
+  // 1. In getLegend in animint.R I export the legend entries as a
+  // list of rows that can be used in a data() bind in D3.
+
+  // 2. Here in add_legend I create a <table> for every legend, and
+  // then I bind the legend entries to <tr>, <td>, and <svg> elements.
   var add_legend = function(p_name, p_info){
     // case of multiple legends, d3 reads legend structure in as an array
     var tdRight = element.select("td#"+p_name+"_legend");

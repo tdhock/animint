@@ -41,21 +41,19 @@ gg2list <- function(p){
     ## function to handle cases like coord_flip. scales is a list of
     ## 12, coords is a list(limits=list(x=NULL,y=NULL)) with class
     ## e.g. c("cartesian","coord"). The result is a transformed data
-    ## frame where all the data values are between 0 and 1. TODO:
-    ## change the JS code to reflect this fact.
+    ## frame where all the data values are between 0 and 1.
+    
+    ## TODO: coord_transform maybe won't work for 
+    ## geom_dotplot|rect|segment and polar/log transformations, which
+    ## could result in something nonlinear. For the time being it is
+    ## best to just ignore this, but you can look at the source of
+    ## e.g. geom-rect.r in ggplot2 to see how they deal with this by
+    ## doing a piecewise linear interpolation of the shape.
+
     g$data <- ggplot2:::coord_transform(plistextra$plot$coord, g$data,
                                         plistextra$panel$ranges[[1]])
     plist$geoms[[i]] <- g
-
-    ## TODO: use ranges calculated by ggplot2.
-    
-    ## for(ax.name in names(plist$ranges)){
-    ##   plist$ranges[[ax.name]] <-
-    ##     c(plist$ranges[[ax.name]], g$ranges[ax.name,])
-    ## }
   }
-  ##plist$ranges <- lapply(plist$ranges, range, na.rm=TRUE)
-  
   # Export axis specification as a combination of breaks and
   # labels, on the relevant axis scale (i.e. so that it can
   # be passed into d3 on the x axis scale instead of on the 
@@ -122,14 +120,46 @@ layer2list <- function(l, d, ranges){
     names(g$params[[p.name]]) <- NULL
   }
 
-  ## Make a list of variables to use for subsetting.
+  ## Make a list of variables to use for subsetting. subord is the
+  ## order in which these variables will be accessed in the recursive
+  ## JavaScript array structure.
+
+  ## subvars/subord IS in fact useful with geom_segment! For example, in
+  ## the first plot in the breakpointError example, the geom_segment has
+  ## the following exported data in plot.json
+
+  ## "subord": [
+  ##  "showSelected",
+  ## "showSelected2" 
+  ## ],
+  ## "subvars": {
+  ##  "showSelected": "segments",
+  ## "showSelected2": "bases.per.probe" 
+  ## },
+
+  ## This information is used to parse the recursive array data structure
+  ## that allows efficient lookup of subsets of data in JavaScript. Look at
+  ## the Firebug DOM browser on
+  ## http://sugiyama-www.cs.titech.ac.jp/~toby/animint/breakpoints/index.html
+  ## and navigate to plot.Geoms.geom3.data. You will see that this is a
+  ## recursive array that can be accessed via
+  ## data[segments][bases.per.probe] which is an un-named array
+  ## e.g. [{row1},{row2},...] which will be bound to the <line> elements by
+  ## D3. The key point is that the subord array stores the order of the
+  ## indices that will be used to select the current subset of data (in
+  ## this case showSelected=segments, showSelected2=bases.per.probe). The
+  ## currently selected values of these variables are stored in
+  ## plot.Selectors.
+  
   some.vars <- c(g$aes[grepl("showSelected",names(g$aes))])
   g$update <- c(some.vars, g$aes[names(g$aes)=="clickSelects"])
   subset.vars <- c(some.vars, g$aes[names(g$aes)=="group"])
   g$subord <- as.list(names(subset.vars))
   g$subvars <- as.list(subset.vars)
 
-  ## Warn if stat_bin is used with animint aes.
+  ## Warn if stat_bin is used with animint aes. geom_bar + stat_bin
+  ## doesn't make sense with clickSelects/showSelected, since two
+  ## clickSelects/showSelected values may show up in the same bin.
   stat <- l$stat
   if(!is.null(stat)){
     is.bin <- stat$objname=="bin"
@@ -190,7 +220,12 @@ layer2list <- function(l, d, ranges){
   } else if(g$geom=="bin2d"){
     stop("bin2d is not supported in animint. Try using geom_tile() and binning the data yourself.")
   } else if(g$geom=="boxplot"){
-    stop("boxplots are not supported in animint")
+    stop("boxplots are not supported. Workaround: rects, lines, and points")
+    ## TODO: boxplot support. But it is hard since boxplots are drawn
+    ## using multiple geoms and it is not straightforward to deal with
+    ## that using our current JS code. There is a straightforward
+    ## workaround: combing 3 other geoms (rects, lines, and points).
+
     g$data$outliers <- sapply(g$data$outliers, FUN=paste, collapse=" @ ") 
     # outliers are specified as a list... change so that they are specified 
     # as a single string which can then be parsed in JavaScript.
@@ -228,6 +263,11 @@ layer2list <- function(l, d, ranges){
     g$subvars <- as.list(subset.vars)
   } else if(g$geom=="hex"){
     g$geom <- "polygon"
+    ## TODO: for interactivity we will run into the same problems as
+    ## we did with histograms. Again, if we put several
+    ## clickSelects/showSelected values in the same hexbin, then
+    ## clicking/hiding hexbins doesn't really make sense. Need to stop
+    ## with an error if showSelected/clickSelects is used with hex.
     g$aes[["group"]] <- "group"
     dx <- ggplot2::resolution(g$data$x, FALSE)
     dy <- ggplot2::resolution(g$data$y, FALSE) / sqrt(3) / 2 * 1.15
@@ -586,6 +626,14 @@ getLegendList <- function(plistextra){
 #' @return list of legend information, NULL if guide=FALSE.
 getLegend <- function(mb){
   guidetype <- mb$name
+  ## The main idea of legends:
+  
+  ## 1. Here in getLegend I export the legend entries as a list of
+  ## rows that can be used in a data() bind in D3.
+
+  ## 2. In add_legend in the JS code I create a <table> for every
+  ## legend, and then I bind the legend entries to <tr>, <td>, and
+  ## <svg> elements.
   geoms <- sapply(mb$geoms, function(i) i$geom$objname)
   cleanData <- function(data, key, geom){
     if(nrow(data)==0) return(data.frame()); # if no rows, return an empty df.
