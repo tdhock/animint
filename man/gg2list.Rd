@@ -14,9 +14,6 @@
 \description{
   Convert a ggplot to a list. Called from gg2animint().
 }
-\examples{
-gg2list(ggplot() + geom_point(data=data.frame(x=rnorm(100, 3, 1), y=rnorm(100, 5, 1))), aes(x=x, y=y))
-}
 \seealso{
   \code{\link{gg2animint}}
 }

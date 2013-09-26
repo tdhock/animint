@@ -16,7 +16,8 @@ Depends:
     maps,
     reshape2,
     MASS,
-    hexbin
+    hexbin,
+    scales
 Collate:
     'animint.R'
     'geoms.R'

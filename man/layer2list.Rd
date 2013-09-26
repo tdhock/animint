@@ -9,6 +9,8 @@
 
   \item{d}{one layer of calculated data from
   ggplot2::ggplot_build(p)}
+
+  \item{ranges}{axes ranges}
 }
 \value{
   list representing a layer, with corresponding aesthetics,

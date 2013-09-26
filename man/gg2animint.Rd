@@ -12,11 +12,10 @@
 
   \item{out.dir}{directory to store html/js/csv files.}
 
-  \item{open.browser}{Should R open a browser? Note: Chrome
-  will not display local html files unless you are running
-  a local webserver or have launched chrome with the option
-  --allow-file-access-from-files. Firefox should display
-  local html files.}
+  \item{open.browser}{Should R open a browser? If yes, be
+  sure to configure your browser to allow access to local
+  files, as some browsers block this by default (e.g.
+  chrome).}
 }
 \value{
   invisible list of ggplots in list format.
@@ -34,7 +33,7 @@
 }
 \details{
   Supported ggplot2 geoms: \itemize{ \item point \item
-  jitter \item line \item rect \item tallRect (new with
+  jitter \item line \item rect \item tallrect (new with
   this package) \item segment \item hline \item vline \item
   bar \item text \item tile \item raster \item ribbon \item
   abline \item density \item path \item polygon \item
@@ -61,11 +60,7 @@
   can be represented by manipulating fill and colour scales
   and using default (circle) points, but d3 does not
   support many R shape types, so mapping between the two is
-  difficult. } Note: If you are using chrome, you must
-  first close all windows, then start chrome with the
-  option --allow-file-access-from-files, which will allow
-  you to load local pages. Alternately, use Firefox when
-  loading local pages.
+  difficult. }
 }
 \examples{
 data(worldPop)

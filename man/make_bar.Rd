@@ -19,19 +19,6 @@
   Convenience function for an interactive bar that might
   otherwise be created using stat_bin.
 }
-\examples{
-data(Tornadoes)
-tornado.bar <-
-list(map=ggplot()+
-       geom_polygon(aes(x=long, y=lat, group=group),
-                    data=USpolygons, fill="black", colour="grey") +
-       geom_segment(aes(x=startLong, y=startLat, xend=endLong, yend=endLat,
-                        showSelected=year),
-                    colour="#55B1F7", data=UStornadoes),
-     ts=ggplot()+
-       make_bar(UStornadoes, "year"))
-gg2animint(tornado.bar)
-}
 \author{
   Toby Dylan Hocking
 }

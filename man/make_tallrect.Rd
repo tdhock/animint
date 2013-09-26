@@ -26,15 +26,6 @@ case of selecting a particular x value.}
   the x range. This makes it easy to construct tallrects
   for the common case of selecting a particular x value.
 }
-\examples{
-data(worldPop)
-popPlot <- ggplot()+
-  make_tallrect("year", worldPop)+
-  geom_line(aes(year, population, group=subcontinent),
-            data=worldPop, size=4)
-print(popPlot)
-gg2animint(list(popPlot=popPlot))
-}
 \author{
   Toby Dylan Hocking
 }

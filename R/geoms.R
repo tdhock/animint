@@ -42,14 +42,6 @@ geom_tallrect <- function(mapping=NULL, data=NULL, stat="identity", position="id
 #' @return a geom_tallrect layer.
 #' @author Toby Dylan Hocking
 #' @export
-#' @examples
-#' data(worldPop)
-#' popPlot <- ggplot()+
-#'   make_tallrect("year", worldPop)+
-#'   geom_line(aes(year, population, group=subcontinent),
-#'             data=worldPop, size=4)
-#' print(popPlot)
-#' gg2animint(list(popPlot=popPlot))
 make_tallrect <- function(data, x.name, even=FALSE, alpha=1/2){
   stopifnot(is.data.frame(data))
   stopifnot(is.character(x.name))
@@ -78,18 +70,6 @@ make_tallrect <- function(data, x.name, even=FALSE, alpha=1/2){
 #' @return a geom_bar layer.
 #' @author Toby Dylan Hocking
 #' @export
-#' @examples
-#' data(Tornadoes)
-#' tornado.bar <-
-#' list(map=ggplot()+
-#'        geom_polygon(aes(x=long, y=lat, group=group),
-#'                     data=USpolygons, fill="black", colour="grey") +
-#'        geom_segment(aes(x=startLong, y=startLat, xend=endLong, yend=endLat,
-#'                         showSelected=year),
-#'                     colour="#55B1F7", data=UStornadoes),
-#'      ts=ggplot()+
-#'        make_bar(UStornadoes, "year"))
-#' gg2animint(tornado.bar)
 make_bar <- function(data, x.name, alpha=1){
   stopifnot(is.data.frame(data))
   stopifnot(is.character(x.name))
@@ -109,20 +89,6 @@ make_bar <- function(data, x.name, alpha=1){
 #' @return a geom_text layer.
 #' @author Toby Dylan Hocking
 #' @export
-#' @examples
-#' tornado.ts.bar <-
-#'   list(map=ggplot()+
-#'          make_text(UStornadoCounts, -100, 50, "year", "Tornadoes in %d")+
-#'          geom_polygon(aes(x=long, y=lat, group=group, clickSelects=state),
-#'                       data=USpolygons, fill="black", colour="grey") +
-#'          geom_segment(aes(x=startLong, y=startLat, xend=endLong, yend=endLat,
-#'                           showSelected=year),
-#'                       colour="#55B1F7", data=UStornadoes),
-#'        ts=ggplot()+
-#'          make_text(UStornadoes, 1980, 200, "state")+
-#'          geom_bar(aes(year, count, clickSelects=year, showSelected=state),
-#'                   data=UStornadoCounts, stat="identity", position="identity"))
-#' gg2animint(tornado.ts.bar, "tornado-ts-bar")
 make_text <- function(data, x, y, label.var, format=NULL){
   stopifnot(is.data.frame(data))
   stopifnot(length(x)==1)

@@ -3,9 +3,6 @@
 #' @return list representing a ggplot, with elements, ranges, axes, scales, geoms, and options
 #' @export
 #' @seealso \code{\link{gg2animint}}
-#' @examples
-#' gg2list(ggplot() + geom_point(data=data.frame(x=rnorm(100, 3, 1), y=rnorm(100, 5, 1))), aes(x=x, y=y))
-#' 
 gg2list <- function(p){
   plist <- list()
   plistextra <- ggplot2::ggplot_build(p)
@@ -104,6 +101,7 @@ gg2list <- function(p){
 #' Convert a layer to a list. Called from gg2list()
 #' @param l one layer of the ggplot object
 #' @param d one layer of calculated data from ggplot2::ggplot_build(p)
+#' @param ranges axes ranges
 #' @return list representing a layer, with corresponding aesthetics, ranges, and groups.
 #' @export
 #' @seealso \code{\link{gg2animint}}
@@ -224,14 +222,19 @@ layer2list <- function(l, d, ranges){
     ## TODO: boxplot support. But it is hard since boxplots are drawn
     ## using multiple geoms and it is not straightforward to deal with
     ## that using our current JS code. There is a straightforward
-    ## workaround: combing 3 other geoms (rects, lines, and points).
+    ## workaround: combine working geoms (rects, lines, and points).
 
     g$data$outliers <- sapply(g$data$outliers, FUN=paste, collapse=" @ ") 
     # outliers are specified as a list... change so that they are specified 
     # as a single string which can then be parsed in JavaScript.
     # there has got to be a better way to do this!!
   } else if(g$geom=="violin"){
-    g$data <- transform(g$data, xminv = x-violinwidth*(x-xmin),xmaxv = x+violinwidth*(xmax-x))
+    x <- g$data$x
+    vw <- g$data$violinwidth
+    xmin <- g$data$xmin
+    xmax <- g$data$xmax
+    g$data$xminv <- x-vw*(x-xmin)
+    g$data$xmaxv <- x+vw*(xmax-x)
     newdata <- ddply(g$data, .(group), function(df){
                   rbind(arrange(transform(df, x=xminv), y), arrange(transform(df, x=xmaxv), -y))
                 })
@@ -351,7 +354,7 @@ layer2list <- function(l, d, ranges){
 #' \item jitter
 #' \item line
 #' \item rect
-#' \item tallRect (new with this package)
+#' \item tallrect (new with this package)
 #' \item segment
 #' \item hline
 #' \item vline
@@ -400,15 +403,12 @@ layer2list <- function(l, d, ranges){
 #' \itemize{
 #' \item shape. Open and closed circles can be represented by manipulating fill and colour scales and using default (circle) points, but d3 does not support many R shape types, so mapping between the two is difficult.
 #' }
-#' Note: If you are using chrome, you must first close all windows, then start 
-#' chrome with the option --allow-file-access-from-files, which will allow you 
-#' to load local pages. Alternately, use Firefox when loading local pages.
 #' 
 #' @title gg2animint
 #' @aliases animint
 #' @param plot.list a named list of ggplots and option lists.
 #' @param out.dir directory to store html/js/csv files.
-#' @param open.browser Should R open a browser? Note: Chrome will not display local html files unless you are running a local webserver or have launched chrome with the option --allow-file-access-from-files. Firefox should display local html files.
+#' @param open.browser Should R open a browser? If yes, be sure to configure your browser to allow access to local files, as some browsers block this by default (e.g. chrome).
 #' @return invisible list of ggplots in list format.
 #' @export 
 #' @seealso \code{\link{ggplot2}}
