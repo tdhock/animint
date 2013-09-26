@@ -15,6 +15,12 @@ clickSelects, then can we select all of the corresponding geoms? This
 would require rewriting a substantial amount of JS code, so let's just
 ignore this for the time being.
 
+2013.9.26
+
+Update R/JS comments from emails to Susan.
+
+gg2animint examples are animated and interactive.
+
 2013.8.29
 Implementation of geom_hex with relevant examples and documentation.
 

@@ -1,6 +1,5 @@
 \name{animint-package}
 \alias{animint-package}
-\alias{animint}
 \docType{package}
 \title{Interactive animations}
 \description{Interactive animations can be defined using the
