@@ -5,15 +5,26 @@ An interactive animation can be defined using a list of ggplots with
 clickSelects and showSelected aesthetics.
 
 ```s
-install.packages(c("devtools","ggplot2","RJSONIO"))
+install.packages("devtools")
 library(devtools)
 install_github("animint","tdhock")
 library(animint)
 example(gg2animint)
 ```
 
-For more examples, see [the animint tutorial](http://tdhock.github.io/animint/) or look at breakpoints.R evolution.R intreg.R and
-Tornadoes.R in the examples folder.
+For more examples, see [the animint
+tutorial](http://tdhock.github.io/animint/) or look at the *.R files
+in the examples folder.
 
-A list of implemented features and TODOs can be found on the
-gg2animint man page.
+A list of implemented features can be found on the gg2animint man
+page, and [TODOs are listed in the NEWS
+file](https://github.com/tdhock/animint/blob/master/NEWS).
+
+A [table of related
+work](https://github.com/tdhock/animint/blob/master/etc/references.org)
+explains the differences between animint and several similar R
+interactive graphics packages.
+
+We created [some documentation for un-documented ggplot2 functions
+that we use in
+animint](https://github.com/tdhock/animint/blob/master/etc/ggplot2.org).
