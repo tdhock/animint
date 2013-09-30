@@ -842,21 +842,35 @@ var animint = function (to_select, json_file) {
       // the legend table with breaks/value/label.
       var legendgeoms = l_info.geoms;
       var legend_rows = legend_table.selectAll("tr")
-            .data(l_info.entries).sort(function(d) {return d["order"];}).enter().append("tr");
+        .data(l_info.entries)
+	.sort(function(d) {return d["order"];})
+	.enter()
+	.append("tr")
+      ;
       var legend_svgs = legend_rows.append("td")
         .append("svg")
-  	    .attr("id", function(d){return "legend-"+d["label"];})
-  	    .attr("height", 14)
-  	    .attr("width", 20);
+  	.attr("id", function(d){return "legend-"+d["label"];})
+  	.attr("height", 14)
+  	.attr("width", 20)
+      ;
       var pointscale = d3.scale.linear().domain([0,7]).range([1,4]);
-      // scale points so they are visible in the legend. (does not affect plot scaling)
+      // scale points so they are visible in the legend. (does not
+      // affect plot scaling)
       var linescale = d3.scale.linear().domain([0,6]).range([1,4]);
-      // scale lines so they are visible in the legend. (does not affect plot scaling)
+      // scale lines so they are visible in the legend. (does not
+      // affect plot scaling)
       if(legendgeoms.indexOf("polygon")>-1){ 
         // aesthetics that would draw a rect
-        legend_svgs.append("rect").attr("x", 2).attr("y", 2).attr("width", 10).attr("height", 10)
+        legend_svgs.append("rect")
+	  .attr("x", 2)
+	  .attr("y", 2)
+	  .attr("width", 10)
+	  .attr("height", 10)
           .style("stroke-width", function(d){return d["polygonsize"]||1;})
-          .style("stroke-dasharray", function(d){return linetypesize2dasharray(d["polygonlinetype"]||"solid", d["size"]||2);})
+          .style("stroke-dasharray", function(d){
+	    return linetypesize2dasharray(d["polygonlinetype"]||"solid", 
+					  d["size"]||2);
+	  })
           .style("stroke", function(d){return d["polygoncolour"] || "#000000";})
           .style("fill", function(d){return d["polygonfill"] || "#FFFFFF";})
           .style("opacity", function(d){return d["polygonalpha"]||1;});
@@ -865,20 +879,32 @@ var animint = function (to_select, json_file) {
         // aesthetics that would draw a line
         legend_svgs.append("line")
           .attr("x1", 1).attr("x2", 19).attr("y1", 7).attr("y2", 7)
-          .style("stroke-width", function(d){return linescale(d["pathsize"])||2;})
-          .style("stroke-dasharray", function(d){return linetypesize2dasharray(d["pathlinetype"]||"solid", d["pathsize"] || 2);})
+          .style("stroke-width", function(d){
+	    return linescale(d["pathsize"])||2;
+	  })
+          .style("stroke-dasharray", function(d){
+	    return linetypesize2dasharray(d["pathlinetype"]||"solid", 
+					  d["pathsize"] || 2);
+	  })
           .style("stroke", function(d){return d["pathcolour"] || "#000000";})
           .style("opacity", function(d){return d["pathalpha"]||1;});
       }
       if(legendgeoms.indexOf("point")>-1){
         // aesthetics that would draw a point
-        legend_svgs.append("circle").attr("cx", function(d){return (10-pointscale(d["pointsize"])||4)}).attr("cy", 7)
+        legend_svgs.append("circle")
+	  .attr("cx", function(d){return (10-pointscale(d["pointsize"])||4)})
+	  .attr("cy", 7)
           .attr("r", function(d){return pointscale(d["pointsize"])||4;})
           .style("stroke", function(d){return d["pointcolour"] || "#000000";})
-          .style("fill", function(d){return d["pointfill"] || "#000000";})
+          .style("fill", function(d){
+	    return d["pointfill"] || d["pointcolour"] || "#000000";
+	  })
           .style("opacity", function(d){return d["pointalpha"]||1;});
       }
-      legend_rows.append("td").attr("align", "left").text(function(d){ return d["label"];});
+      legend_rows.append("td")
+	.attr("align", "left")
+	.text(function(d){ return d["label"];})
+      ;
     }
   }
   
