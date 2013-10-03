@@ -78,6 +78,7 @@ for(var.name in c("method", "classifier")){
 sqLab <- "squared error of the prior estimate"
 priorBands <-
   list(set=ggplot()+
+       geom_abline()+
        geom_text(aes(positive, negative, label=set), data=priorData)+
        geom_point(aes(positive, negative, size=dimension, clickSelects=set),
                   data=priorData)+
