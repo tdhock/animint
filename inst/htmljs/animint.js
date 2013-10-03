@@ -570,10 +570,11 @@ var animint = function (to_select, json_file) {
       eActions = function (e) {
         e.attr("x", toXY("x", "x"))
           .attr("y", toXY("y", "y"))
+	  .style("fill", get_colour)
+          .style("text-anchor", text_anchor)
           .text(function (d) {
             return d.label;
-          })
-          .style("text-anchor", text_anchor);
+          });
       }
       eAppend = "text";
     } else if (g_info.geom == "point") {
