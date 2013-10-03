@@ -641,10 +641,14 @@ getLegend <- function(mb){
   ## legend, and then I bind the legend entries to <tr>, <td>, and
   ## <svg> elements.
   geoms <- sapply(mb$geoms, function(i) i$geom$objname)
-  cleanData <- function(data, key, geom){
-    if(nrow(data)==0) return(data.frame()); # if no rows, return an empty df.
-    data$order <- 1:nrow(data)
-    data <- merge(data, key)
+  cleanData <- function(orig, key, geom){
+    if(nrow(orig)==0) return(data.frame()); # if no rows, return an empty df.
+    orig$order <- 1:nrow(orig)
+    count.na <- function(x)sum(is.na(x))
+    orig.na <- sapply(orig, count.na)>0
+    key.na <- sapply(key, count.na)>0
+    by <- intersect(names(orig.na)[!orig.na], names(key.na)[!key.na])
+    data <- merge(orig, key, by=by)
     data <- data[order(data$order),]
     if(!".label"%in%names(data)) return(data.frame()); # if there are no labels, return an empty df.
     data <- data[,which(colSums(!is.na(data))>0)] # remove cols that are entirely na
