@@ -15,6 +15,11 @@ clickSelects, then can we select all of the corresponding geoms? This
 would require rewriting a substantial amount of JS code, so let's just
 ignore this for the time being.
 
+2013.10.4
+
+Bugfixes for geom_ribbon(aes(fill=variable)) and
+geom_text(aes(label=variable)).
+
 2013.9.26
 
 Update R/JS comments from emails to Susan.
