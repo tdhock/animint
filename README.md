@@ -13,8 +13,9 @@ example(gg2animint)
 ```
 
 For more examples, see [the animint
-tutorial](http://tdhock.github.io/animint/) or look at the *.R files
-in the examples folder.
+tutorial](http://tdhock.github.io/animint/) and look at the
+[examples/*.R](https://github.com/tdhock/animint/tree/master/examples)
+files.
 
 A list of implemented features can be found on the gg2animint man
 page, and [TODOs are listed in the NEWS
