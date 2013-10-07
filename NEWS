@@ -18,7 +18,7 @@ ignore this for the time being.
 2013.10.4
 
 Bugfixes for geom_ribbon(aes(fill=variable)) and
-geom_text(aes(label=variable)).
+geom_text(aes(color=variable)).
 
 2013.9.26
 
