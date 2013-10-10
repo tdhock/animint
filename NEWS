@@ -15,6 +15,9 @@ clickSelects, then can we select all of the corresponding geoms? This
 would require rewriting a substantial amount of JS code, so let's just
 ignore this for the time being.
 
+Figure out when two csv files are the same and if so only write one of
+them?
+
 2013.10.4
 
 Bugfixes for geom_ribbon(aes(fill=variable)) and

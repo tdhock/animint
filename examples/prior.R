@@ -152,3 +152,19 @@ priorBands <-
        xlab("class prior")+
        ylab(sqLab))
 gg2animint(priorBands)
+
+## are the exported files the same?
+
+## csv.files <- Sys.glob("/tmp/RtmpVIt99h/filee8b6b741ce7/*.csv")
+## for(i in 1:(length(csv.files)-1)){
+##   for(j in (i+1):length(csv.files)){
+##     cmd <- sprintf("diff %s %s|head -1",csv.files[i],csv.files[j])
+##     out <- system(cmd, intern=TRUE)
+##     if(length(out)==0){
+##       print(cmd)
+##     }
+##   }
+## }
+
+## Answer: 3 pairs are the same: (12,20), (14,9), (17,7). So actually
+## there is not so much repetition that can be easily avoided.
