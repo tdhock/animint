@@ -4,6 +4,9 @@ facets
 
 coord_equal
 
+layout=matrix of plot names means render plots in an html table
+instead of in a line.
+
 Include d3 plots directly in knitr html output e.g.
 http://zvfak.blogspot.jp/2013/08/using-javascript-visualization.html
 
