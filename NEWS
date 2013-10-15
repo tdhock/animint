@@ -4,14 +4,14 @@ facets
 
 coord_equal
 
+aes(tooltip=text) for specifying the text to show when you hover the
+mouse over something, e.g. #1.
+
 layout=matrix of plot names means render plots in an html table
 instead of in a line.
 
 Include d3 plots directly in knitr html output e.g.
 http://zvfak.blogspot.jp/2013/08/using-javascript-visualization.html
-
-stop with an error when stat_bin is used to put several clickSelects
-or showSelected values in the same bin!
 
 multiple selection? ex, if 1 bin contains multiple values of
 clickSelects, then can we select all of the corresponding geoms? This
@@ -20,6 +20,10 @@ ignore this for the time being.
 
 Figure out when two csv files are the same and if so only write one of
 them?
+
+2013.10.15
+
+Hide only y axis and not x axis if axis.text.y=element_blank(), etc.
 
 2013.10.4
 
@@ -55,3 +59,7 @@ the actual values.
 make_text for quick labels.
 
 make_*(data, ...)
+
+WARNING when stat_bin is used to put several clickSelects or
+showSelected values in the same bin!
+
