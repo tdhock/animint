@@ -562,7 +562,7 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
   ## Finally, copy html/js/json files to out.dir.
   src.dir <- system.file("htmljs",package="animint")
   to.copy <- Sys.glob(file.path(src.dir, "*"))
-  file.copy(to.copy, out.dir, overwrite=TRUE)
+  file.copy(to.copy, out.dir, overwrite=TRUE, recursive=TRUE)
   json <- RJSONIO::toJSON(result)
   cat(json,file=file.path(out.dir,"plot.json"))
   if(open.browser){
