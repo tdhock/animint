@@ -58,6 +58,15 @@ gg2list <- function(p){
   # out of the box, with no additional d3 coding. 
   theme.pars <- ggplot2:::plot_theme(p)  
   
+  ## Flip labels if coords are flipped - transform does not take care
+  ## of this. Do this BEFORE checking if it is blank or not, so that
+  ## individual axes can be hidden appropriately, e.g. #1.
+  ranges <- plistextra$panel$ranges[[1]]
+  if("flip"%in%attr(plistextra$plot$coordinates, "class")){
+    temp <- plistextra$plot$labels$x
+    plistextra$plot$labels$x <- plistextra$plot$labels$y
+    plistextra$plot$labels$y <- temp
+  }
   is.blank <- function(el.name){
     x <- ggplot2::calc_element(el.name, p$theme)
     "element_blank"%in%attr(x,"class")
@@ -65,13 +74,13 @@ gg2list <- function(p){
   plist$axis <- list()
   for(xy in c("x","y")){
     s <- function(tmp)sprintf(tmp, xy)
-    plist$axis[[xy]] <- plistextra$panel$ranges[[1]][[s("%s.major")]]
+    plist$axis[[xy]] <- ranges[[s("%s.major")]]
     plist$axis[[s("%slab")]] <- if(is.blank(s("axis.text.%s"))){
       NULL
     }else{
-      plistextra$panel$ranges[[1]][[s("%s.labels")]]
+      ranges[[s("%s.labels")]]
     }
-    plist$axis[[s("%srange")]] <- plistextra$panel$ranges[[1]][[s("%s.range")]]
+    plist$axis[[s("%srange")]] <- ranges[[s("%s.range")]]
     plist$axis[[s("%sname")]] <- if(is.blank(s("axis.title.%s"))){
       ""
     }else{
@@ -79,14 +88,6 @@ gg2list <- function(p){
     }
     plist$axis[[s("%sline")]] <- !is.blank(s("axis.line.%s"))
     plist$axis[[s("%sticks")]] <- !is.blank(s("axis.ticks.%s"))
-  }
-  print(plist$axis)
-  # Flip labels if coords are flipped - transform does not take care of this.
-  # I wonder if there is a better way to do this, though...?
-  if("flip"%in%attr(plistextra$plot$coordinates, "class")){
-    temp = plist$axis$xname
-    plist$axis$xname = plist$axis$yname
-    plist$axis$yname = temp
   }
   
   plist$legend <- getLegendList(plistextra)
