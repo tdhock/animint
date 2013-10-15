@@ -58,23 +58,29 @@ gg2list <- function(p){
   # out of the box, with no additional d3 coding. 
   theme.pars <- ggplot2:::plot_theme(p)  
   
-  is.blank <- function(x){
+  is.blank <- function(el.name){
+    x <- ggplot2::calc_element(el.name, p$theme)
     "element_blank"%in%attr(x,"class")
   }
-  plist$axis <- list(
-    x = plistextra$panel$ranges[[1]]$x.major,
-    xlab = if(is.blank(ggplot2::calc_element("axis.text.x", p$theme))) NULL else plistextra$panel$ranges[[1]]$x.labels,
-    xrange = plistextra$panel$ranges[[1]]$x.range,
-    xname = if(is.blank(ggplot2::calc_element("axis.title.x", p$theme))) "" else plistextra$plot$labels$x,
-    xline = !is.blank(ggplot2::calc_element("axis.line.x", p$theme)),
-    xticks = !is.blank(ggplot2::calc_element("axis.ticks.x", p$theme)),
-    y = plistextra$panel$ranges[[1]]$y.major,
-    ylab = if(is.blank(ggplot2::calc_element("axis.text.y", p$theme))) NULL else plistextra$panel$ranges[[1]]$y.labels,
-    yrange = plistextra$panel$ranges[[1]]$y.range,
-    yname = if(is.blank(ggplot2::calc_element("axis.title.y", p$theme))) "" else plistextra$plot$labels$y,
-    yline = !is.blank(ggplot2::calc_element("axis.line.y", p$theme)),
-    yticks= !is.blank(ggplot2::calc_element("axis.ticks.y", p$theme))
-  )
+  plist$axis <- list()
+  for(xy in c("x","y")){
+    s <- function(tmp)sprintf(tmp, xy)
+    plist$axis[[xy]] <- plistextra$panel$ranges[[1]][[s("%s.major")]]
+    plist$axis[[s("%slab")]] <- if(is.blank(s("axis.text.%s"))){
+      NULL
+    }else{
+      plistextra$panel$ranges[[1]][[s("%s.labels")]]
+    }
+    plist$axis[[s("%srange")]] <- plistextra$panel$ranges[[1]][[s("%s.range")]]
+    plist$axis[[s("%sname")]] <- if(is.blank(s("axis.title.%s"))){
+      ""
+    }else{
+      plistextra$plot$labels[[xy]]
+    }
+    plist$axis[[s("%sline")]] <- !is.blank(s("axis.line.%s"))
+    plist$axis[[s("%sticks")]] <- !is.blank(s("axis.ticks.%s"))
+  }
+  print(plist$axis)
   # Flip labels if coords are flipped - transform does not take care of this.
   # I wonder if there is a better way to do this, though...?
   if("flip"%in%attr(plistextra$plot$coordinates, "class")){
