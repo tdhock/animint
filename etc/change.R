@@ -54,7 +54,7 @@ for(df.name in names(change)){
 ## Define positions for each variable.
 var.ids <- unique(with(change$coefs, c(v1, v2)))
 angle <- seq(0, 2*pi, l=length(var.ids)+1)[-1]
-changePos <- data.frame(variable=var.ids, x=cos(angle), y=sin(angle))
+change$position <- data.frame(variable=var.ids, x=cos(angle), y=sin(angle))
 ## append the positions for each.
 for(df.name in names(change)){
   df <- change[[df.name]]
@@ -62,7 +62,7 @@ for(df.name in names(change)){
     i <- df[,v.name]
     for(xy in c("x","y")){
       newCol <- sprintf("%s.%s",v.name,xy)
-      df[,newCol] <- changePos[i, xy]
+      df[,newCol] <- change$pos[i, xy]
     }
   }
   change[[df.name]] <- df

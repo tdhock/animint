@@ -15,7 +15,7 @@ print(likPlot)
 ## Just the variables which have really changed.
 changed <- subset(change$truth, changed)
 varPlot <- ggplot()+
-  geom_text(aes(x,y,label=variable), data=changePos)+
+  geom_text(aes(x,y,label=variable), data=change$pos)+
   geom_segment(aes(v1.x, v1.y, xend=v2.x, yend=v2.y,
                    size=change, colour=change,
                    showSelected=complexity, clickSelects=variables),
