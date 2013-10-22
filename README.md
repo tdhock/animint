@@ -13,7 +13,9 @@ example(gg2animint)
 ```
 
 For more examples, see [the animint
-tutorial](http://tdhock.github.io/animint/) and look at the
+tutorial](http://tdhock.github.io/animint/) the [examples web
+site](http://sugiyama-www.cs.titech.ac.jp/~toby/animint/index.html)
+and look at the
 [examples/*.R](https://github.com/tdhock/animint/tree/master/examples)
 files.
 
