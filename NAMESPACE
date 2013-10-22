@@ -1,6 +1,7 @@
 export(geom_tallrect)
 export(getLegendList)
 export(gg2animint)
+export(gg2animint_knitr)
 export(gg2list)
 export(is.rgb)
 export(layer2list)
