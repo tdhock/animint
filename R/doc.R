@@ -7,7 +7,7 @@ makeDocs <- function(doc.dir){
   require(knitr)
   viz.path <- Sys.glob(file.path(doc.dir, "*", "viz.R"))
   sub.dirs <- dirname(viz.path)
-  Rmd.tmp.file <- system.file("template.Rmd", package="animint")
+  Rmd.tmp.file <- file.path(doc.dir, "template.Rmd")
   Rmd.tmp.lines <- readLines(Rmd.tmp.file)
   Rmd.template <- paste(Rmd.tmp.lines, collapse="\n")
   owd <- getwd()
@@ -54,20 +54,21 @@ makeDocs <- function(doc.dir){
           '<td>%s</td>',
           '<td><a href="%s/viz.html"><img src="%s/small.png" /></a></td>',
           '<td>%s</td>',
+          '<td class="numeric">%d</td>',
           '<td>%s</td>',
-          '<td>%d</td>',
+          '<td class="numeric">%d</td>',
           '<td>%s</td>',
-          '<td>%d</td>',
           '</tr>',
           collapse="\n")
   tr.vec <- sprintf(tr.tmp, base, base, base, animated,
-                    name.interactive, n.interactive, 
-                    name.vars, n.vars)
+                    n.interactive, name.interactive, 
+                    n.vars, name.vars)
   trs <- paste(tr.vec, collapse="\n")
   index.tmp.file <- file.path(doc.dir,"index-template.html")
   index.tmp.lines <- readLines(index.tmp.file)
   index.tmp <- paste(index.tmp.lines, collapse="\n")
-  index.filled <- sub("TABLE", trs, index.tmp)
+  vers <- packageVersion("animint")
+  index.filled <- sub("VERSION", vers, sub("TABLE", trs, index.tmp))
   index.file <- file.path(doc.dir, "index.html")
   writeLines(index.filled, index.file)
 }
