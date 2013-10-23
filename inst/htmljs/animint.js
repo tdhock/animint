@@ -357,6 +357,8 @@ var animint = function (to_select, json_file) {
     }
     if (g_info.params.fill) {
       fill = g_info.params.fill;
+    }else if(g_info.params.colour){
+      fill = g_info.params.colour;
     }
     var text_anchor = "middle";
     if (g_info.params.hjust == 0) {
