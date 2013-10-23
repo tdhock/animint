@@ -895,7 +895,7 @@ var animint = function (to_select, json_file) {
       if(legendgeoms.indexOf("point")>-1){
         // aesthetics that would draw a point
         legend_svgs.append("circle")
-	  .attr("cx", function(d){return (10-pointscale(d["pointsize"])||4)})
+	  .attr("cx", 10)
 	  .attr("cy", 7)
           .attr("r", function(d){return pointscale(d["pointsize"])||4;})
           .style("stroke", function(d){return d["pointcolour"] || "#000000";})

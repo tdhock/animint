@@ -55,5 +55,5 @@ gapminder <-
        make_text(WorldBank, 5, 80, "year")+
        continuous_scale("size","area",palette=function(x){
          scales:::rescale(sqrt(abs(x)), c(2,20))
-       }))
+       },breaks=seq(5e8, 1e9, by=1e8)))
 gg2animint(gapminder)
