@@ -1,5 +1,7 @@
 TODO
 
+specify scale_x_continuous(LABEL) instead of xlab(LABEL).
+
 facets
 
 coord_equal
