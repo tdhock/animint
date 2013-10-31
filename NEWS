@@ -1,5 +1,7 @@
 TODO
 
+theme(legend.position)
+
 specify scale_x_continuous(LABEL) instead of xlab(LABEL).
 
 facets
