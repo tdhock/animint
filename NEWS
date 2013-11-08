@@ -1,5 +1,9 @@
 TODO
 
+customizable alpha/color/size/etc for mouseovered/selected geoms. One
+way to do this is by defining new *.hover aesthetics,
+e.g. https://github.com/rstudio/ggvis/blob/master/demo/hover.r
+
 theme(legend.position)
 
 specify scale_x_continuous(LABEL) instead of xlab(LABEL).
