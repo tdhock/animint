@@ -27,6 +27,10 @@ clickSelects, then can we select all of the corresponding geoms? This
 would require rewriting a substantial amount of JS code, so let's just
 ignore this for the time being.
 
+specify id or key variable for transitions? In the current set of
+examples, using keys has proven un-necessary. So let's just ignore
+this for now.  http://bost.ocks.org/mike/constancy/
+
 Figure out when two csv files are the same and if so only write one of
 them?
 
