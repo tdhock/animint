@@ -8,7 +8,8 @@ theme(legend.position)
 
 specify scale_x_continuous(LABEL) instead of xlab(LABEL).
 
-facets
+facets -- to implement these it may be useful to use "margin
+convention" http://bl.ocks.org/mbostock/3019563
 
 coord_equal
 
