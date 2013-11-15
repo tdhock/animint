@@ -44,10 +44,9 @@ viz <-
        xlab(x.lab)+
        ggtitle("test error, select data set"),
        diff=ggplot()+
+       geom_line(aes(N, mean, group=norm), data=diff.df)+
        geom_ribbon(aes(N, ymin=mean-sd, ymax=mean+sd, group=norm,
                        clickSelects=norm), alpha=1/2,
-                   data=diff.df)+
-       geom_line(aes(N, mean, group=norm, clickSelects=norm), 
                    data=diff.df)+
        geom_hline(yintercept=0, color="red")+
        geom_text(aes(x,y,label=label),color="red",

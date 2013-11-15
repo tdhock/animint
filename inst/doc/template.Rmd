@@ -1,6 +1,6 @@
-The code below shows a minimal example of the animint package: an
-interactive animation can be defined as a list of ggplots with
-showSelected and clickSelects aesthetics.
+The code below shows an example of the animint package: an interactive
+animation can be defined as a list of ggplots with showSelected and
+clickSelects aesthetics.
 
 ```{r, "title", tidy=FALSE, results="asis", fig.keep="none"}
 library(animint)
@@ -8,4 +8,4 @@ VIZ
 gg2animint_knitr(viz) # use gg2animint(viz) instead if not inside knitr/Rmd.
 ```
 
-There should be an interactive animation above.
+DESCRIPTION

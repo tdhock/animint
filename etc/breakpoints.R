@@ -1,5 +1,5 @@
 ## Make some simulated signals that show the breakpointError.
-works_with_R("2.15.2",breakpointError="1.0")
+works_with_R("3.0.2", breakpointError="1.0", plyr="1.8")
 
 kmax <- 20
 sample.signal <- function(d){
@@ -33,7 +33,7 @@ mu.break.after <- which(diff(mu)!=0)
 signal <- rnorm(length(mu), mu, 1)
 ## here we define the size of the signals.
 variable.density.signals <- list()
-signal.size <- c(1000,50)*length(means)
+signal.size <- c(200, 100, 50, 25)*length(means)
 n.signals <- length(signal.size)
 
 ## we need to recover these data for each signal:
@@ -51,7 +51,7 @@ for(sig.i in 1:n.signals){
                 segments=sig$segments)
   for(N in names(these)){
     breakpoints[[N]] <- rbind(breakpoints[[N]],{
-      data.frame(these[[N]],bases.per.probe)
+      data.frame(these[[N]],bases.per.probe,samples=d)
     })
   }
 }
@@ -67,5 +67,19 @@ imp.df <- with(details,{
         get.imp(breaks,yrange[1]))
 })
 breakpoints$imprecision <- imp.df[order(imp.df$pos),]
+
+breakpoints$roc <-
+  ddply(breakpoints$error, .(segments, bases.per.probe, samples), function(d){
+    rownames(d) <- d$type
+    e <- d[,"error",drop=FALSE]
+    B <- length(seg.size)-1 # number of real breakpoints.
+    N <- length(signal) # number of points we could possibly sample.
+    max.possible.breaks <- N-1 # there could be a break after every point.
+    max.fp <- max.possible.breaks - B
+    FNR <- (e["FN",]+e["I",])/B
+    FPR <- e["FP",]/max.fp
+    TPR <- 1-FNR
+    data.frame(TPR, FPR, FNR)
+  })
 
 save(breakpoints,file=file.path("..","data","breakpoints.RData"),compress="xz")

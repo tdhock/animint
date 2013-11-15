@@ -469,7 +469,11 @@ var animint = function (to_select, json_file) {
           var one_group = data[d.value];
 	  // filter NaN since they make the whole line disappear!
 	  var no_na = one_group.filter(function(d){
-	    return !isNaN(d.x) && !isNaN(d.y);
+	    if(g_info.geom == "ribbon"){
+	      return !isNaN(d.x) && !isNaN(d.ymin) && !isNaN(d.ymax);
+	    }else{
+	      return !isNaN(d.x) && !isNaN(d.y);
+	    }
 	  })
           return lineThing(no_na);
         })

@@ -1,0 +1,2 @@
+- Click on the background of the time series plot on the right to select a year.
+- Click on a line on the time series plot or a bar on the left to select a subcontinent.

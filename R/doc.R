@@ -19,9 +19,17 @@ makeDocs <- function(doc.dir){
   for(sub.dir.i in seq_along(sub.dirs)){
     sub.dir <- sub.dirs[[sub.dir.i]]
     setwd(sub.dir)
+    ##print(sub.dir)
     vizLines <- readLines("viz.R")
     vizCode <- paste(vizLines, collapse="\n")
-    Rmd.filled <- sub("VIZ", vizCode, Rmd.template)
+    descLines <- tryCatch({
+      readLines("description.md")
+    },error=function(e){
+      "There should be an interactive animation above."
+    })
+    desc <- paste(descLines, collapse="\n")
+    Rmd.filled <- sub("DESCRIPTION", desc, sub("VIZ", vizCode, Rmd.template))
+    ##Rmd.filled <- sub("VIZ", vizCode, Rmd.template)
     writeLines(Rmd.filled, "viz.Rmd")
     convert.cmd <- "convert big.png -geometry 200 small.png"
     system(convert.cmd)
