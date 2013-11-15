@@ -46,5 +46,11 @@ motion.area <-
                      clickSelects=country),
                  data=WorldBank, size=4, alpha=3/5),
        time=list(variable="year",ms=3000),
-       duration=list(year=1000))
+       bar=ggplot()+
+       geom_bar(aes(country, life.expectancy,
+                    showSelected=year, clickSelects=country),
+                data=WorldBank, stat="identity", position="identity")+
+       coord_flip(),
+       duration=list(year=1000),
+       height=list(bar=1500))
 gg2animint(motion.area, "motion-area")

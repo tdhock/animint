@@ -34,6 +34,11 @@ this for now.  http://bost.ocks.org/mike/constancy/
 Figure out when two csv files are the same and if so only write one of
 them?
 
+2013.11.15
+
+Bugfix: filter NaN before passing data to lineThing to avoid hiding an
+entire line if only one element is NA.
+
 2013.10.23
 
 Include 1 animint in a knitr Rmd document when processed in the same
