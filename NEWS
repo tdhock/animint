@@ -34,6 +34,10 @@ this for now.  http://bost.ocks.org/mike/constancy/
 Figure out when two csv files are the same and if so only write one of
 them?
 
+2013.11.19
+
+geom_text(aes(size)) is resized using e.g. <text font-size="10">
+
 2013.11.15
 
 Bugfix: filter NaN before passing data to lineThing to avoid hiding an

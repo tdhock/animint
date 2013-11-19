@@ -581,6 +581,7 @@ var animint = function (to_select, json_file) {
         e.attr("x", toXY("x", "x"))
           .attr("y", toXY("y", "y"))
 	  .style("fill", get_colour)
+	  .attr("font-size", get_size)
           .style("text-anchor", text_anchor)
           .text(function (d) {
             return d.label;
