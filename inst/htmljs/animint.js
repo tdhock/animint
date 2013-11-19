@@ -308,6 +308,9 @@ var animint = function (to_select, json_file) {
       return a;
     }
     var size = 2;
+    if(g_info.geom == "text"){
+      size = 12;
+    }
     if (g_info.params.size) {
       size = g_info.params.size;
     }
