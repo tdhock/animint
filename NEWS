@@ -36,6 +36,8 @@ them?
 
 2013.11.19
 
+draw colored, sized "a" in legend for geom_text.
+
 geom_text(aes(size)) is resized using e.g. <text font-size="10">
 
 2013.11.15

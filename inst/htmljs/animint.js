@@ -887,6 +887,17 @@ var animint = function (to_select, json_file) {
           .style("fill", function(d){return d["polygonfill"] || "#FFFFFF";})
           .style("opacity", function(d){return d["polygonalpha"]||1;});
       }
+      if(legendgeoms.indexOf("text")>-1){ 
+        // aesthetics that would draw a rect
+        legend_svgs.append("text")
+	  .attr("x", 10)
+	  .attr("y", 14)
+          .style("fill", function(d){return d["textcolour"]||1;})
+	  .style("text-anchor", "middle")
+	  .attr("font-size", function(d){return d["textsize"]||1;})
+	  .text("a")
+	;
+      }
       if(legendgeoms.indexOf("path")>-1){
         // aesthetics that would draw a line
         legend_svgs.append("line")
