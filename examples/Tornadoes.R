@@ -81,6 +81,30 @@ tornado.ts.bar <-
        geom_bar(aes(year, count, clickSelects=year, showSelected=state),
                 data=UStornadoCounts, stat="identity", position="identity"))
 gg2animint(tornado.ts.bar, "tornado-ts-bar")
+## also show points.
+seg.color <- "#55B1F7"
+tornado.points <-
+  list(map=ggplot()+
+       make_text(UStornadoCounts, -100, 50, "year", "Tornadoes in %d")+
+       geom_polygon(aes(x=long, y=lat, group=group, clickSelects=state),
+                    data=USpolygons, fill="black", colour="grey") +
+       geom_segment(aes(x=startLong, y=startLat, xend=endLong, yend=endLat,
+                        showSelected=year),
+                    colour=seg.color, data=UStornadoes)+
+       ## geom_point(aes(startLong, startLat, fill=place, showSelected=year),
+       ##              colour=seg.color,
+       ##            data=data.frame(UStornadoes,place="start"))+
+       scale_fill_manual(values=c(end=seg.color))+
+       geom_point(aes(endLong, endLat, fill=place, showSelected=year),
+                    colour=seg.color,
+                  data=data.frame(UStornadoes,place="end")),
+       width=list(map=1500, ts=300),
+       height=list(map=1000, ts=300),
+       ts=ggplot()+
+       make_text(UStornadoes, 1980, 200, "state")+
+       geom_bar(aes(year, count, clickSelects=year, showSelected=state),
+                data=UStornadoCounts, stat="identity", position="identity"))
+gg2animint(tornado.points, "tornado-points")
 ## OK: interactive version with lines instead of bars!
 tornado.ts.line <-
   list(map=ggplot()+
