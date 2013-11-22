@@ -39,7 +39,11 @@ them?
 
 2013.11.22
 
+Test for warnings.
+
 Warn when 0-sized geoms are produced, since they will be invisible.
+
+Do not sort NULL during check for animation values, to avoid warning.
 
 2013.11.19
 

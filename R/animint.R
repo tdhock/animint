@@ -342,7 +342,7 @@ layer2list <- function(l, d, ranges){
   }
 
   if(any(g$data$size == 0, na.rm=TRUE)){
-    warning(sprintf("geom_%s with size=0 will be invisible!",g$geom))
+    warning(sprintf("geom_%s with size=0 will be invisible",g$geom))
   }
   
   g
@@ -558,7 +558,9 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
       anim.cols <- names(g$aes)[g$aes==v.name & click.or.show]
       g.data <- df.list[[g.name]][,anim.cols,drop=FALSE]
       g.vec <- unlist(g.data)
-      anim.values[[g.name]] <- as.character(sort(unique(g.vec)))
+      if(!is.null(g.vec)){
+        anim.values[[g.name]] <- as.character(sort(unique(g.vec)))
+      }
     }
     olist$time$sequence <- unique(unlist(anim.values))
     result$time <- olist$time
