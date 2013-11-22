@@ -340,6 +340,10 @@ layer2list <- function(l, d, ranges){
       g$data[,color.var] <- toRGB(g$data[,color.var])
     }
   }
+
+  if(any(g$data$size == 0, na.rm=TRUE)){
+    warning(sprintf("geom_%s with size=0 will be invisible!",g$geom))
+  }
   
   g
 }

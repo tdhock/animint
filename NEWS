@@ -37,6 +37,10 @@ this for now.  http://bost.ocks.org/mike/constancy/
 Figure out when two csv files are the same and if so only write one of
 them?
 
+2013.11.22
+
+Warn when 0-sized geoms are produced, since they will be invisible.
+
 2013.11.19
 
 draw colored, sized "a" in legend for geom_text.

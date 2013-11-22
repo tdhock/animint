@@ -9,13 +9,16 @@ data(WorldBank)
 
 ## A google motion chart is just a scatterplot with size and color
 ## that moves over time.
+pop.range <- range(WorldBank$pop,na.rm=TRUE)
+pop.breaks <-
+  10^seq(ceiling(log10(pop.range[1])),floor(log10(pop.range[2])),by=1)
 motion <-
   list(scatter=ggplot()+
        geom_point(aes(life.expectancy, fertility.rate, clickSelects=country,
                       showSelected=year, colour=region, size=population),
                   data=WorldBank)+
-       make_text(WorldBank, 55, 9, "year")+
-       scale_size_continuous(range=c(1.5,20)),
+       ##scale_size_area(max_size=40)+
+       make_text(WorldBank, 55, 9, "year"),
        ts=ggplot()+
        make_tallrect(WorldBank, "year")+
        geom_line(aes(year, life.expectancy, group=country,
@@ -25,9 +28,9 @@ motion <-
        duration=list(year=1000))
 gg2animint(motion, "motion")
 
-## Why can't we use range with scale_size_area? At least we can create
-## our own continuous scale with a more sensible lower limit of 2
-## pixels.
+## Why can't we use range with scale_size_area? Because the number of
+## pixels should be proportional to the number represented i.e. it is
+## a linear, not affine function.
 motion.area <-
   list(scatter=ggplot()+
        geom_point(aes(life.expectancy, fertility.rate, clickSelects=country,
@@ -36,18 +39,16 @@ motion.area <-
        geom_text(aes(life.expectancy, fertility.rate, label=country,
                      showSelected=country, showSelected2=year),
                  data=WorldBank)+
-       make_text(WorldBank, 55, 9, "year")+
-       continuous_scale("size","area",palette=function(x){
-         scales:::rescale(sqrt(abs(x)), c(2,20))
-       }),
+       scale_size_continuous(range=c(3, 10))+
+       make_text(WorldBank, 55, 9, "year"),
        ts=ggplot()+
        make_tallrect(WorldBank, "year")+
-       geom_line(aes(year, life.expectancy, group=country,
+       geom_line(aes(year, life.expectancy, group=country, colour=region,
                      clickSelects=country),
                  data=WorldBank, size=4, alpha=3/5),
        time=list(variable="year",ms=3000),
        bar=ggplot()+
-       geom_bar(aes(country, life.expectancy,
+       geom_bar(aes(country, life.expectancy, fill=region,
                     showSelected=year, clickSelects=country),
                 data=WorldBank, stat="identity", position="identity")+
        coord_flip(),
