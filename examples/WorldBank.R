@@ -10,8 +10,8 @@ data(WorldBank)
 ## A google motion chart is just a scatterplot with size and color
 ## that moves over time.
 pop.range <- range(WorldBank$pop,na.rm=TRUE)
-pop.breaks <-
-  10^seq(ceiling(log10(pop.range[1])),floor(log10(pop.range[2])),by=1)
+log.scale <- seq(ceiling(log10(pop.range[1])),floor(log10(pop.range[2])),by=1)
+pop.breaks <- sort(c(10^log.scale))
 motion <-
   list(scatter=ggplot()+
        geom_point(aes(life.expectancy, fertility.rate, clickSelects=country,
@@ -39,7 +39,9 @@ motion.area <-
        geom_text(aes(life.expectancy, fertility.rate, label=country,
                      showSelected=country, showSelected2=year),
                  data=WorldBank)+
-       scale_size_continuous(range=c(3, 10))+
+       continuous_scale("size","area",palette=function(x){
+         scales:::rescale(sqrt(abs(x)), c(2,20), c(0,1))
+       },breaks=10^(4:9))+
        make_text(WorldBank, 55, 9, "year"),
        ts=ggplot()+
        make_tallrect(WorldBank, "year")+

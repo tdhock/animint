@@ -1,7 +1,6 @@
 ## Make a Gapminder plot (aka Google motion chart), which is actually
 ## just a scatterplot with size and color that moves over time.
 data(WorldBank)
-pop.range <- range(WorldBank$pop,na.rm=TRUE)
 viz <-
   list(ts=ggplot()+
        make_tallrect(WorldBank, "year")+
@@ -19,5 +18,5 @@ viz <-
                  data=WorldBank)+
        make_text(WorldBank, 5, 80, "year")+
        continuous_scale("size","area",palette=function(x){
-         scales:::rescale(sqrt(abs(x)), c(2,20))
-       },breaks=seq(pop.range[1], pop.range[2], l=5)))
+         scales:::rescale(sqrt(abs(x)), c(2,20), c(0,1))
+       },breaks=10^(4:9)))

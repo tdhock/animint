@@ -24,3 +24,5 @@ Collate:
     'transformShape.R'
     'knitr.R'
     'doc.R'
+Suggests:
+    knitr

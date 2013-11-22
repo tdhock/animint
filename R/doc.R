@@ -1,5 +1,5 @@
 ##' Make documentation web site.
-##' @param path containing example subdirectories.
+##' @param doc.dir containing example subdirectories.
 ##' @return nothing.
 ##' @author Toby Dylan Hocking
 ##' @export

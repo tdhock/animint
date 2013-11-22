@@ -663,6 +663,8 @@ getLegend <- function(mb){
     by <- intersect(names(orig.na)[!orig.na], names(key.na)[!key.na])
     data <- merge(orig, key, by=by)
     data <- data[order(data$order),]
+    ## old code above.
+    data <- data.frame(orig, key)
     if(!".label"%in%names(data)) return(data.frame()); # if there are no labels, return an empty df.
     data <- data[,which(colSums(!is.na(data))>0)] # remove cols that are entirely na
     if("colour"%in%names(data)) data[["colour"]] <- toRGB(data[["colour"]]) # color hex values
@@ -671,7 +673,6 @@ getLegend <- function(mb){
     names(data) <- gsub(paste(geom, ".", sep=""), "", names(data), fixed=TRUE) # label isn't geom-specific
     data
   }
-#   conflict <- sapply(mb$geoms, function(i) i$geom$objname)
   dataframes <- lapply(mb$geoms, function(i) cleanData(i$data, mb$key, i$geom$objname))
   dataframes <- dataframes[which(sapply(dataframes, nrow)>0)]
   data <- merge_recurse(dataframes)
