@@ -601,9 +601,9 @@ toRGB <- function(x){
 #' @export
 getLegendList <- function(plistextra){
   plot <- plistextra$plot
-  scales = plot$scales
-  layers = plot$layers
-  default_mapping = plot$mapping
+  scales <- plot$scales
+  layers <- plot$layers
+  default_mapping <- plot$mapping
   theme <- ggplot2:::plot_theme(plot)
   position <- theme$legend.position
   # by default, guide boxes are vertically aligned
@@ -629,8 +629,8 @@ getLegendList <- function(plistextra){
     } 
   
   position <- theme$legend.position
-  guides = plyr::defaults(plot$guides, guides(colour="legend", fill="legend"))
-  labels = plot$labels
+  guides <- plyr::defaults(plot$guides, guides(colour="legend", fill="legend"))
+  labels <- plot$labels
   gdefs <- ggplot2:::guides_train(scales = scales, theme = theme, guides = guides, labels = labels)
   if (length(gdefs) != 0) {
     gdefs <- ggplot2:::guides_merge(gdefs)
