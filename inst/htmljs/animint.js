@@ -162,7 +162,7 @@ var animint = function (to_select, json_file) {
     axislabs(p_info.axis.x, p_info.axis.xlab, "x");
     axislabs(p_info.axis.y, p_info.axis.ylab, "y");
 
-    titlepadding = measureText(p_info.title, 20).height+5;
+    titlepadding = measureText(p_info.title, 20).height+10;
     axispaddingy = 5 + Math.max.apply(null, yaxislabs.map(function(entry){return measureText(entry, 11).width;}));
     axispaddingx = 5 + Math.max.apply(null, xaxislabs.map(function(entry){return measureText(entry, 11).height;}));
     labelpaddingy = 5 + measureText(p_info.axis.yname, 11).height;
@@ -252,6 +252,7 @@ var animint = function (to_select, json_file) {
 
     svg.append("text")
       .text(p_info.title)
+      .attr("id", "plottitle")
       .attr("class", "title")
       .attr("font-family", "sans-serif")
       .attr("font-size", "20px")
