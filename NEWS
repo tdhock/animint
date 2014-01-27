@@ -1,3 +1,5 @@
+2014.01.27 - allow specifying guide="none" in ggplot2 scales that would generate a legend.
+
 TODO
 
 some bug with specifying manual breaks with size scale on
