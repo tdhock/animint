@@ -95,6 +95,9 @@ gg2list <- function(p){
     plist$legend <- plist$legend[which(sapply(plist$legend, function(i) length(i)>0))]
   }  # only pass out legends that have guide = "legend" or guide="colorbar"
   
+  # Remove legend if theme has no legend position
+  if(theme.pars$legend.position=="none") plist$legend <- NULL
+  
   if("element_blank"%in%attr(theme.pars$plot.title, "class")){
     plist$title <- ""
   } else {
@@ -673,7 +676,10 @@ getLegend <- function(mb){
   }
   dataframes <- lapply(mb$geoms, function(i) cleanData(i$data, mb$key, i$geom$objname, i$params))
   dataframes <- dataframes[which(sapply(dataframes, nrow)>0)]
-  data <- merge_recurse(dataframes)
+  # Check to make sure datframes is non-empty. If it is empty, return NULL.
+  if(length(dataframes)>0) {
+    data <- merge_recurse(dataframes)
+  } else return(NULL)
   data <- lapply(nrow(data):1, function(i) as.list(data[i,]))
   if(guidetype=="none"){
     NULL
