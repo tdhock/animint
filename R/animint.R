@@ -654,18 +654,16 @@ getLegend <- function(mb){
   ## legend, and then I bind the legend entries to <tr>, <td>, and
   ## <svg> elements.
   geoms <- sapply(mb$geoms, function(i) i$geom$objname)
-  cleanData <- function(orig, key, geom){
-    if(nrow(orig)==0) return(data.frame()); # if no rows, return an empty df.
-    orig$order <- 1:nrow(orig)
-    count.na <- function(x)sum(is.na(x))
-    orig.na <- sapply(orig, count.na)>0
-    key.na <- sapply(key, count.na)>0
-    by <- intersect(names(orig.na)[!orig.na], names(key.na)[!key.na])
-    data <- merge(orig, key, by=by)
+  cleanData <- function(data, key, geom, params){
+    if(nrow(data)==0) return(data.frame()); # if no rows, return an empty df.
+    if("guide"%in%names(params)){
+      if(params[["guide"]]=="none") return(data.frame()); # if no guide, return an empty df
+    } 
+    data$order <- 1:nrow(data)
+    data <- merge(data, key)
     data <- data[order(data$order),]
-    ## old code above.
-    data <- data.frame(orig, key)
     if(!".label"%in%names(data)) return(data.frame()); # if there are no labels, return an empty df.
+    if(nrow(data)==0) return(data.frame());
     data <- data[,which(colSums(!is.na(data))>0)] # remove cols that are entirely na
     if("colour"%in%names(data)) data[["colour"]] <- toRGB(data[["colour"]]) # color hex values
     if("fill"%in%names(data)) data[["fill"]] <- toRGB(data[["fill"]]) # fill hex values
@@ -673,7 +671,7 @@ getLegend <- function(mb){
     names(data) <- gsub(paste(geom, ".", sep=""), "", names(data), fixed=TRUE) # label isn't geom-specific
     data
   }
-  dataframes <- lapply(mb$geoms, function(i) cleanData(i$data, mb$key, i$geom$objname))
+  dataframes <- lapply(mb$geoms, function(i) cleanData(i$data, mb$key, i$geom$objname, i$params))
   dataframes <- dataframes[which(sapply(dataframes, nrow)>0)]
   data <- merge_recurse(dataframes)
   data <- lapply(nrow(data):1, function(i) as.list(data[i,]))
