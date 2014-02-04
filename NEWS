@@ -1,3 +1,5 @@
+2014.01.27 - allow specifying guide="none" in ggplot2 scales that would generate a legend.
+
 TODO
 
 Test SVG output after applying JavaScript? Is there some way we can
