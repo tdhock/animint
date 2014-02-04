@@ -1,7 +1,8 @@
 TODO
 
-some bug with specifying manual breaks with size scale on
-scatterplots?
+Test SVG output after applying JavaScript? Is there some way we can
+apply the JavaScript non-interactively and then check the results?
+http://phantomjs.org/
 
 customizable alpha/color/size/etc for mouseovered/selected geoms. One
 way to do this is by defining new *.hover aesthetics,
