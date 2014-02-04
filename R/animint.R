@@ -168,6 +168,7 @@ layer2list <- function(l, d, ranges){
   stat <- l$stat
   if(!is.null(stat)){
     is.bin <- stat$objname=="bin"
+    ## TODO: does this work with showSelected2?
     has.animint.aes <- any(c("clickSelects","showSelected")%in%names(g$aes))
     if(is.bin & has.animint.aes){
       warning(paste0("stat_bin is unpredictable ",
@@ -554,6 +555,7 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
     anim.values <- list()
     for(g.name in geom.names){
       g <- result$geoms[[g.name]]
+      ## TODO: does this work with showSelected2?
       click.or.show <- names(g$aes) %in% c("clickSelects","showSelected")
       anim.cols <- names(g$aes)[g$aes==v.name & click.or.show]
       g.data <- df.list[[g.name]][,anim.cols,drop=FALSE]
