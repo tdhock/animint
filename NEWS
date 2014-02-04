@@ -1,6 +1,6 @@
-2014.01.27 - allow specifying guide="none" in ggplot2 scales that would generate a legend.
-
 TODO
+
+Profile gg2animint() to see what part is slow, and speed it up!
 
 Test SVG output after applying JavaScript? Is there some way we can
 apply the JavaScript non-interactively and then check the results?
@@ -8,7 +8,11 @@ http://phantomjs.org/
 
 customizable alpha/color/size/etc for mouseovered/selected geoms. One
 way to do this is by defining new *.hover aesthetics,
-e.g. https://github.com/rstudio/ggvis/blob/master/demo/hover.r
+e.g. https://github.com/rstudio/ggvis/blob/master/demo/hover.r Another
+way to do something similar is to just use
+e.g. geom_point(aes(clickSelects=var))+
+geom_point(aes(showSelected=var), colour="red", size=5)
+Could we create a make_selecter() shortcut that does this?
 
 theme(legend.position)
 
@@ -39,6 +43,11 @@ this for now.  http://bost.ocks.org/mike/constancy/
 
 Figure out when two csv files are the same and if so only write one of
 them?
+
+2014.01.27
+
+allow specifying guide="none" in ggplot2 scales that would generate a
+legend.
 
 2013.11.22
 
