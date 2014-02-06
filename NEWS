@@ -1,5 +1,9 @@
 TODO
 
+Fix geom_rect and geom_text alignment.
+
+Memory, speed, and disk space issues for large e.g. monkeys data.
+
 Profile gg2animint() to see what part is slow, and speed it up!
 
 Test SVG output after applying JavaScript? Is there some way we can
