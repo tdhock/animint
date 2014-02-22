@@ -2,7 +2,9 @@ TODO
 
 Fix geom_rect and geom_text alignment.
 
-Memory, speed, and disk space issues for large e.g. monkeys data.
+Speedy loading: on compile, divide data into chunks that will be onscreen at once, and when rendering, only download data when it needs to be onscreen.
+
+Why does it take so much memory to compile large e.g. monkeys data?
 
 Profile gg2animint() to see what part is slow, and speed it up!
 
@@ -28,7 +30,7 @@ convention" http://bl.ocks.org/mbostock/3019563
 coord_equal
 
 aes(tooltip=text) for specifying the text to show when you hover the
-mouse over something, e.g. #1.
+mouse over something, e.g. issue #1.
 
 layout=matrix of plot names means render plots in an html table
 instead of in a line.
@@ -44,9 +46,6 @@ ignore this for the time being.
 specify id or key variable for transitions? In the current set of
 examples, using keys has proven un-necessary. So let's just ignore
 this for now.  http://bost.ocks.org/mike/constancy/
-
-Figure out when two csv files are the same and if so only write one of
-them?
 
 2014.01.27
 
