@@ -9,9 +9,26 @@ https://github.com/vdimarco/dojo1/blob/master/hocking-canada-cities-viz.R
 Why doesn't animation work in the last plot of this example?
 https://github.com/vdimarco/dojo1/blob/master/hocking-canada-cities-viz.R
 
-Speedy downloading: on compile, divide data into chunks that will be
-onscreen at once, and when rendering, only download data when it
-needs to be onscreen.
+Speedy downloading: on compile, divide data into chunks ---
+separate csv files. In general a chunk of data will be shown
+onscreen at the same time, but we should not make chunks with
+only 1 row e.g. for the WorldBank viz, geom_points should have
+1 chunk per year, geom_text country labels sholuld have 1 chunk
+per country, and geom_text year labels should have just 1 chunk
+which covers all years. On page load, start downloading the first
+chunk for each geom. After a chunk finishes downloading, start
+downloading the next chunk for that geom, until all data is loaded,
+even if it is not needed on screen right now. Also, start downloading
+a chunk if we click on an unloaded subset that we need to show.
+E.g. for geom_point start downloading the year=1960 chunk, then
+the year=1961 chunk, but then if we clicked on year=2000, download
+that one immediately and set the next chunk in the queue as year=2001.
+
+Download progress table at the bottom of the plot.
+- click a button to show or hide the entire table.
+- starts shown, hides itself when everything is loaded.
+- row for every geom.
+- at least 3 columns: geom, total chunks, downloaded chunks.
 
 Why does it take so much memory to compile large e.g. monkeys data?
 
