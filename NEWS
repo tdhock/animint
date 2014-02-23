@@ -2,7 +2,16 @@ TODO
 
 Fix geom_rect and geom_text alignment.
 
-Speedy loading: on compile, divide data into chunks that will be onscreen at once, and when rendering, only download data when it needs to be onscreen.
+Render a <select> for each selector variable, so long lists
+like this are not necessary.
+https://github.com/vdimarco/dojo1/blob/master/hocking-canada-cities-viz.R
+
+Why doesn't animation work in the last plot of this example?
+https://github.com/vdimarco/dojo1/blob/master/hocking-canada-cities-viz.R
+
+Speedy downloading: on compile, divide data into chunks that will be
+onscreen at once, and when rendering, only download data when it
+needs to be onscreen.
 
 Why does it take so much memory to compile large e.g. monkeys data?
 
@@ -38,7 +47,7 @@ instead of in a line.
 Include SEVERAL d3 plots directly in knitr html output e.g.
 http://zvfak.blogspot.jp/2013/08/using-javascript-visualization.html
 
-multiple selection? ex, if 1 bin contains multiple values of
+multiple selection/brushing? ex, if 1 bin contains multiple values of
 clickSelects, then can we select all of the corresponding geoms? This
 would require rewriting a substantial amount of JS code, so let's just
 ignore this for the time being.
@@ -46,6 +55,9 @@ ignore this for the time being.
 specify id or key variable for transitions? In the current set of
 examples, using keys has proven un-necessary. So let's just ignore
 this for now.  http://bost.ocks.org/mike/constancy/
+
+gg2shiny(ggList) renders the interactive animation as a shiny app, e.g.
+https://github.com/tdhock/interactive-tutorial/tree/master/animation/WorldBank
 
 2014.01.27
 
