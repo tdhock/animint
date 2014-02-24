@@ -4,7 +4,35 @@ animint2gist(L) uploads animint as a gist to github.
 
 Fix geom_rect and geom_text alignment.
 
-Memory, speed, and disk space issues for large e.g. monkeys data.
+Render a <select> for each selector variable, so long lists
+like this are not necessary.
+https://github.com/vdimarco/dojo1/blob/master/hocking-canada-cities-viz.R
+
+Why doesn't animation work in the last plot of this example?
+https://github.com/vdimarco/dojo1/blob/master/hocking-canada-cities-viz.R
+
+Speedy downloading: on compile, divide data into chunks ---
+separate csv files. In general a chunk of data will be shown
+onscreen at the same time, but we should not make chunks with
+only 1 row e.g. for the WorldBank viz, geom_points should have
+1 chunk per year, geom_text country labels sholuld have 1 chunk
+per country, and geom_text year labels should have just 1 chunk
+which covers all years. On page load, start downloading the first
+chunk for each geom. After a chunk finishes downloading, start
+downloading the next chunk for that geom, until all data is loaded,
+even if it is not needed on screen right now. Also, start downloading
+a chunk if we click on an unloaded subset that we need to show.
+E.g. for geom_point start downloading the year=1960 chunk, then
+the year=1961 chunk, but then if we clicked on year=2000, download
+that one immediately and set the next chunk in the queue as year=2001.
+
+Download progress table at the bottom of the plot.
+- click a button to show or hide the entire table.
+- starts shown, hides itself when everything is loaded.
+- row for every geom.
+- at least 3 columns: geom, total chunks, downloaded chunks.
+
+Why does it take so much memory to compile large e.g. monkeys data?
 
 Profile gg2animint() to see what part is slow, and speed it up!
 
@@ -30,7 +58,7 @@ convention" http://bl.ocks.org/mbostock/3019563
 coord_equal
 
 aes(tooltip=text) for specifying the text to show when you hover the
-mouse over something, e.g. #1.
+mouse over something, e.g. issue #1.
 
 layout=matrix of plot names means render plots in an html table
 instead of in a line.
@@ -38,7 +66,7 @@ instead of in a line.
 Include SEVERAL d3 plots directly in knitr html output e.g.
 http://zvfak.blogspot.jp/2013/08/using-javascript-visualization.html
 
-multiple selection? ex, if 1 bin contains multiple values of
+multiple selection/brushing? ex, if 1 bin contains multiple values of
 clickSelects, then can we select all of the corresponding geoms? This
 would require rewriting a substantial amount of JS code, so let's just
 ignore this for the time being.
@@ -47,8 +75,8 @@ specify id or key variable for transitions? In the current set of
 examples, using keys has proven un-necessary. So let's just ignore
 this for now.  http://bost.ocks.org/mike/constancy/
 
-Figure out when two csv files are the same and if so only write one of
-them?
+gg2shiny(ggList) renders the interactive animation as a shiny app, e.g.
+https://github.com/tdhock/interactive-tutorial/tree/master/animation/WorldBank
 
 2014.01.27
 
