@@ -9,9 +9,10 @@ coord_equal -- would be useful for maps e.g. examples/Tornadoes.R.
 Include SEVERAL d3 plots directly in knitr html output e.g.
 http://zvfak.blogspot.jp/2013/08/using-javascript-visualization.html
 
-animint2gist(L) uploads animint as a gist to github.
+gg2gist(L) uploads animint as a gist to github.
 
-Fix geom_rect and geom_text alignment.
+BUG: when there are commas in text labels, animint.js does not parse
+the CSV correctly. See examples/align_rect_text.R.
 
 Render a <select> for each selector variable, so long lists
 like this are not necessary.
@@ -79,6 +80,11 @@ Could we create a make_selecter() shortcut that does this?
 
 gg2shiny(ggList) renders the interactive animation as a shiny app, e.g.
 https://github.com/tdhock/interactive-tutorial/tree/master/animation/WorldBank
+
+Is it possible to fix geom_rect and geom_text alignment? The
+underlying problem is that there is no equivalent of R's vjust in SVG
+(the equivalent of R's hjust=0.5|1|0 is CSS text-anchor:
+middle|end|start). See examples/align_rect_text.R.
 
 2014.2.24
 
