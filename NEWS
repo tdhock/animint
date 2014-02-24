@@ -1,5 +1,7 @@
 TODO
 
+animint2gist(L) uploads animint as a gist to github.
+
 Fix geom_rect and geom_text alignment.
 
 Memory, speed, and disk space issues for large e.g. monkeys data.
