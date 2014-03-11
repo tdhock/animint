@@ -1,5 +1,8 @@
 TODOs in approximate order of importance (higher is more important).
 
+BUG: geom_segment(aes(group=var)) will not be parsed correctly by
+animint.js!
+
 facets -- would be useful when we want to align axes in related plots,
 e.g. the last plot of examples/intreg.R. To implement facets it may be
 useful to use "margin convention" http://bl.ocks.org/mbostock/3019563
