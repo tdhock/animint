@@ -3,26 +3,36 @@ TODOs in approximate order of importance (higher is more important).
 BUG: geom_segment(aes(group=var)) will not be parsed correctly by
 animint.js!
 
-facets -- would be useful when we want to align axes in related plots,
-e.g. the last plot of examples/intreg.R. To implement facets it may be
-useful to use "margin convention" http://bl.ocks.org/mbostock/3019563
+BUG: when there are commas in text labels, animint.js does not parse
+the CSV correctly. See examples/align_rect_text.R.
 
-coord_equal -- would be useful for maps e.g. examples/Tornadoes.R.
+BUG: Why doesn't animation work in the last plot of this example?
+https://github.com/vdimarco/dojo1/blob/master/hocking-canada-cities-viz.R
 
 Include SEVERAL d3 plots directly in knitr html output e.g.
 http://zvfak.blogspot.jp/2013/08/using-javascript-visualization.html
 
 gg2gist(L) uploads animint as a gist to github.
 
-BUG: when there are commas in text labels, animint.js does not parse
-the CSV correctly. See examples/align_rect_text.R.
+facets -- would be useful when we want to align axes in related plots,
+e.g. the last plot of examples/intreg.R. To implement facets it may be
+useful to use "margin convention" http://bl.ocks.org/mbostock/3019563
+
+coord_equal -- would be useful for maps e.g. examples/Tornadoes.R.
 
 Render a <select> for each selector variable, so long lists
 like this are not necessary.
 https://github.com/vdimarco/dojo1/blob/master/hocking-canada-cities-viz.R
 
-Why doesn't animation work in the last plot of this example?
-https://github.com/vdimarco/dojo1/blob/master/hocking-canada-cities-viz.R
+OPTION: after clicking and changing the displayed data subset,
+zoom/update the axes of related plots. For animations we clearly want
+to keep the same axes across animation frames, but for some other
+kinds of plots it would be nice if the axes automatically zoomed. Make
+this an option list axesZoom=list(plotXY=c("x", "y"), plotX="x") means
+that the x axis should be updated for plotX and both axes should be
+updated for plotXY, but the axes are NOT updated for any other
+plots. There should also be a button next to each axis that you can
+click to toggle zooming on and off.
 
 Speedy downloading: on compile, divide data into chunks --- separate
 csv files. In general a chunk of data will be shown onscreen at the
