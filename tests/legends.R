@@ -24,7 +24,7 @@ wbViz <-
        },breaks=breaks))
 info <- gg2animint(wbViz, open.browser=FALSE)
 entries <- info$plots$scatter$legend$population$entries
-stopifnot(length(entries) == breaks)
+stopifnot(length(entries) == length(breaks))
 label.chr <- sapply(entries, "[[", "label")
 label.num <- as.numeric(label.chr)
-stopifnot(all.equal(breaks, label.num))
+stopifnot(all.equal(sort(breaks), sort(label.num)))
