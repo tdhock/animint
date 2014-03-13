@@ -2,7 +2,7 @@
 \alias{make_bar}
 \title{Convenience function for an interactive bar that might otherwise be created using stat_bin.}
 \usage{
-  make_bar(data, x.name, alpha = 1)
+make_bar(data, x.name, alpha = 1)
 }
 \arguments{
   \item{data}{data.frame to analyze for unique x.name
@@ -13,13 +13,13 @@
   \item{alpha}{transparency of selected bar, default 1.}
 }
 \value{
-  a geom_bar layer.
+a geom_bar layer.
 }
 \description{
-  Convenience function for an interactive bar that might
-  otherwise be created using stat_bin.
+Convenience function for an interactive bar that might
+otherwise be created using stat_bin.
 }
 \author{
-  Toby Dylan Hocking
+Toby Dylan Hocking
 }
 

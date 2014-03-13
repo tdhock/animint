@@ -2,18 +2,18 @@
 \alias{makeDocs}
 \title{Make documentation web site.}
 \usage{
-  makeDocs(doc.dir)
+makeDocs(doc.dir)
 }
 \arguments{
   \item{doc.dir}{containing example subdirectories.}
 }
 \value{
-  nothing.
+nothing.
 }
 \description{
-  Make documentation web site.
+Make documentation web site.
 }
 \author{
-  Toby Dylan Hocking
+Toby Dylan Hocking
 }
 

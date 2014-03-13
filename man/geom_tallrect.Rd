@@ -2,8 +2,8 @@
 \alias{geom_tallrect}
 \title{ggplot2 geom with xmin and xmax aesthetics that covers the entire y range, useful for clickSelects background elements.}
 \usage{
-  geom_tallrect(mapping = NULL, data = NULL,
-    stat = "identity", position = "identity", ...)
+geom_tallrect(mapping = NULL, data = NULL, stat = "identity",
+  position = "identity", ...)
 }
 \arguments{
   \item{mapping}{aesthetic mapping}
@@ -17,12 +17,12 @@
   \item{...}{other arguments}
 }
 \value{
-  ggplot2 layer
+ggplot2 layer
 }
 \description{
-  ggplot2 geom with xmin and xmax aesthetics that covers
-  the entire y range, useful for clickSelects background
-  elements.
+ggplot2 geom with xmin and xmax aesthetics that covers the
+entire y range, useful for clickSelects background
+elements.
 }
 \examples{
 library(animint)
@@ -60,6 +60,6 @@ gg2animint(breakpointError)
 
 }
 \seealso{
-  \code{\link{gg2animint}}
+\code{\link{gg2animint}}
 }
 

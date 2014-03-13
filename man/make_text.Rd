@@ -2,7 +2,7 @@
 \alias{make_text}
 \title{Convenvience function for a showSelected plot label.}
 \usage{
-  make_text(data, x, y, label.var, format = NULL)
+make_text(data, x, y, label.var, format = NULL)
 }
 \arguments{
   \item{data}{data.frame of relevant data}
@@ -18,12 +18,12 @@
   to insert relevant label.var value.}
 }
 \value{
-  a geom_text layer.
+a geom_text layer.
 }
 \description{
-  Convenvience function for a showSelected plot label.
+Convenvience function for a showSelected plot label.
 }
 \author{
-  Toby Dylan Hocking
+Toby Dylan Hocking
 }
 

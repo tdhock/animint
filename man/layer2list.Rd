@@ -2,7 +2,7 @@
 \alias{layer2list}
 \title{Convert a layer to a list. Called from gg2list()}
 \usage{
-  layer2list(l, d, ranges)
+layer2list(l, d, ranges)
 }
 \arguments{
   \item{l}{one layer of the ggplot object}
@@ -13,13 +13,13 @@
   \item{ranges}{axes ranges}
 }
 \value{
-  list representing a layer, with corresponding aesthetics,
-  ranges, and groups.
+list representing a layer, with corresponding aesthetics,
+ranges, and groups.
 }
 \description{
-  Convert a layer to a list. Called from gg2list()
+Convert a layer to a list. Called from gg2list()
 }
 \seealso{
-  \code{\link{gg2animint}}
+\code{\link{gg2animint}}
 }
 

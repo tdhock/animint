@@ -2,15 +2,15 @@
 \alias{is.rgb}
 \title{Check if character is an RGB hexadecimal color value}
 \usage{
-  is.rgb(x)
+is.rgb(x)
 }
 \arguments{
   \item{x}{character}
 }
 \value{
-  True/False value
+True/False value
 }
 \description{
-  Check if character is an RGB hexadecimal color value
+Check if character is an RGB hexadecimal color value
 }
 

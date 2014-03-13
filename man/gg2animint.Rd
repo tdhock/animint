@@ -3,8 +3,7 @@
 \alias{gg2animint}
 \title{gg2animint}
 \usage{
-  gg2animint(plot.list, out.dir = tempfile(),
-    open.browser = interactive())
+gg2animint(plot.list, out.dir = tempfile(), open.browser = interactive())
 }
 \arguments{
   \item{plot.list}{a named list of ggplots and option
@@ -18,49 +17,48 @@
   chrome).}
 }
 \value{
-  invisible list of ggplots in list format.
+invisible list of ggplots in list format.
 }
 \description{
-  Convert a list of ggplots to an interactive animation
-  that can be viewed in a web browser. Two new aesthetics
-  control interactivity: \itemize{ \item
-  \code{aes(showSelected=variable)} means that only the
-  subset of the data that corresponds to the selected value
-  of variable will be shown. \item
-  \code{aes(clickSelects=variable)} means that clicking
-  this geom will change the currently selected value of
-  variable. }
+Convert a list of ggplots to an interactive animation that
+can be viewed in a web browser. Two new aesthetics control
+interactivity: \itemize{ \item
+\code{aes(showSelected=variable)} means that only the
+subset of the data that corresponds to the selected value
+of variable will be shown. \item
+\code{aes(clickSelects=variable)} means that clicking this
+geom will change the currently selected value of variable.
+}
 }
 \details{
-  Supported ggplot2 geoms: \itemize{ \item point \item
-  jitter \item line \item rect \item tallrect (new with
-  this package) \item segment \item hline \item vline \item
-  bar \item text \item tile \item raster \item ribbon \item
-  abline \item density \item path \item polygon \item
-  histogram \item violin \item linerange \item step \item
-  contour \item density2d \item area \item freqpoly \item
-  hex } Unsupported geoms: \itemize{ \item rug \item
-  dotplot \item quantile - should *theoretically* work but
-  in practice does not work \item smooth - can be created
-  using geom_line and geom_ribbon \item boxplot - can be
-  created using geom_rect and geom_segment \item crossbar -
-  can be created using geom_rect and geom_segment \item
-  pointrange - can be created using geom_linerange and
-  geom_point \item bin2d - bin using ddply() and then use
-  geom_tile() \item map - can be created using geom_polygon
-  or geom_path } Supported scales: \itemize{ \item alpha,
-  \item fill/colour (brewer, gradient, identity, manual)
-  \item linetype \item x and y axis scales, manual break
-  specification, label formatting \item x and y axis theme
-  elements: axis.line, axis.ticks, axis.text, axis.title
-  can be set to element_blank(); other theme modifications
-  not supported at this time, but would be possible with
-  custom css files. \item area \item size } Unsupported
-  scales: \itemize{ \item shape. Open and closed circles
-  can be represented by manipulating fill and colour scales
-  and using default (circle) points, but d3 does not
-  support many R shape types, so mapping between the two is
-  difficult. }
+Supported ggplot2 geoms: \itemize{ \item point \item jitter
+\item line \item rect \item tallrect (new with this
+package) \item segment \item hline \item vline \item bar
+\item text \item tile \item raster \item ribbon \item
+abline \item density \item path \item polygon \item
+histogram \item violin \item linerange \item step \item
+contour \item density2d \item area \item freqpoly \item hex
+} Unsupported geoms: \itemize{ \item rug \item dotplot
+\item quantile - should *theoretically* work but in
+practice does not work \item smooth - can be created using
+geom_line and geom_ribbon \item boxplot - can be created
+using geom_rect and geom_segment \item crossbar - can be
+created using geom_rect and geom_segment \item pointrange -
+can be created using geom_linerange and geom_point \item
+bin2d - bin using ddply() and then use geom_tile() \item
+map - can be created using geom_polygon or geom_path }
+Supported scales: \itemize{ \item alpha, \item fill/colour
+(brewer, gradient, identity, manual) \item linetype \item x
+and y axis scales, manual break specification, label
+formatting \item x and y axis theme elements: axis.line,
+axis.ticks, axis.text, axis.title can be set to
+element_blank(); other theme modifications not supported at
+this time, but would be possible with custom css files.
+\item area \item size } Unsupported scales: \itemize{ \item
+shape. Open and closed circles can be represented by
+manipulating fill and colour scales and using default
+(circle) points, but d3 does not support many R shape
+types, so mapping between the two is difficult. }
 }
 \examples{
 data(worldPop)
@@ -124,6 +122,6 @@ gapminder <-
 gg2animint(gapminder)
 }
 \seealso{
-  \code{\link{ggplot2}}
+\code{\link{ggplot2}}
 }
 

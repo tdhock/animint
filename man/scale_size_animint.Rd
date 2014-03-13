@@ -1,0 +1,17 @@
+\name{scale_size_animint}
+\alias{scale_size_animint}
+\title{Scale point sizes using circle area, but specifying the radius in
+pixels.}
+\usage{
+scale_size_animint(pixel.range = c(2, 20), ...)
+}
+\arguments{
+  \item{pixel.range}{min and max circle radius in pixels.}
+
+  \item{...}{passed to continuous_scale.}
+}
+\description{
+Scale point sizes using circle area, but specifying the
+radius in pixels.
+}
+
