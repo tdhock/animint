@@ -9,6 +9,8 @@ the CSV correctly. See examples/align_rect_text.R.
 BUG: Why doesn't animation work in the last plot of this example?
 https://github.com/vdimarco/dojo1/blob/master/hocking-canada-cities-viz.R
 
+Custom titles for the generated HTML page.
+
 Include SEVERAL d3 plots directly in knitr html output e.g.
 http://zvfak.blogspot.jp/2013/08/using-javascript-visualization.html
 
@@ -98,6 +100,10 @@ Is it possible to fix geom_rect and geom_text alignment? The
 underlying problem is that there is no equivalent of R's vjust in SVG
 (the equivalent of R's hjust=0.5|1|0 is CSS text-anchor:
 middle|end|start). See examples/align_rect_text.R.
+
+2014.3.13
+
+scale_size_animint
 
 2014.2.24
 
