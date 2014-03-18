@@ -1,5 +1,8 @@
 TODOs in approximate order of importance (higher is more important).
 
+BUG: make_text does not work if it appears before/after certain other
+data... why? See examples/make_text_bug.R
+
 BUG: geom_segment(aes(group=var)) will not be parsed correctly by
 animint.js!
 
