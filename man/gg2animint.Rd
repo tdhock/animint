@@ -116,9 +116,7 @@ gapminder <-
                      showSelected=country, showSelected2=year),
                  data=WorldBank)+
        make_text(WorldBank, 5, 80, "year")+
-       continuous_scale("size","area",palette=function(x){
-         scales:::rescale(sqrt(abs(x)), c(2,20), c(0,1))
-       },breaks=10^(4:9)))
+       scale_size_animint(pixel.range=c(2,20), breaks=10^(4:9)))
 gg2animint(gapminder)
 }
 \seealso{
