@@ -12,6 +12,22 @@ the CSV correctly. See examples/align_rect_text.R.
 BUG: Why doesn't animation work in the last plot of this example?
 https://github.com/vdimarco/dojo1/blob/master/hocking-canada-cities-viz.R
 
+customizable alpha/color/size/fill/linetype for selected geoms, using
+selected.alpha, selected.color, etc aesthetics, see
+examples/Climate-selected.R. The first implementation should only
+allow this at the geom level,
+e.g. geom_point(aes(clickSelects=var),selected.color="red") means to
+plot a bunch of points which are black if not selected and red if
+selected. In ggplot2-0.9.3.1, selected.color thus defined can be
+accessed as layer$stat_params$selected.color. In the future we can try
+an implementation at the aes level,
+e.g. geom_point(aes(clickSelects=var1,selected.color=var2)) means
+black if not selected and scale[var2] if selected. NOTE: should
+maintain compatibility with existing code, which assumes
+selected.color="black" and color="transparent" for
+e.g. geom_rect(aes(fill=numeric, clickSelects=id)) and otherwise,
+selected.alpha=1 and alpha=1/2.
+
 Custom titles for the generated HTML page.
 
 Include SEVERAL d3 plots directly in knitr html output e.g.
@@ -39,7 +55,8 @@ updated for plotXY, but the axes are NOT updated for any other
 plots. There should also be a button next to each axis that you can
 click to toggle zooming on and off.
 
-It would be nice to be able to resize plots interactively, like we can do in shiny.
+It would be nice to be able to resize plots interactively, like we can
+do in shiny.
 
 Speedy downloading: on compile, divide data into chunks --- separate
 csv files. In general a chunk of data will be shown onscreen at the
@@ -56,7 +73,9 @@ year=1960 chunk, then the year=1961 chunk, but then if we clicked on
 year=2000, download that one immediately and set the next chunk in the
 queue as year=2001.
 
-It would probably reduce disk space and file transfer times if we used separate CSV files for different showSelected values, and deleted the showSelected column(s) in the CSV files.
+It would probably reduce disk space and file transfer times if we used
+separate CSV files for different showSelected values, and deleted the
+showSelected column(s) in the CSV files.
 
 Download progress table at the bottom of the plot.
 - click a button to show or hide the entire table.
@@ -92,14 +111,6 @@ specify id or key variable for transitions? In the current set of
 examples, using keys has proven un-necessary. So let's just ignore
 this for now.  http://bost.ocks.org/mike/constancy/
 
-customizable alpha/color/size/etc for mouseovered/selected geoms. One
-way to do this is by defining new *.hover aesthetics,
-e.g. https://github.com/rstudio/ggvis/blob/master/demo/hover.r Another
-way to do something similar is to just use
-e.g. geom_point(aes(clickSelects=var))+
-geom_point(aes(showSelected=var), colour="red", size=5)
-Could we create a make_selecter() shortcut that does this?
-
 gg2shiny(ggList) renders the interactive animation as a shiny app, e.g.
 https://github.com/tdhock/interactive-tutorial/tree/master/animation/WorldBank
 
@@ -107,6 +118,17 @@ Is it possible to fix geom_rect and geom_text alignment? The
 underlying problem is that there is no equivalent of R's vjust in SVG
 (the equivalent of R's hjust=0.5|1|0 is CSS text-anchor:
 middle|end|start). See examples/align_rect_text.R.
+
+theme(animint.width=600, animint.height=600) instead of option lists
+which make us repeat the plot names... this results in an error with
+ggplot2-0.9.3.1, is there any work-around or do we need to just
+continue to use option lists?
+
+2014.3.19
+
+For geoms with fill=a numeric variable, changing the opacity changes
+how we interpret the colors, so for these geoms, show selection by
+changing the stroke instead.
 
 2014.3.13
 

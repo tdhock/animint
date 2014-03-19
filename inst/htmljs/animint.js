@@ -96,6 +96,13 @@ var animint = function (to_select, json_file) {
         });
       });
       g_info.data = nest.map(response);
+      // Determine what style to use to show the current selection.
+      if(g_info.aes.hasOwnProperty("fill") && 
+	 !g_info.aes.hasOwnProperty("colour")){
+	g_info.select_style = "stroke";
+      }else{
+	g_info.select_style = "opacity";
+      }
       Geoms[g_name] = g_info;
       update_geom(g_name);
     });
@@ -291,8 +298,7 @@ var animint = function (to_select, json_file) {
     }
     var elements = svg.selectAll("." + g_info.classed);
 
-    // TODO: set all of these on a per-item basis. This needs to
-    // be standardized!
+    // TODO: standardize this code across aes/styles.
     var base_opacity = 1;
     if (g_info.params.alpha) {
       base_opacity = g_info.params.alpha;
@@ -639,8 +645,10 @@ var animint = function (to_select, json_file) {
           })
           .style("stroke-dasharray", get_dasharray)
           .style("stroke-width", get_size)
-          .style("stroke", get_colour)
           .style("fill", get_fill);
+	if(g_info.select_style != "stroke"){
+          e.style("stroke", get_colour);
+	}
       }
       eAppend = "rect";
     } else if (g_info.geom == "boxplot") {
@@ -730,10 +738,26 @@ var animint = function (to_select, json_file) {
     var enter = elements.enter().insert(eAppend, "." + g_info.nextgeom);
     enter.classed(g_info.classed, 1);
     if (g_info.aes.hasOwnProperty("clickSelects")) {
-      var notOver = function (d) {
-        return selectedOpacity(d, g_info.aes.clickSelects,
-          get_alpha(d), get_alpha(d) - 1 / 2);
-      }
+      var selected_funs = {
+	"opacity":{
+	  "mouseout":function (d) {
+            return ifSelectedElse(d, g_info.aes.clickSelects, 
+				  get_alpha(d), get_alpha(d) - 1/2);
+	  },
+	  "mouseover":function (d) {
+            return get_alpha(d);
+	  }
+	},
+	"stroke":{
+	  "mouseout":function(d){
+	    return ifSelectedElse(d, g_info.aes.clickSelects, 
+				  "black", "transparent");
+	  },
+	  "mouseover":function(d){
+	    return "black";
+	  }
+	}
+      };
       // My original design for clicking/interactivity/transparency:
       // Basically I wanted a really simple way to show which element
       // in a group of clickable geom elements is currently
@@ -758,20 +782,29 @@ var animint = function (to_select, json_file) {
       // with alpha=1 and the others are shown but a bit faded with
       // alpha=0.5 (normal alpha 1 - 0.5 = 0.5).
 
-      // TODO: defining a penalty of 0.5 alpha for non-selected geoms
-      // is somewhat arbitrary and so this should be configurable
-      // (e.g. somebody may want to change color instead of
-      // transparency).
+      // Edit 19 March 2014: Now there are two styles to show the
+      // selection, depending on the geom. For most geoms it is as
+      // described above. But for geoms like rects with
+      // aes(fill=numericVariable), using opacity to indicate the
+      // selection results in a misleading decoding of the fill
+      // variable. So in this case we set stroke to "black" for the
+      // current selection.
 
-      elements.style("opacity", notOver)
+      // TODO: user-configurable selection styles.
+
+      var style_funs = selected_funs[g_info.select_style];
+      var over_fun = function(e){
+	e.style(g_info.select_style, style_funs["mouseover"]);
+      }
+      var out_fun = function(e){
+	e.style(g_info.select_style, style_funs["mouseout"]);
+      }
+      elements.call(out_fun)
         .on("mouseover", function (d) {
-          d3.select(this).style("opacity", function (d) {
-            return selectedOpacity(d, g_info.aes.clickSelects,
-              get_alpha(d), get_alpha(d));
-          });
+          d3.select(this).call(over_fun);
         })
         .on("mouseout", function (d) {
-          d3.select(this).style("opacity", notOver);
+          d3.select(this).call(out_fun);
         })
         .on("click", function (d) {
 	  // The main idea of how clickSelects works: when we click
@@ -789,18 +822,14 @@ var animint = function (to_select, json_file) {
           var v_name = g_info.aes.clickSelects;
           return v_name + " " + d.clickSelects;
         });
-    } else {
-      if (g_info.geom == "line") { // treat lines (groups of points) differently
+    } else { //no clickSelects for this geom.
+      // Assign opacity. treat lines and ribbons (groups of points)
+      // specially.
+      if (g_info.geom == "line" || g_info.geom == "ribbon") { 
         enter.style("opacity", function (group_info) {
           var one_group = data[group_info.value];
           var one_row = one_group[0]; // take aesthetic for first value in the group
-          return (get_alpha(one_row));
-        })
-      } else if (g_info.geom == "ribbon") { // treat areas (groups of points) differently
-        enter.style("opacity", function (group_info) {
-          var one_group = data[group_info.value];
-          var one_row = one_group[0]; // take aesthetic for first value in the group
-          return (get_alpha(one_row));
+          return get_alpha(one_row);
         })
       } else {
         enter.style("opacity", get_alpha);
@@ -817,11 +846,11 @@ var animint = function (to_select, json_file) {
     Selectors[v_name].subset.forEach(update_geom);
     //Selectors[v_name].hilite.forEach(update_geom);
   }
-  var selectedOpacity = function (d, v_name, selected, others) {
+  var ifSelectedElse = function (d, v_name, selected, not_selected) {
     if (d.clickSelects == Selectors[v_name].selected) {
       return selected;
     } else {
-      return others;
+      return not_selected;
     }
   }
   var animateIfInactive = function () {
