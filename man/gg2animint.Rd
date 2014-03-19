@@ -103,7 +103,7 @@ data(WorldBank)
 gapminder <-
   list(ts=ggplot()+
        make_tallrect(WorldBank, "year")+
-       geom_line(aes(year, life.expectancy, group=country,
+       geom_line(aes(year, life.expectancy, group=country, color=region,
                      clickSelects=country),
                  data=WorldBank, size=4, alpha=3/5),
        time=list(variable="year",ms=3000),
