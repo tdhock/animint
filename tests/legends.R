@@ -28,3 +28,4 @@ stopifnot(length(entries) == length(breaks))
 label.chr <- sapply(entries, "[[", "label")
 label.num <- as.numeric(label.chr)
 stopifnot(all.equal(sort(breaks), sort(label.num)))
+

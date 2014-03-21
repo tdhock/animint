@@ -1,5 +1,9 @@
 TODOs in approximate order of importance (higher is more important).
 
+BUG: Too many legend entries for the WorldBank viz --- git bisect
+figured out that the bug was introduced in this change
+https://github.com/tdhock/animint/commit/069c167117c169dea9277608e8a0cbed3c75fcff
+
 BUG: make_text does not work if it appears before/after certain other
 data... why? See examples/make_text_bug.R
 
