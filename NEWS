@@ -16,6 +16,10 @@ the CSV correctly. See examples/align_rect_text.R.
 BUG: Why doesn't animation work in the last plot of this example?
 https://github.com/vdimarco/dojo1/blob/master/hocking-canada-cities-viz.R
 
+Test SVG output after applying JavaScript? Is there some way we can
+apply the JavaScript non-interactively and then check the results?
+http://phantomjs.org/ or in R http://www.omegahat.org/SpiderMonkey/
+
 customizable alpha/color/size/fill/linetype for selected geoms, using
 selected.alpha, selected.color, etc aesthetics, see
 examples/Climate-selected.R. The first implementation should only
@@ -31,6 +35,11 @@ maintain compatibility with existing code, which assumes
 selected.color="black" and color="transparent" for
 e.g. geom_rect(aes(fill=numeric, clickSelects=id)) and otherwise,
 selected.alpha=1 and alpha=1/2.
+
+Why does it take so much memory to compile large data? e.g.
+examples/vervet.R.
+
+Profile gg2animint() to see what part is slow, and speed it up!
 
 Custom titles for the generated HTML page.
 
@@ -48,19 +57,6 @@ coord_equal -- would be useful for maps e.g. examples/Tornadoes.R.
 Render a <select> for each selector variable, so long lists
 like this are not necessary.
 https://github.com/vdimarco/dojo1/blob/master/hocking-canada-cities-viz.R
-
-OPTION: after clicking and changing the displayed data subset,
-zoom/update the axes of related plots. For animations we clearly want
-to keep the same axes across animation frames, but for some other
-kinds of plots it would be nice if the axes automatically zoomed. Make
-this an option list axesZoom=list(plotXY=c("x", "y"), plotX="x") means
-that the x axis should be updated for plotX and both axes should be
-updated for plotXY, but the axes are NOT updated for any other
-plots. There should also be a button next to each axis that you can
-click to toggle zooming on and off.
-
-It would be nice to be able to resize plots interactively, like we can
-do in shiny.
 
 Speedy downloading: on compile, divide data into chunks --- separate
 csv files. In general a chunk of data will be shown onscreen at the
@@ -87,14 +83,31 @@ Download progress table at the bottom of the plot.
 - row for every geom.
 - at least 3 columns: geom, total chunks, downloaded chunks.
 
-Why does it take so much memory to compile large data? e.g.
-examples/vervet.R.
+OPTION: after clicking and changing the displayed data subset,
+zoom/update the axes of related plots. For animations we clearly want
+to keep the same axes across animation frames, but for some other
+kinds of plots it would be nice if the axes automatically zoomed. Make
+this an option list axesZoom=list(plotXY=c("x", "y"), plotX="x") means
+that the x axis should be updated for plotX and both axes should be
+updated for plotXY, but the axes are NOT updated for any other
+plots. There should also be a button next to each axis that you can
+click to toggle zooming on and off.
 
-Profile gg2animint() to see what part is slow, and speed it up!
+It would be nice to be able to resize plots interactively, like we can
+do in shiny.
 
-Test SVG output after applying JavaScript? Is there some way we can
-apply the JavaScript non-interactively and then check the results?
-http://phantomjs.org/ or in R http://www.omegahat.org/SpiderMonkey/
+multiple selection! currently, each interaction variable can only have
+a single selected value at a time, e.g. year=1996 and country=Japan in
+the WorldBank viz. In the future, we should be able to declare each
+interaction variable as either single or multiple selection using an
+option list: selection=list(year="single", country="multiple"). If
+this option list is not specified, the compiler should infer a
+default: multiple selection for interaction variables with only
+clickSelects and no showSelected elements (like country in the
+WorldBank viz), and single selection for interaction variables with
+showSelected elements (like year in the WorldBank viz). The interface
+to multiple selection should be simple: click a country to toggle the
+selection state from off to on.
 
 theme(legend.position)
 
@@ -105,11 +118,6 @@ mouse over something, e.g. issue #1.
 
 layout=matrix of plot names means render plots in an html table
 instead of in a line.
-
-multiple selection/brushing? ex, if 1 bin contains multiple values of
-clickSelects, then can we select all of the corresponding geoms? This
-would require rewriting a substantial amount of JS code, so let's just
-ignore this for the time being.
 
 specify id or key variable for transitions? In the current set of
 examples, using keys has proven un-necessary. So let's just ignore
@@ -126,7 +134,8 @@ middle|end|start). See examples/align_rect_text.R.
 theme(animint.width=600, animint.height=600) instead of option lists
 which make us repeat the plot names... this results in an error with
 ggplot2-0.9.3.1, is there any work-around or do we need to just
-continue to use option lists?
+continue to use option lists? maybe we can implement a custom theme()
+function?
 
 2014.3.19
 
