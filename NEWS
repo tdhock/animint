@@ -18,7 +18,9 @@ https://github.com/vdimarco/dojo1/blob/master/hocking-canada-cities-viz.R
 
 Test SVG output after applying JavaScript? Is there some way we can
 apply the JavaScript non-interactively and then check the results?
-http://phantomjs.org/ or in R http://www.omegahat.org/SpiderMonkey/
+Need to figure out which one(s) of these libraries could do the job:
+http://phantomjs.org/ http://www.omegahat.org/SpiderMonkey/
+https://github.com/tmpvar/jsdom/blob/master/README.md
 
 customizable alpha/color/size/fill/linetype for selected geoms, using
 selected.alpha, selected.color, etc aesthetics, see
