@@ -23,7 +23,9 @@ Test SVG output after applying JavaScript? Is there some way we can
 apply the JavaScript non-interactively and then check the results?
 Need to figure out which one(s) of these libraries could do the job:
 http://phantomjs.org/ http://www.omegahat.org/SpiderMonkey/
-https://github.com/tmpvar/jsdom/blob/master/README.md
+https://github.com/tmpvar/jsdom/blob/master/README.md After we figure
+out what testing framework is best, use it to implement the
+animint2HTML function used in the inst/tests/TEST-*.R files.
 
 customizable alpha/color/size/fill/linetype for selected geoms, using
 selected.alpha, selected.color, etc aesthetics, see

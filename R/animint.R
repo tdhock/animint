@@ -443,6 +443,10 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
   for(plot.name in names(plot.list)){
     p <- plot.list[[plot.name]]
     if(is.ggplot(p)){
+      pattern <- "[a-zA-Z][a-zA-Z0-9].*"
+      if(!grepl(pattern, plot.name)){
+        stop("ggplot names must match ", pattern)
+      }
       plist[[plot.name]] <- gg2list(p)
     }else if(is.list(p)){ ## for options.
       olist[[plot.name]] <- p
@@ -529,14 +533,19 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
   }
   ## Set plot sizes.
   for(d in c("width","height")){
-    if(is.list(olist[[d]])){
-      if(is.null(names(olist[[d]]))){ #use this size for all plots.
+    size <- olist[[d]]
+    if(is.list(size)){
+      if(is.null(names(size))){ #use this size for all plots.
         for(plot.name in names(result$plots)){
-          result$plots[[plot.name]]$options[[d]] <- olist[[d]][[1]]
+          result$plots[[plot.name]]$options[[d]] <- size[[1]]
         }
       }else{ #use the size specified for the named plot.
-        for(plot.name in names(olist[[d]])){
-          result$plots[[plot.name]]$options[[d]] <- olist[[d]][[plot.name]]
+        for(plot.name in names(size)){
+          if(plot.name %in% names(result$plots)){
+            result$plots[[plot.name]]$options[[d]] <- size[[plot.name]]
+          }else{
+            stop("no ggplot named ", plot.name)
+          }
         }
       }
     }

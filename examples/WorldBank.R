@@ -19,7 +19,7 @@ motion <-
                   data=WorldBank)+
        ##scale_size_area(max_size=40)+
        make_text(WorldBank, 55, 9, "year"),
-       ts=ggplot()+
+       timeSeries=ggplot()+
        make_tallrect(WorldBank, "year")+
        geom_line(aes(year, life.expectancy, group=country,
                      clickSelects=country),
