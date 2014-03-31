@@ -1,9 +1,9 @@
 #' Convert a ggplot to a list. Called from gg2animint(). 
-#' @param p ggplot2 plot
-#' @return list representing a ggplot, with elements, ranges, axes, scales, geoms, and options
+#' @param meta environment with previously calculated plot data, and a new plot to parse, already stored in plot and plot.name.
+#' @return nothing, info is stored in meta.
 #' @export
 #' @seealso \code{\link{gg2animint}}
-gg2list <- function(p){
+parsePlot <- function(meta){
   plist <- list()
   plistextra <- ggplot2::ggplot_build(p)
   for(sc in plistextra$plot$scales$scales){
@@ -24,6 +24,7 @@ gg2list <- function(p){
     }
   }
   for(i in seq_along(plistextra$plot$layers)){
+    cat(sprintf("%4d / %4d layers\n", i, length(plistextra$plot$layers)))
     ## This is the layer from the original ggplot object.
     L <- plistextra$plot$layers[[i]]
 
@@ -108,7 +109,7 @@ gg2list <- function(p){
   plist
 }
 
-#' Convert a layer to a list. Called from gg2list()
+#' Convert a layer to a list. 
 #' @param l one layer of the ggplot object
 #' @param d one layer of calculated data from ggplot2::ggplot_build(p)
 #' @param ranges axes ranges
@@ -180,6 +181,8 @@ layer2list <- function(l, d, ranges){
                      "or use make_bar if using geom_bar/geom_histogram."))
     }
   }
+
+  ##print("before pre-processing")
   
   ## Pre-process some complex geoms so that they are treated as
   ## special cases of basic geoms. In ggplot2, this processing is done
@@ -313,6 +316,8 @@ layer2list <- function(l, d, ranges){
     ## all other geoms are basic, and keep the same name.
     g$geom
   }
+
+  ##print("after pre-processing")
   
   ## idea: if geom is calculated, group is not meaningful - 
   ## it has already been used in the calculation stage, and 
@@ -337,6 +342,7 @@ layer2list <- function(l, d, ranges){
     }
   }
   
+  ##print("after group block")
   
   ## Check g$data for color/fill - convert to hexadecimal so JS can parse correctly.
   for(color.var in c("colour", "color", "fill")){
@@ -434,10 +440,14 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
   stopifnot(!is.null(names(plot.list)))
   stopifnot(all(names(plot.list)!=""))
   
-  plist <- list() ## for extracted plots.
-  olist <- list() ## for options.
-  df.list <- list() ## for data.frames so we can look at their values
-  ## to create an animation.
+
+  ## Store meta-data in this environment, so we can alter state in the
+  ## lower-level functions.
+  meta <- new.env()
+  meta$plots <- list()
+  meta$geoms <- list()
+  meta$selectors <- list()
+  meta$geom.count <- 1
   
   ## Extract essential info from ggplots, reality checks.
   for(plot.name in names(plot.list)){
@@ -447,9 +457,11 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
       if(!grepl(pattern, plot.name)){
         stop("ggplot names must match ", pattern)
       }
-      plist[[plot.name]] <- gg2list(p)
+      meta$plot.name <- plot.name
+      meta$plot <- p
+      parsePlot(meta)
     }else if(is.list(p)){ ## for options.
-      olist[[plot.name]] <- p
+      meta[[plot.name]] <- p
     }else{
       stop("list items must be ggplots or option lists")
     }
@@ -457,7 +469,6 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
   
   dir.create(out.dir,showWarnings=FALSE)
   i <- 1 #geom counter.
-  result <- list(geoms=list(), selectors=list(), plots=list())
   for(plot.name in names(plist)){
     p <- plist[[plot.name]]
     result$plots[[plot.name]]$geoms <- list()
