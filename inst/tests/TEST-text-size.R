@@ -9,8 +9,8 @@ viz <- list(scatter=ggplot()+
 
 test_that("text size range is translated to <text font-size>", {
   html <- animint2HTML(viz)
-  expect_true(grepl('font-size="10"', html))
-  expect_true(grepl('font-size="20"', html))
+  expect_match(html, 'font-size="10"')
+  expect_match(html, 'font-size="20"')
 })
               
 
