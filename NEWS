@@ -60,6 +60,12 @@ Render a <select> for each selector variable, so long lists
 like this are not necessary.
 https://github.com/vdimarco/dojo1/blob/master/hocking-canada-cities-viz.R
 
+Allow other variable names for the same selection variable,
+e.g. insert and insert.show are 2 different columns in
+data=other.inserts, but they should both use the "insert" selection
+variable, in geom_point(aes(clickSelects=insert,
+showSelected=insert.show, data=other.inserts).
+
 Speedy downloading: on compile, divide data into chunks --- separate
 csv files. In general a chunk of data will be shown onscreen at the
 same time, but we should not make chunks with only 1 row e.g. for the
