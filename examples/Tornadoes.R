@@ -106,6 +106,28 @@ tornado.points <-
                 data=UStornadoCounts, stat="identity", position="identity"))
 gg2animint(tornado.points, "tornado-points")
 
+## It would be nice to be able to specify the width/height using
+## animint.* theme options, but this currently gives an error... is
+## there any work-around?
+tornado.points <-
+  list(map=ggplot()+
+       make_text(UStornadoCounts, -100, 50, "year", "Tornadoes in %d")+
+       geom_polygon(aes(x=long, y=lat, group=group, clickSelects=state),
+                    data=USpolygons, fill="black", colour="grey") +
+       geom_segment(aes(x=startLong, y=startLat, xend=endLong, yend=endLat,
+                        showSelected=year),
+                    colour=seg.color, data=UStornadoes)+
+       scale_fill_manual(values=c(end=seg.color))+
+       theme(animint.width=750, animint.height=500)+
+       geom_point(aes(endLong, endLat, fill=place, showSelected=year),
+                    colour=seg.color,
+                  data=data.frame(UStornadoes,place="end")),
+       ts=ggplot()+
+       make_text(UStornadoes, 1980, 200, "state")+
+       geom_bar(aes(year, count, clickSelects=year, showSelected=state),
+                data=UStornadoCounts, stat="identity", position="identity"))
+gg2animint(tornado.points, "tornado-points")
+
 tornado.points.anim <-
   list(map=ggplot()+
        make_text(UStornadoes, -100, 50, "year",
