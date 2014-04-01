@@ -351,7 +351,7 @@ var animint = function (to_select, json_file) {
     var colour = "black";
     var fill = "black";
     var get_colour = function (d) {
-      if (d.hasOwnProperty("colour")) {
+      if(d.hasOwnProperty("colour")) {
         return d["colour"]
       }
       return colour;
@@ -605,17 +605,10 @@ var animint = function (to_select, json_file) {
           .attr("cy", toXY("y", "y"))
           .attr("r", get_size)
           .style("fill", get_fill)
-          .style("stroke", get_colour);
-      }
-      eAppend = "circle";
-    } else if (g_info.geom == "jitter") {
-      elements = elements.data(data);
-      eActions = function (e) {
-        e.attr("cx", toXY("x", "x"))
-          .attr("cy", toXY("y", "y"))
-          .attr("r", get_size)
-          .style("fill", get_fill)
-          .style("stroke", get_colour);
+	;
+	if(g_info.select_style != "stroke"){
+          e.style("stroke", get_colour);
+	}
       }
       eAppend = "circle";
     } else if (g_info.geom == "tallrect") {
