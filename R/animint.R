@@ -440,12 +440,25 @@ saveLayer <- function(l, d, meta){
     }
     names(vec.list)
   }
-  g$chunkord <- as.list(as.character(g$aes[chunk.cols]))
   
   ## Split into chunks and save tsv files.
   meta$classed <- g$classed
   meta$chunk.i <- 1
   g$data <- saveChunks(g$data, chunk.cols, meta)
+
+  ## Also add pointers to these chunks to the related selectors.
+  if(length(chunk.cols)){
+    selector.names <- as.character(g$aes[chunk.cols])
+    chunk.name <- paste(selector.names, collapse="_")
+    g$chunkord <- as.list(selector.names)
+    for(selector.name in selector.names){
+      meta$selectors[[selector.name]]$chunks <-
+        unique(c(meta$selectors[[selector.name]]$chunks, chunk.name))
+    }
+    chunk.list <- list(order=g$chunkord, chunks=g$data)
+    meta$chunks[[chunk.name]] <-
+      c(meta$chunks[[chunk.name]], list(chunk.list))
+  }
   
   ## Get unique values of time variable.
   if(length(time.col)){ # if this layer/geom is animated,
@@ -454,8 +467,6 @@ saveLayer <- function(l, d, meta){
 
   ## TODO: save the download order... if it is an animation then the
   ## download order should be in the same order.
-  print(g[c("data", "chunkord", "classed")])
-  browser()
   
   ## Finally save to the master geom list.
   meta$geoms[[g$classed]] <- g
