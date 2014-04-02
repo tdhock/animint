@@ -159,8 +159,8 @@ saveLayer <- function(l, d, meta){
       value <- g$data[[col.name]][1]
       meta$selectors[[v.name]] <- list(selected=as.character(value))
     }
-    meta$selectors[[v.name]]$subset <-
-      c(meta$selectors[[v.name]]$subset, as.list(g$classed))
+    meta$selectors[[v.name]]$update <-
+      c(meta$selectors[[v.name]]$update, as.list(g$classed))
   }
   
 
@@ -170,9 +170,8 @@ saveLayer <- function(l, d, meta){
   stat <- l$stat
   if(!is.null(stat)){
     is.bin <- stat$objname=="bin"
-    ## TODO: does this work with showSelected2?
-    has.animint.aes <- any(c("clickSelects","showSelected")%in%names(g$aes))
-    if(is.bin & has.animint.aes){
+    is.animint.aes <- grepl("clickSelects|showSelected", names(g$aes))
+    if(is.bin & any(is.animint.aes)){
       warning(paste0("stat_bin is unpredictable ",
                     "when used with clickSelects/showSelected.\n",
                      "Use ddply to do the binning ",
@@ -414,11 +413,39 @@ saveLayer <- function(l, d, meta){
   ## TODO:facets. Right now we delete PANEL info since it just takes
   ## up space for no reason in the CSV database.
   g$data <- g$data[names(g$data) != "PANEL"]
+
+  ## Make the time variable the first subord variable.
+  time.col <- if(is.null(meta$time)){ # if this is not an animation,
+    NULL
+  }else{
+    click.or.show <- grepl("clickSelects|showSelected", names(g$aes))
+    names(g$aes)[g$aes==meta$time$var & click.or.show]
+  }
+  g$subord <- g$subord[order(g$subord != time.col)]
   
   ## Output data to tsv.
   meta$chunk.i <- 1
   meta$classed <- g$classed
   g$data <- saveChunks(g$data, g$subord, meta)
+
+  ## Determine which showSelected values were actually used for
+  ## breaking the data into chunks. This list of variables should have
+  ## the same names as the selectors. E.g. if chunkord=list("year")
+  ## then when year is clicked, we may need to download some new data
+  ## for this geom. e.g. if chunkord=list("segments", "samples") then
+  ## if either segments or samples is clicked, we need to!
+  some <- g$data
+  g$chunkord <- NULL
+  while(!is.character(some)){
+    some <- some[[1]]
+    col.name <- g$subord[[1]]
+    g$chunkord <- c(g$chunkord, list(g$aes[[col.name]]))
+  }
+  
+  ## Get unique values of time variable.
+  if(length(time.col)){ # if this layer/geom is animated,
+    g$timeValues <- names(g$data)
+  }
 
   ## TODO: save the download order... if it is an animation then the
   ## download order should be in the same order.
@@ -444,7 +471,7 @@ saveChunks <- function(x, vars, meta){
       if(all(table(x[[use]]) == 1)){ 
         saveChunks(x, rest, meta) #do not split if they would all have 1 row.
       }else{
-        df.list <- split(x[names(x) != use], vec)
+        df.list <- split(x[names(x) != use], vec, drop=TRUE)
         saveChunks(df.list, rest, meta)
       }
     }
@@ -548,7 +575,6 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
   stopifnot(!is.null(names(plot.list)))
   stopifnot(all(names(plot.list)!=""))
   
-
   ## Store meta-data in this environment, so we can alter state in the
   ## lower-level functions.
   meta <- new.env()
@@ -558,7 +584,21 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
   dir.create(out.dir,showWarnings=FALSE)
   meta$out.dir <- out.dir
   meta$geom.count <- 1
-  
+
+  ## Save the animation variable so we can treat it specially when we
+  ## process each geom.
+  if(is.list(meta$time <- plot.list$time)){
+    ms <- meta$time$ms
+    stopifnot(is.numeric(ms))
+    stopifnot(length(ms)==1)
+    ## NOTE: although we do not use olist$ms for anything in the R
+    ## code, it is used to control the number of milliseconds between
+    ## animation frames in the JS code.
+    time.var <- meta$time$variable
+    stopifnot(is.character(time.var))
+    stopifnot(length(time.var)==1)
+  }
+
   ## Extract essential info from ggplots, reality checks.
   for(list.name in names(plot.list)){
     p <- plot.list[[list.name]]
@@ -625,35 +665,23 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
       }
     }
   }
-  if(is.list(olist$time)){
-    ms <- olist$time$ms
-    stopifnot(is.numeric(ms))
-    stopifnot(length(ms)==1)
-    ## NOTE: although we do not use olist$ms for anything in the R
-    ## code, it is used to control the number of milliseconds between
-    ## animation frames in the JS code.
-    v.name <- olist$time$variable
-    stopifnot(is.character(v.name))
-    stopifnot(length(v.name)==1)
-    ## These geoms need to be updated when the v.name variable is
-    ## animated, so let's make a list of all possible values to cycle
-    ## through, from all the values used in those geoms.
-    geom.names <- result$selectors[[v.name]]$subset
-    anim.values <- list()
-    for(g.name in geom.names){
-      g <- result$geoms[[g.name]]
-      ## TODO: does this work with showSelected2?
-      click.or.show <- names(g$aes) %in% c("clickSelects","showSelected")
-      anim.cols <- names(g$aes)[g$aes==v.name & click.or.show]
-      g.data <- df.list[[g.name]][,anim.cols,drop=FALSE]
-      g.vec <- unlist(g.data)
-      if(!is.null(g.vec)){
-        anim.values[[g.name]] <- as.character(sort(unique(g.vec)))
-      }
+
+  ## These geoms need to be updated when the time.var is animated, so
+  ## let's make a list of all possible values to cycle through, from
+  ## all the values used in those geoms.
+  geom.names <- result$selectors[[v.name]]$subset
+  anim.values <- sapply(meta$geoms, "[[", "timeValues")
+  for(g.name in geom.names){
+    g <- result$geoms[[g.name]]
+    if(!is.null(values <- g$time.values)){
+      anim.values[[g.name]] <- as.character(sort(unique()))
     }
-    olist$time$sequence <- unique(unlist(anim.values))
-    result$time <- olist$time
   }
+  meta$time$sequence <- unique(unlist(anim.values))
+
+  ## Also, figure out the download order:
+  meta$
+
   ## Finally, copy html/js/json files to out.dir.
   src.dir <- system.file("htmljs",package="animint")
   to.copy <- Sys.glob(file.path(src.dir, "*"))

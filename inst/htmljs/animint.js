@@ -836,7 +836,7 @@ var animint = function (to_select, json_file) {
   }
   var update_selector = function (v_name, value) {
     Selectors[v_name].selected = value;
-    Selectors[v_name].subset.forEach(update_geom);
+    Selectors[v_name].update.forEach(update_geom);
     //Selectors[v_name].hilite.forEach(update_geom);
   }
   var ifSelectedElse = function (d, v_name, selected, not_selected) {
