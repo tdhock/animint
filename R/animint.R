@@ -40,7 +40,7 @@ parsePlot <- function(meta){
   # be passed into d3 on the x axis scale instead of on the 
   # grid 0-1 scale). This allows transformations to be used 
   # out of the box, with no additional d3 coding. 
-  theme.pars <- ggplot2:::plot_theme(p)  
+  theme.pars <- ggplot2:::plot_theme(meta$plot)  
   
   ## Flip labels if coords are flipped - transform does not take care
   ## of this. Do this BEFORE checking if it is blank or not, so that
@@ -52,7 +52,7 @@ parsePlot <- function(meta){
     meta$built$plot$labels$y <- temp
   }
   is.blank <- function(el.name){
-    x <- ggplot2::calc_element(el.name, p$theme)
+    x <- ggplot2::calc_element(el.name, meta$plot$theme)
     "element_blank"%in%attr(x,"class")
   }
   meta$axis <- list()
