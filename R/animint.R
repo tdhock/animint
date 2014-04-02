@@ -32,7 +32,7 @@ parsePlot <- function(meta){
     df <- meta$built$data[[i]]
 
     ## This extracts essential info for this geom/layer.
-    g <- layer2list(L, df, meta)
+    saveLayer(L, df, meta)
     
   }
   # Export axis specification as a combination of breaks and
@@ -99,11 +99,16 @@ parsePlot <- function(meta){
 #' @return list representing a layer, with corresponding aesthetics, ranges, and groups.
 #' @export
 #' @seealso \code{\link{gg2animint}}
-layer2list <- function(l, d, meta){
+saveLayer <- function(l, d, meta){
   ranges <- meta$built$panel$ranges[[1]] #TODO:facets
   g <- list(geom=l$geom$objname,
             data=d)
-  g$aes <- sapply(l$mapping, function(k) as.character(as.expression(k))) # needed for when group, etc. is an expression
+  g$classed <-
+    sprintf("geom%d_%s_%s",
+            meta$geom.count, g$geom, meta$plot.name)
+  meta$geom.count <- meta$geom.count + 1
+  ## needed for when group, etc. is an expression:
+  g$aes <- sapply(l$mapping, function(k) as.character(as.expression(k))) 
 
   ## use un-named parameters so that they will not be exported
   ## to JSON as a named object, since that causes problems with
@@ -140,10 +145,24 @@ layer2list <- function(l, d, meta){
   ## currently selected values of these variables are stored in
   ## plot.Selectors.
   
-  some.vars <- c(g$aes[grepl("showSelected",names(g$aes))])
-  g$update <- c(some.vars, g$aes[names(g$aes)=="clickSelects"])
+  some.vars <- g$aes[is.showSelected(names(g$aes))]
+  update.vars <- c(some.vars, g$aes[names(g$aes)=="clickSelects"])
   subset.vars <- c(some.vars, g$aes[names(g$aes)=="group"])
-  g$subord <- as.character(names(subset.vars))
+  g$subord <- as.list(names(subset.vars))
+
+  ## Construct the selector.
+  for(sel.i in seq_along(update.vars)){
+    v.name <- update.vars[[sel.i]]
+    col.name <- names(update.vars)[[sel.i]]
+    if(!v.name %in% names(meta$selectors)){
+      ## select the first one. TODO: customize.
+      value <- g$data[[col.name]][1]
+      meta$selectors[[v.name]] <- list(selected=as.character(value))
+    }
+    meta$selectors[[v.name]]$subset <-
+      c(meta$selectors[[v.name]]$subset, as.list(g$classed))
+  }
+  
 
   ## Warn if stat_bin is used with animint aes. geom_bar + stat_bin
   ## doesn't make sense with clickSelects/showSelected, since two
@@ -182,7 +201,7 @@ layer2list <- function(l, d, meta){
       ## TODO: Figure out a better way to handle this...
       g$aes <- g$aes[-which(names(g$aes)=="group")]
       subset.vars <- c(some.vars, g$aes[names(g$aes)=="group"])
-      g$subord <- as.character(names(subset.vars))
+      g$subord <- as.list(names(subset.vars))
     } 
     g$geom <- "segment"
   } else if(g$geom=="point"){
@@ -252,18 +271,18 @@ layer2list <- function(l, d, meta){
     g$aes[["group"]] <- "piece"
     # reset g$subord now that group aesthetic exists.
     subset.vars <- c(some.vars, g$aes[names(g$aes)=="group"])
-    g$subord <- as.character(names(subset.vars))
+    g$subord <- as.list(names(subset.vars))
     g$geom <- "path"
   } else if(g$geom=="freqpoly"){
     g$geom <- "line"
     # reset g$subord now that group aesthetic exists.
     subset.vars <- c(some.vars, group="group")
-    g$subord <- as.character(names(subset.vars))
+    g$subord <- as.list(names(subset.vars))
   } else if(g$geom=="quantile"){
     g$geom <- "path"
     # reset g$subord now that group aesthetic exists.
     subset.vars <- c(some.vars, group="group")
-    g$subord <- as.character(names(subset.vars))
+    g$subord <- as.list(names(subset.vars))
   } else if(g$geom=="hex"){
     g$geom <- "polygon"
     ## TODO: for interactivity we will run into the same problems as
@@ -296,7 +315,7 @@ layer2list <- function(l, d, meta){
     }
     # reset g$subord now that group aesthetic exists.
     subset.vars <- c(some.vars, group="group")
-    g$subord <- as.character(names(subset.vars))
+    g$subord <- as.list(names(subset.vars))
   } else { 
     ## all other geoms are basic, and keep the same name.
     g$geom
@@ -321,7 +340,7 @@ layer2list <- function(l, d, meta){
         ## remove group from aes listing
         subset.vars <- c(some.vars, g$aes[names(g$aes)=="group"])
         ## recalculate subord.
-        g$subord <- as.character(names(subset.vars))
+        g$subord <- as.list(names(subset.vars))
       }
     }
   }
@@ -369,43 +388,44 @@ layer2list <- function(l, d, meta){
     })
     namedlinetype | xsplit
   }
-  g$types <- as.list(sapply(g$data, function(i) paste(class(i), collapse="-")))
-  charidx <- which(g$types=="character")
-  g$types[charidx] <- sapply(charidx, function(i) {
-    if(sum(!is.rgb(g$data[[i]]))==0){
-      "rgb"
-    }else if(sum(!is.linetype(g$data[[i]]))==0){
-      "linetype"
-    }else {
-      "character"
+  g$types <- sapply(g$data, function(x) {
+    type <- paste(class(x), collapse="-")
+    if(type == "character"){
+      if(sum(!is.rgb(x))==0){
+        "rgb"
+      }else if(sum(!is.linetype(x))==0){
+        "linetype"
+      }else {
+        "character"
+      }
+    }else{
+      type
     }
   })
   
   ## convert ordered factors to unordered factors so javascript
   ## doesn't flip out.
   ordfactidx <- which(g$types=="ordered-factor")
-  if(length(ordfactidx)>0){
-    for(i in ordfactidx){
-      g$data[[i]] <- factor(as.character(g$data[[i]]))
-      g$types[[i]] <- "factor"
-    }
+  for(i in ordfactidx){
+    g$data[[i]] <- factor(as.character(g$data[[i]]))
+    g$types[[i]] <- "factor"
   }
 
   ## TODO:facets. Right now we delete PANEL info since it just takes
   ## up space for no reason in the CSV database.
   g$data <- g$data[names(g$data) != "PANEL"]
   
-  ## Output data to csv.
-  g$classed <- sprintf("geom%d_%s_%s", meta$geom.count, g$geom, meta$plot.name)
-  meta$geom.count <- meta$geom.count + 1
+  ## Output data to tsv.
   meta$chunk.i <- 1
   meta$classed <- g$classed
   g$data <- saveChunks(g$data, g$subord, meta)
+
+  ## TODO: save the download order... if it is an animation then the
+  ## download order should be in the same order.
   browser()
+  
   ## Finally save to the master geom list.
-  g$data <- list()
   meta$geoms[[g$classed]] <- g
-  g
 }
 
 saveChunks <- function(x, vars, meta){
@@ -413,13 +433,12 @@ saveChunks <- function(x, vars, meta){
     if(length(vars) == 0){
       csv.name <- sprintf("%s_chunk%d.tsv", meta$classed, meta$chunk.i)
       meta$chunk.i <- meta$chunk.i + 1
-      print(csv.name)
       write.table(x,
                   file.path(meta$out.dir, csv.name),
                   quote=FALSE, row.names=FALSE, sep="\t")
       csv.name
     }else{
-      use <- vars[1]
+      use <- vars[[1]]
       rest <- vars[-1]
       vec <- x[[use]]
       if(all(table(x[[use]]) == 1)){ 
@@ -566,17 +585,6 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
     for(g in p$geoms){
       result$plots[[plot.name]]$geoms <-
         c(result$plots[[plot.name]]$geoms, g$classed)
-      ## Construct the selector.
-      for(sel.i in seq_along(g$update)){
-        v.name <- g$update[[sel.i]]
-        col.name <- names(g$update)[[sel.i]]
-        if(!v.name %in% names(result$selectors)){
-          ## select the first one. TODO: customize.
-          result$selectors[[v.name]] <- list(selected=g$data[[col.name]][1])
-        }
-        result$selectors[[v.name]]$subset <-
-          c(result$selectors[[v.name]]$subset, list(g$classed))
-      }
     }
     result$plots[[plot.name]]$scales <- p$scales
     result$plots[[plot.name]]$options <- p$options
