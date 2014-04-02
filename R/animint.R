@@ -330,8 +330,9 @@ saveLayer <- function(l, d, meta){
   if(length(grpidx)>0){
     if(length(geom.aes.vars)>0 & nrow(g$data)!=nrow(l$data) & 
          !g$geom%in%c("ribbon","polygon","line", "path")){
-      # need to exclude geom_ribbon and geom_violin, since they are coded to allow group aesthetics
-      # because they use the d3 path setup.
+      ## need to exclude geom_ribbon and geom_violin, since they are
+      ## coded to allow group aesthetics because they use the d3 path
+      ## setup.
       if(g$aes[grpidx]%in%geom.aes.vars){
         ## if the group aesthetic is also mapped to another visual aesthetic, 
         ## then remove the group aesthetic
@@ -421,26 +422,30 @@ saveLayer <- function(l, d, meta){
     click.or.show <- grepl("clickSelects|showSelected", names(g$aes))
     names(g$aes)[g$aes==meta$time$var & click.or.show]
   }
-  g$subord <- g$subord[order(g$subord != time.col)]
-  
-  ## Output data to tsv.
-  meta$chunk.i <- 1
-  meta$classed <- g$classed
-  g$data <- saveChunks(g$data, g$subord, meta)
-
-  ## Determine which showSelected values were actually used for
-  ## breaking the data into chunks. This list of variables should have
-  ## the same names as the selectors. E.g. if chunkord=list("year")
-  ## then when year is clicked, we may need to download some new data
-  ## for this geom. e.g. if chunkord=list("segments", "samples") then
-  ## if either segments or samples is clicked, we need to!
-  some <- g$data
-  g$chunkord <- NULL
-  while(!is.character(some)){
-    some <- some[[1]]
-    col.name <- g$subord[[1]]
-    g$chunkord <- c(g$chunkord, list(g$aes[[col.name]]))
+  if(length(time.col)){
+    g$subord <- g$subord[order(g$subord != time.col)]
   }
+  
+  ## Determine which showSelected values to use for breaking the data
+  ## into chunks. This list of variables should have the same names as
+  ## the selectors. E.g. if chunkord=list("year") then when year is
+  ## clicked, we may need to download some new data for this
+  ## geom. e.g. if chunkord=list("segments", "samples") then if either
+  ## segments or samples is clicked, we need to!
+  chunk.cols <- if(length(g$subord)){
+    vec.list <- g$data[unlist(g$subord)]
+    counts <- do.call(table, vec.list)
+    if(all(counts == 1)){
+      vec.list <- vec.list[-length(vec.list)]
+    }
+    names(vec.list)
+  }
+  g$chunkord <- as.list(as.character(g$aes[chunk.cols]))
+  
+  ## Split into chunks and save tsv files.
+  meta$classed <- g$classed
+  meta$chunk.i <- 1
+  g$data <- saveChunks(g$data, chunk.cols, meta)
   
   ## Get unique values of time variable.
   if(length(time.col)){ # if this layer/geom is animated,
@@ -449,12 +454,19 @@ saveLayer <- function(l, d, meta){
 
   ## TODO: save the download order... if it is an animation then the
   ## download order should be in the same order.
+  print(g[c("data", "chunkord", "classed")])
   browser()
   
   ## Finally save to the master geom list.
   meta$geoms[[g$classed]] <- g
 }
 
+##' Split data set into chunks and save them to separate files.
+##' @param x data.frame.
+##' @param vars character vector of variable names to split on.
+##' @param meta environment.
+##' @return recursive list of chunk file names.
+##' @author Toby Dylan Hocking
 saveChunks <- function(x, vars, meta){
   if(is.data.frame(x)){
     if(length(vars) == 0){
@@ -468,12 +480,8 @@ saveChunks <- function(x, vars, meta){
       use <- vars[[1]]
       rest <- vars[-1]
       vec <- x[[use]]
-      if(all(table(x[[use]]) == 1)){ 
-        saveChunks(x, rest, meta) #do not split if they would all have 1 row.
-      }else{
-        df.list <- split(x[names(x) != use], vec, drop=TRUE)
-        saveChunks(df.list, rest, meta)
-      }
+      df.list <- split(x[names(x) != use], vec, drop=TRUE)
+      saveChunks(df.list, rest, meta)
     }
   }else if(is.list(x)){
     lapply(x, saveChunks, vars, meta)
@@ -578,6 +586,7 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
   ## Store meta-data in this environment, so we can alter state in the
   ## lower-level functions.
   meta <- new.env()
+  meta$chunks <- list()
   meta$plots <- list()
   meta$geoms <- list()
   meta$selectors <- list()
