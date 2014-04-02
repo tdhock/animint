@@ -13,9 +13,6 @@ data... why? See examples/make_text_bug.R
 BUG: geom_segment(aes(group=var)) will not be parsed correctly by
 animint.js!
 
-BUG: when there are commas in text labels, animint.js does not parse
-the CSV correctly. See examples/align_rect_text.R.
-
 BUG: Why doesn't animation work in the last plot of this example?
 https://github.com/vdimarco/dojo1/blob/master/hocking-canada-cities-viz.R
 
@@ -149,6 +146,12 @@ which make us repeat the plot names... this results in an error with
 ggplot2-0.9.3.1, is there any work-around or do we need to just
 continue to use option lists? maybe we can implement a custom theme()
 function?
+
+2014.4
+
+BUGFIX: when there are commas in text labels, animint.js now parses
+the data correctly, since we use tsv instead of csv. See
+examples/align_rect_text.R.
 
 2014.3.19
 

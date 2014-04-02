@@ -65,7 +65,7 @@ var animint = function (to_select, json_file) {
   };
 
   var add_geom = function (g_name, g_info) {
-    d3.csv(g_info.data, function (error, response) {
+    d3.tsv(g_info.data, function (error, response) {
       // First convert to correct types.
       response.forEach(function (d) {
         for (var v_name in g_info.types) {
@@ -281,7 +281,7 @@ var animint = function (to_select, json_file) {
     var data = g_info.data;
     g_info.subord.forEach(function (aes_name) {
       if (aes_name != "group") {
-        var v_name = g_info.subvars[aes_name];
+        var v_name = g_info.aes[aes_name];
         var value = Selectors[v_name].selected;
         if (data.hasOwnProperty(value)) {
           data = data[value];

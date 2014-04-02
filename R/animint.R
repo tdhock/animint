@@ -4,53 +4,36 @@
 #' @export
 #' @seealso \code{\link{gg2animint}}
 parsePlot <- function(meta){
-  plist <- list()
-  plistextra <- ggplot2::ggplot_build(p)
-  for(sc in plistextra$plot$scales$scales){
+  meta$built <- ggplot2::ggplot_build(meta$plot)
+  for(sc in meta$built$plot$scales$scales){
     if(sc$scale_name == "manual"){
-      plist$scales[[sc$aesthetics]] <- sc$palette(0)
+      meta$scales[[sc$aesthetics]] <- sc$palette(0)
     }else if(sc$scale_name == "brewer"){
-      plist$scales[[sc$aesthetics]] <- sc$palette(length(sc$range$range))
+      meta$scales[[sc$aesthetics]] <- sc$palette(length(sc$range$range))
     }else if(sc$scale_name == "hue"){
-      plist$scales[[sc$aesthetics]] <- sc$palette(length(sc$range$range))
+      meta$scales[[sc$aesthetics]] <- sc$palette(length(sc$range$range))
     }else if(sc$scale_name == "linetype_d"){
-      plist$scales[[sc$aesthetics]] <- sc$palette(length(sc$range$range))
+      meta$scales[[sc$aesthetics]] <- sc$palette(length(sc$range$range))
     }else if(sc$scale_name == "alpha_c"){
-      plist$scales[[sc$aesthetics]] <- sc$palette(sc$range$range)
+      meta$scales[[sc$aesthetics]] <- sc$palette(sc$range$range)
     }else if(sc$scale_name == "size_c"){
-      plist$scales[[sc$aesthetics]] <- sc$palette(sc$range$range)
+      meta$scales[[sc$aesthetics]] <- sc$palette(sc$range$range)
     }else if(sc$scale_name == "gradient"){
-      plist$scales[[sc$aesthetics]] <- ggplot2:::scale_map(sc, ggplot2:::scale_breaks(sc))
+      meta$scales[[sc$aesthetics]] <- ggplot2:::scale_map(sc, ggplot2:::scale_breaks(sc))
     }
   }
-  for(i in seq_along(plistextra$plot$layers)){
-    cat(sprintf("%4d / %4d layers\n", i, length(plistextra$plot$layers)))
+  for(i in seq_along(meta$built$plot$layers)){
+    cat(sprintf("%4d / %4d layers\n", i, length(meta$built$plot$layers)))
     ## This is the layer from the original ggplot object.
-    L <- plistextra$plot$layers[[i]]
+    L <- meta$built$plot$layers[[i]]
 
     ## for each layer, there is a correpsonding data.frame which
     ## evaluates the aesthetic mapping.
-    df <- plistextra$data[[i]]
+    df <- meta$built$data[[i]]
 
     ## This extracts essential info for this geom/layer.
-    g <- layer2list(L, df, plistextra$panel$ranges[[1]])
+    g <- layer2list(L, df, meta)
     
-    ## Idea: use the ggplot2:::coord_transform(coords, data, scales)
-    ## function to handle cases like coord_flip. scales is a list of
-    ## 12, coords is a list(limits=list(x=NULL,y=NULL)) with class
-    ## e.g. c("cartesian","coord"). The result is a transformed data
-    ## frame where all the data values are between 0 and 1.
-    
-    ## TODO: coord_transform maybe won't work for 
-    ## geom_dotplot|rect|segment and polar/log transformations, which
-    ## could result in something nonlinear. For the time being it is
-    ## best to just ignore this, but you can look at the source of
-    ## e.g. geom-rect.r in ggplot2 to see how they deal with this by
-    ## doing a piecewise linear interpolation of the shape.
-
-    g$data <- ggplot2:::coord_transform(plistextra$plot$coord, g$data,
-                                        plistextra$panel$ranges[[1]])
-    plist$geoms[[i]] <- g
   }
   # Export axis specification as a combination of breaks and
   # labels, on the relevant axis scale (i.e. so that it can
@@ -62,51 +45,51 @@ parsePlot <- function(meta){
   ## Flip labels if coords are flipped - transform does not take care
   ## of this. Do this BEFORE checking if it is blank or not, so that
   ## individual axes can be hidden appropriately, e.g. #1.
-  ranges <- plistextra$panel$ranges[[1]]
-  if("flip"%in%attr(plistextra$plot$coordinates, "class")){
-    temp <- plistextra$plot$labels$x
-    plistextra$plot$labels$x <- plistextra$plot$labels$y
-    plistextra$plot$labels$y <- temp
+  ranges <- meta$built$panel$ranges[[1]]
+  if("flip"%in%attr(meta$built$plot$coordinates, "class")){
+    temp <- meta$built$plot$labels$x
+    meta$built$plot$labels$x <- meta$built$plot$labels$y
+    meta$built$plot$labels$y <- temp
   }
   is.blank <- function(el.name){
     x <- ggplot2::calc_element(el.name, p$theme)
     "element_blank"%in%attr(x,"class")
   }
-  plist$axis <- list()
+  meta$axis <- list()
   for(xy in c("x","y")){
     s <- function(tmp)sprintf(tmp, xy)
-    plist$axis[[xy]] <- ranges[[s("%s.major")]]
-    plist$axis[[s("%slab")]] <- if(is.blank(s("axis.text.%s"))){
+    meta$axis[[xy]] <- ranges[[s("%s.major")]]
+    meta$axis[[s("%slab")]] <- if(is.blank(s("axis.text.%s"))){
       NULL
     }else{
       ranges[[s("%s.labels")]]
     }
-    plist$axis[[s("%srange")]] <- ranges[[s("%s.range")]]
-    plist$axis[[s("%sname")]] <- if(is.blank(s("axis.title.%s"))){
+    meta$axis[[s("%srange")]] <- ranges[[s("%s.range")]]
+    meta$axis[[s("%sname")]] <- if(is.blank(s("axis.title.%s"))){
       ""
     }else{
-      plistextra$plot$labels[[xy]]
+      meta$built$plot$labels[[xy]]
     }
-    plist$axis[[s("%sline")]] <- !is.blank(s("axis.line.%s"))
-    plist$axis[[s("%sticks")]] <- !is.blank(s("axis.ticks.%s"))
+    meta$axis[[s("%sline")]] <- !is.blank(s("axis.line.%s"))
+    meta$axis[[s("%sticks")]] <- !is.blank(s("axis.ticks.%s"))
   }
   
-  plist$legend <- getLegendList(plistextra)
-  if(length(plist$legend)>0){
-    plist$legend <- plist$legend[which(sapply(plist$legend, function(i) length(i)>0))]
+  meta$legend <- getLegendList(meta$built)
+  if(length(meta$legend)>0){
+    meta$legend <- meta$legend[which(sapply(meta$legend, function(i) length(i)>0))]
   }  # only pass out legends that have guide = "legend" or guide="colorbar"
   
   # Remove legend if theme has no legend position
-  if(theme.pars$legend.position=="none") plist$legend <- NULL
+  if(theme.pars$legend.position=="none") meta$legend <- NULL
   
   if("element_blank"%in%attr(theme.pars$plot.title, "class")){
-    plist$title <- ""
+    meta$title <- ""
   } else {
-    plist$title <- plistextra$plot$labels$title
+    meta$title <- meta$built$plot$labels$title
   }
   
-  plist$options <- list(width=400,height=400)
-  plist
+  meta$options <- list(width=400,height=400)
+  meta
 }
 
 #' Convert a layer to a list. 
@@ -116,7 +99,8 @@ parsePlot <- function(meta){
 #' @return list representing a layer, with corresponding aesthetics, ranges, and groups.
 #' @export
 #' @seealso \code{\link{gg2animint}}
-layer2list <- function(l, d, ranges){
+layer2list <- function(l, d, meta){
+  ranges <- meta$built$panel$ranges[[1]] #TODO:facets
   g <- list(geom=l$geom$objname,
             data=d)
   g$aes <- sapply(l$mapping, function(k) as.character(as.expression(k))) # needed for when group, etc. is an expression
@@ -124,7 +108,7 @@ layer2list <- function(l, d, ranges){
   ## use un-named parameters so that they will not be exported
   ## to JSON as a named object, since that causes problems with
   ## e.g. colour.
-  g$params <- l$geom_params
+  g$params <- c(l$geom_params, l$stat_params)
   for(p.name in names(g$params)){
     names(g$params[[p.name]]) <- NULL
   }
@@ -133,7 +117,7 @@ layer2list <- function(l, d, ranges){
   ## order in which these variables will be accessed in the recursive
   ## JavaScript array structure.
 
-  ## subvars/subord IS in fact useful with geom_segment! For example, in
+  ## subord IS in fact useful with geom_segment! For example, in
   ## the first plot in the breakpointError example, the geom_segment has
   ## the following exported data in plot.json
 
@@ -141,10 +125,6 @@ layer2list <- function(l, d, ranges){
   ##  "showSelected",
   ## "showSelected2" 
   ## ],
-  ## "subvars": {
-  ##  "showSelected": "segments",
-  ## "showSelected2": "bases.per.probe" 
-  ## },
 
   ## This information is used to parse the recursive array data structure
   ## that allows efficient lookup of subsets of data in JavaScript. Look at
@@ -163,8 +143,7 @@ layer2list <- function(l, d, ranges){
   some.vars <- c(g$aes[grepl("showSelected",names(g$aes))])
   g$update <- c(some.vars, g$aes[names(g$aes)=="clickSelects"])
   subset.vars <- c(some.vars, g$aes[names(g$aes)=="group"])
-  g$subord <- as.list(names(subset.vars))
-  g$subvars <- as.list(subset.vars)
+  g$subord <- as.character(names(subset.vars))
 
   ## Warn if stat_bin is used with animint aes. geom_bar + stat_bin
   ## doesn't make sense with clickSelects/showSelected, since two
@@ -203,8 +182,7 @@ layer2list <- function(l, d, ranges){
       ## TODO: Figure out a better way to handle this...
       g$aes <- g$aes[-which(names(g$aes)=="group")]
       subset.vars <- c(some.vars, g$aes[names(g$aes)=="group"])
-      g$subord <- as.list(names(subset.vars))
-      g$subvars <- as.list(subset.vars)
+      g$subord <- as.character(names(subset.vars))
     } 
     g$geom <- "segment"
   } else if(g$geom=="point"){
@@ -212,6 +190,17 @@ layer2list <- function(l, d, ranges){
     if(!"fill"%in%names(g$data) & "colour"%in%names(g$data)){
       g$data[["fill"]] <- g$data[["colour"]]
     }
+    ## group is meaningless for points, so delete it.
+    g$data <- g$data[names(g$data) != "group"]
+  } else if(g$geom=="segment"){
+    ## group is meaningless for segments, so delete it.
+    g$data <- g$data[names(g$data) != "group"]
+  } else if(g$geom=="text"){
+    ## group is meaningless for text, so delete it.
+    g$data <- g$data[names(g$data) != "group"]
+  } else if(g$geom=="rect"){
+    ## group is meaningless for rects, so delete it.
+    g$data <- g$data[names(g$data) != "group"]
   } else if(g$geom=="ribbon"){
     # Color set to match ggplot2 default of fill with no outside border.
     if("fill"%in%names(g$data) & !"colour"%in%names(g$data)){
@@ -261,23 +250,20 @@ layer2list <- function(l, d, ranges){
     g$geom <- "path"
   } else if(g$geom=="contour" | g$geom=="density2d"){
     g$aes[["group"]] <- "piece"
-    # reset g$subord, g$subvars now that group aesthetic exists.
+    # reset g$subord now that group aesthetic exists.
     subset.vars <- c(some.vars, g$aes[names(g$aes)=="group"])
-    g$subord <- as.list(names(subset.vars))
-    g$subvars <- as.list(subset.vars)
+    g$subord <- as.character(names(subset.vars))
     g$geom <- "path"
   } else if(g$geom=="freqpoly"){
     g$geom <- "line"
-    # reset g$subord, g$subvars now that group aesthetic exists.
+    # reset g$subord now that group aesthetic exists.
     subset.vars <- c(some.vars, group="group")
-    g$subord <- as.list(names(subset.vars))
-    g$subvars <- as.list(subset.vars)
+    g$subord <- as.character(names(subset.vars))
   } else if(g$geom=="quantile"){
     g$geom <- "path"
-    # reset g$subord, g$subvars now that group aesthetic exists.
+    # reset g$subord now that group aesthetic exists.
     subset.vars <- c(some.vars, group="group")
-    g$subord <- as.list(names(subset.vars))
-    g$subvars <- as.list(subset.vars)
+    g$subord <- as.character(names(subset.vars))
   } else if(g$geom=="hex"){
     g$geom <- "polygon"
     ## TODO: for interactivity we will run into the same problems as
@@ -308,10 +294,9 @@ layer2list <- function(l, d, ranges){
       # Make outer border of 0 size if size isn't already specified.
       if(!"size"%in%names(g$data)) g$data[["size"]] <- 0 
     }
-    # reset g$subord, g$subvars now that group aesthetic exists.
+    # reset g$subord now that group aesthetic exists.
     subset.vars <- c(some.vars, group="group")
-    g$subord <- as.list(names(subset.vars))
-    g$subvars <- as.list(subset.vars)    
+    g$subord <- as.character(names(subset.vars))
   } else { 
     ## all other geoms are basic, and keep the same name.
     g$geom
@@ -335,9 +320,8 @@ layer2list <- function(l, d, ranges){
         g$aes <- g$aes[-which(names(g$aes)=="group")]
         ## remove group from aes listing
         subset.vars <- c(some.vars, g$aes[names(g$aes)=="group"])
-        ## recalculate subord/subvars.
-        g$subord <- as.list(names(subset.vars))
-        g$subvars <- as.list(subset.vars)
+        ## recalculate subord.
+        g$subord <- as.character(names(subset.vars))
       }
     }
   }
@@ -355,7 +339,112 @@ layer2list <- function(l, d, ranges){
     warning(sprintf("geom_%s with size=0 will be invisible",g$geom))
   }
   
+  ## Idea: use the ggplot2:::coord_transform(coords, data, scales)
+  ## function to handle cases like coord_flip. scales is a list of
+  ## 12, coords is a list(limits=list(x=NULL,y=NULL)) with class
+  ## e.g. c("cartesian","coord"). The result is a transformed data
+  ## frame where all the data values are between 0 and 1.
+  
+  ## TODO: coord_transform maybe won't work for 
+  ## geom_dotplot|rect|segment and polar/log transformations, which
+  ## could result in something nonlinear. For the time being it is
+  ## best to just ignore this, but you can look at the source of
+  ## e.g. geom-rect.r in ggplot2 to see how they deal with this by
+  ## doing a piecewise linear interpolation of the shape.
+
+  g$data <-
+    ggplot2:::coord_transform(meta$plot$coord,
+                              g$data,
+                              ranges)
+  
+  ## Output types
+  ## Check to see if character type is d3's rgb type. 
+  is.linetype <- function(x){
+    x <- tolower(x)
+    namedlinetype <-
+      x%in%c("blank", "solid", "dashed",
+             "dotted", "dotdash", "longdash", "twodash")
+    xsplit <- sapply(x, function(i){
+      sum(is.na(strtoi(strsplit(i,"")[[1]],16)))==0
+    })
+    namedlinetype | xsplit
+  }
+  g$types <- as.list(sapply(g$data, function(i) paste(class(i), collapse="-")))
+  charidx <- which(g$types=="character")
+  g$types[charidx] <- sapply(charidx, function(i) {
+    if(sum(!is.rgb(g$data[[i]]))==0){
+      "rgb"
+    }else if(sum(!is.linetype(g$data[[i]]))==0){
+      "linetype"
+    }else {
+      "character"
+    }
+  })
+  
+  ## convert ordered factors to unordered factors so javascript
+  ## doesn't flip out.
+  ordfactidx <- which(g$types=="ordered-factor")
+  if(length(ordfactidx)>0){
+    for(i in ordfactidx){
+      g$data[[i]] <- factor(as.character(g$data[[i]]))
+      g$types[[i]] <- "factor"
+    }
+  }
+
+  ## TODO:facets. Right now we delete PANEL info since it just takes
+  ## up space for no reason in the CSV database.
+  g$data <- g$data[names(g$data) != "PANEL"]
+  
+  ## Output data to csv.
+  g$classed <- sprintf("geom%d_%s_%s", meta$geom.count, g$geom, meta$plot.name)
+  meta$geom.count <- meta$geom.count + 1
+  meta$chunk.i <- 1
+  meta$classed <- g$classed
+  g$data <- saveChunks(g$data, g$subord, meta)
+  browser()
+  ## Finally save to the master geom list.
+  g$data <- list()
+  meta$geoms[[g$classed]] <- g
   g
+}
+
+saveChunks <- function(x, vars, meta){
+  if(is.data.frame(x)){
+    if(length(vars) == 0){
+      csv.name <- sprintf("%s_chunk%d.tsv", meta$classed, meta$chunk.i)
+      meta$chunk.i <- meta$chunk.i + 1
+      print(csv.name)
+      write.table(x,
+                  file.path(meta$out.dir, csv.name),
+                  quote=FALSE, row.names=FALSE, sep="\t")
+      csv.name
+    }else{
+      use <- vars[1]
+      rest <- vars[-1]
+      vec <- x[[use]]
+      if(all(table(x[[use]]) == 1)){ 
+        saveChunks(x, rest, meta) #do not split if they would all have 1 row.
+      }else{
+        df.list <- split(x[names(x) != use], vec)
+        saveChunks(df.list, rest, meta)
+      }
+    }
+  }else if(is.list(x)){
+    lapply(x, saveChunks, vars, meta)
+  }else{
+    str(x)
+    stop("unknown object")
+  }
+}
+
+##' Test if aesthetics are showSelected.
+##' @param x character vector.
+##' @return logical vector
+##' @export
+##' @author Toby Dylan Hocking
+is.showSelected <- function(x){
+  stopifnot(is.character(x))
+  grepl("showSelected", x)
 }
 
 #' Convert a list of ggplots to an interactive animation
@@ -447,36 +536,36 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
   meta$plots <- list()
   meta$geoms <- list()
   meta$selectors <- list()
+  dir.create(out.dir,showWarnings=FALSE)
+  meta$out.dir <- out.dir
   meta$geom.count <- 1
   
   ## Extract essential info from ggplots, reality checks.
-  for(plot.name in names(plot.list)){
-    p <- plot.list[[plot.name]]
+  for(list.name in names(plot.list)){
+    p <- plot.list[[list.name]]
     if(is.ggplot(p)){
       pattern <- "[a-zA-Z][a-zA-Z0-9].*"
-      if(!grepl(pattern, plot.name)){
+      if(!grepl(pattern, list.name)){
         stop("ggplot names must match ", pattern)
       }
-      meta$plot.name <- plot.name
       meta$plot <- p
+      meta$plot.name <- list.name
       parsePlot(meta)
+      meta$plots[[list.name]] <- meta$plot
+      stop("TODO save other meta for this plot")
     }else if(is.list(p)){ ## for options.
-      meta[[plot.name]] <- p
+      meta[[list.name]] <- p
     }else{
       stop("list items must be ggplots or option lists")
     }
   }
   
-  dir.create(out.dir,showWarnings=FALSE)
-  i <- 1 #geom counter.
   for(plot.name in names(plist)){
     p <- plist[[plot.name]]
     result$plots[[plot.name]]$geoms <- list()
     for(g in p$geoms){
-      g$classed <- sprintf("geom%d_%s_%s", i, g$geom, plot.name)
       result$plots[[plot.name]]$geoms <-
         c(result$plots[[plot.name]]$geoms, g$classed)
-      df.list[[g$classed]] <- g$data
       ## Construct the selector.
       for(sel.i in seq_along(g$update)){
         v.name <- g$update[[sel.i]]
@@ -488,39 +577,6 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
         result$selectors[[v.name]]$subset <-
           c(result$selectors[[v.name]]$subset, list(g$classed))
       }
-      ## Output data to csv.
-      csv.name <- sprintf("%s.csv", g$classed)
-      write.csv(g$data, file.path(out.dir, csv.name),
-                quote=FALSE,row.names=FALSE)
-      
-      ## Output types
-      ## Check to see if character type is d3's rgb type. 
-      is.linetype <- function(x){
-        x <- tolower(x)
-        namedlinetype <- x%in%c("blank", "solid", "dashed", "dotted", "dotdash", "longdash", "twodash")
-        xsplit <- sapply(x, function(i) sum(is.na(strtoi(strsplit(i,"")[[1]],16)))==0)
-        return(namedlinetype | xsplit)
-      }
-      g$types <- as.list(sapply(g$data, function(i) paste(class(i), collapse="-")))
-      charidx <- which(g$types=="character")
-      g$types[charidx] <- sapply(charidx, function(i) 
-        if(sum(!is.rgb(g$data[[i]]))==0){"rgb"
-        }else if(sum(!is.linetype(g$data[[i]]))==0){"linetype"
-        }else "character")
-      
-      # convert ordered factors to unordered factors so javascript doesn't flip out.
-      ordfactidx <- which(g$types=="ordered-factor")
-      if(length(ordfactidx)>0){
-        for(i in ordfactidx){
-          g$data[[i]] <- factor(as.character(g$data[[i]]))
-          g$types[[i]] <- "factor"
-        }
-      }
-      
-      g$data <- csv.name
-      ## Finally save to the master geom list.
-      result$geoms[[g$classed]] <- g
-      i <- i+1
     }
     result$plots[[plot.name]]$scales <- p$scales
     result$plots[[plot.name]]$options <- p$options
