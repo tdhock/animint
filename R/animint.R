@@ -450,25 +450,29 @@ saveLayer <- function(l, d, meta){
   ## clicked, we may need to download some new data for this
   ## geom. e.g. if chunk_order=list("segments", "samples") then if either
   ## segments or samples is clicked, we need to!
+  nest.cols <- NULL
   chunk.cols <- if(length(g$subset_order)){
     vec.list <- g.data[unlist(g$subset_order)]
     counts <- do.call(table, vec.list)
     if(all(counts == 1)){
-      vec.list <- vec.list[-length(vec.list)]
+      nest.cols <- names(vec.list)[length(vec.list)]
+      names(vec.list)[-length(vec.list)]
+    }else{
+      names(vec.list)
     }
-    names(vec.list)
   }
   
   ## Split into chunks and save tsv files.
   meta$classed <- g$classed
   meta$chunk.i <- 1
-  g$chunks <- saveChunks(g$data, chunk.cols, meta)
+  g$chunks <- saveChunks(g.data, chunk.cols, meta)
 
   ## Also add pointers to these chunks to the related selectors.
   if(length(chunk.cols)){
     selector.names <- as.character(g$aes[chunk.cols])
     chunk.name <- paste(selector.names, collapse="_")
     g$chunk_order <- as.list(selector.names)
+    g$nest_order <- as.list(g$aes[nest.cols])
     for(selector.name in selector.names){
       meta$selectors[[selector.name]]$chunks <-
         unique(c(meta$selectors[[selector.name]]$chunks, chunk.name))
@@ -476,7 +480,12 @@ saveLayer <- function(l, d, meta){
     chunk.list <- list(order=g$chunk_order, chunks=g$chunks)
     meta$chunks[[chunk.name]] <-
       c(meta$chunks[[chunk.name]], list(chunk.list))
+  }else{
+    g$chunk_order <- list()
+    g$nest_order <- list()
   }
+  names(g$chunk_order) <- NULL
+  names(g$nest_order) <- NULL
   
   ## Get unique values of time variable.
   if(length(time.col)){ # if this layer/geom is animated,
@@ -485,6 +494,8 @@ saveLayer <- function(l, d, meta){
 
   ## TODO: save the download order... if it is an animation then the
   ## download order should be in the same order.
+
+  print(g[c("chunk_order", "nest_order")])
   
   ## Finally save to the master geom list.
   meta$geoms[[g$classed]] <- g

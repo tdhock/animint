@@ -268,11 +268,15 @@ var animint = function (to_select, json_file) {
       draw_geom(g_info, g_info.data[tsv_name]);
     }else{
       var svg = SVGs[g_name];
-      svg.append("text")
-	.attr("class", "loading")
+      var loading = svg.append("text")
+	.attr("class", "loading"+tsv_name)
 	.text("Downloading "+tsv_name+"...")
+	.attr("font-size", 9)
+	.attr("y", 10)
+	.style("fill", "red")
+	//.attr("x", svg.attr("width")/2)
       ;
-      d3.csv(tsv_name, function (error, response) {
+      d3.tsv(tsv_name, function (error, response) {
 	// First convert to correct types.
 	response.forEach(function (d) {
           for (var v_name in g_info.types) {
@@ -304,6 +308,7 @@ var animint = function (to_select, json_file) {
 	});
 	var chunk = nest.map(response);
 	g_info.data[tsv_name] = chunk;
+	loading.remove();
 	draw_geom(g_info, chunk);
       });
     }
@@ -311,9 +316,11 @@ var animint = function (to_select, json_file) {
   // update_geom is responsible for obtaining a chunk of downloaded
   // data, and then calling draw_geom to actually draw it.
   var draw_geom = function(g_info, chunk){
-    g_info.subset_order.forEach(function (aes_name) {
+    var svg = SVGs[g_info.classed];
+    data = chunk;
+    g_info.nest_order.forEach(function (aes_name) {
       if (aes_name != "group") {
-        var v_name = g_info.subvars[aes_name];
+        var v_name = g_info.aes[aes_name];
         var value = Selectors[v_name].selected;
         if (data.hasOwnProperty(value)) {
           data = data[value];
@@ -1119,3 +1126,4 @@ var isArray = function(o) {
 }
 
 
+ 
