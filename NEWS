@@ -55,6 +55,16 @@ useful to use "margin convention" http://bl.ocks.org/mbostock/3019563
 
 coord_equal -- would be useful for maps e.g. examples/Tornadoes.R.
 
+The default/first selection should be specified by an option
+first=list(year=1960, country=c("Japan", "United States"). Stop with
+an error if multiple values are specified for a single selection
+variable.
+
+Legends can be interactive: clicking a legend entry shows/hides that
+subset of data. For example, when we say aes(color=variable), this
+should imply aes(showSelectedColor=variable) on that geom, and
+selection=list(variable="multiple") on that plot.
+
 For each selector variable, render a widget for selecting values:
 - single selection variable: <select> or <input type="radio">
 - multiple selection categorical variable: <input type="checkbox">
