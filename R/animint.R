@@ -119,8 +119,8 @@ parsePlot <- function(meta){
 #' @seealso \code{\link{gg2animint}}
 saveLayer <- function(l, d, meta){
   ranges <- meta$built$panel$ranges[[1]] #TODO:facets
-  g <- list(geom=l$geom$objname,
-            data=d)
+  g <- list(geom=l$geom$objname)
+  g.data <- d
   g$classed <-
     sprintf("geom%d_%s_%s",
             meta$geom.count, g$geom, meta$plot.name)
@@ -136,15 +136,15 @@ saveLayer <- function(l, d, meta){
     names(g$params[[p.name]]) <- NULL
   }
 
-  ## Make a list of variables to use for subsetting. subord is the
+  ## Make a list of variables to use for subsetting. subset_order is the
   ## order in which these variables will be accessed in the recursive
   ## JavaScript array structure.
 
-  ## subord IS in fact useful with geom_segment! For example, in
+  ## subset_order IS in fact useful with geom_segment! For example, in
   ## the first plot in the breakpointError example, the geom_segment has
   ## the following exported data in plot.json
 
-  ## "subord": [
+  ## "subset_order": [
   ##  "showSelected",
   ## "showSelected2" 
   ## ],
@@ -157,7 +157,7 @@ saveLayer <- function(l, d, meta){
   ## recursive array that can be accessed via
   ## data[segments][bases.per.probe] which is an un-named array
   ## e.g. [{row1},{row2},...] which will be bound to the <line> elements by
-  ## D3. The key point is that the subord array stores the order of the
+  ## D3. The key point is that the subset_order array stores the order of the
   ## indices that will be used to select the current subset of data (in
   ## this case showSelected=segments, showSelected2=bases.per.probe). The
   ## currently selected values of these variables are stored in
@@ -166,7 +166,7 @@ saveLayer <- function(l, d, meta){
   some.vars <- g$aes[is.showSelected(names(g$aes))]
   update.vars <- c(some.vars, g$aes[names(g$aes)=="clickSelects"])
   subset.vars <- c(some.vars, g$aes[names(g$aes)=="group"])
-  g$subord <- as.list(names(subset.vars))
+  g$subset_order <- as.list(names(subset.vars))
 
   ## Construct the selector.
   for(sel.i in seq_along(update.vars)){
@@ -174,7 +174,7 @@ saveLayer <- function(l, d, meta){
     col.name <- names(update.vars)[[sel.i]]
     if(!v.name %in% names(meta$selectors)){
       ## select the first one. TODO: customize.
-      value <- g$data[[col.name]][1]
+      value <- g.data[[col.name]][1]
       meta$selectors[[v.name]] <- list(selected=as.character(value))
     }
     meta$selectors[[v.name]]$update <-
@@ -204,11 +204,11 @@ saveLayer <- function(l, d, meta){
   ## in the draw method of the geoms.
   if(g$geom=="abline"){
     # "Trick" ggplot coord_transform into transforming the slope and intercept
-    g$data[,"x"] <- ranges$x.range[1]
-    g$data[,"xend"] <- ranges$x.range[2]
-    g$data[,"y"] <- g$data$slope*ranges$x.range[1]+g$data$intercept
-    g$data[,"yend"] <-  g$data$slope*ranges$x.range[2]+g$data$intercept
-    g$data <- as.data.frame(g$data)
+    g.data[,"x"] <- ranges$x.range[1]
+    g.data[,"xend"] <- ranges$x.range[2]
+    g.data[,"y"] <- g.data$slope*ranges$x.range[1]+g.data$intercept
+    g.data[,"yend"] <-  g.data$slope*ranges$x.range[2]+g.data$intercept
+    g.data <- as.data.frame(g.data)
     if(g$aes[["group"]]=="1"){ 
       # ggplot2 defaults to adding a group attribute
       # which misleads for situations where there are 
@@ -218,38 +218,38 @@ saveLayer <- function(l, d, meta){
       ## TODO: Figure out a better way to handle this...
       g$aes <- g$aes[-which(names(g$aes)=="group")]
       subset.vars <- c(some.vars, g$aes[names(g$aes)=="group"])
-      g$subord <- as.list(names(subset.vars))
+      g$subset_order <- as.list(names(subset.vars))
     } 
     g$geom <- "segment"
   } else if(g$geom=="point"){
     # Fill set to match ggplot2 default of filled in circle. 
-    if(!"fill"%in%names(g$data) & "colour"%in%names(g$data)){
-      g$data[["fill"]] <- g$data[["colour"]]
+    if(!"fill"%in%names(g.data) & "colour"%in%names(g.data)){
+      g.data[["fill"]] <- g.data[["colour"]]
     }
     ## group is meaningless for points, so delete it.
-    g$data <- g$data[names(g$data) != "group"]
+    g.data <- g.data[names(g.data) != "group"]
   } else if(g$geom=="segment"){
     ## group is meaningless for segments, so delete it.
-    g$data <- g$data[names(g$data) != "group"]
+    g.data <- g.data[names(g.data) != "group"]
   } else if(g$geom=="text"){
     ## group is meaningless for text, so delete it.
-    g$data <- g$data[names(g$data) != "group"]
+    g.data <- g.data[names(g.data) != "group"]
   } else if(g$geom=="rect"){
     ## group is meaningless for rects, so delete it.
-    g$data <- g$data[names(g$data) != "group"]
+    g.data <- g.data[names(g.data) != "group"]
   } else if(g$geom=="ribbon"){
     # Color set to match ggplot2 default of fill with no outside border.
-    if("fill"%in%names(g$data) & !"colour"%in%names(g$data)){
-      g$data[["colour"]] <- g$data[["fill"]]
+    if("fill"%in%names(g.data) & !"colour"%in%names(g.data)){
+      g.data[["colour"]] <- g.data[["fill"]]
     }
   } else if(g$geom=="density" | g$geom=="area"){
     g$geom <- "ribbon"
   } else if(g$geom=="tile" | g$geom=="raster" | g$geom=="histogram" ){
     # Color set to match ggplot2 default of tile with no outside border.
-    if(!"colour"%in%names(g$data) & "fill"%in%names(g$data)){
-      g$data[["colour"]] <- g$data[["fill"]]
+    if(!"colour"%in%names(g.data) & "fill"%in%names(g.data)){
+      g.data[["colour"]] <- g.data[["fill"]]
       # Make outer border of 0 size if size isn't already specified.
-      if(!"size"%in%names(g$data)) g$data[["size"]] <- 0 
+      if(!"size"%in%names(g.data)) g.data[["size"]] <- 0 
     }
     g$geom <- "rect"
   } else if(g$geom=="bar"){
@@ -263,43 +263,43 @@ saveLayer <- function(l, d, meta){
     ## that using our current JS code. There is a straightforward
     ## workaround: combine working geoms (rects, lines, and points).
 
-    g$data$outliers <- sapply(g$data$outliers, FUN=paste, collapse=" @ ") 
+    g.data$outliers <- sapply(g.data$outliers, FUN=paste, collapse=" @ ") 
     # outliers are specified as a list... change so that they are specified 
     # as a single string which can then be parsed in JavaScript.
     # there has got to be a better way to do this!!
   } else if(g$geom=="violin"){
-    x <- g$data$x
-    vw <- g$data$violinwidth
-    xmin <- g$data$xmin
-    xmax <- g$data$xmax
-    g$data$xminv <- x-vw*(x-xmin)
-    g$data$xmaxv <- x+vw*(xmax-x)
-    newdata <- ddply(g$data, .(group), function(df){
+    x <- g.data$x
+    vw <- g.data$violinwidth
+    xmin <- g.data$xmin
+    xmax <- g.data$xmax
+    g.data$xminv <- x-vw*(x-xmin)
+    g.data$xmaxv <- x+vw*(xmax-x)
+    newdata <- ddply(g.data, .(group), function(df){
                   rbind(arrange(transform(df, x=xminv), y), arrange(transform(df, x=xmaxv), -y))
                 })
     newdata <- ddply(newdata, .(group), function(df) rbind(df, df[1,]))
-    g$data <- newdata
+    g.data <- newdata
     g$geom <- "polygon"
   } else if(g$geom=="step"){
-    datanames <- names(g$data)
-    g$data <- ddply(g$data, .(group), function(df) ggplot2:::stairstep(df))
+    datanames <- names(g.data)
+    g.data <- ddply(g.data, .(group), function(df) ggplot2:::stairstep(df))
     g$geom <- "path"
   } else if(g$geom=="contour" | g$geom=="density2d"){
     g$aes[["group"]] <- "piece"
-    # reset g$subord now that group aesthetic exists.
+    # reset g$subset_order now that group aesthetic exists.
     subset.vars <- c(some.vars, g$aes[names(g$aes)=="group"])
-    g$subord <- as.list(names(subset.vars))
+    g$subset_order <- as.list(names(subset.vars))
     g$geom <- "path"
   } else if(g$geom=="freqpoly"){
     g$geom <- "line"
-    # reset g$subord now that group aesthetic exists.
+    # reset g$subset_order now that group aesthetic exists.
     subset.vars <- c(some.vars, group="group")
-    g$subord <- as.list(names(subset.vars))
+    g$subset_order <- as.list(names(subset.vars))
   } else if(g$geom=="quantile"){
     g$geom <- "path"
-    # reset g$subord now that group aesthetic exists.
+    # reset g$subset_order now that group aesthetic exists.
     subset.vars <- c(some.vars, group="group")
-    g$subord <- as.list(names(subset.vars))
+    g$subset_order <- as.list(names(subset.vars))
   } else if(g$geom=="hex"){
     g$geom <- "polygon"
     ## TODO: for interactivity we will run into the same problems as
@@ -308,31 +308,31 @@ saveLayer <- function(l, d, meta){
     ## clicking/hiding hexbins doesn't really make sense. Need to stop
     ## with an error if showSelected/clickSelects is used with hex.
     g$aes[["group"]] <- "group"
-    dx <- ggplot2::resolution(g$data$x, FALSE)
-    dy <- ggplot2::resolution(g$data$y, FALSE) / sqrt(3) / 2 * 1.15
+    dx <- ggplot2::resolution(g.data$x, FALSE)
+    dy <- ggplot2::resolution(g.data$y, FALSE) / sqrt(3) / 2 * 1.15
     hex <- as.data.frame(hexcoords(dx, dy))[,1:2]
     hex <- rbind(hex, hex[1,]) # to join hexagon back to first point
-    g$data$group <- as.numeric(interaction(g$data$group, 1:nrow(g$data)))
+    g.data$group <- as.numeric(interaction(g.data$group, 1:nrow(g.data)))
     ## this has the potential to be a bad assumption - 
     ##   by default, group is identically 1, if the user 
     ##   specifies group, polygons aren't possible to plot
     ##   using d3, because group will have a different meaning
     ##   than "one single polygon".
-    newdata <- ddply(g$data, .(group), function(df){
+    newdata <- ddply(g.data, .(group), function(df){
       df$xcenter <- df$x
       df$ycenter <- df$y
       cbind(x=df$x+hex$x, y=df$y+hex$y, df[,-which(names(df)%in%c("x", "y"))])
     })
-    g$data <- newdata
+    g.data <- newdata
     # Color set to match ggplot2 default of tile with no outside border.
-    if(!"colour"%in%names(g$data) & "fill"%in%names(g$data)){
-      g$data[["colour"]] <- g$data[["fill"]]
+    if(!"colour"%in%names(g.data) & "fill"%in%names(g.data)){
+      g.data[["colour"]] <- g.data[["fill"]]
       # Make outer border of 0 size if size isn't already specified.
-      if(!"size"%in%names(g$data)) g$data[["size"]] <- 0 
+      if(!"size"%in%names(g.data)) g.data[["size"]] <- 0 
     }
-    # reset g$subord now that group aesthetic exists.
+    # reset g$subset_order now that group aesthetic exists.
     subset.vars <- c(some.vars, group="group")
-    g$subord <- as.list(names(subset.vars))
+    g$subset_order <- as.list(names(subset.vars))
   } else { 
     ## all other geoms are basic, and keep the same name.
     g$geom
@@ -345,8 +345,8 @@ saveLayer <- function(l, d, meta){
   ## will only confuse the issue later.
   geom.aes.vars = g$aes[which(names(g$aes)%in%c("x", "y", "fill", "colour", "alpha", "size"))]
   grpidx <- which(names(g$aes)=="group")
-  if(length(grpidx)>0){
-    if(length(geom.aes.vars)>0 & nrow(g$data)!=nrow(l$data) & 
+  if(length(grpidx) > 0){
+    if(length(geom.aes.vars)>0 & nrow(g.data)!=nrow(l$data) & 
          !g$geom%in%c("ribbon","polygon","line", "path")){
       ## need to exclude geom_ribbon and geom_violin, since they are
       ## coded to allow group aesthetics because they use the d3 path
@@ -357,22 +357,22 @@ saveLayer <- function(l, d, meta){
         g$aes <- g$aes[-which(names(g$aes)=="group")]
         ## remove group from aes listing
         subset.vars <- c(some.vars, g$aes[names(g$aes)=="group"])
-        ## recalculate subord.
-        g$subord <- as.list(names(subset.vars))
+        ## recalculate subset_order.
+        g$subset_order <- as.list(names(subset.vars))
       }
     }
   }
   
   ##print("after group block")
   
-  ## Check g$data for color/fill - convert to hexadecimal so JS can parse correctly.
+  ## Check g.data for color/fill - convert to hexadecimal so JS can parse correctly.
   for(color.var in c("colour", "color", "fill")){
-    if(color.var %in% names(g$data)){
-      g$data[,color.var] <- toRGB(g$data[,color.var])
+    if(color.var %in% names(g.data)){
+      g.data[,color.var] <- toRGB(g.data[,color.var])
     }
   }
 
-  if(any(g$data$size == 0, na.rm=TRUE)){
+  if(any(g.data$size == 0, na.rm=TRUE)){
     warning(sprintf("geom_%s with size=0 will be invisible",g$geom))
   }
   
@@ -389,9 +389,9 @@ saveLayer <- function(l, d, meta){
   ## e.g. geom-rect.r in ggplot2 to see how they deal with this by
   ## doing a piecewise linear interpolation of the shape.
 
-  g$data <-
+  g.data <-
     ggplot2:::coord_transform(meta$plot$coord,
-                              g$data,
+                              g.data,
                               ranges)
   
   ## Output types
@@ -406,7 +406,7 @@ saveLayer <- function(l, d, meta){
     })
     namedlinetype | xsplit
   }
-  g$types <- sapply(g$data, function(x) {
+  g$types <- sapply(g.data, function(x) {
     type <- paste(class(x), collapse="-")
     if(type == "character"){
       if(sum(!is.rgb(x))==0){
@@ -425,15 +425,15 @@ saveLayer <- function(l, d, meta){
   ## doesn't flip out.
   ordfactidx <- which(g$types=="ordered-factor")
   for(i in ordfactidx){
-    g$data[[i]] <- factor(as.character(g$data[[i]]))
+    g.data[[i]] <- factor(as.character(g.data[[i]]))
     g$types[[i]] <- "factor"
   }
 
   ## TODO:facets. Right now we delete PANEL info since it just takes
   ## up space for no reason in the CSV database.
-  g$data <- g$data[names(g$data) != "PANEL"]
+  g.data <- g.data[names(g.data) != "PANEL"]
 
-  ## Make the time variable the first subord variable.
+  ## Make the time variable the first subset_order variable.
   time.col <- if(is.null(meta$time)){ # if this is not an animation,
     NULL
   }else{
@@ -441,17 +441,17 @@ saveLayer <- function(l, d, meta){
     names(g$aes)[g$aes==meta$time$var & click.or.show]
   }
   if(length(time.col)){
-    g$subord <- g$subord[order(g$subord != time.col)]
+    g$subset_order <- g$subset_order[order(g$subset_order != time.col)]
   }
   
   ## Determine which showSelected values to use for breaking the data
   ## into chunks. This list of variables should have the same names as
-  ## the selectors. E.g. if chunkord=list("year") then when year is
+  ## the selectors. E.g. if chunk_order=list("year") then when year is
   ## clicked, we may need to download some new data for this
-  ## geom. e.g. if chunkord=list("segments", "samples") then if either
+  ## geom. e.g. if chunk_order=list("segments", "samples") then if either
   ## segments or samples is clicked, we need to!
-  chunk.cols <- if(length(g$subord)){
-    vec.list <- g$data[unlist(g$subord)]
+  chunk.cols <- if(length(g$subset_order)){
+    vec.list <- g.data[unlist(g$subset_order)]
     counts <- do.call(table, vec.list)
     if(all(counts == 1)){
       vec.list <- vec.list[-length(vec.list)]
@@ -462,25 +462,25 @@ saveLayer <- function(l, d, meta){
   ## Split into chunks and save tsv files.
   meta$classed <- g$classed
   meta$chunk.i <- 1
-  g$data <- saveChunks(g$data, chunk.cols, meta)
+  g$chunks <- saveChunks(g$data, chunk.cols, meta)
 
   ## Also add pointers to these chunks to the related selectors.
   if(length(chunk.cols)){
     selector.names <- as.character(g$aes[chunk.cols])
     chunk.name <- paste(selector.names, collapse="_")
-    g$chunkord <- as.list(selector.names)
+    g$chunk_order <- as.list(selector.names)
     for(selector.name in selector.names){
       meta$selectors[[selector.name]]$chunks <-
         unique(c(meta$selectors[[selector.name]]$chunks, chunk.name))
     }
-    chunk.list <- list(order=g$chunkord, chunks=g$data)
+    chunk.list <- list(order=g$chunk_order, chunks=g$chunks)
     meta$chunks[[chunk.name]] <-
       c(meta$chunks[[chunk.name]], list(chunk.list))
   }
   
   ## Get unique values of time variable.
   if(length(time.col)){ # if this layer/geom is animated,
-    g$timeValues <- names(g$data)
+    g$timeValues <- names(g.data)
   }
 
   ## TODO: save the download order... if it is an animation then the
