@@ -5,35 +5,38 @@
 #' @seealso \code{\link{gg2animint}}
 parsePlot <- function(meta){
   meta$built <- ggplot2::ggplot_build(meta$plot)
-  for(sc in meta$built$plot$scales$scales){
+  plot.meta <- list()
+  for(sc in meta$plot$scales$scales){
     if(sc$scale_name == "manual"){
-      meta$scales[[sc$aesthetics]] <- sc$palette(0)
+      plot.meta$scales[[sc$aesthetics]] <- sc$palette(0)
     }else if(sc$scale_name == "brewer"){
-      meta$scales[[sc$aesthetics]] <- sc$palette(length(sc$range$range))
+      plot.meta$scales[[sc$aesthetics]] <- sc$palette(length(sc$range$range))
     }else if(sc$scale_name == "hue"){
-      meta$scales[[sc$aesthetics]] <- sc$palette(length(sc$range$range))
+      plot.meta$scales[[sc$aesthetics]] <- sc$palette(length(sc$range$range))
     }else if(sc$scale_name == "linetype_d"){
-      meta$scales[[sc$aesthetics]] <- sc$palette(length(sc$range$range))
+      plot.meta$scales[[sc$aesthetics]] <- sc$palette(length(sc$range$range))
     }else if(sc$scale_name == "alpha_c"){
-      meta$scales[[sc$aesthetics]] <- sc$palette(sc$range$range)
+      plot.meta$scales[[sc$aesthetics]] <- sc$palette(sc$range$range)
     }else if(sc$scale_name == "size_c"){
-      meta$scales[[sc$aesthetics]] <- sc$palette(sc$range$range)
+      plot.meta$scales[[sc$aesthetics]] <- sc$palette(sc$range$range)
     }else if(sc$scale_name == "gradient"){
-      meta$scales[[sc$aesthetics]] <- ggplot2:::scale_map(sc, ggplot2:::scale_breaks(sc))
+      plot.meta$scales[[sc$aesthetics]] <-
+        ggplot2:::scale_map(sc, ggplot2:::scale_breaks(sc))
     }
   }
-  for(i in seq_along(meta$built$plot$layers)){
-    cat(sprintf("%4d / %4d layers\n", i, length(meta$built$plot$layers)))
+  for(i in seq_along(meta$plot$layers)){
+    cat(sprintf("%4d / %4d layers\n", i, length(meta$plot$layers)))
     ## This is the layer from the original ggplot object.
-    L <- meta$built$plot$layers[[i]]
+    L <- meta$plot$layers[[i]]
 
     ## for each layer, there is a correpsonding data.frame which
     ## evaluates the aesthetic mapping.
     df <- meta$built$data[[i]]
 
     ## This extracts essential info for this geom/layer.
-    saveLayer(L, df, meta)
-    
+    g <- saveLayer(L, df, meta)
+
+    plot.meta$geoms <- c(plot.meta$geoms, g$classed)
   }
   # Export axis specification as a combination of breaks and
   # labels, on the relevant axis scale (i.e. so that it can
@@ -46,50 +49,73 @@ parsePlot <- function(meta){
   ## of this. Do this BEFORE checking if it is blank or not, so that
   ## individual axes can be hidden appropriately, e.g. #1.
   ranges <- meta$built$panel$ranges[[1]]
-  if("flip"%in%attr(meta$built$plot$coordinates, "class")){
-    temp <- meta$built$plot$labels$x
-    meta$built$plot$labels$x <- meta$built$plot$labels$y
-    meta$built$plot$labels$y <- temp
+  if("flip"%in%attr(meta$plot$coordinates, "class")){
+    temp <- meta$plot$labels$x
+    meta$plot$labels$x <- meta$plot$labels$y
+    meta$plot$labels$y <- temp
   }
   is.blank <- function(el.name){
     x <- ggplot2::calc_element(el.name, meta$plot$theme)
     "element_blank"%in%attr(x,"class")
   }
-  meta$axis <- list()
+  plot.meta$axis <- list()
   for(xy in c("x","y")){
     s <- function(tmp)sprintf(tmp, xy)
-    meta$axis[[xy]] <- ranges[[s("%s.major")]]
-    meta$axis[[s("%slab")]] <- if(is.blank(s("axis.text.%s"))){
+    plot.meta$axis[[xy]] <- ranges[[s("%s.major")]]
+    plot.meta$axis[[s("%slab")]] <- if(is.blank(s("axis.text.%s"))){
       NULL
     }else{
       ranges[[s("%s.labels")]]
     }
-    meta$axis[[s("%srange")]] <- ranges[[s("%s.range")]]
-    meta$axis[[s("%sname")]] <- if(is.blank(s("axis.title.%s"))){
+    plot.meta$axis[[s("%srange")]] <- ranges[[s("%s.range")]]
+    plot.meta$axis[[s("%sname")]] <- if(is.blank(s("axis.title.%s"))){
       ""
     }else{
-      meta$built$plot$labels[[xy]]
+      meta$plot$labels[[xy]]
     }
-    meta$axis[[s("%sline")]] <- !is.blank(s("axis.line.%s"))
-    meta$axis[[s("%sticks")]] <- !is.blank(s("axis.ticks.%s"))
+    plot.meta$axis[[s("%sline")]] <- !is.blank(s("axis.line.%s"))
+    plot.meta$axis[[s("%sticks")]] <- !is.blank(s("axis.ticks.%s"))
   }
   
-  meta$legend <- getLegendList(meta$built)
-  if(length(meta$legend)>0){
-    meta$legend <- meta$legend[which(sapply(meta$legend, function(i) length(i)>0))]
+  plot.meta$legend <- getLegendList(meta$built)
+  if(length(plot.meta$legend)>0){
+    plot.meta$legend <-
+      plot.meta$legend[which(sapply(plot.meta$legend, function(i) {
+        length(i)>0
+      }))]
   }  # only pass out legends that have guide = "legend" or guide="colorbar"
   
   # Remove legend if theme has no legend position
-  if(theme.pars$legend.position=="none") meta$legend <- NULL
+  if(theme.pars$legend.position=="none") plot.meta$legend <- NULL
   
   if("element_blank"%in%attr(theme.pars$plot.title, "class")){
-    meta$title <- ""
+    plot.meta$title <- ""
   } else {
-    meta$title <- meta$built$plot$labels$title
+    plot.meta$title <- meta$plot$labels$title
   }
   
-  meta$options <- list(width=400,height=400)
-  meta
+  plot.meta$options <- list(width=400,height=400)
+
+  result$plots
+
+    for(plot.name in names(plist)){
+    p <- plist[[plot.name]]
+    result$plots[[plot.name]]$geoms <- list()
+    for(g in p$geoms){
+      result$plots[[plot.name]]$geoms <-
+        c(result$plots[[plot.name]]$geoms, g$classed)
+    }
+  }
+  ## add nextgeom so that drawing order is preserved.
+  
+  if(length(result$geoms)-1>0){
+    for(i in 1:(length(result$geoms)-1)){
+      result$geoms[[i]]$nextgeom <- result$geoms[[i+1]]$classed
+    }
+  }
+
+
+  meta[[meta$plot.name]] <- plot.meta
 }
 
 #' Convert a layer to a list. 
@@ -470,6 +496,8 @@ saveLayer <- function(l, d, meta){
   
   ## Finally save to the master geom list.
   meta$geoms[[g$classed]] <- g
+
+  g
 }
 
 ##' Split data set into chunks and save them to separate files.
@@ -630,8 +658,6 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
       meta$plot <- p
       meta$plot.name <- list.name
       parsePlot(meta)
-      meta$plots[[list.name]] <- meta$plot
-      stop("TODO save other meta for this plot")
     }else if(is.list(p)){ ## for options.
       meta[[list.name]] <- p
     }else{
@@ -639,27 +665,6 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
     }
   }
   
-  for(plot.name in names(plist)){
-    p <- plist[[plot.name]]
-    result$plots[[plot.name]]$geoms <- list()
-    for(g in p$geoms){
-      result$plots[[plot.name]]$geoms <-
-        c(result$plots[[plot.name]]$geoms, g$classed)
-    }
-    result$plots[[plot.name]]$scales <- p$scales
-    result$plots[[plot.name]]$options <- p$options
-    result$plots[[plot.name]]$ranges <- p$ranges
-    result$plots[[plot.name]]$axis <- p$axis
-    result$plots[[plot.name]]$title <- p$title
-    result$plots[[plot.name]]$legend <- p$legend
-  }
-  ## add nextgeom so that drawing order is preserved.
-  
-  if(length(result$geoms)-1>0){
-    for(i in 1:(length(result$geoms)-1)){
-      result$geoms[[i]]$nextgeom <- result$geoms[[i+1]]$classed
-    }
-  }
   ## Go through options and add to the list.
   for(v.name in names(olist$duration)){
     for(g.name in result$selectors[[v.name]]$subset){
