@@ -24,25 +24,36 @@ parsePlot <- function(meta){
         ggplot2:::scale_map(sc, ggplot2:::scale_breaks(sc))
     }
   }
-  for(i in seq_along(meta$plot$layers)){
-    cat(sprintf("%4d / %4d layers\n", i, length(meta$plot$layers)))
+  for(layer.i in seq_along(meta$plot$layers)){
+    ##cat(sprintf("%4d / %4d layers\n", layer.i, length(meta$plot$layers)))
+    
     ## This is the layer from the original ggplot object.
-    L <- meta$plot$layers[[i]]
+    L <- meta$plot$layers[[layer.i]]
 
     ## for each layer, there is a correpsonding data.frame which
     ## evaluates the aesthetic mapping.
-    df <- meta$built$data[[i]]
+    df <- meta$built$data[[layer.i]]
 
     ## This extracts essential info for this geom/layer.
     g <- saveLayer(L, df, meta)
 
     plot.meta$geoms <- c(plot.meta$geoms, g$classed)
   }
-  # Export axis specification as a combination of breaks and
-  # labels, on the relevant axis scale (i.e. so that it can
-  # be passed into d3 on the x axis scale instead of on the 
-  # grid 0-1 scale). This allows transformations to be used 
-  # out of the box, with no additional d3 coding. 
+  ## For each geom, save the nextgeom to preserve drawing order.
+  n.next <- length(plot.meta$geoms) - 1
+  if(n.next){
+    for(geom.i in 1:n.next){
+      geom.prev <- plot.meta$geoms[[geom.i]]
+      geom.next <- plot.meta$geoms[[geom.i + 1]]
+      meta$geoms[[geom.prev]]$nextgeom <- meta$geoms[[geom.next]]$classed
+    }
+  }
+                                        
+  ## Export axis specification as a combination of breaks and
+  ## labels, on the relevant axis scale (i.e. so that it can
+  ## be passed into d3 on the x axis scale instead of on the 
+  ## grid 0-1 scale). This allows transformations to be used 
+  ## out of the box, with no additional d3 coding. 
   theme.pars <- ggplot2:::plot_theme(meta$plot)  
   
   ## Flip labels if coords are flipped - transform does not take care
@@ -96,26 +107,7 @@ parsePlot <- function(meta){
   
   plot.meta$options <- list(width=400,height=400)
 
-  result$plots
-
-    for(plot.name in names(plist)){
-    p <- plist[[plot.name]]
-    result$plots[[plot.name]]$geoms <- list()
-    for(g in p$geoms){
-      result$plots[[plot.name]]$geoms <-
-        c(result$plots[[plot.name]]$geoms, g$classed)
-    }
-  }
-  ## add nextgeom so that drawing order is preserved.
-  
-  if(length(result$geoms)-1>0){
-    for(i in 1:(length(result$geoms)-1)){
-      result$geoms[[i]]$nextgeom <- result$geoms[[i+1]]$classed
-    }
-  }
-
-
-  meta[[meta$plot.name]] <- plot.meta
+  meta$plots[[meta$plot.name]] <- plot.meta
 }
 
 #' Convert a layer to a list. 
@@ -666,23 +658,23 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
   }
   
   ## Go through options and add to the list.
-  for(v.name in names(olist$duration)){
-    for(g.name in result$selectors[[v.name]]$subset){
-      result$geoms[[g.name]]$duration <- olist$duration[[v.name]]
+  for(v.name in names(meta$duration)){
+    for(g.name in meta$selectors[[v.name]]$subset){
+      meta$geoms[[g.name]]$duration <- meta$duration[[v.name]]
     }
   }
   ## Set plot sizes.
   for(d in c("width","height")){
-    size <- olist[[d]]
+    size <- meta[[d]]
     if(is.list(size)){
       if(is.null(names(size))){ #use this size for all plots.
-        for(plot.name in names(result$plots)){
-          result$plots[[plot.name]]$options[[d]] <- size[[1]]
+        for(plot.name in names(meta$plots)){
+          meta$plots[[plot.name]]$options[[d]] <- size[[1]]
         }
       }else{ #use the size specified for the named plot.
         for(plot.name in names(size)){
-          if(plot.name %in% names(result$plots)){
-            result$plots[[plot.name]]$options[[d]] <- size[[plot.name]]
+          if(plot.name %in% names(meta$plots)){
+            meta$plots[[plot.name]]$options[[d]] <- size[[plot.name]]
           }else{
             stop("no ggplot named ", plot.name)
           }
@@ -694,29 +686,33 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
   ## These geoms need to be updated when the time.var is animated, so
   ## let's make a list of all possible values to cycle through, from
   ## all the values used in those geoms.
-  geom.names <- result$selectors[[v.name]]$subset
-  anim.values <- sapply(meta$geoms, "[[", "timeValues")
-  for(g.name in geom.names){
-    g <- result$geoms[[g.name]]
-    if(!is.null(values <- g$time.values)){
-      anim.values[[g.name]] <- as.character(sort(unique()))
+  if("time" %in% ls(plot.list)){
+    geom.names <- meta$selectors[[v.name]]$subset
+    anim.values <- sapply(meta$geoms, "[[", "timeValues")
+    for(g.name in geom.names){
+      g <- meta$geoms[[g.name]]
+      if(!is.null(values <- g$time.values)){
+        anim.values[[g.name]] <- as.character(sort(unique()))
+      }
     }
+    meta$time$sequence <- unique(unlist(anim.values))
   }
-  meta$time$sequence <- unique(unlist(anim.values))
 
   ## Also, figure out the download order:
-  meta$
 
   ## Finally, copy html/js/json files to out.dir.
   src.dir <- system.file("htmljs",package="animint")
   to.copy <- Sys.glob(file.path(src.dir, "*"))
   file.copy(to.copy, out.dir, overwrite=TRUE, recursive=TRUE)
-  json <- RJSONIO::toJSON(result)
+  export.names <-
+    c("geoms", "time", "duration", "selectors", "plots", "chunks")
+  export.data <- as.list(meta)[export.names]
+  json <- RJSONIO::toJSON(export.data)
   cat(json,file=file.path(out.dir,"plot.json"))
   if(open.browser){
     browseURL(sprintf("%s/index.html",out.dir))
   }
-  invisible(result)
+  invisible(meta)
   ### An invisible copy of the R list that was exported to JSON.
 }
 
