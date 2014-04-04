@@ -55,9 +55,11 @@ useful to use "margin convention" http://bl.ocks.org/mbostock/3019563
 
 coord_equal -- would be useful for maps e.g. examples/Tornadoes.R.
 
-Render a <select> for each selector variable, so long lists
-like this are not necessary.
-https://github.com/vdimarco/dojo1/blob/master/hocking-canada-cities-viz.R
+For each selector variable, render a widget for selecting values:
+- single selection variable: <select> or <input type="radio">
+- multiple selection categorical variable: <input type="checkbox">
+- multiple selection numeric/datetime variable: crossfilter.js
+http://square.github.io/crossfilter/
 
 Allow other variable names for the same selection variable,
 e.g. insert and insert.show are 2 different columns in
