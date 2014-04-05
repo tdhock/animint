@@ -7,6 +7,8 @@
 var animint = function (to_select, json_file) {
   var element = d3.select(to_select);
   this.element = element;
+  var Widgets = {};
+  this.Widgets = Widgets;
   var Selectors = {};
   this.Selectors = Selectors;
   var Plots = {};
@@ -80,6 +82,13 @@ var animint = function (to_select, json_file) {
     }else{
       g_info.select_style = "opacity";
     }
+    // Add a row to the loading table.
+    g_info.tr = Widgets["loading"].append("tr");
+    g_info.tr.append("td").text(g_name);
+    g_info.tr.append("td").attr("class", "chunk");
+    g_info.tr.append("td").attr("class", "status").text("initialized");
+    g_info.tr.append("td").attr("class", "downloaded").text(0);
+    g_info.tr.append("td").text(g_info.total);
     // Save this geom and load it!
     g_info.data = {};
     Geoms[g_name] = g_info;
@@ -264,9 +273,11 @@ var animint = function (to_select, json_file) {
       tsv_name = tsv_name[value];
     });
     // get the data if it has not yet been downloaded.
+    g_info.tr.select("td.chunk").text(tsv_name);
     if(g_info.data.hasOwnProperty(tsv_name)){
       draw_geom(g_info, g_info.data[tsv_name]);
     }else{
+      g_info.tr.select("td.status").text("downloading");
       var svg = SVGs[g_name];
       var loading = svg.append("text")
 	.attr("class", "loading"+tsv_name)
@@ -309,6 +320,7 @@ var animint = function (to_select, json_file) {
 	var chunk = nest.map(response);
 	g_info.data[tsv_name] = chunk;
 	loading.remove();
+	g_info.tr.select("td.downloaded").text(d3.keys(g_info.data).length);
 	draw_geom(g_info, chunk);
       });
     }
@@ -316,6 +328,7 @@ var animint = function (to_select, json_file) {
   // update_geom is responsible for obtaining a chunk of downloaded
   // data, and then calling draw_geom to actually draw it.
   var draw_geom = function(g_info, chunk){
+    g_info.tr.select("td.status").text("displayed");
     var svg = SVGs[g_info.classed];
     var data = chunk;
     g_info.subset_order.forEach(function (aes_name) {
@@ -1019,7 +1032,9 @@ var animint = function (to_select, json_file) {
       document.head.appendChild(css);   
     }
     // First add chunks which define TSV data files for each subset of
-    // data which is displayed at once.
+    // data which is displayed at once. TODO: currently this is not
+    // used, but it may be useful when we want to load all data before
+    // actually clicking to show it.
     for(var c_name in response.chunks){
       add_chunk(c_name, response.chunks[c_name]);
     }
@@ -1027,6 +1042,15 @@ var animint = function (to_select, json_file) {
     for (var s_name in response.selectors) {
       add_selector(s_name, response.selectors[s_name]);
     }
+    // loading table.
+    var loading = element.append("table");
+    Widgets["loading"] = loading;
+    var tr = loading.append("tr");
+    tr.append("th").text("geom");
+    tr.append("th").attr("class", "chunk").text("selected chunk");
+    tr.append("th").attr("class", "status").text("status");
+    tr.append("th").attr("class", "downloaded").text("downloaded");
+    tr.append("th").attr("class", "total").text("total");
     // Add geoms and construct nest operators.
     for (var g_name in response.geoms) {
       add_geom(g_name, response.geoms[g_name]);

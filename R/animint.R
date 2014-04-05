@@ -442,12 +442,12 @@ saveLayer <- function(l, d, meta){
       names(vec.list)
     }
   }
-  print(chunk.cols)
   
   ## Split into chunks and save tsv files.
   meta$classed <- g$classed
   meta$chunk.i <- 1
   g$chunks <- saveChunks(g.data, chunk.cols, meta)
+  g$total <- length(unlist(g$chunks))
 
   ## Also add pointers to these chunks to the related selectors.
   if(length(chunk.cols)){
