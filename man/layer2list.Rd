@@ -1,6 +1,6 @@
 \name{layer2list}
 \alias{layer2list}
-\title{Convert a layer to a list. Called from gg2list()}
+\title{Convert a layer to a list.}
 \usage{
 layer2list(l, d, ranges)
 }
@@ -17,7 +17,7 @@ list representing a layer, with corresponding aesthetics,
 ranges, and groups.
 }
 \description{
-Convert a layer to a list. Called from gg2list()
+Convert a layer to a list.
 }
 \seealso{
 \code{\link{gg2animint}}

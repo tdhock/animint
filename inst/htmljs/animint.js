@@ -7,6 +7,8 @@
 var animint = function (to_select, json_file) {
   var element = d3.select(to_select);
   this.element = element;
+  var Widgets = {};
+  this.Widgets = Widgets;
   var Selectors = {};
   this.Selectors = Selectors;
   var Plots = {};
@@ -17,6 +19,8 @@ var animint = function (to_select, json_file) {
   this.SVGs = SVGs;
   var Animation = {};
   this.Animation = Animation;
+  var Chunks = {};
+  this.Chunks = Chunks;
   var all_geom_names = {};
   this.all_geom_names = all_geom_names;
   
@@ -64,48 +68,31 @@ var animint = function (to_select, json_file) {
     }
   };
 
+  var add_chunk = function(c_name, c_info){
+    Chunks[c_name] = c_info;
+  }
+
   var add_geom = function (g_name, g_info) {
-    d3.csv(g_info.data, function (error, response) {
-      // First convert to correct types.
-      response.forEach(function (d) {
-        for (var v_name in g_info.types) {
-          var r_type = g_info.types[v_name];
-          if (r_type == "integer") {
-            d[v_name] = parseInt(d[v_name]);
-          } else if (r_type == "numeric") {
-            d[v_name] = parseFloat(d[v_name]);
-          } else if (r_type == "factor") {
-            //keep it as a character.
-          } else if (r_type == "rgb") {
-            //keep it as a character.                
-          } else if (r_type == "linetype") {
-            //keep it as a character. 
-          } else if (r_type == "label") {
-            //keep it as a character
-          } else if (r_type == "character" & v_name == "outliers") {
-            d[v_name] = parseFloat(d[v_name].split(" @ "));
-          } else {
-            throw "unsupported R type " + r_type;
-          }
-        }
-      });
-      var nest = d3.nest();
-      g_info.subord.forEach(function (v_name) {
-        nest.key(function (d) {
-          return d[v_name];
-        });
-      });
-      g_info.data = nest.map(response);
-      // Determine what style to use to show the current selection.
-      if(g_info.aes.hasOwnProperty("fill") && 
-	 !g_info.aes.hasOwnProperty("colour")){
-	g_info.select_style = "stroke";
-      }else{
-	g_info.select_style = "opacity";
-      }
-      Geoms[g_name] = g_info;
-      update_geom(g_name);
-    });
+    // Determine what style to use to show the selection for this
+    // geom. This is a hack and should be removed when we implement
+    // the selected.color, selected.size, etc aesthetics.
+    if(g_info.aes.hasOwnProperty("fill") && 
+       !g_info.aes.hasOwnProperty("colour")){
+      g_info.select_style = "stroke";
+    }else{
+      g_info.select_style = "opacity";
+    }
+    // Add a row to the loading table.
+    g_info.tr = Widgets["loading"].append("tr");
+    g_info.tr.append("td").text(g_name);
+    g_info.tr.append("td").attr("class", "chunk");
+    g_info.tr.append("td").attr("class", "status").text("initialized");
+    g_info.tr.append("td").attr("class", "downloaded").text(0);
+    g_info.tr.append("td").text(g_info.total);
+    // Save this geom and load it!
+    g_info.data = {};
+    Geoms[g_name] = g_info;
+    update_geom(g_name);
   }
   var add_plot = function (p_name, p_info) {
     // Each plot may have one or more legends. To make space for the
@@ -275,13 +262,85 @@ var animint = function (to_select, json_file) {
   var add_selector = function (s_name, s_info) {
     Selectors[s_name] = s_info;
   }
+  // update_geom is called from add_geom and update_selector. It
+  // downloads data if necessary, and then calls draw_geom.
   var update_geom = function (g_name) {
-    var svg = SVGs[g_name];
     var g_info = Geoms[g_name];
-    var data = g_info.data;
-    g_info.subord.forEach(function (aes_name) {
+    // First apply chunk_order selector variables.
+    var tsv_name = g_info.chunks;
+    g_info.chunk_order.forEach(function (v_name) {
+      var value = Selectors[v_name].selected;
+      if(tsv_name.hasOwnProperty(value)){
+	tsv_name = tsv_name[value];
+      }else{
+	tsv_name = null; // no data to show in this subset.
+      }
+    });
+    if(tsv_name == null){
+      return;
+    }
+    // get the data if it has not yet been downloaded.
+    g_info.tr.select("td.chunk").text(tsv_name);
+    if(g_info.data.hasOwnProperty(tsv_name)){
+      draw_geom(g_info, g_info.data[tsv_name]);
+    }else{
+      g_info.tr.select("td.status").text("downloading");
+      var svg = SVGs[g_name];
+      var loading = svg.append("text")
+	.attr("class", "loading"+tsv_name)
+	.text("Downloading "+tsv_name+"...")
+	.attr("font-size", 9)
+	.attr("y", 10)
+	.style("fill", "red")
+	//.attr("x", svg.attr("width")/2)
+      ;
+      d3.tsv(tsv_name, function (error, response) {
+	// First convert to correct types.
+	response.forEach(function (d) {
+          for (var v_name in g_info.types) {
+            var r_type = g_info.types[v_name];
+            if (r_type == "integer") {
+              d[v_name] = parseInt(d[v_name]);
+            } else if (r_type == "numeric") {
+              d[v_name] = parseFloat(d[v_name]);
+            } else if (r_type == "factor") {
+              //keep it as a character.
+            } else if (r_type == "rgb") {
+              //keep it as a character.                
+            } else if (r_type == "linetype") {
+              //keep it as a character. 
+            } else if (r_type == "label") {
+              //keep it as a character
+            } else if (r_type == "character" & v_name == "outliers") {
+              d[v_name] = parseFloat(d[v_name].split(" @ "));
+            } else {
+              throw "unsupported R type " + r_type;
+            }
+          }
+	});
+	var nest = d3.nest();
+	g_info.nest_order.forEach(function (v_name) {
+          nest.key(function (d) {
+            return d[v_name];
+          });
+	});
+	var chunk = nest.map(response);
+	g_info.data[tsv_name] = chunk;
+	loading.remove();
+	g_info.tr.select("td.downloaded").text(d3.keys(g_info.data).length);
+	draw_geom(g_info, chunk);
+      });
+    }
+  }
+  // update_geom is responsible for obtaining a chunk of downloaded
+  // data, and then calling draw_geom to actually draw it.
+  var draw_geom = function(g_info, chunk){
+    g_info.tr.select("td.status").text("displayed");
+    var svg = SVGs[g_info.classed];
+    var data = chunk;
+    g_info.subset_order.forEach(function (aes_name) {
       if (aes_name != "group") {
-        var v_name = g_info.subvars[aes_name];
+        var v_name = g_info.aes[aes_name];
         var value = Selectors[v_name].selected;
         if (data.hasOwnProperty(value)) {
           data = data[value];
@@ -381,7 +440,7 @@ var animint = function (to_select, json_file) {
     var eActions, eAppend;
 
     if (g_info.geom == "line" || g_info.geom == "path" || g_info.geom ==
-      "polygon" || g_info.geom == "ribbon") {
+	"polygon" || g_info.geom == "ribbon") {
 
       // Lines, paths, polygons, and ribbons are a bit special. For
       // every unique value of the group variable, we take the
@@ -489,31 +548,36 @@ var animint = function (to_select, json_file) {
         })
           .style("fill", function (group_info) {
             if (g_info.geom == "line" || g_info.geom == "path") {
-              return ("none")
+              return "none";
             }
             var one_group = data[group_info.value];
-            var one_row = one_group[0]; // take color for first value in the group
-            return (get_fill(one_row));
+            var one_row = one_group[0];
+	    // take color for first value in the group
+            return get_fill(one_row);
           })
           .style("stroke-width", function (group_info) {
             var one_group = data[group_info.value];
-            var one_row = one_group[0]; // take size for first value in the group
-            return (get_size(one_row));
+            var one_row = one_group[0];
+	    // take size for first value in the group
+            return get_size(one_row);
           })
           .style("stroke", function (group_info) {
             var one_group = data[group_info.value];
-            var one_row = one_group[0]; // take color for first value in the group
-            return (get_colour(one_row));
+            var one_row = one_group[0];
+	    // take color for first value in the group
+            return get_colour(one_row);
           })
           .style("stroke-dasharray", function (group_info) {
             var one_group = data[group_info.value];
-            var one_row = one_group[0]; // take linetype for first value in the group
-            return (get_dasharray(one_row));
+            var one_row = one_group[0];
+	    // take linetype for first value in the group
+            return get_dasharray(one_row);
           })
           .style("stroke-width", function (group_info) {
             var one_group = data[group_info.value];
-            var one_row = one_group[0]; // take line size for first value in the group
-            return (get_size(one_row));
+            var one_row = one_group[0]; 
+	    // take line size for first value in the group
+            return get_size(one_row);
           });
       }
       eAppend = "path";
@@ -843,7 +907,7 @@ var animint = function (to_select, json_file) {
   }
   var update_selector = function (v_name, value) {
     Selectors[v_name].selected = value;
-    Selectors[v_name].subset.forEach(update_geom);
+    Selectors[v_name].update.forEach(update_geom);
     //Selectors[v_name].hilite.forEach(update_geom);
   }
   var ifSelectedElse = function (d, v_name, selected, not_selected) {
@@ -863,9 +927,9 @@ var animint = function (to_select, json_file) {
       return d3.keys(Geoms).indexOf(x)!=-1;
     }
     if(all_geom_names.every(geomLoaded)){
-	    update_selector(v_name, next);
+      update_selector(v_name, next);
     }
- } 
+  } 
 
   //The main idea of how legends work:
 
@@ -879,10 +943,10 @@ var animint = function (to_select, json_file) {
     var tdRight = element.select("td#"+p_name+"_legend");
     var legendkeys = d3.keys(p_info.legend);
     for(var i=0; i<legendkeys.length; i++){
-	    // the table that contains one row for each legend element.
-	    var legend_table = tdRight.append("table").append("tr")
-                                .append("th").attr("align", "left")
-                                .text(p_info.legend[legendkeys[i]].title);
+      // the table that contains one row for each legend element.
+      var legend_table = tdRight.append("table").append("tr")
+        .append("th").attr("align", "left")
+        .text(p_info.legend[legendkeys[i]].title);
       var l_info = p_info.legend[legendkeys[i]];
       // the legend table with breaks/value/label.
       var legendgeoms = l_info.geoms;
@@ -974,10 +1038,26 @@ var animint = function (to_select, json_file) {
       css.appendChild(document.createTextNode(styles.join(" ")));
       document.head.appendChild(css);   
     }
-    // Add selectors.
+    // First add chunks which define TSV data files for each subset of
+    // data which is displayed at once. TODO: currently this is not
+    // used, but it may be useful when we want to load all data before
+    // actually clicking to show it.
+    for(var c_name in response.chunks){
+      add_chunk(c_name, response.chunks[c_name]);
+    }
+    // Then add selectors and start downloading the first data subset.
     for (var s_name in response.selectors) {
       add_selector(s_name, response.selectors[s_name]);
     }
+    // loading table.
+    var loading = element.append("table");
+    Widgets["loading"] = loading;
+    var tr = loading.append("tr");
+    tr.append("th").text("geom");
+    tr.append("th").attr("class", "chunk").text("selected chunk");
+    tr.append("th").attr("class", "status").text("status");
+    tr.append("th").attr("class", "downloaded").text("downloaded");
+    tr.append("th").attr("class", "total").text("total");
     // Add geoms and construct nest operators.
     for (var g_name in response.geoms) {
       add_geom(g_name, response.geoms[g_name]);
@@ -1005,29 +1085,29 @@ var animint = function (to_select, json_file) {
 }
 
 var measureText = function (pText, pFontSize, pStyle) {
-    var lDiv = document.createElement('lDiv');
+  var lDiv = document.createElement('lDiv');
 
-    document.body.appendChild(lDiv);
+  document.body.appendChild(lDiv);
 
-    if (pStyle != null) {
-        lDiv.style = pStyle;
-    }
-    lDiv.style.fontSize = "" + pFontSize + "px";
-    lDiv.style.position = "absolute";
-    lDiv.style.left = -1000;
-    lDiv.style.top = -1000;
+  if (pStyle != null) {
+    lDiv.style = pStyle;
+  }
+  lDiv.style.fontSize = "" + pFontSize + "px";
+  lDiv.style.position = "absolute";
+  lDiv.style.left = -1000;
+  lDiv.style.top = -1000;
 
-    lDiv.innerHTML = pText;
+  lDiv.innerHTML = pText;
 
-    var lResult = {
-        width: lDiv.clientWidth,
-        height: lDiv.clientHeight
-    };
+  var lResult = {
+    width: lDiv.clientWidth,
+    height: lDiv.clientHeight
+  };
 
-    document.body.removeChild(lDiv);
-    lDiv = null;
+  document.body.removeChild(lDiv);
+  lDiv = null;
 
-    return lResult;
+  return lResult;
 }
 
 var linetypesize2dasharray = function (lt, size) {
@@ -1043,27 +1123,27 @@ var linetypesize2dasharray = function (lt, size) {
       6: size * 2 + "," + size * 2 + "," + size * 6 + "," + size * 2
     };
   } else { //R defined line types
-      var o = {
-        "blank": size * 0 + "," + size * 10,
-        "solid": 0,
-        "dashed": size * 4 + "," + size * 4,
-        "dotted": size + "," + size * 2,
-        "dotdash": size + "," + size * 2 + "," + size * 4 + "," + size * 2,
-        "longdash": size * 8 + "," + size * 4,
-        "twodash": size * 2 + "," + size * 2 + "," + size * 6 + "," + size * 2,
-        "22": size * 2 + "," + size * 2,
-        "42": size * 4 + "," + size * 2,
-        "44": size * 4 + "," + size * 4,
-        "13": size + "," + size * 3,
-        "1343": size + "," + size * 3 + "," + size * 4 + "," + size * 3,
-        "73": size * 7 + "," + size * 3,
-        "2262": size * 2 + "," + size * 2 + "," + size * 6 + "," + size * 2,
-        "12223242": size + "," + size * 2 + "," + size * 2 + "," + size * 2 + "," + size * 3 + "," + size * 2 + "," + size * 4 + "," + size * 2,
-        "F282": size * 15 + "," + size * 2 + "," + size * 8 + "," + size * 2,
-        "F4448444": size * 15 + "," + size * 4 + "," + size * 4 + "," + size * 4 + "," + size * 8 + "," + size * 4 + "," + size * 4 + "," + size * 4,
-        "224282F2": size * 2 + "," + size * 2 + "," + size * 4 + "," + size * 2 + "," + size * 8 + "," + size * 2 + "," + size * 16 + "," + size * 2,
-        "F1": size * 16 + "," + size
-      };
+    var o = {
+      "blank": size * 0 + "," + size * 10,
+      "solid": 0,
+      "dashed": size * 4 + "," + size * 4,
+      "dotted": size + "," + size * 2,
+      "dotdash": size + "," + size * 2 + "," + size * 4 + "," + size * 2,
+      "longdash": size * 8 + "," + size * 4,
+      "twodash": size * 2 + "," + size * 2 + "," + size * 6 + "," + size * 2,
+      "22": size * 2 + "," + size * 2,
+      "42": size * 4 + "," + size * 2,
+      "44": size * 4 + "," + size * 4,
+      "13": size + "," + size * 3,
+      "1343": size + "," + size * 3 + "," + size * 4 + "," + size * 3,
+      "73": size * 7 + "," + size * 3,
+      "2262": size * 2 + "," + size * 2 + "," + size * 6 + "," + size * 2,
+      "12223242": size + "," + size * 2 + "," + size * 2 + "," + size * 2 + "," + size * 3 + "," + size * 2 + "," + size * 4 + "," + size * 2,
+      "F282": size * 15 + "," + size * 2 + "," + size * 8 + "," + size * 2,
+      "F4448444": size * 15 + "," + size * 4 + "," + size * 4 + "," + size * 4 + "," + size * 8 + "," + size * 4 + "," + size * 4 + "," + size * 4,
+      "224282F2": size * 2 + "," + size * 2 + "," + size * 4 + "," + size * 2 + "," + size * 8 + "," + size * 2 + "," + size * 16 + "," + size * 2,
+      "F1": size * 16 + "," + size
+    };
   }
 
   if (lt in o){
@@ -1080,3 +1160,6 @@ var linetypesize2dasharray = function (lt, size) {
 var isArray = function(o) {
   return Object.prototype.toString.call(o) === '[object Array]';
 }
+
+
+ 

@@ -23,7 +23,7 @@ popPlots <-
                    data=worldPop, alpha=3/4, size=4)+
          geom_point(aes(year, population, fill=type, colour=type),
                     data=worldPop))
-gg2animint(popPlots, "worldPop")
+info <- gg2animint(popPlots, "worldPop")
 
 ## we should at least see the bars in this simpler test.
 onebar <- ggplot()+

@@ -1,8 +1,5 @@
 TODOs in approximate order of importance (higher is more important).
 
-BUG: stop with an error if width or height list contains plot names
-that do not exist!
-
 BUG: Too many legend entries for the WorldBank viz --- git bisect
 figured out that the bug was introduced in this change
 https://github.com/tdhock/animint/commit/069c167117c169dea9277608e8a0cbed3c75fcff
@@ -13,19 +10,16 @@ data... why? See examples/make_text_bug.R
 BUG: geom_segment(aes(group=var)) will not be parsed correctly by
 animint.js!
 
-BUG: when there are commas in text labels, animint.js does not parse
-the CSV correctly. See examples/align_rect_text.R.
-
 BUG: Why doesn't animation work in the last plot of this example?
 https://github.com/vdimarco/dojo1/blob/master/hocking-canada-cities-viz.R
 
-Test SVG output after applying JavaScript? Is there some way we can
-apply the JavaScript non-interactively and then check the results?
-Need to figure out which one(s) of these libraries could do the job:
-http://phantomjs.org/ http://www.omegahat.org/SpiderMonkey/
+OUTPUT: Test SVG output after applying JavaScript? Is there some way
+we can apply the JavaScript non-interactively and then check the
+results?  Need to figure out which one(s) of these libraries could do
+the job: http://phantomjs.org/ http://www.omegahat.org/SpiderMonkey/
 https://github.com/tmpvar/jsdom/blob/master/README.md After we figure
 out what testing framework is best, use it to implement the
-animint2HTML function used in the inst/tests/TEST-*.R files.
+animint2HTML function used in some of the inst/tests/test-*.R files.
 
 customizable alpha/color/size/fill/linetype for selected geoms, using
 selected.alpha, selected.color, etc aesthetics, see
@@ -50,20 +44,27 @@ Profile gg2animint() to see what part is slow, and speed it up!
 
 Custom titles for the generated HTML page.
 
-Include SEVERAL d3 plots directly in knitr html output e.g.
-http://zvfak.blogspot.jp/2013/08/using-javascript-visualization.html
-
-gg2gist(L) uploads animint as a gist to github.
-
 facets -- would be useful when we want to align axes in related plots,
 e.g. the last plot of examples/intreg.R. To implement facets it may be
 useful to use "margin convention" http://bl.ocks.org/mbostock/3019563
 
 coord_equal -- would be useful for maps e.g. examples/Tornadoes.R.
 
-Render a <select> for each selector variable, so long lists
-like this are not necessary.
-https://github.com/vdimarco/dojo1/blob/master/hocking-canada-cities-viz.R
+The default/first selection should be specified by an option
+first=list(year=1960, country=c("Japan", "United States"). Stop with
+an error if multiple values are specified for a single selection
+variable.
+
+Legends can be interactive: clicking a legend entry shows/hides that
+subset of data. For example, when we say aes(color=variable), this
+should imply aes(showSelectedColor=variable) on that geom, and
+selection=list(variable="multiple") on that plot.
+
+For each selector variable, render a widget for selecting values:
+- single selection variable: <select> or <input type="radio">
+- multiple selection categorical variable: <input type="checkbox">
+- multiple selection numeric/datetime variable: crossfilter.js
+http://square.github.io/crossfilter/
 
 Allow other variable names for the same selection variable,
 e.g. insert and insert.show are 2 different columns in
@@ -71,12 +72,7 @@ data=other.inserts, but they should both use the "insert" selection
 variable, in geom_point(aes(clickSelects=insert,
 showSelected=insert.show, data=other.inserts).
 
-Speedy downloading: on compile, divide data into chunks --- separate
-csv files. In general a chunk of data will be shown onscreen at the
-same time, but we should not make chunks with only 1 row e.g. for the
-WorldBank viz, geom_points should have 1 chunk per year, geom_text
-country labels should have 1 chunk per country, and geom_text year
-labels should have just 1 chunk which covers all years. On page load,
+On page load,
 start downloading the first chunk for each geom. After a chunk
 finishes downloading, start downloading the next chunk for that geom,
 until all data is loaded, even if it is not needed on screen right
@@ -85,10 +81,6 @@ that we need to show.  E.g. for geom_point start downloading the
 year=1960 chunk, then the year=1961 chunk, but then if we clicked on
 year=2000, download that one immediately and set the next chunk in the
 queue as year=2001.
-
-It would probably reduce disk space and file transfer times if we used
-separate CSV files for different showSelected values, and deleted the
-showSelected column(s) in the CSV files.
 
 Download progress table at the bottom of the plot.
 - click a button to show or hide the entire table.
@@ -100,14 +92,14 @@ OPTION: after clicking and changing the displayed data subset,
 zoom/update the axes of related plots. For animations we clearly want
 to keep the same axes across animation frames, but for some other
 kinds of plots it would be nice if the axes automatically zoomed. Make
-this an option list axesZoom=list(plotXY=c("x", "y"), plotX="x") means
-that the x axis should be updated for plotX and both axes should be
-updated for plotXY, but the axes are NOT updated for any other
-plots. There should also be a button next to each axis that you can
-click to toggle zooming on and off.
+this an option list axesZoom=list(scatter=c("x", "y"), timeSeries="x")
+means that the x axis should be updated for timeSeries and both axes
+should be updated for scatter, but the axes are NOT updated for any
+other plots. There should also be a button next to each axis that you
+can click to toggle zooming on and off.
 
 It would be nice to be able to resize plots interactively, like we can
-do in shiny.
+do in shiny+ggvis.
 
 multiple selection! currently, each interaction variable can only have
 a single selected value at a time, e.g. year=1996 and country=Japan in
@@ -136,7 +128,20 @@ specify id or key variable for transitions? In the current set of
 examples, using keys has proven un-necessary. So let's just ignore
 this for now.  http://bost.ocks.org/mike/constancy/
 
-gg2shiny(ggList) renders the interactive animation as a shiny app, e.g.
+OUTPUT: animint2dir(L) is the same as gg2animint, but with a name that
+is consistent with the other functions below.
+
+OUTPUT: animint2gist(L) uploads animint as a gist to github. Need to have a
+flat filesystem structure, with no sub-directories?
+
+OUTPUT: animint2knitr(L) may be used SEVERAL times to include d3
+plots directly in knitr html output e.g.
+http://zvfak.blogspot.jp/2013/08/using-javascript-visualization.html
+Every animint should be saved in its own sub-directory, to avoid
+filename conflicts, e.g. plot.json.
+
+OUTPUT: animint2shiny(ggList) renders the interactive animation as a shiny
+app, e.g.
 https://github.com/tdhock/interactive-tutorial/tree/master/animation/WorldBank
 
 Is it possible to fix geom_rect and geom_text alignment? The
@@ -148,7 +153,29 @@ theme(animint.width=600, animint.height=600) instead of option lists
 which make us repeat the plot names... this results in an error with
 ggplot2-0.9.3.1, is there any work-around or do we need to just
 continue to use option lists? maybe we can implement a custom theme()
-function?
+function? Another solution is for ggplot2 to accept non-standard
+options, so I posted an issue
+https://github.com/hadley/ggplot2/issues/938
+
+2014.4
+
+BUGFIX: stop with an error if width or height list contains plot names
+that do not exist!
+
+BUGFIX: when there are commas in text labels, animint.js now parses
+the data correctly, since we use tsv instead of csv. See
+examples/align_rect_text.R.
+
+Speedy downloading: on compile, divide data into chunks --- separate
+csv files. In general a chunk of data will be shown onscreen at the
+same time, but we should not make chunks with only 1 row e.g. for the
+WorldBank viz, geom_points should have 1 chunk per year, geom_text
+country labels should have 1 chunk per country, and geom_text year
+labels should have just 1 chunk which covers all years. 
+
+It would probably reduce disk space and file transfer times if we used
+separate CSV files for different showSelected values, and deleted the
+showSelected column(s) in the CSV files.
 
 2014.3.19
 
