@@ -317,8 +317,8 @@ var animint = function (to_select, json_file) {
   // data, and then calling draw_geom to actually draw it.
   var draw_geom = function(g_info, chunk){
     var svg = SVGs[g_info.classed];
-    data = chunk;
-    g_info.nest_order.forEach(function (aes_name) {
+    var data = chunk;
+    g_info.subset_order.forEach(function (aes_name) {
       if (aes_name != "group") {
         var v_name = g_info.aes[aes_name];
         var value = Selectors[v_name].selected;
@@ -528,31 +528,36 @@ var animint = function (to_select, json_file) {
         })
           .style("fill", function (group_info) {
             if (g_info.geom == "line" || g_info.geom == "path") {
-              return ("none")
+              return "none";
             }
             var one_group = data[group_info.value];
-            var one_row = one_group[0]; // take color for first value in the group
-            return (get_fill(one_row));
+            var one_row = one_group[0];
+	    // take color for first value in the group
+            return get_fill(one_row);
           })
           .style("stroke-width", function (group_info) {
             var one_group = data[group_info.value];
-            var one_row = one_group[0]; // take size for first value in the group
-            return (get_size(one_row));
+            var one_row = one_group[0];
+	    // take size for first value in the group
+            return get_size(one_row);
           })
           .style("stroke", function (group_info) {
             var one_group = data[group_info.value];
-            var one_row = one_group[0]; // take color for first value in the group
-            return (get_colour(one_row));
+            var one_row = one_group[0];
+	    // take color for first value in the group
+            return get_colour(one_row);
           })
           .style("stroke-dasharray", function (group_info) {
             var one_group = data[group_info.value];
-            var one_row = one_group[0]; // take linetype for first value in the group
-            return (get_dasharray(one_row));
+            var one_row = one_group[0];
+	    // take linetype for first value in the group
+            return get_dasharray(one_row);
           })
           .style("stroke-width", function (group_info) {
             var one_group = data[group_info.value];
-            var one_row = one_group[0]; // take line size for first value in the group
-            return (get_size(one_row));
+            var one_row = one_group[0]; 
+	    // take line size for first value in the group
+            return get_size(one_row);
           });
       }
       eAppend = "path";
@@ -882,7 +887,7 @@ var animint = function (to_select, json_file) {
   }
   var update_selector = function (v_name, value) {
     Selectors[v_name].selected = value;
-    Selectors[v_name].subset.forEach(update_geom);
+    Selectors[v_name].update.forEach(update_geom);
     //Selectors[v_name].hilite.forEach(update_geom);
   }
   var ifSelectedElse = function (d, v_name, selected, not_selected) {

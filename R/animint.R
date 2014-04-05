@@ -163,10 +163,9 @@ saveLayer <- function(l, d, meta){
   ## currently selected values of these variables are stored in
   ## plot.Selectors.
   
-  some.vars <- g$aes[is.showSelected(names(g$aes))]
-  update.vars <- c(some.vars, g$aes[names(g$aes)=="clickSelects"])
-  subset.vars <- c(some.vars, g$aes[names(g$aes)=="group"])
-  g$subset_order <- as.list(names(subset.vars))
+  show.vars <- g$aes[is.showSelected(names(g$aes))]
+  update.vars <- c(show.vars, g$aes[names(g$aes)=="clickSelects"])
+  g$subset_order <- as.list(names(show.vars))
 
   ## Construct the selector.
   for(sel.i in seq_along(update.vars)){
@@ -217,8 +216,6 @@ saveLayer <- function(l, d, meta){
       # information, remove it.
       ## TODO: Figure out a better way to handle this...
       g$aes <- g$aes[-which(names(g$aes)=="group")]
-      subset.vars <- c(some.vars, g$aes[names(g$aes)=="group"])
-      g$subset_order <- as.list(names(subset.vars))
     } 
     g$geom <- "segment"
   } else if(g$geom=="point"){
@@ -286,20 +283,11 @@ saveLayer <- function(l, d, meta){
     g$geom <- "path"
   } else if(g$geom=="contour" | g$geom=="density2d"){
     g$aes[["group"]] <- "piece"
-    # reset g$subset_order now that group aesthetic exists.
-    subset.vars <- c(some.vars, g$aes[names(g$aes)=="group"])
-    g$subset_order <- as.list(names(subset.vars))
     g$geom <- "path"
   } else if(g$geom=="freqpoly"){
     g$geom <- "line"
-    # reset g$subset_order now that group aesthetic exists.
-    subset.vars <- c(some.vars, group="group")
-    g$subset_order <- as.list(names(subset.vars))
   } else if(g$geom=="quantile"){
     g$geom <- "path"
-    # reset g$subset_order now that group aesthetic exists.
-    subset.vars <- c(some.vars, group="group")
-    g$subset_order <- as.list(names(subset.vars))
   } else if(g$geom=="hex"){
     g$geom <- "polygon"
     ## TODO: for interactivity we will run into the same problems as
@@ -330,9 +318,6 @@ saveLayer <- function(l, d, meta){
       # Make outer border of 0 size if size isn't already specified.
       if(!"size"%in%names(g.data)) g.data[["size"]] <- 0 
     }
-    # reset g$subset_order now that group aesthetic exists.
-    subset.vars <- c(some.vars, group="group")
-    g$subset_order <- as.list(names(subset.vars))
   } else { 
     ## all other geoms are basic, and keep the same name.
     g$geom
@@ -355,10 +340,6 @@ saveLayer <- function(l, d, meta){
         ## if the group aesthetic is also mapped to another visual aesthetic, 
         ## then remove the group aesthetic
         g$aes <- g$aes[-which(names(g$aes)=="group")]
-        ## remove group from aes listing
-        subset.vars <- c(some.vars, g$aes[names(g$aes)=="group"])
-        ## recalculate subset_order.
-        g$subset_order <- as.list(names(subset.vars))
       }
     }
   }
@@ -394,6 +375,10 @@ saveLayer <- function(l, d, meta){
                               g.data,
                               ranges)
   
+  ## TODO:facets. Right now we delete PANEL info since it just takes
+  ## up space for no reason in the CSV database.
+  g.data <- g.data[names(g.data) != "PANEL"]
+
   ## Output types
   ## Check to see if character type is d3's rgb type. 
   is.linetype <- function(x){
@@ -429,10 +414,6 @@ saveLayer <- function(l, d, meta){
     g$types[[i]] <- "factor"
   }
 
-  ## TODO:facets. Right now we delete PANEL info since it just takes
-  ## up space for no reason in the CSV database.
-  g.data <- g.data[names(g.data) != "PANEL"]
-
   ## Make the time variable the first subset_order variable.
   time.col <- if(is.null(meta$time)){ # if this is not an animation,
     NULL
@@ -461,6 +442,7 @@ saveLayer <- function(l, d, meta){
       names(vec.list)
     }
   }
+  print(chunk.cols)
   
   ## Split into chunks and save tsv files.
   meta$classed <- g$classed
@@ -472,7 +454,6 @@ saveLayer <- function(l, d, meta){
     selector.names <- as.character(g$aes[chunk.cols])
     chunk.name <- paste(selector.names, collapse="_")
     g$chunk_order <- as.list(selector.names)
-    g$nest_order <- as.list(g$aes[nest.cols])
     for(selector.name in selector.names){
       meta$selectors[[selector.name]]$chunks <-
         unique(c(meta$selectors[[selector.name]]$chunks, chunk.name))
@@ -482,10 +463,14 @@ saveLayer <- function(l, d, meta){
       c(meta$chunks[[chunk.name]], list(chunk.list))
   }else{
     g$chunk_order <- list()
-    g$nest_order <- list()
   }
+  g$nest_order <- as.list(nest.cols)
   names(g$chunk_order) <- NULL
   names(g$nest_order) <- NULL
+  g$subset_order <- g$nest_order
+  if("group" %in% names(g$aes)){
+    g$nest_order <- c(g$nest_order, "group")
+  }
   
   ## Get unique values of time variable.
   if(length(time.col)){ # if this layer/geom is animated,
@@ -495,8 +480,6 @@ saveLayer <- function(l, d, meta){
   ## TODO: save the download order... if it is an animation then the
   ## download order should be in the same order.
 
-  print(g[c("chunk_order", "nest_order")])
-  
   ## Finally save to the master geom list.
   meta$geoms[[g$classed]] <- g
 
