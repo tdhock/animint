@@ -474,7 +474,7 @@ saveLayer <- function(l, d, meta){
   
   ## Get unique values of time variable.
   if(length(time.col)){ # if this layer/geom is animated,
-    g$timeValues <- names(g.data)
+    g$timeValues <- unique(g.data[[time.col]])
   }
 
   ## TODO: save the download order... if it is an animation then the
@@ -621,7 +621,8 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
 
   ## Save the animation variable so we can treat it specially when we
   ## process each geom.
-  if(is.list(meta$time <- plot.list$time)){
+  if(is.list(plot.list$time)){
+    meta$time <- plot.list$time
     ms <- meta$time$ms
     stopifnot(is.numeric(ms))
     stopifnot(length(ms)==1)
@@ -680,16 +681,17 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
   ## These geoms need to be updated when the time.var is animated, so
   ## let's make a list of all possible values to cycle through, from
   ## all the values used in those geoms.
-  if("time" %in% ls(plot.list)){
-    geom.names <- meta$selectors[[v.name]]$subset
-    anim.values <- sapply(meta$geoms, "[[", "timeValues")
-    for(g.name in geom.names){
-      g <- meta$geoms[[g.name]]
-      if(!is.null(values <- g$time.values)){
-        anim.values[[g.name]] <- as.character(sort(unique()))
+  if("time" %in% ls(meta)){
+    geom.names <- meta$selectors[[time.var]]$update
+    anim.values <- lapply(meta$geoms, "[[", "timeValues")
+    anim.norm <- lapply(anim.values, function(x){
+      if(is.factor(x)){
+        as.numeric(as.character(x))
+      }else{
+        as.numeric(x)
       }
-    }
-    meta$time$sequence <- unique(unlist(anim.values))
+    })
+    meta$time$sequence <- unique(unlist(anim.norm))
   }
 
   ## Also, figure out the download order:
