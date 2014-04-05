@@ -360,5 +360,5 @@ viz <-
        height=list(kmer=300, samples=300, circle=300, monkey=600))
 ##viz$sca+facet_grid(pair~monkey)+theme_bw()+theme(panel.margin=unit(0,"cm"))
 ###print(viz$table)
-gg2animint(viz, "vervet")
+gg2animint(viz, "vervet-new")
 
