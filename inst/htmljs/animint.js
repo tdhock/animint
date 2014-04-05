@@ -270,8 +270,15 @@ var animint = function (to_select, json_file) {
     var tsv_name = g_info.chunks;
     g_info.chunk_order.forEach(function (v_name) {
       var value = Selectors[v_name].selected;
-      tsv_name = tsv_name[value];
+      if(tsv_name.hasOwnProperty(value)){
+	tsv_name = tsv_name[value];
+      }else{
+	tsv_name = null; // no data to show in this subset.
+      }
     });
+    if(tsv_name == null){
+      return;
+    }
     // get the data if it has not yet been downloaded.
     g_info.tr.select("td.chunk").text(tsv_name);
     if(g_info.data.hasOwnProperty(tsv_name)){

@@ -165,6 +165,10 @@ saveLayer <- function(l, d, meta){
   
   show.vars <- g$aes[is.showSelected(names(g$aes))]
   update.vars <- c(show.vars, g$aes[names(g$aes)=="clickSelects"])
+  ## Force factor?
+  ## for(v.name in names(update.vars)){
+  ##   g.data[[v.name]] <- as.factor(g.data[[v.name]])
+  ## }
   g$subset_order <- as.list(names(show.vars))
 
   ## Construct the selector.

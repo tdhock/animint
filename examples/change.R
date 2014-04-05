@@ -43,5 +43,5 @@ pathPlot <- ggplot()+
 print(pathPlot)
 
 viz <- list(path=pathPlot, var=varPlot, lik=likPlot)
-gg2animint(viz, "~/public_html/change")
+gg2animint(viz, "change")
 
