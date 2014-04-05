@@ -84,7 +84,7 @@ priorBands <-
                  data=prior$accuracy)+
        xlab("class prior")+
        ylab(sqLab))
-gg2animint(priorBands)
+gg2animint(priorBands, "prior")
 
 ## are the exported files the same?
 
