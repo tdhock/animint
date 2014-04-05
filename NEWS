@@ -52,8 +52,14 @@ thocking@silene:~/projects/scaffold-viz$ ls boxes-nochunks|grep csv|wc -l
 thocking@silene:~/projects/scaffold-viz$ ls boxes-chunks|grep tsv|wc -l
 94032
 thocking@silene:~/projects/scaffold-viz$ du -hs boxes-*chunks
-400M	boxes-chunks
 45M	boxes-nochunks
+400M	boxes-chunks
+I uploaded these two visualizations and timed page loading in chromium:
+http://cbio.ensmp.fr/~thocking/scaffold-viz5/ 44.1MB transferred 27.95 s
+transfers ALL the data. slow part is 3 csv files, each around 13 MB.
+http://cbio.ensmp.fr/~thocking/boxes-chunks/ 12.1MB transferred 9.61 s
+transfers only the first subset.
+slow part is plot.json is 8.7MB --- can this be reduced?
 
 Is it possible to download gzipped tsv files in JavaScript/D3?
 
