@@ -87,6 +87,7 @@ var animint = function (to_select, json_file) {
     g_info.tr.append("td").text(g_info.total);
     // Save this geom and load it!
     g_info.data = {};
+    g_info.download_status = {};
     Geoms[g_name] = g_info;
     update_geom(g_name);
   }
@@ -258,6 +259,9 @@ var animint = function (to_select, json_file) {
   var add_selector = function (s_name, s_info) {
     Selectors[s_name] = s_info;
   }
+  var get_tsv = function(g_info, chunk_id){
+    return g_info.classed + "_chunk" + chunk_id + ".tsv";  
+  }
   // update_geom is called from add_geom and update_selector. It
   // downloads data if necessary, and then calls draw_geom.
   var update_geom = function (g_name) {
@@ -275,7 +279,7 @@ var animint = function (to_select, json_file) {
     if(chunk_id == null){
       return;
     }
-    var tsv_name = g_info.classed + "_chunk" + chunk_id + ".tsv";
+    var tsv_name = get_tsv(g_info, chunk_id);
     // get the data if it has not yet been downloaded.
     g_info.tr.select("td.chunk").text(tsv_name);
     if(g_info.data.hasOwnProperty(tsv_name)){
@@ -291,43 +295,82 @@ var animint = function (to_select, json_file) {
 	.style("fill", "red")
 	//.attr("x", svg.attr("width")/2)
       ;
-      d3.tsv(tsv_name, function (error, response) {
-	// First convert to correct types.
-	response.forEach(function (d) {
-          for (var v_name in g_info.types) {
-            var r_type = g_info.types[v_name];
-            if (r_type == "integer") {
-              d[v_name] = parseInt(d[v_name]);
-            } else if (r_type == "numeric") {
-              d[v_name] = parseFloat(d[v_name]);
-            } else if (r_type == "factor") {
-              //keep it as a character.
-            } else if (r_type == "rgb") {
-              //keep it as a character.                
-            } else if (r_type == "linetype") {
-              //keep it as a character. 
-            } else if (r_type == "label") {
-              //keep it as a character
-            } else if (r_type == "character" & v_name == "outliers") {
-              d[v_name] = parseFloat(d[v_name].split(" @ "));
-            } else {
-              throw "unsupported R type " + r_type;
-            }
-          }
-	});
-	var nest = d3.nest();
-	g_info.nest_order.forEach(function (v_name) {
-          nest.key(function (d) {
-            return d[v_name];
-          });
-	});
-	var chunk = nest.map(response);
-	g_info.data[tsv_name] = chunk;
-	loading.remove();
-	g_info.tr.select("td.downloaded").text(d3.keys(g_info.data).length);
+      download_chunk(g_info, tsv_name, function(chunk){
+      	loading.remove();
 	draw_geom(g_info, chunk);
       });
     }
+  }
+  var download_sequence = function(g_name, seq){
+    var g_info = Geoms[g_name];
+    // If there is only 1 chunk we don't need to download anything
+    // else.
+    if(g_info.chunk_order.length == 0){
+      return;
+    }
+    if(g_info.chunk_order.length != 1){
+      throw "do not know how to handle more than 1 chunk variable";
+    }
+    g_info.seq_i = 0;
+    g_info.seq = seq;
+    download_next(g_name);
+  }
+  var download_next = function(g_name){
+    var g_info = Geoms[g_name];
+    g_info.seq_i = g_info.seq_i + 1;
+    if(g_info.seq_i == g_info.seq.length){
+      return;
+    }
+    var selector_value = g_info.seq[g_info.seq_i];
+    var chunk_id = g_info.chunks[selector_value];
+    var tsv_name = get_tsv(g_info, chunk_id);
+    download_chunk(g_info, tsv_name, function(chunk){
+      download_next(g_name);
+    })
+  }
+  // download_chunk is called from update_geom and download_sequence.
+  var download_chunk = function(g_info, tsv_name, funAfter){
+    if(g_info.download_status.hasOwnProperty(tsv_name)){
+      return; // do not download twice.
+    }
+    g_info.download_status[tsv_name] = "downloading";
+    d3.tsv(tsv_name, function (error, response) {
+      // First convert to correct types.
+      g_info.download_status[tsv_name] = "processing";
+      response.forEach(function (d) {
+        for (var v_name in g_info.types) {
+          var r_type = g_info.types[v_name];
+          if (r_type == "integer") {
+            d[v_name] = parseInt(d[v_name]);
+          } else if (r_type == "numeric") {
+            d[v_name] = parseFloat(d[v_name]);
+          } else if (r_type == "factor") {
+            //keep it as a character.
+          } else if (r_type == "rgb") {
+            //keep it as a character.                
+          } else if (r_type == "linetype") {
+            //keep it as a character. 
+          } else if (r_type == "label") {
+            //keep it as a character
+          } else if (r_type == "character" & v_name == "outliers") {
+            d[v_name] = parseFloat(d[v_name].split(" @ "));
+          } else {
+            throw "unsupported R type " + r_type;
+          }
+        }
+      });
+      var nest = d3.nest();
+      g_info.nest_order.forEach(function (v_name) {
+        nest.key(function (d) {
+          return d[v_name];
+        });
+      });
+      var chunk = nest.map(response);
+      g_info.data[tsv_name] = chunk;
+      g_info.tr.select("td.downloaded").text(d3.keys(g_info.data).length);
+      g_info.download_status[tsv_name] = "saved";
+      funAfter(chunk);
+    });
   }
   // update_geom is responsible for obtaining a chunk of downloaded
   // data, and then calling draw_geom to actually draw it.
@@ -914,7 +957,7 @@ var animint = function (to_select, json_file) {
       return not_selected;
     }
   }
-  var animateIfInactive = function () {
+  var animateIfLoaded = function () {
     var v_name = Animation.variable;
     var cur = Selectors[v_name].selected;
     var next = Animation.next[cur];
@@ -1052,12 +1095,18 @@ var animint = function (to_select, json_file) {
     for (var g_name in response.geoms) {
       add_geom(g_name, response.geoms[g_name]);
     }
-    // Start timer if necessary.
+    // If this is an animation, then start downloading all the rest of
+    // the data, and start the animation.
     if (response.time) {
       Animation.next = {};
       Animation.ms = response.time.ms;
       Animation.variable = response.time.variable;
-      var i, prev, cur, seq = response.time.sequence.map(function(d){return parseFloat(d)});
+      var i, prev, cur, seq = response.time.sequence.map(function(d){
+	return parseFloat(d);
+      });
+      Selectors[Animation.variable].update.forEach(function(g_name){
+	download_sequence(g_name, seq);
+      });
       for (i = 0; i < seq.length; i++) {
         if (i == 0) {
           prev = seq[seq.length-1];
@@ -1069,7 +1118,7 @@ var animint = function (to_select, json_file) {
       }
       all_geom_names = d3.keys(response.geoms);
       // as shown on http://bl.ocks.org/mbostock/3808234
-      setInterval(animateIfInactive, Animation.ms);
+      setInterval(animateIfLoaded, Animation.ms);
     }
   });
 }

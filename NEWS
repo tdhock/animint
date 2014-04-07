@@ -74,14 +74,6 @@ data=other.inserts, but they should both use the "insert" selection
 variable, in geom_point(aes(clickSelects=insert,
 showSelected=insert.show, data=other.inserts).
 
-After a chunk finishes downloading, start downloading the next chunk
-for that geom, until all data is loaded, even if it is not needed on
-screen right now. Also, start downloading a chunk if we click on an
-unloaded subset that we need to show.  E.g. for geom_point start
-downloading the year=1960 chunk, then the year=1961 chunk, but then if
-we clicked on year=2000, download that one immediately and set the
-next chunk in the queue as year=2001.
-
 Download progress table at the bottom of the plot.
 - click a button to show or hide the entire table.
 - starts shown, hides itself when everything is loaded.
@@ -156,6 +148,9 @@ options, so I posted an issue
 https://github.com/hadley/ggplot2/issues/938
 
 2014.4.7
+
+For animations, start downloading the next chunk for that geom, until
+all data is loaded, even if it is not needed on screen right now.
 
 For large data sets such as the scaffold data, breaking the CSV
 database from 21 to 94032 CSV files resulted in a 10x increase
