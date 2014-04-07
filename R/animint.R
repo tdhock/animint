@@ -37,7 +37,7 @@ parsePlot <- function(meta){
     ## This extracts essential info for this geom/layer.
     g <- saveLayer(L, df, meta)
 
-    plot.meta$geoms <- c(plot.meta$geoms, g$classed)
+    plot.meta$geoms <- c(plot.meta$geoms, list(g$classed))
   }
   ## For each geom, save the nextgeom to preserve drawing order.
   n.next <- length(plot.meta$geoms) - 1
@@ -710,14 +710,20 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
   if("time" %in% ls(meta)){
     geom.names <- meta$selectors[[time.var]]$update
     anim.values <- lapply(meta$geoms, "[[", "timeValues")
-    anim.norm <- lapply(anim.values, function(x){
-      if(is.factor(x)){
-        as.numeric(as.character(x))
-      }else{
-        as.numeric(x)
+    anim.not.null <- anim.values[!sapply(anim.values, is.null)]
+    meta$time$sequence <- if(all(sapply(anim.not.null, is.numeric))){
+      as.character(sort(unique(unlist(anim.not.null))))
+    }else if(all(sapply(anim.not.null, is.factor))){
+      levs <- levels(anim.not.null[[1]])
+      if(any(sapply(anim.not.null, function(f)levels(f)!=levs))){
+        print(sapply(anim.not.null, levels))
+        stop("all time factors must have same levels")
       }
-    })
-    meta$time$sequence <- unique(unlist(anim.norm))
+      levs
+    }else{
+      stop("time variables must be all numeric or all factor")
+    }
+    meta$selectors[[time.var]]$selected <- meta$time$sequence[[1]]
   }
 
   ## Also, figure out the download order:

@@ -10,9 +10,6 @@ data... why? See examples/make_text_bug.R
 BUG: geom_segment(aes(group=var)) will not be parsed correctly by
 animint.js!
 
-BUG: Why doesn't animation work in the last plot of this example?
-https://github.com/vdimarco/dojo1/blob/master/hocking-canada-cities-viz.R
-
 OUTPUT: Test SVG output after applying JavaScript? Is there some way
 we can apply the JavaScript non-interactively and then check the
 results?  Need to figure out which one(s) of these libraries could do
@@ -148,6 +145,9 @@ options, so I posted an issue
 https://github.com/hadley/ggplot2/issues/938
 
 2014.4.7
+
+BUGFIX: Animation now works even for non-numeric variables,
+e.g. examples/canada-cities.R.
 
 For animations, start downloading the next chunk for that geom, until
 all data is loaded, even if it is not needed on screen right now.

@@ -102,10 +102,11 @@ make_text <- function(data, x, y, label.var, format=NULL){
   ##   y <- max(data[,y])
   ## }
   data <- unique(data[,label.var,drop=FALSE])
+  data$label <- data[,label.var]
   data$x <- x
   data$y <- y
   if(is.null(format)){
-    data[,label.var] <- as.character(data[,label.var])
+    data$label <- as.character(data$label)
     format <- paste(label.var,"= %s")
   }
   if(is.character(format)){
@@ -115,7 +116,7 @@ make_text <- function(data, x, y, label.var, format=NULL){
     }
   }
   stopifnot(is.function(format))
-  data$label <- format(data[,label.var])
+  data$label <- format(data$label)
   a <- aes_string(x="x",y="y",label="label",showSelected=label.var)
   geom_text(a, data)
 }

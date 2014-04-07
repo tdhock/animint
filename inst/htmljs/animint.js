@@ -82,9 +82,9 @@ var animint = function (to_select, json_file) {
     g_info.tr = Widgets["loading"].append("tr");
     g_info.tr.append("td").text(g_name);
     g_info.tr.append("td").attr("class", "chunk");
-    g_info.tr.append("td").attr("class", "status").text("initialized");
     g_info.tr.append("td").attr("class", "downloaded").text(0);
     g_info.tr.append("td").text(g_info.total);
+    g_info.tr.append("td").attr("class", "status").text("initialized");
     // Save this geom and load it!
     g_info.data = {};
     g_info.download_status = {};
@@ -301,29 +301,27 @@ var animint = function (to_select, json_file) {
       });
     }
   }
-  var download_sequence = function(g_name, seq){
+  var download_sequence = function(g_name, s_name, seq){
     var g_info = Geoms[g_name];
-    // If there is only 1 chunk we don't need to download anything
-    // else.
-    if(g_info.chunk_order.length == 0){
-      return;
-    }
-    if(g_info.chunk_order.length != 1){
-      throw "do not know how to handle more than 1 chunk variable";
-    }
-    g_info.seq_i = 0;
+    var s_info = Selectors[s_name];
+    g_info.seq_i = seq.indexOf(s_info.selected);
+    g_info.seq_count = 0;
     g_info.seq = seq;
     download_next(g_name);
   }
   var download_next = function(g_name){
     var g_info = Geoms[g_name];
-    g_info.seq_i = g_info.seq_i + 1;
-    if(g_info.seq_i == g_info.seq.length){
-      return;
-    }
     var selector_value = g_info.seq[g_info.seq_i];
     var chunk_id = g_info.chunks[selector_value];
     var tsv_name = get_tsv(g_info, chunk_id);
+    g_info.seq_count += 1;
+    if(g_info.seq_count > g_info.seq.length){
+      return;
+    }
+    g_info.seq_i += 1;
+    if(g_info.seq_i == g_info.seq.length){
+      g_info.seq_i = 0;
+    }
     download_chunk(g_info, tsv_name, function(chunk){
       download_next(g_name);
     })
@@ -331,6 +329,7 @@ var animint = function (to_select, json_file) {
   // download_chunk is called from update_geom and download_sequence.
   var download_chunk = function(g_info, tsv_name, funAfter){
     if(g_info.download_status.hasOwnProperty(tsv_name)){
+      funAfter();
       return; // do not download twice.
     }
     g_info.download_status[tsv_name] = "downloading";
@@ -1088,9 +1087,9 @@ var animint = function (to_select, json_file) {
     var tr = loading.append("tr");
     tr.append("th").text("geom");
     tr.append("th").attr("class", "chunk").text("selected chunk");
-    tr.append("th").attr("class", "status").text("status");
     tr.append("th").attr("class", "downloaded").text("downloaded");
     tr.append("th").attr("class", "total").text("total");
+    tr.append("th").attr("class", "status").text("status");
     // Add geoms and construct nest operators.
     for (var g_name in response.geoms) {
       add_geom(g_name, response.geoms[g_name]);
@@ -1101,19 +1100,30 @@ var animint = function (to_select, json_file) {
       Animation.next = {};
       Animation.ms = response.time.ms;
       Animation.variable = response.time.variable;
-      var i, prev, cur, seq = response.time.sequence.map(function(d){
-	return parseFloat(d);
-      });
+      Animation.sequence = response.time.sequence;
+      var i, prev, cur;
       Selectors[Animation.variable].update.forEach(function(g_name){
-	download_sequence(g_name, seq);
+	var g_info = Geoms[g_name];
+	// If there is only 1 chunk we don't need to download anything
+	// else.
+	if(g_info.chunk_order.length == 0){
+	  return;
+	}
+	if(g_info.chunk_order.length != 1){
+	  throw "do not know how to handle more than 1 chunk variable";
+	}
+	if(g_info.chunk_order[0] != Animation.variable){
+	  return; //ignore if this geom is chunked on a non-anim variable.
+	}
+	download_sequence(g_name, Animation.variable, Animation.sequence);
       });
-      for (i = 0; i < seq.length; i++) {
+      for (i = 0; i < Animation.sequence.length; i++) {
         if (i == 0) {
-          prev = seq[seq.length-1];
+          prev = Animation.sequence[Animation.sequence.length-1];
         } else {
-          prev = seq[i - 1];
+          prev = Animation.sequence[i - 1];
         }
-        cur = seq[i];
+        cur = Animation.sequence[i];
         Animation.next[prev] = cur;
       }
       all_geom_names = d3.keys(response.geoms);
