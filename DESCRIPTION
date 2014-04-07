@@ -19,4 +19,5 @@ Depends:
     hexbin,
     scales
 Suggests:
-    knitr
+    knitr,
+    testthat

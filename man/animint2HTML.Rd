@@ -5,7 +5,7 @@
 animint2HTML(gg.opt.list)
 }
 \arguments{
-  \item{gg.opt.list}{}
+  \item{gg.opt.list}{List of ggplots and option lists.}
 }
 \value{
 HTML generated after evaluation of JavaScript.
