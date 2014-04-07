@@ -1,0 +1,19 @@
+\name{animint2HTML}
+\alias{animint2HTML}
+\title{Run gg2animint and then applyJS.}
+\usage{
+animint2HTML(gg.opt.list)
+}
+\arguments{
+  \item{gg.opt.list}{}
+}
+\value{
+HTML generated after evaluation of JavaScript.
+}
+\description{
+Run gg2animint and then applyJS.
+}
+\author{
+Toby Dylan Hocking
+}
+

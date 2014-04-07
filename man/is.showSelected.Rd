@@ -1,0 +1,19 @@
+\name{is.showSelected}
+\alias{is.showSelected}
+\title{Test if aesthetics are showSelected.}
+\usage{
+is.showSelected(x)
+}
+\arguments{
+  \item{x}{character vector.}
+}
+\value{
+logical vector
+}
+\description{
+Test if aesthetics are showSelected.
+}
+\author{
+Toby Dylan Hocking
+}
+

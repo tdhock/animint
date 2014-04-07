@@ -110,10 +110,10 @@ parsePlot <- function(meta){
   meta$plots[[meta$plot.name]] <- plot.meta
 }
 
-#' Convert a layer to a list. 
-#' @param l one layer of the ggplot object
-#' @param d one layer of calculated data from ggplot2::ggplot_build(p)
-#' @param ranges axes ranges
+#' Save a layer to disk, save and return meta-data.
+#' @param l one layer of the ggplot object.
+#' @param d one layer of calculated data from ggplot2::ggplot_build(p).
+#' @param meta environment of meta-data.
 #' @return list representing a layer, with corresponding aesthetics, ranges, and groups.
 #' @export
 #' @seealso \code{\link{gg2animint}}
@@ -725,8 +725,12 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
     }
     meta$selectors[[time.var]]$selected <- meta$time$sequence[[1]]
   }
-
-  ## Also, figure out the download order:
+  ## The first selection:
+  for(selector.name in names(meta$first)){
+    first <- as.character(meta$first[[selector.name]])
+    stopifnot(length(first) == 1)
+    meta$selectors[[selector.name]]$selected <- first
+  }
 
   ## Finally, copy html/js/json files to out.dir.
   src.dir <- system.file("htmljs",package="animint")

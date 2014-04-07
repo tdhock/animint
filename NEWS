@@ -4,12 +4,6 @@ BUG: Too many legend entries for the WorldBank viz --- git bisect
 figured out that the bug was introduced in this change
 https://github.com/tdhock/animint/commit/069c167117c169dea9277608e8a0cbed3c75fcff
 
-BUG: make_text does not work if it appears before/after certain other
-data... why? See examples/make_text_bug.R
-
-BUG: geom_segment(aes(group=var)) will not be parsed correctly by
-animint.js!
-
 OUTPUT: Test SVG output after applying JavaScript? Is there some way
 we can apply the JavaScript non-interactively and then check the
 results?  Need to figure out which one(s) of these libraries could do
@@ -48,11 +42,6 @@ e.g. the last plot of examples/intreg.R. To implement facets it may be
 useful to use "margin convention" http://bl.ocks.org/mbostock/3019563
 
 coord_equal -- would be useful for maps e.g. examples/Tornadoes.R.
-
-The default/first selection should be specified by an option
-first=list(year=1960, country=c("Japan", "United States"). Stop with
-an error if multiple values are specified for a single selection
-variable.
 
 Legends can be interactive: clicking a legend entry shows/hides that
 subset of data. For example, when we say aes(color=variable), this
@@ -145,6 +134,14 @@ options, so I posted an issue
 https://github.com/hadley/ggplot2/issues/938
 
 2014.4.7
+
+BUGFIX: make_text now works even if it appears before/after certain
+other data. See examples/make_text_bug.R
+
+The default/first selection can be specified by an option
+first=list(year=1960, country=c("Japan", "United States"). Stop with
+an error if multiple values are specified for a single selection
+variable.
 
 BUGFIX: Animation now works even for non-numeric variables,
 e.g. examples/canada-cities.R.
