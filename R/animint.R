@@ -430,26 +430,51 @@ saveLayer <- function(l, d, meta){
   }
   
   ## Determine which showSelected values to use for breaking the data
-  ## into chunks. This list of variables should have the same names as
-  ## the selectors. E.g. if chunk_order=list("year") then when year is
-  ## clicked, we may need to download some new data for this
-  ## geom. e.g. if chunk_order=list("segments", "samples") then if either
-  ## segments or samples is clicked, we need to!
-  nest.cols <- NULL
-  chunk.cols <- if(length(g$subset_order)){
-    vec.list <- g.data[unlist(g$subset_order)]
-    counts <- do.call(table, vec.list)
+  ## into chunks. This is a list of variables which have the same
+  ## names as the selectors. E.g. if chunk_order=list("year") then
+  ## when year is clicked, we may need to download some new data for
+  ## this geom.
+
+  ## Old code which allows several chunk variables:
+  ## nest.cols <- NULL
+  ## chunk.cols <- if(length(g$subset_order)){
+  ##   vec.list <- g.data[unlist(g$subset_order)]
+  ##   counts <- do.call(table, vec.list)
+  ##   if(all(counts == 1)){
+  ##     nest.cols <- names(vec.list)[length(vec.list)]
+  ##     names(vec.list)[-length(vec.list)]
+  ##   }else{
+  ##     names(vec.list)
+  ##   }
+  ## }
+
+  ## New code which only allows 0 or 1 chunk variables:
+  subset.vec <- unlist(g$subset_order)
+  chunk.var <- subset.vec[[1]]
+  several.chunks <- if(length(g$subset_order)){
+    chunk.vec <- g.data[[chunk.var]]
+    counts <- table(chunk.vec)
     if(all(counts == 1)){
-      nest.cols <- names(vec.list)[length(vec.list)]
-      names(vec.list)[-length(vec.list)]
+      FALSE
     }else{
-      names(vec.list)
+      TRUE
     }
+  }else{
+    FALSE
   }
-  
+  if(several.chunks){
+    nest.cols <- subset.vec[-1]
+    chunk.cols <- chunk.var
+  }else{
+    nest.cols <- subset.vec
+    chunk.cols <- NULL
+  }
+  ##cat(g$classed, "\nnest", nest.cols, "\nchunk", chunk.cols, "\n")
+  ##browser()
+
   ## Split into chunks and save tsv files.
   meta$classed <- g$classed
-  meta$chunk.i <- 1
+  meta$chunk.i <- 1L
   g$chunks <- saveChunks(g.data, chunk.cols, meta)
   g$total <- length(unlist(g$chunks))
 
@@ -462,9 +487,6 @@ saveLayer <- function(l, d, meta){
       meta$selectors[[selector.name]]$chunks <-
         unique(c(meta$selectors[[selector.name]]$chunks, chunk.name))
     }
-    chunk.list <- list(order=g$chunk_order, chunks=g$chunks)
-    meta$chunks[[chunk.name]] <-
-      c(meta$chunks[[chunk.name]], list(chunk.list))
   }else{
     g$chunk_order <- list()
   }
@@ -499,12 +521,13 @@ saveLayer <- function(l, d, meta){
 saveChunks <- function(x, vars, meta){
   if(is.data.frame(x)){
     if(length(vars) == 0){
-      csv.name <- sprintf("%s_chunk%d.tsv", meta$classed, meta$chunk.i)
-      meta$chunk.i <- meta$chunk.i + 1
+      this.i <- meta$chunk.i
+      csv.name <- sprintf("%s_chunk%d.tsv", meta$classed, this.i)
+      meta$chunk.i <- meta$chunk.i + 1L
       write.table(x,
                   file.path(meta$out.dir, csv.name),
                   quote=FALSE, row.names=FALSE, sep="\t")
-      csv.name
+      this.i
     }else{
       use <- vars[[1]]
       rest <- vars[-1]
@@ -615,7 +638,6 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
   ## Store meta-data in this environment, so we can alter state in the
   ## lower-level functions.
   meta <- new.env()
-  meta$chunks <- list()
   meta$plots <- list()
   meta$geoms <- list()
   meta$selectors <- list()
@@ -705,7 +727,7 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
   to.copy <- Sys.glob(file.path(src.dir, "*"))
   file.copy(to.copy, out.dir, overwrite=TRUE, recursive=TRUE)
   export.names <-
-    c("geoms", "time", "duration", "selectors", "plots", "chunks")
+    c("geoms", "time", "duration", "selectors", "plots")
   export.data <- as.list(meta)[export.names]
   json <- RJSONIO::toJSON(export.data)
   cat(json,file=file.path(out.dir,"plot.json"))

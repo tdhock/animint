@@ -42,25 +42,6 @@ examples/vervet.R.
 
 Profile gg2animint() to see what part is slow, and speed it up!
 
-For large data sets such as the scaffold data, breaking the CSV
-database from 21 to 94032 CSV files resulted in a 10x increase
-in disk space usage (but faster loading of the first data subset),
-for 653018 rows of data.
-TODO: figure out a more space-efficient chunking scheme.
-thocking@silene:~/projects/scaffold-viz$ ls boxes-nochunks|grep csv|wc -l
-21
-thocking@silene:~/projects/scaffold-viz$ ls boxes-chunks|grep tsv|wc -l
-94032
-thocking@silene:~/projects/scaffold-viz$ du -hs boxes-*chunks
-45M	boxes-nochunks
-400M	boxes-chunks
-I uploaded these two visualizations and timed page loading in chromium:
-http://cbio.ensmp.fr/~thocking/scaffold-viz5/ 44.1MB transferred 27.95 s
-transfers ALL the data. slow part is 3 csv files, each around 13 MB.
-http://cbio.ensmp.fr/~thocking/boxes-chunks/ 12.1MB transferred 9.61 s
-transfers only the first subset.
-slow part is plot.json is 8.7MB --- can this be reduced?
-
 Is it possible to download gzipped tsv files in JavaScript/D3?
 
 Custom titles for the generated HTML page.
@@ -173,6 +154,33 @@ continue to use option lists? maybe we can implement a custom theme()
 function? Another solution is for ggplot2 to accept non-standard
 options, so I posted an issue
 https://github.com/hadley/ggplot2/issues/938
+
+2014.4.7
+
+For large data sets such as the scaffold data, breaking the CSV
+database from 21 to 94032 CSV files resulted in a 10x increase
+in disk space usage (but faster loading of the first data subset),
+for 653018 rows of data. Forcing max 1 chunk variable means only
+18045 CSV files which is more space/time efficient. Also, plot.json
+only stores the chunk ids, not the full filenames (less repetition).
+thocking@silene:~/projects/scaffold-viz$ ls boxes-nochunks|grep csv|wc -l
+21
+thocking@silene:~/projects/scaffold-viz$ ls boxes-fewer-chunks|grep tsv|wc -l
+18045
+thocking@silene:~/projects/scaffold-viz$ ls boxes-chunks|grep tsv|wc -l
+94032
+thocking@silene:~/projects/scaffold-viz$ du -hs boxes-*chunks
+45M	boxes-nochunks
+99M	boxes-fewer-chunks
+400M	boxes-chunks
+I uploaded these visualizations and timed page loading in chromium:
+http://cbio.ensmp.fr/~thocking/scaffold-viz5/ 44.1MB transferred 27.95 s
+transfers ALL the data. slow part is 3 csv files, each around 13 MB.
+http://cbio.ensmp.fr/~thocking/boxes-fewer-chunks/
+transfers only the first subset. 5.6MB transferred 7.73 s.
+plot.json is only 304KB, slow part is 1.6MB geom7_point_box_chunk1057.tsv.
+http://cbio.ensmp.fr/~thocking/boxes-chunks/ 12.1MB transferred 9.61 s
+transfers only the first subset. slow part is 8.7MB plot.json.
 
 2014.4.4
 

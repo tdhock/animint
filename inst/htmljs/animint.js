@@ -15,12 +15,12 @@ var animint = function (to_select, json_file) {
   this.Plots = Plots;
   var Geoms = {};
   this.Geoms = Geoms;
+  // SVGs must be stored separately from Geoms since they are
+  // initialized first, with the Plots.
   var SVGs = {};
   this.SVGs = SVGs;
   var Animation = {};
   this.Animation = Animation;
-  var Chunks = {};
-  this.Chunks = Chunks;
   var all_geom_names = {};
   this.all_geom_names = all_geom_names;
   
@@ -67,10 +67,6 @@ var animint = function (to_select, json_file) {
       y: 0
     }
   };
-
-  var add_chunk = function(c_name, c_info){
-    Chunks[c_name] = c_info;
-  }
 
   var add_geom = function (g_name, g_info) {
     // Determine what style to use to show the selection for this
@@ -267,18 +263,19 @@ var animint = function (to_select, json_file) {
   var update_geom = function (g_name) {
     var g_info = Geoms[g_name];
     // First apply chunk_order selector variables.
-    var tsv_name = g_info.chunks;
+    var chunk_id = g_info.chunks;
     g_info.chunk_order.forEach(function (v_name) {
       var value = Selectors[v_name].selected;
-      if(tsv_name.hasOwnProperty(value)){
-	tsv_name = tsv_name[value];
+      if(chunk_id.hasOwnProperty(value)){
+	chunk_id = chunk_id[value];
       }else{
-	tsv_name = null; // no data to show in this subset.
+	chunk_id = null; // no data to show in this subset.
       }
     });
-    if(tsv_name == null){
+    if(chunk_id == null){
       return;
     }
+    var tsv_name = g_info.classed + "_chunk" + chunk_id + ".tsv";
     // get the data if it has not yet been downloaded.
     g_info.tr.select("td.chunk").text(tsv_name);
     if(g_info.data.hasOwnProperty(tsv_name)){
@@ -1037,13 +1034,6 @@ var animint = function (to_select, json_file) {
       // Append style sheet to document head.
       css.appendChild(document.createTextNode(styles.join(" ")));
       document.head.appendChild(css);   
-    }
-    // First add chunks which define TSV data files for each subset of
-    // data which is displayed at once. TODO: currently this is not
-    // used, but it may be useful when we want to load all data before
-    // actually clicking to show it.
-    for(var c_name in response.chunks){
-      add_chunk(c_name, response.chunks[c_name]);
     }
     // Then add selectors and start downloading the first data subset.
     for (var s_name in response.selectors) {
