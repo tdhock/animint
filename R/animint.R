@@ -6,22 +6,20 @@
 parsePlot <- function(meta){
   meta$built <- ggplot2::ggplot_build(meta$plot)
   plot.meta <- list()
+  scaleFuns <-
+    list(manual=function(sc)sc$palette(0),
+         brewer=function(sc)sc$palette(length(sc$range$range)),
+         hue=function(sc)sc$palette(length(sc$range$range)),
+         linetype_d=function(sc)sc$palette(length(sc$range$range)),
+         alpha_c=function(sc)sc$palette(sc$range$range),
+         size_c=function(sc)sc$palette(sc$range$range),
+         gradient=function(sc){
+           ggplot2:::scale_map(sc, ggplot2:::scale_breaks(sc))
+         })
   for(sc in meta$plot$scales$scales){
-    if(sc$scale_name == "manual"){
-      plot.meta$scales[[sc$aesthetics]] <- sc$palette(0)
-    }else if(sc$scale_name == "brewer"){
-      plot.meta$scales[[sc$aesthetics]] <- sc$palette(length(sc$range$range))
-    }else if(sc$scale_name == "hue"){
-      plot.meta$scales[[sc$aesthetics]] <- sc$palette(length(sc$range$range))
-    }else if(sc$scale_name == "linetype_d"){
-      plot.meta$scales[[sc$aesthetics]] <- sc$palette(length(sc$range$range))
-    }else if(sc$scale_name == "alpha_c"){
-      plot.meta$scales[[sc$aesthetics]] <- sc$palette(sc$range$range)
-    }else if(sc$scale_name == "size_c"){
-      plot.meta$scales[[sc$aesthetics]] <- sc$palette(sc$range$range)
-    }else if(sc$scale_name == "gradient"){
-      plot.meta$scales[[sc$aesthetics]] <-
-        ggplot2:::scale_map(sc, ggplot2:::scale_breaks(sc))
+    if(!is.null(sc$range$range)){
+      makeScale <- scaleFuns[[sc$scale_name]]
+      plot.meta$scales[[sc$aesthetics]] <- makeScale(sc)
     }
   }
   for(layer.i in seq_along(meta$plot$layers)){
