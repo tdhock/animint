@@ -132,6 +132,10 @@ saveLayer <- function(l, d, meta){
   g$params <- c(l$geom_params, l$stat_params)
   for(p.name in names(g$params)){
     names(g$params[[p.name]]) <- NULL
+    ## Ignore functions.
+    if(is.function(g$params[[p.name]])){
+      g$params[[p.name]] <- NULL
+    }
   }
 
   ## Make a list of variables to use for subsetting. subset_order is the
@@ -736,7 +740,12 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
   file.copy(to.copy, out.dir, overwrite=TRUE, recursive=TRUE)
   export.names <-
     c("geoms", "time", "duration", "selectors", "plots")
-  export.data <- as.list(meta)[export.names]
+  export.data <- list()
+  for(export.name in export.names){
+    if(export.name %in% ls(meta)){
+      export.data[[export.name]] <- meta[[export.name]]
+    }
+  }
   json <- RJSONIO::toJSON(export.data)
   cat(json,file=file.path(out.dir,"plot.json"))
   if(open.browser){

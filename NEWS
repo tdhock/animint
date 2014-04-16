@@ -135,6 +135,13 @@ function? Another solution is for ggplot2 to accept non-standard
 options, so I posted an issue
 https://github.com/hadley/ggplot2/issues/938
 
+2014.4.16
+
+BUGFIX: toJSON gives an infinite recursion error for converting R
+functions to JSON, and R functions are sometimes used as ggplot
+params/stat_params. But we do not want to pass these to JSON anyway,
+so we just ignore them.
+
 2014.4.7
 
 BUGFIX: make_text now works even if it appears before/after certain
