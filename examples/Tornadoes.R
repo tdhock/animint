@@ -7,9 +7,6 @@
 #' State/County Area and Population - http://quickfacts.census.gov/qfd/download/DataSet.txt
 #' 
 #' Image Inspiration -  http://www.kulfoto.com/pic/0001/0033/b/h4n5832833.jpg
-library(maps)
-library(plyr)
-library(ggplot2)
 library(animint)
 data(UStornadoes)
 stateOrder <- data.frame(state = unique(UStornadoes$state)[order(unique(UStornadoes$TornadoesSqMile), decreasing=T)], rank = 1:49) # order states by tornadoes per square mile
