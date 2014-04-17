@@ -4,6 +4,10 @@ BUG: Too many legend entries for the WorldBank viz --- git bisect
 figured out that the bug was introduced in this change
 https://github.com/tdhock/animint/commit/069c167117c169dea9277608e8a0cbed3c75fcff
 
+The designer should be able to specify chunk variables via
+geom_line(aes(showSelected=var1, showSelected2=var2,
+showSelected3=var3), chunk_order=c("var1", "var2")).
+
 OUTPUT: Test SVG output after applying JavaScript? Is there some way
 we can apply the JavaScript non-interactively and then check the
 results?  Need to figure out which one(s) of these libraries could do
@@ -45,17 +49,6 @@ useful to use "margin convention" http://bl.ocks.org/mbostock/3019563
 
 coord_equal -- would be useful for maps e.g. examples/Tornadoes.R.
 
-Legends can be interactive: clicking a legend entry shows/hides that
-subset of data. For example, when we say aes(color=variable), this
-should imply aes(showSelectedColor=variable) on that geom, and
-selection=list(variable="multiple") on that plot.
-
-For each selector variable, render a widget for selecting values:
-- single selection variable: <select> or <input type="radio">
-- multiple selection categorical variable: <input type="checkbox">
-- multiple selection numeric/datetime variable: crossfilter.js
-http://square.github.io/crossfilter/
-
 Allow other variable names for the same selection variable,
 e.g. insert and insert.show are 2 different columns in
 data=other.inserts, but they should both use the "insert" selection
@@ -91,6 +84,24 @@ WorldBank viz), and single selection for interaction variables with
 showSelected elements (like year in the WorldBank viz). The interface
 to multiple selection should be simple: click a country to toggle the
 selection state from off to on.
+
+Legends can be interactive: clicking a legend entry shows/hides that
+subset of data. For example, when we say aes(color=variable), this
+should imply aes(showSelectedColor=variable) on that geom, and
+selection=list(variable="multiple") on that plot.
+
+For each selector variable, render a widget for selecting values:
+- single selection variable: <select> or <input type="radio">
+- multiple selection categorical variable: <input type="checkbox">
+- multiple selection numeric/datetime variable: crossfilter.js
+http://square.github.io/crossfilter/
+
+To accomplish interactivity like in this plot
+http://kbroman.github.io/qtlcharts/assets/chartexamples/iplotMScanone_example.html
+we could write geom_tile(aes(hoverSelects=var)) which means that the
+selected value of var should be changed when the user hovers the mouse
+over any tile. Raise an error if hoverSelects isused with clickSelects
+or multiple selection.
 
 theme(legend.position)
 
