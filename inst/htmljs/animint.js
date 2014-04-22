@@ -455,6 +455,9 @@ var animint = function (to_select, json_file) {
       return colour;
     }
     var get_fill = function (d) {
+      if(typeof d == "undefined"){
+	alert(g_info.classed);
+      }
       if (d.hasOwnProperty("fill")) {
         return d["fill"];
       }
@@ -536,13 +539,18 @@ var animint = function (to_select, json_file) {
       //id's) -- the kv variable. Then each separate object is plotted
       //using path (case of only 1 thing and no groups).
       if (!aes.hasOwnProperty("group")) {
-        kv = [{
-          "key": 0,
-          "value": 0
-        }];
-        data = {
-          0: data
-        };
+	// There is either 1 or 0 groups.
+	if(data.length == 0){
+	  kv = [];
+	}else{
+          kv = [{
+            "key": 0,
+            "value": 0
+          }];
+          data = {
+            0: data
+          };
+	}
       } else {
         // we need to use a path for each group.
         var kv = d3.entries(d3.keys(data));
@@ -560,15 +568,17 @@ var animint = function (to_select, json_file) {
       // line, path, and polygon use d3.svg.line(), 
       // ribbon uses d3.svg.area()
       // we have to define lineThing accordingly.
-      if (g_info.geom != "ribbon") {
-        var lineThing = d3.svg.line()
-          .x(toXY("x", "x"))
-          .y(toXY("y", "y"));
-      } else {
+      if (g_info.geom == "ribbon") {
         var lineThing = d3.svg.area()
           .x(toXY("x", "x"))
           .y(toXY("y", "ymax"))
-          .y0(toXY("y", "ymin"));;
+          .y0(toXY("y", "ymin"))
+	;
+      } else {
+        var lineThing = d3.svg.line()
+          .x(toXY("x", "x"))
+          .y(toXY("y", "y"))
+	;
       }
 
       elements = elements.data(kv); //select the correct group before returning anything

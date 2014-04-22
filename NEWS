@@ -151,6 +151,13 @@ added to the ggplot, resulting in an error. Waiting to come to an
 agreement with ggplot2
 developers. https://github.com/hadley/ggplot2/issues/938
 
+2014.4.22
+
+BUGFIX: in the JavaScript, when there are zero groups of line/ribbon
+data to display for the current selection, just draw nothing (before
+there was an error since the code was written as though there was 1
+instead of 0 groups).
+
 2014.4.16
 
 BUGFIX: toJSON gives an infinite recursion error for converting R
