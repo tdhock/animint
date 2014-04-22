@@ -166,19 +166,18 @@ saveLayer <- function(l, d, meta){
   ## plot.Selectors.
 
   is.ss <- is.showSelected(names(g$aes))
-  show.vars <- g$aes[is.ss]
   is.cs <- names(g$aes) == "clickSelects"
-  i.vars <- g$aes[is.ss | is.cs]
-  has.var <- i.vars %in% names(l$data)
+  update.vars <- g$aes[is.ss | is.cs]
+  has.var <- update.vars %in% names(l$data)
   if(!all(has.var)){
-    print(i.vars[!has.var])
+    print(update.vars[!has.var])
     stop("data does not have interactive variables")
   }
-  update.vars <- c(show.vars, g$aes[names(g$aes)=="clickSelects"])
   ## Force factor?
   ## for(v.name in names(update.vars)){
   ##   g.data[[v.name]] <- as.factor(g.data[[v.name]])
   ## }
+  show.vars <- g$aes[is.ss]
   g$subset_order <- as.list(names(show.vars))
 
   ## Construct the selector.
