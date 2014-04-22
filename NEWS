@@ -153,6 +153,13 @@ developers. https://github.com/hadley/ggplot2/issues/938
 
 2014.4.22
 
+BUGFIX: the geom drawing order is respected now, even if there are
+some geoms which are absent for the current selection. This is
+implemented by putting the geoms on each layer in a g element with
+class e.g. geom7_vline_scatter. The g element is initialized on plot
+startup, and never is deleted, even if there are 0 geoms in the
+current selection.
+
 BUGFIX: in the JavaScript, when there are zero groups of line/ribbon
 data to display for the current selection, just draw nothing (before
 there was an error since the code was written as though there was 1

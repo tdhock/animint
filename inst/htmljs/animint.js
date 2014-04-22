@@ -252,6 +252,7 @@ var animint = function (to_select, json_file) {
       .style("text-anchor", "middle");
     svg.plot = p_info;
     p_info.geoms.forEach(function (g_name) {
+      svg.append("g").attr("class", g_name);
       SVGs[g_name] = svg;
     });
     Plots[p_name] = p_info;
@@ -394,8 +395,8 @@ var animint = function (to_select, json_file) {
         return svg[xy](d[a]);
       }
     }
-    var elements = svg.selectAll("." + g_info.classed);
-
+    var g_element = svg.select("g." + g_info.classed);
+    var elements = g_element.selectAll(".geom");
     // TODO: standardize this code across aes/styles.
     var base_opacity = 1;
     if (g_info.params.alpha) {
@@ -846,7 +847,7 @@ var animint = function (to_select, json_file) {
     }
     elements.exit().remove();
     var enter = elements.enter().insert(eAppend, "." + g_info.nextgeom);
-    enter.classed(g_info.classed, 1);
+    enter.attr("class", "geom");
     if (g_info.aes.hasOwnProperty("clickSelects")) {
       var selected_funs = {
 	"opacity":{
