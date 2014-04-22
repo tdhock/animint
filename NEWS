@@ -96,6 +96,11 @@ For each selector variable, render a widget for selecting values:
 - multiple selection numeric/datetime variable: crossfilter.js
 http://square.github.io/crossfilter/
 
+OPTION: For each widget selector, should we show all available values,
+or just the values that are clickable onscreen? Or both? This may be
+specified by the designer using an option
+widgets=list(var1="onscreen", var2="all", var3="both").
+
 To accomplish interactivity like in this plot
 http://kbroman.github.io/qtlcharts/assets/chartexamples/iplotMScanone_example.html
 we could write geom_tile(aes(hoverSelects=var)) which means that the
