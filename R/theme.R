@@ -9,5 +9,5 @@
 theme_animint <- function(..., complete=FALSE){
   elements <- list(...)
   names(elements) <- paste0("animint.", names(elements))
-  structure(elements, class=c("theme", "gg"), complete=complete)
+  structure(elements, class=c("novalidate", "theme", "gg"), complete=complete)
 }
