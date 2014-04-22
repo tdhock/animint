@@ -138,13 +138,13 @@ underlying problem is that there is no equivalent of R's vjust in SVG
 (the equivalent of R's hjust=0.5|1|0 is CSS text-anchor:
 middle|end|start). See examples/align_rect_text.R.
 
-theme(animint.width=600, animint.height=600) instead of option lists
-which make us repeat the plot names... this results in an error with
-ggplot2-0.9.3.1, is there any work-around or do we need to just
-continue to use option lists? maybe we can implement a custom theme()
-function? Another solution is for ggplot2 to accept non-standard
-options, so I posted an issue
-https://github.com/hadley/ggplot2/issues/938
+theme_animint(width=600, height=600) instead of option lists which
+make us repeat the plot names... The custom theme_animint() function
+is implemented in R/theme.R and does not call validate_element, but
+ggplot2 still calls validate_element when the non-standard theme is
+added to the ggplot, resulting in an error. Waiting to come to an
+agreement with ggplot2
+developers. https://github.com/hadley/ggplot2/issues/938
 
 2014.4.16
 

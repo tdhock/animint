@@ -1,6 +1,8 @@
-##' Theme without checks. This would allow us to write
-##' theme_animint(width=500), which would give an error under standard
-##' ggplot2.
+##' Theme without checks. This allows us to write
+##' theme_animint(width=500), instead of theme(animint.width=500)
+##' which gives an error in ggplot2 because users should be informed
+##' if they mis-type standard theme element
+##' names. https://github.com/hadley/ggplot2/issues/938
 ##' @param ... theme options.
 ##' @param complete TRUE or FALSE.
 ##' @return ggplot theme list.
