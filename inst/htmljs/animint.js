@@ -455,9 +455,6 @@ var animint = function (to_select, json_file) {
       return colour;
     }
     var get_fill = function (d) {
-      if(typeof d == "undefined"){
-	alert(g_info.classed);
-      }
       if (d.hasOwnProperty("fill")) {
         return d["fill"];
       }
