@@ -164,8 +164,16 @@ saveLayer <- function(l, d, meta){
   ## this case showSelected=segments, showSelected2=bases.per.probe). The
   ## currently selected values of these variables are stored in
   ## plot.Selectors.
-  
-  show.vars <- g$aes[is.showSelected(names(g$aes))]
+
+  is.ss <- is.showSelected(names(g$aes))
+  show.vars <- g$aes[is.ss]
+  is.cs <- names(g$aes) == "clickSelects"
+  i.vars <- g$aes[is.ss | is.cs]
+  has.var <- i.vars %in% names(l$data)
+  if(!all(has.var)){
+    print(i.vars[!has.var])
+    stop("data does not have interactive variables")
+  }
   update.vars <- c(show.vars, g$aes[names(g$aes)=="clickSelects"])
   ## Force factor?
   ## for(v.name in names(update.vars)){
