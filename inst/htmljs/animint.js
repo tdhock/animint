@@ -73,7 +73,7 @@ var animint = function (to_select, json_file) {
     // geom. This is a hack and should be removed when we implement
     // the selected.color, selected.size, etc aesthetics.
     if(g_info.aes.hasOwnProperty("fill") && 
-       !g_info.aes.hasOwnProperty("colour")){
+       g_info.geom == "rect"){
       g_info.select_style = "stroke";
     }else{
       g_info.select_style = "opacity";
