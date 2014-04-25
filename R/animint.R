@@ -102,8 +102,19 @@ parsePlot <- function(meta){
   } else {
     plot.meta$title <- meta$plot$labels$title
   }
-  
-  plot.meta$options <- list(width=400,height=400)
+
+  ## Set plot width and height from animint.* options if they are
+  ## present.
+  plot.meta$options <- list()
+  theme <- meta$plot$theme
+  for(wh in c("width", "height")){
+    awh <- paste0("animint.", wh)
+    plot.meta$options[[wh]] <- if(awh %in% names(theme)){
+      theme[[awh]]
+    }else{
+      400
+    }
+  }
 
   meta$plots[[meta$plot.name]] <- plot.meta
 }

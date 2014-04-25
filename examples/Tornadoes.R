@@ -115,7 +115,7 @@ tornado.points <-
                         showSelected=year),
                     colour=seg.color, data=UStornadoes)+
        scale_fill_manual(values=c(end=seg.color))+
-       theme(animint.width=750, animint.height=500)+
+       theme_animint(width=750, height=500)+
        geom_point(aes(endLong, endLat, fill=place, showSelected=year),
                     colour=seg.color,
                   data=data.frame(UStornadoes,place="end")),
