@@ -80,7 +80,15 @@ parsePlot <- function(meta){
     plot.meta$axis[[s("%sname")]] <- if(is.blank(s("axis.title.%s"))){
       ""
     }else{
-      meta$plot$labels[[xy]]
+      scale.i <- which(meta$plot$scales$find(xy))
+      lab.or.null <- if(length(scale.i) == 1){
+        meta$plot$scales$scales[[scale.i]]$name
+      }
+      if(is.null(lab.or.null)){
+        meta$plot$labels[[xy]]
+      }else{
+        lab.or.null
+      }
     }
     plot.meta$axis[[s("%sline")]] <- !is.blank(s("axis.line.%s"))
     plot.meta$axis[[s("%sticks")]] <- !is.blank(s("axis.ticks.%s"))

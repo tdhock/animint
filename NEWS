@@ -123,8 +123,6 @@ or multiple selection.
 
 theme(legend.position)
 
-specify scale_x_continuous(LABEL) instead of xlab(LABEL).
-
 aes(tooltip=text) for specifying the text to show when you hover the
 mouse over something, e.g. issue #1.
 
@@ -155,6 +153,11 @@ underlying problem is that there is no equivalent of R's vjust in SVG
 middle|end|start). See examples/align_rect_text.R.
 
 Should time=list(variable=2000) imply duration=list(variable=1000)? 
+
+2014.4.28
+
+scale_x_continuous(LABEL) specifies the x axis label. Previously, we
+could only use xlab(LABEL).
 
 2014.4.25
 
