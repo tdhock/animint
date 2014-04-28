@@ -131,6 +131,8 @@ mouse over something, e.g. issue #1.
 layout=matrix of plot names means render plots in an html table
 instead of in a line.
 
+example with the pirates data.
+
 OUTPUT: animint2dir(L) is the same as gg2animint, but with a name that
 is consistent with the other functions below.
 
