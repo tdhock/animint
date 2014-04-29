@@ -6,7 +6,7 @@ clickSelects and showSelected aesthetics.
 
 ```s
 install.packages("devtools")
-devtools::install_github("tdhock/ggplot2", "tdhock/animint")
+devtools::install_github("tdhock/ggplot2", "tdhock/animint", build_vignettes=FALSE)
 library(animint)
 example(gg2animint)
 ```
