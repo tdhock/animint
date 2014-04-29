@@ -17,5 +17,5 @@ test_that("non-alphanumeric plot names are not allowed", {
   viz <- list(fooo.bar=gg)
   expect_error({
     gg2animint(viz)
-  }, "ggplot names must match ^[a-zA-Z][a-zA-Z0-9]*$")
+  }, "ggplot names must match ^[a-zA-Z][a-zA-Z0-9]*$", fixed=TRUE)
 })

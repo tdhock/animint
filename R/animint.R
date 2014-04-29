@@ -185,19 +185,11 @@ saveLayer <- function(l, d, meta){
   ## plot.Selectors.
 
   is.ss <- is.showSelected(names(g$aes))
-  is.cs <- names(g$aes) == "clickSelects"
-  update.vars <- g$aes[is.ss | is.cs]
-  has.var <- update.vars %in% names(l$data)
-  if(!all(has.var)){
-    print(update.vars[!has.var])
-    stop("data does not have interactive variables")
-  }
-  ## Force factor?
-  ## for(v.name in names(update.vars)){
-  ##   g.data[[v.name]] <- as.factor(g.data[[v.name]])
-  ## }
   show.vars <- g$aes[is.ss]
   g$subset_order <- as.list(names(show.vars))
+
+  is.cs <- names(g$aes) == "clickSelects"
+  update.vars <- g$aes[is.ss | is.cs]
 
   ## Construct the selector.
   for(sel.i in seq_along(update.vars)){
@@ -497,8 +489,6 @@ saveLayer <- function(l, d, meta){
     nest.cols <- subset.vec
     chunk.cols <- NULL
   }
-  ##cat(g$classed, "\nnest", nest.cols, "\nchunk", chunk.cols, "\n")
-  ##browser()
 
   ## Split into chunks and save tsv files.
   meta$classed <- g$classed
@@ -697,9 +687,24 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
       if(!grepl(pattern, list.name)){
         stop("ggplot names must match ", pattern)
       }
+      ## Before calling ggplot_build, we do some error checking for
+      ## some animint extensions.
+      for(L in p$layers){
+        ## This code assumes that the layer has the complete aesthetic
+        ## mapping and data. TODO: Do we need to copy any global
+        ## values to this layer?
+        is.ss <- is.showSelected(names(L$mapping))
+        is.cs <- names(L$mapping) == "clickSelects"
+        update.vars <- L$mapping[is.ss | is.cs]
+        has.var <- update.vars %in% names(L$data)
+        if(!all(has.var)){
+          print(update.vars[!has.var])
+          stop("data does not have interactive variables")
+        }
+      }
       meta$plot <- p
       meta$plot.name <- list.name
-      parsePlot(meta)
+      parsePlot(meta) # calls ggplot_build.
     }else if(is.list(p)){ ## for options.
       meta[[list.name]] <- p
     }else{
