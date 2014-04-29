@@ -23,10 +23,12 @@ A list of implemented features can be found on the gg2animint man
 page, and [TODOs are listed in the NEWS
 file](https://github.com/tdhock/animint/blob/master/NEWS).
 
-A [table of related
-work](https://github.com/tdhock/animint/blob/master/etc/references.org)
-explains the differences between animint and several similar R
-interactive graphics packages.
+We have compiled
+[short](https://github.com/tdhock/interactive-tutorial/tree/master/animation)
+and
+[long](https://github.com/tdhock/animint/blob/master/etc/references.org)
+tables of related work explains the differences between animint and
+several similar R interactive graphics packages.
 
 We created [some documentation for un-documented ggplot2 functions
 that we use in
