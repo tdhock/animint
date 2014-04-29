@@ -4,6 +4,9 @@ BUG: Too many legend entries for the WorldBank viz --- git bisect
 figured out that the bug was introduced in this change
 https://github.com/tdhock/animint/commit/069c167117c169dea9277608e8a0cbed3c75fcff
 
+Should we download all data in the background, even for non-animated
+plots?
+
 Specify aes(key=variable) for constancy in transitions:
 http://bost.ocks.org/mike/constancy/ I found a real data set where
 this is necessary:
