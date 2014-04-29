@@ -9,12 +9,10 @@ names. https://github.com/hadley/ggplot2/issues/938}
 theme_animint(...)
 }
 \arguments{
-  \item{...}{theme options.}
-
-  \item{complete}{TRUE or FALSE.}
+  \item{...}{theme options such as width.}
 }
 \value{
-ggplot theme list.
+ggplot theme list with names such as animint.width.
 }
 \description{
 Theme without checks. This allows us to write

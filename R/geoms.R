@@ -49,7 +49,7 @@ make_tallrect <- function(data, x.name, even=FALSE, alpha=1/2){
   x <- data[,x.name]
   stopifnot(is.numeric(x))
   vals <- sort(unique(x))
-  Delta <- if(even) rep(ggplot2:::resolution(vals), length(vals)-1)/2 else diff(vals)/2
+  Delta <- if(even) rep(ggplot2::resolution(vals), length(vals)-1)/2 else diff(vals)/2
   breaks <- c(vals[1] - Delta[1],
               vals[-1] - Delta,
               vals[length(vals)]+Delta[length(Delta)])
@@ -63,7 +63,8 @@ make_tallrect <- function(data, x.name, even=FALSE, alpha=1/2){
   geom_tallrect(a, df, alpha=alpha)
 }
 
-#' Convenience function for an interactive bar that might otherwise be created using stat_bin. 
+#' Convenience function for an interactive bar that might otherwise be
+#' created using stat_summary(geom="bar").
 #' @param data data.frame to analyze for unique x.name values.
 #' @param x.name variable to be used for x, clickSelects.
 #' @param alpha transparency of selected bar, default 1.

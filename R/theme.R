@@ -3,9 +3,8 @@
 ##' which gives an error in ggplot2 because users should be informed
 ##' if they mis-type standard theme element
 ##' names. https://github.com/hadley/ggplot2/issues/938
-##' @param ... theme options.
-##' @param complete TRUE or FALSE.
-##' @return ggplot theme list.
+##' @param ... theme options such as width.
+##' @return ggplot theme list with names such as animint.width.
 ##' @export
 ##' @author Toby Dylan Hocking
 theme_animint <- function(...){

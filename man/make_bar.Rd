@@ -1,6 +1,7 @@
 \name{make_bar}
 \alias{make_bar}
-\title{Convenience function for an interactive bar that might otherwise be created using stat_bin.}
+\title{Convenience function for an interactive bar that might otherwise be
+created using stat_summary(geom="bar").}
 \usage{
 make_bar(data, x.name, alpha = 1)
 }
@@ -17,7 +18,7 @@ a geom_bar layer.
 }
 \description{
 Convenience function for an interactive bar that might
-otherwise be created using stat_bin.
+otherwise be created using stat_summary(geom="bar").
 }
 \author{
 Toby Dylan Hocking

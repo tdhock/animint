@@ -577,6 +577,7 @@ saveChunks <- function(x, vars, meta){
 ##' @export
 ##' @author Toby Dylan Hocking
 is.showSelected <- function(x){
+  if(length(x) == 0)return(logical())
   stopifnot(is.character(x))
   grepl("showSelected", x)
 }
@@ -692,7 +693,7 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
   for(list.name in names(plot.list)){
     p <- plot.list[[list.name]]
     if(is.ggplot(p)){
-      pattern <- "[a-zA-Z][a-zA-Z0-9].*"
+      pattern <- "^[a-zA-Z][a-zA-Z0-9]*$"
       if(!grepl(pattern, list.name)){
         stop("ggplot names must match ", pattern)
       }
