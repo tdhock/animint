@@ -13,10 +13,11 @@ example(gg2animint)
 
 For more examples, see [the animint
 tutorial](http://tdhock.github.io/animint/) the [examples web
-site](http://sugiyama-www.cs.titech.ac.jp/~toby/animint/index.html)
-and look at the
-[examples/*.R](https://github.com/tdhock/animint/tree/master/examples)
-files.
+site](http://sugiyama-www.cs.titech.ac.jp/~toby/animint/index.html),
+the [animint/examples/*.R
+files](https://github.com/tdhock/animint/tree/master/examples), and
+the [bigger examples in
+animint-examples/examples/*.R](https://github.com/tdhock/animint-examples/tree/master/examples).
 
 A list of implemented features can be found on the gg2animint man
 page, and [TODOs are listed in the NEWS
