@@ -468,26 +468,34 @@ saveLayer <- function(l, d, meta){
   ##   }
   ## }
 
-  ## New code which only allows 0 or 1 chunk variables:
   subset.vec <- unlist(g$subset_order)
-  chunk.var <- subset.vec[[1]]
-  several.chunks <- if(length(g$subset_order)){
-    chunk.vec <- g.data[[chunk.var]]
-    counts <- table(chunk.vec)
-    if(all(counts == 1)){
-      FALSE
+  if(length(g$params$chunk_vars)){ #designer-specified chunk vars.
+    is.chunk <- g$aes[subset.vec] %in% g$params$chunk_vars
+    chunk.cols <- subset.vec[is.chunk]
+    nest.cols <- subset.vec[!is.chunk]
+  }else{ #infer a default, either 0 or 1 chunk vars:
+    several.chunks <- if(length(g$subset_order)){
+      chunk.var <- subset.vec[[1]]
+      chunk.vec <- g.data[[chunk.var]]
+      counts <- table(chunk.vec)
+      if(length(counts) == 1){
+        stop("only 1 chunk") # do we ever get here?
+      }
+      if(all(counts == 1)){
+        FALSE #each chunk has only 1 row -- chunks are too small.
+      }else{
+        TRUE
+      }
     }else{
-      TRUE
+      FALSE
     }
-  }else{
-    FALSE
-  }
-  if(several.chunks){
-    nest.cols <- subset.vec[-1]
-    chunk.cols <- chunk.var
-  }else{
-    nest.cols <- subset.vec
-    chunk.cols <- NULL
+    if(several.chunks){
+      nest.cols <- subset.vec[-1]
+      chunk.cols <- chunk.var
+    }else{
+      nest.cols <- subset.vec
+      chunk.cols <- NULL
+    }
   }
 
   ## Split into chunks and save tsv files.

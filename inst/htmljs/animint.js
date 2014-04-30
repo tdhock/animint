@@ -270,6 +270,9 @@ var animint = function (to_select, json_file) {
     // First apply chunk_order selector variables.
     var chunk_id = g_info.chunks;
     g_info.chunk_order.forEach(function (v_name) {
+      if(chunk_id == null){
+	return; //no data in a higher up chunk var.
+      }
       var value = Selectors[v_name].selected;
       if(chunk_id.hasOwnProperty(value)){
 	chunk_id = chunk_id[value];
@@ -278,6 +281,7 @@ var animint = function (to_select, json_file) {
       }
     });
     if(chunk_id == null){
+      draw_geom(g_info, []); //draw nothing.
       return;
     }
     var tsv_name = get_tsv(g_info, chunk_id);
