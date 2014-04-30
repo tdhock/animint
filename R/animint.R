@@ -469,8 +469,20 @@ saveLayer <- function(l, d, meta){
   ## }
 
   subset.vec <- unlist(g$subset_order)
-  if(length(g$params$chunk_vars)){ #designer-specified chunk vars.
-    is.chunk <- g$aes[subset.vec] %in% g$params$chunk_vars
+  if("chunk_vars" %in% names(g$params)){ #designer-specified chunk vars.
+    designer.chunks <- g$params$chunk_vars
+    if(!is.character(designer.chunks)){
+      stop("chunk_vars must be a character vector; ",
+           "use chunk_vars=character() to specify 1 chunk")
+    }
+    not.subset <- !designer.chunks %in% g$aes[subset.vec]
+    if(any(not.subset)){
+      stop("invalid chunk_vars ",
+           paste(designer.chunks[not.subset], collapse=" "),
+           "; possible showSelected variables: ",
+           paste(g$aes[subset.vec], collapse=" "))
+    }
+    is.chunk <- g$aes[subset.vec] %in% designer.chunks
     chunk.cols <- subset.vec[is.chunk]
     nest.cols <- subset.vec[!is.chunk]
   }else{ #infer a default, either 0 or 1 chunk vars:
