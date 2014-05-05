@@ -21,7 +21,11 @@ animint-examples/examples/*.R](https://github.com/tdhock/animint-examples/tree/m
 
 A list of implemented features can be found on the gg2animint man
 page, and [TODOs are listed in the NEWS
-file](https://github.com/tdhock/animint/blob/master/NEWS).
+file](https://github.com/tdhock/animint/blob/master/NEWS). There are
+wiki pages for [Advanced features of animint not present in
+ggplot2](https://github.com/tdhock/animint/wiki/Advanced-features-present-animint-but-not-in-ggplot2)
+and [Guidelines for contributing to
+animint](https://github.com/tdhock/animint/wiki/Development-guidelines).
 
 We have compiled
 [short](https://github.com/tdhock/interactive-tutorial/tree/master/animation)
