@@ -4,22 +4,6 @@ BUG: Too many legend entries for the WorldBank viz --- git bisect
 figured out that the bug was introduced in this change
 https://github.com/tdhock/animint/commit/069c167117c169dea9277608e8a0cbed3c75fcff
 
-Should we download all data in the background, even for non-animated
-plots?
-
-Specify aes(key=variable) for constancy in transitions:
-http://bost.ocks.org/mike/constancy/ I found a real data set where
-this is necessary:
-https://github.com/tdhock/animint-examples/blob/master/examples/chip.seq.R
-
-duration=list(complexity.i=2000) should mean a smooth transition over
-2 seconds ONLY when the complexity.i selector is updated. e.g. for
-geom_ribbon(aes(showSelected=sample1, showSelected2=sample2,
-showSelected3=complexity.i, showSelected4=set.name), this means that
-there should be no smooth transition when we click to update sample1,
-sample2, or set.name. See
-https://github.com/tdhock/animint-examples/blob/master/examples/chip.seq.R
-
 OUTPUT: Test SVG output after applying JavaScript? Is there some way
 we can apply the JavaScript non-interactively and then check the
 results?  Need to figure out which one(s) of these libraries could do
@@ -29,6 +13,30 @@ using node, so I think we should try something like this first:
 https://github.com/trifacta/vega/blob/master/bin/vg2svg Use it to
 implement the animint2HTML/applyJS function defined in R/test.R and
 used in some of the inst/tests/test-*.R files.
+
+OUTPUT: animint2dir(L) is the same as gg2animint, but with a name that
+is consistent with the other functions below.
+
+OUTPUT: animint2gist(L) uploads animint as a gist to github. Need to have a
+flat filesystem structure, with no sub-directories?
+
+OUTPUT: animint2knitr(L) may be used SEVERAL times to include d3
+plots directly in knitr html output e.g.
+http://zvfak.blogspot.jp/2013/08/using-javascript-visualization.html
+Every animint should be saved in its own sub-directory, to avoid
+filename conflicts, e.g. plot.json.
+
+OUTPUT: animint2shiny(ggList) renders the interactive animation as a shiny
+app, e.g.
+https://github.com/tdhock/interactive-tutorial/tree/master/animation/WorldBank
+
+Custom titles for the generated HTML page.
+
+facets -- would be useful when we want to align axes in related plots,
+e.g. the last plot of examples/intreg.R. To implement facets it may be
+useful to use "margin convention" http://bl.ocks.org/mbostock/3019563
+
+coord_equal -- would be useful for maps e.g. examples/Tornadoes.R.
 
 customizable alpha/color/size/fill/linetype for selected geoms, using
 selected.alpha, selected.color, etc aesthetics, see
@@ -46,20 +54,25 @@ selected.color="black" and color="transparent" for
 e.g. geom_rect(aes(fill=numeric, clickSelects=id)) and otherwise,
 selected.alpha=1 and alpha=1/2.
 
+Specify aes(key=variable) for constancy in transitions:
+http://bost.ocks.org/mike/constancy/ I found a real data set where
+this is necessary:
+https://github.com/tdhock/animint-examples/blob/master/examples/chip.seq.R
+
+duration=list(complexity.i=2000) should mean a smooth transition over
+2 seconds ONLY when the complexity.i selector is updated. e.g. for
+geom_ribbon(aes(showSelected=sample1, showSelected2=sample2,
+showSelected3=complexity.i, showSelected4=set.name), this means that
+there should be no smooth transition when we click to update sample1,
+sample2, or set.name. See
+https://github.com/tdhock/animint-examples/blob/master/examples/chip.seq.R
+
 Why does it take so much memory to compile large data? e.g.
 examples/vervet.R.
 
 Profile gg2animint() to see what part is slow, and speed it up!
 
 Is it possible to download gzipped tsv files in JavaScript/D3?
-
-Custom titles for the generated HTML page.
-
-facets -- would be useful when we want to align axes in related plots,
-e.g. the last plot of examples/intreg.R. To implement facets it may be
-useful to use "margin convention" http://bl.ocks.org/mbostock/3019563
-
-coord_equal -- would be useful for maps e.g. examples/Tornadoes.R.
 
 Allow other variable names for the same selection variable,
 e.g. insert and insert.show are 2 different columns in
@@ -75,11 +88,9 @@ OPTION: after clicking and changing the displayed data subset,
 zoom/update the axes of related plots. For animations we clearly want
 to keep the same axes across animation frames, but for some other
 kinds of plots it would be nice if the axes automatically zoomed. Make
-this an option list axesZoom=list(scatter=c("x", "y"), timeSeries="x")
-means that the x axis should be updated for timeSeries and both axes
-should be updated for scatter, but the axes are NOT updated for any
-other plots. There should also be a button next to each axis that you
-can click to toggle zooming on and off.
+this an option theme_animint(updateAxes=c("x", "y")) which means that
+both the x and y axes should be updated. There should also be a button
+next to each axis that you can click to toggle zooming on and off.
 
 It would be nice to be able to resize plots interactively, like we can
 do in shiny+ggvis.
@@ -130,28 +141,15 @@ instead of in a line.
 
 example with the pirates data.
 
-OUTPUT: animint2dir(L) is the same as gg2animint, but with a name that
-is consistent with the other functions below.
-
-OUTPUT: animint2gist(L) uploads animint as a gist to github. Need to have a
-flat filesystem structure, with no sub-directories?
-
-OUTPUT: animint2knitr(L) may be used SEVERAL times to include d3
-plots directly in knitr html output e.g.
-http://zvfak.blogspot.jp/2013/08/using-javascript-visualization.html
-Every animint should be saved in its own sub-directory, to avoid
-filename conflicts, e.g. plot.json.
-
-OUTPUT: animint2shiny(ggList) renders the interactive animation as a shiny
-app, e.g.
-https://github.com/tdhock/interactive-tutorial/tree/master/animation/WorldBank
-
 Is it possible to fix geom_rect and geom_text alignment? The
 underlying problem is that there is no equivalent of R's vjust in SVG
 (the equivalent of R's hjust=0.5|1|0 is CSS text-anchor:
 middle|end|start). See examples/align_rect_text.R.
 
 Should time=list(variable=2000) imply duration=list(variable=1000)? 
+
+Should we download all data in the background, even for non-animated
+plots?
 
 2014.4.30
 

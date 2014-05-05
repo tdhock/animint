@@ -57,6 +57,9 @@ parsePlot <- function(meta){
   ## Flip labels if coords are flipped - transform does not take care
   ## of this. Do this BEFORE checking if it is blank or not, so that
   ## individual axes can be hidden appropriately, e.g. #1.
+  if(nrow(meta$built$panel$layout) > 1){
+    stop("animint does not yet support facets")
+  }
   ranges <- meta$built$panel$ranges[[1]]
   if("flip"%in%attr(meta$plot$coordinates, "class")){
     temp <- meta$plot$labels$x
