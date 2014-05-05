@@ -65,5 +65,6 @@ good <-
                     showSelected=year, clickSelects=country),
                 data=WorldBank, stat="identity", position="identity")+
        coord_flip(),
-       duration=list(year=1000))
+       duration=list(year=1000),
+       first=list(year=1975, country="United States"))
 gg2animint(good, "WorldBank-good")
