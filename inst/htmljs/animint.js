@@ -89,7 +89,7 @@ var animint = function (to_select, json_file) {
     g_info.data = {};
     g_info.download_status = {};
     Geoms[g_name] = g_info;
-    update_geom(g_name);
+    update_geom(g_name, null);
   }
   var add_plot = function (p_name, p_info) {
     // Each plot may have one or more legends. To make space for the
@@ -265,7 +265,7 @@ var animint = function (to_select, json_file) {
   }
   // update_geom is called from add_geom and update_selector. It
   // downloads data if necessary, and then calls draw_geom.
-  var update_geom = function (g_name) {
+  var update_geom = function (g_name, selector_name) {
     var g_info = Geoms[g_name];
     // First apply chunk_order selector variables.
     var chunk_id = g_info.chunks;
@@ -281,14 +281,14 @@ var animint = function (to_select, json_file) {
       }
     });
     if(chunk_id == null){
-      draw_geom(g_info, []); //draw nothing.
+      draw_geom(g_info, [], selector_name); //draw nothing.
       return;
     }
     var tsv_name = get_tsv(g_info, chunk_id);
     // get the data if it has not yet been downloaded.
     g_info.tr.select("td.chunk").text(tsv_name);
     if(g_info.data.hasOwnProperty(tsv_name)){
-      draw_geom(g_info, g_info.data[tsv_name]);
+      draw_geom(g_info, g_info.data[tsv_name], selector_name);
     }else{
       g_info.tr.select("td.status").text("downloading");
       var svg = SVGs[g_name];
@@ -302,7 +302,7 @@ var animint = function (to_select, json_file) {
       ;
       download_chunk(g_info, tsv_name, function(chunk){
       	loading.remove();
-	draw_geom(g_info, chunk);
+	draw_geom(g_info, chunk, selector_name);
       });
     }
   }
@@ -378,7 +378,7 @@ var animint = function (to_select, json_file) {
   }
   // update_geom is responsible for obtaining a chunk of downloaded
   // data, and then calling draw_geom to actually draw it.
-  var draw_geom = function(g_info, chunk){
+  var draw_geom = function(g_info, chunk, selector_name){
     g_info.tr.select("td.status").text("displayed");
     var svg = SVGs[g_info.classed];
     var data = chunk;
@@ -965,14 +965,16 @@ var animint = function (to_select, json_file) {
       }
     }
     eActions(enter);
-    if (g_info.duration) {
-      elements = elements.transition().duration(g_info.duration);
+    if(g_info.duration && g_info.duration.selector == selector_name) {
+      elements = elements.transition().duration(g_info.duration.ms);
     }
     eActions(elements);
   }
   var update_selector = function (v_name, value) {
     Selectors[v_name].selected = value;
-    Selectors[v_name].update.forEach(update_geom);
+    Selectors[v_name].update.forEach(function(g_name){
+      update_geom(g_name, v_name);
+    });
     //Selectors[v_name].hilite.forEach(update_geom);
   }
   var ifSelectedElse = function (d, v_name, selected, not_selected) {

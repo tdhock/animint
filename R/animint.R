@@ -737,7 +737,9 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
   ## Go through options and add to the list.
   for(v.name in names(meta$duration)){
     for(g.name in meta$selectors[[v.name]]$update){
-      meta$geoms[[g.name]]$duration <- meta$duration[[v.name]]
+      meta$geoms[[g.name]]$duration <-
+        list(ms=meta$duration[[v.name]],
+             selector=v.name)
     }
   }
   ## Set plot sizes.

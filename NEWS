@@ -54,14 +54,6 @@ selected.color="black" and color="transparent" for
 e.g. geom_rect(aes(fill=numeric, clickSelects=id)) and otherwise,
 selected.alpha=1 and alpha=1/2.
 
-duration=list(complexity.i=2000) should mean a smooth transition over
-2 seconds ONLY when the complexity.i selector is updated. e.g. for
-geom_ribbon(aes(showSelected=sample1, showSelected2=sample2,
-showSelected3=complexity.i, showSelected4=set.name), this means that
-there should be no smooth transition when we click to update sample1,
-sample2, or set.name. See
-https://github.com/tdhock/animint-examples/blob/master/examples/chip.seq.R
-
 Why does it take so much memory to compile large data? e.g.
 examples/vervet.R.
 
@@ -147,6 +139,14 @@ Should we download all data in the background, even for non-animated
 plots?
 
 2014.5.5
+
+duration=list(complexity.i=2000) means a smooth transition over 2
+seconds ONLY when the complexity.i selector is updated. e.g. for
+geom_ribbon(aes(showSelected=sample1, showSelected2=sample2,
+showSelected3=complexity.i, showSelected4=set.name), this means that
+there should be no smooth transition when we click to update sample1,
+sample2, or set.name. See
+https://github.com/tdhock/animint-examples/blob/master/examples/chip.seq.R
 
 Specify aes(key=variable) for constancy in transitions:
 http://bost.ocks.org/mike/constancy/ I found a real data set where
