@@ -207,7 +207,6 @@ saveLayer <- function(l, d, meta){
       c(meta$selectors[[v.name]]$update, as.list(g$classed))
   }
   
-
   ## Warn if stat_bin is used with animint aes. geom_bar + stat_bin
   ## doesn't make sense with clickSelects/showSelected, since two
   ## clickSelects/showSelected values may show up in the same bin.

@@ -482,7 +482,12 @@ var animint = function (to_select, json_file) {
     }
 
     var eActions, eAppend;
-
+    var key_fun = null;
+    if(g_info.aes.hasOwnProperty("key")){
+      key_fun = function(d){ 
+	return d.key;
+      };
+    }
     if (g_info.geom == "line" || g_info.geom == "path" || g_info.geom ==
 	"polygon" || g_info.geom == "ribbon") {
 
@@ -582,8 +587,17 @@ var animint = function (to_select, json_file) {
           .y(toXY("y", "y"))
 	;
       }
-
-      elements = elements.data(kv); //select the correct group before returning anything
+      //select the correct group before returning anything.
+      var group_key_fun = null;
+      if(key_fun != null){
+	group_key_fun = function(group_info){
+	  var one_group = data[group_info.value];
+	  var one_row = one_group[0];
+	  //take key from first value in the group.
+	  return key_fun(one_row);
+	};
+      }
+      elements = elements.data(kv); 
       eActions = function (e) {
         e.attr("d", function (d) {
           var one_group = data[d.value];
@@ -633,7 +647,7 @@ var animint = function (to_select, json_file) {
       }
       eAppend = "path";
     } else if (g_info.geom == "segment") {
-      elements = elements.data(data);
+      elements = elements.data(data, key_fun);
       eActions = function (e) {
         e.attr("x1", function (d) {
           return svg.x(d["x"]);
@@ -653,7 +667,7 @@ var animint = function (to_select, json_file) {
       }
       eAppend = "line";
     } else if (g_info.geom == "linerange") {
-      elements = elements.data(data);
+      elements = elements.data(data, key_fun);
       eActions = function (e) {
         e.attr("x1", function (d) {
           return svg.x(d["x"]);
@@ -673,7 +687,7 @@ var animint = function (to_select, json_file) {
       }
       eAppend = "line";
     } else if (g_info.geom == "vline") {
-      elements = elements.data(data);
+      elements = elements.data(data, key_fun);
       eActions = function (e) {
         e.attr("x1", toXY("x", "xintercept"))
           .attr("x2", toXY("x", "xintercept"))
@@ -686,7 +700,7 @@ var animint = function (to_select, json_file) {
       eAppend = "line";
     } else if (g_info.geom == "hline") {
       //pretty much a copy of geom_vline with obvious modifications
-      elements = elements.data(data);
+      elements = elements.data(data, key_fun);
       eActions = function (e) {
         e.attr("y1", toXY("y", "yintercept"))
           .attr("y2", toXY("y", "yintercept"))
@@ -698,7 +712,7 @@ var animint = function (to_select, json_file) {
       }
       eAppend = "line";
     } else if (g_info.geom == "text") {
-      elements = elements.data(data);
+      elements = elements.data(data, key_fun);
       // TODO: how to support vjust? firefox doensn't support
       // baseline-shift... use paths?
       // http://commons.oreilly.com/wiki/index.php/SVG_Essentials/Text
@@ -714,7 +728,7 @@ var animint = function (to_select, json_file) {
       }
       eAppend = "text";
     } else if (g_info.geom == "point") {
-      elements = elements.data(data);
+      elements = elements.data(data, key_fun);
       eActions = function (e) {
         e.attr("cx", toXY("x", "x"))
           .attr("cy", toXY("y", "y"))
@@ -724,7 +738,7 @@ var animint = function (to_select, json_file) {
       }
       eAppend = "circle";
     } else if (g_info.geom == "jitter") {
-      elements = elements.data(data);
+      elements = elements.data(data, key_fun);
       eActions = function (e) {
         e.attr("cx", toXY("x", "x"))
           .attr("cy", toXY("y", "y"))
@@ -734,7 +748,7 @@ var animint = function (to_select, json_file) {
       }
       eAppend = "circle";
     } else if (g_info.geom == "tallrect") {
-      elements = elements.data(data);
+      elements = elements.data(data, key_fun);
       eActions = function (e) {
         e.attr("x", toXY("x", "xmin"))
           .attr("width", function (d) {
@@ -748,7 +762,7 @@ var animint = function (to_select, json_file) {
       }
       eAppend = "rect";
     } else if (g_info.geom == "rect") {
-      elements = elements.data(data);
+      elements = elements.data(data, key_fun);
       eActions = function (e) {
         e.attr("x", toXY("x", "xmin"))
           .attr("width", function (d) {

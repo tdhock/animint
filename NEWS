@@ -54,11 +54,6 @@ selected.color="black" and color="transparent" for
 e.g. geom_rect(aes(fill=numeric, clickSelects=id)) and otherwise,
 selected.alpha=1 and alpha=1/2.
 
-Specify aes(key=variable) for constancy in transitions:
-http://bost.ocks.org/mike/constancy/ I found a real data set where
-this is necessary:
-https://github.com/tdhock/animint-examples/blob/master/examples/chip.seq.R
-
 duration=list(complexity.i=2000) should mean a smooth transition over
 2 seconds ONLY when the complexity.i selector is updated. e.g. for
 geom_ribbon(aes(showSelected=sample1, showSelected2=sample2,
@@ -150,6 +145,13 @@ Should time=list(variable=2000) imply duration=list(variable=1000)?
 
 Should we download all data in the background, even for non-animated
 plots?
+
+2014.5.5
+
+Specify aes(key=variable) for constancy in transitions:
+http://bost.ocks.org/mike/constancy/ I found a real data set where
+this is necessary:
+https://github.com/tdhock/animint-examples/blob/master/examples/chip.seq.R
 
 2014.4.30
 
