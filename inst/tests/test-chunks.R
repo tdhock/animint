@@ -29,14 +29,14 @@ test_that("produce informative errors for bad chunk_vars", {
     geom_point(aes(Petal.Width, Sepal.Length, showSelected=Species),
                data=iris, chunk_vars="species"))
   expect_error({
-    gg2animint(viz, tdir, open.browser=FALSE)
+    gg2animint(viz, open.browser=FALSE)
   }, "invalid chunk_vars species; possible showSelected variables: Species")
   
   viz <- list(iris=ggplot()+
     geom_point(aes(Petal.Width, Sepal.Length, showSelected=Species),
                data=iris, chunk_vars=NA))
   expect_error({
-    gg2animint(viz, tdir, open.browser=FALSE)
-  }, paste("chunk_vars must be a character vector;"
+    gg2animint(viz, open.browser=FALSE)
+  }, paste("chunk_vars must be a character vector;",
            "use chunk_vars=character() to specify 1 chunk"), fixed=TRUE)
 })
