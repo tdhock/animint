@@ -1,7 +1,7 @@
 context("coord")
 
 test_that("coord_flip works",{
-  data(worldPop)
+  data(worldPop, package="animint")
   bars <- ggplot()+
     geom_bar(aes(x=subcontinent, y=population, showSelected=year),
              data=worldPop, stat="identity", position="identity")

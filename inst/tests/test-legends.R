@@ -1,6 +1,6 @@
 context("legends")
 
-data(WorldBank)
+data(WorldBank, package="animint")
 breaks <- 10^(4:9)
 viz <-
   list(ts=ggplot()+
@@ -27,14 +27,14 @@ test_that('breaks are respected', {
 })
 
 test_that('hiding both legends works with geom_point(show_guide=FALSE)', {
-  viz$scatter=ggplot()+
-       geom_point(aes(fertility.rate, life.expectancy, clickSelects=country,
-                      showSelected=year, colour=region, size=population),
-                  data=WorldBank, show_guide=FALSE)+
-       geom_text(aes(fertility.rate, life.expectancy, label=country,
-                     showSelected=country, showSelected2=year),
-                 data=WorldBank)+
-       make_text(WorldBank, 5, 80, "year")
+  viz$scatter <- ggplot()+
+    geom_point(aes(fertility.rate, life.expectancy, clickSelects=country,
+                   showSelected=year, colour=region, size=population),
+               data=WorldBank, show_guide=FALSE)+
+    geom_text(aes(fertility.rate, life.expectancy, label=country,
+                  showSelected=country, showSelected2=year),
+              data=WorldBank)+
+    make_text(WorldBank, 5, 80, "year")
   info <- gg2animint(viz, open.browser=FALSE)
   generated.names <- names(info$plots$scatter$legend)
   expect_identical(length(generated.names), 0L)
