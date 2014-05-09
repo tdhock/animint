@@ -138,6 +138,11 @@ Should time=list(variable=2000) imply duration=list(variable=1000)?
 Should we download all data in the background, even for non-animated
 plots?
 
+2014.5.9
+
+BUGFIX: geom_rect(size=0) is now correctly translated to
+<rect style="stroke-width: 0;">.
+
 2014.5.5
 
 duration=list(complexity.i=2000) means a smooth transition over 2

@@ -421,7 +421,7 @@ var animint = function (to_select, json_file) {
     if(g_info.geom == "text"){
       size = 12;
     }
-    if (g_info.params.size) {
+    if (g_info.params.hasOwnProperty("size")) {
       size = g_info.params.size;
     }
     var get_size = function (d) {
