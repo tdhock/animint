@@ -1110,7 +1110,24 @@ var animint = function (to_select, json_file) {
       add_selector(s_name, response.selectors[s_name]);
     }
     // loading table.
-    var loading = element.append("table");
+    element.append("br");
+    var show_hide_table = element.append("button")
+      .text("Show download status table")
+    ;
+    show_hide_table
+      .on("click", function(){
+	if(this.textContent == "Show download status table"){
+	  loading.style("display", "");
+	  show_hide_table.text("Hide download status table");
+	}else{
+	  loading.style("display", "none");
+	  show_hide_table.text("Show download status table");
+	}
+      })
+    ;
+    var loading = element.append("table")
+      .style("display", "none")
+    ;
     Widgets["loading"] = loading;
     var tr = loading.append("tr");
     tr.append("th").text("geom");

@@ -67,10 +67,6 @@ data=other.inserts, but they should both use the "insert" selection
 variable, in geom_point(aes(clickSelects=insert,
 showSelected=insert.show, data=other.inserts).
 
-Download progress table at the bottom of the plot.
-- click a button to show or hide the entire table.
-- starts shown, hides itself when everything is loaded.
-
 OPTION: after clicking and changing the displayed data subset,
 zoom/update the axes of related plots. For animations we clearly want
 to keep the same axes across animation frames, but for some other
@@ -139,6 +135,9 @@ Should we download all data in the background, even for non-animated
 plots?
 
 2014.5.9
+
+Download progress table at the bottom of the plot.
+- click a button to show or hide the entire table.
 
 BUGFIX: geom_rect(size=0) is now correctly translated to
 <rect style="stroke-width: 0;">.
