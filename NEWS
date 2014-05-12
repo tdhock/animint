@@ -128,6 +128,12 @@ instead of in a line.
 
 example with the pirates data.
 
+example with US state population since 1790, compare w/ other countries?
+http://en.wikipedia.org/wiki/List_of_U.S._states_by_historical_population
+http://fr.wikipedia.org/wiki/Histoire_démographique_de_la_France
+http://www.populstat.info/Asia/japanc.htm
+http://www.populstat.info/Americas/canadac.htm
+
 Is it possible to fix geom_rect and geom_text alignment? The
 underlying problem is that there is no equivalent of R's vjust in SVG
 (the equivalent of R's hjust=0.5|1|0 is CSS text-anchor:
