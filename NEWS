@@ -96,6 +96,10 @@ subset of data. For example, when we say aes(color=variable), this
 should imply aes(showSelectedColor=variable) on that geom, and
 selection=list(variable="multiple") on that plot.
 
+Easy legend decoding: draw an arrow next to the legend entry
+for the value of the element that the mouse is hovering over, e.g.
+http://www.highcharts.com/maps/demo/map-drilldown/dark-unica
+
 For each selector variable, render a widget for selecting values:
 - single selection variable: <select> or <input type="radio">
 - multiple selection categorical variable: <input type="checkbox">
