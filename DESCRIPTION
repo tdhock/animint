@@ -20,4 +20,5 @@ Depends:
     scales
 Suggests:
     knitr,
-    testthat
+    testthat,
+    servr
