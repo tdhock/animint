@@ -174,6 +174,10 @@ non-animated plots? I have started some work on the loadall branch,
 but the preliminary answer is NO -- the browser freezes and the plot
 does not respond to mouse clicks while the data is loading.
 
+2014.5.15
+
+Use a local file server if the servr package is installed.
+
 2014.5.9
 
 Download progress table at the bottom of the plot.
