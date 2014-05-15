@@ -84,7 +84,8 @@ DSL: Allow other variable names for the same selection variable,
 e.g. insert and insert.show are 2 different columns in
 data=other.inserts, but they should both use the "insert" selection
 variable, in geom_point(aes(clickSelects=insert,
-showSelected=insert.show, data=other.inserts).
+showSelected=insert.show, data=other.inserts). See the example in
+https://github.com/tdhock/animint-examples/blob/master/examples/scaffolds.R#L65
 
 DSL: after clicking and changing the displayed data subset,
 zoom/update the axes of related plots. For animations we clearly want
