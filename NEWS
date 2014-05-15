@@ -106,6 +106,12 @@ aes(color=variable), this should imply aes(showSelectedColor=variable)
 on that geom, and selection=list(variable="multiple") on that plot.
 
 RENDER: For each selector variable, render a widget for selecting values:
+
+RENDER: Easy legend decoding: draw an arrow next to the legend entry
+for the value of the element that the mouse is hovering over, e.g.
+http://www.highcharts.com/maps/demo/map-drilldown/dark-unica
+
+RENDER: For each selector variable, render a widget for selecting values:
 - single selection variable: <select> or <input type="radio">
 - multiple selection categorical variable: <input type="checkbox">
 - multiple selection numeric/datetime variable: crossfilter.js
@@ -132,6 +138,12 @@ DSL: option list(layout=matrix of plot names) means render plots in an
 html table instead of in a line.
 
 EXAMPLE: pirates data: world map?
+
+EXAMPLE: US state population since 1790, compare w/ other countries?
+http://en.wikipedia.org/wiki/List_of_U.S._states_by_historical_population
+http://fr.wikipedia.org/wiki/Histoire_démographique_de_la_France
+http://www.populstat.info/Asia/japanc.htm
+http://www.populstat.info/Americas/canadac.htm
 
 RENDER: Is it possible to fix geom_rect and geom_text alignment? The
 underlying problem is that there is no equivalent of R's vjust in SVG
