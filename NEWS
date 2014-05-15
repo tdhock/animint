@@ -3,6 +3,7 @@ TODOs in approximate order of importance (higher is more important).
 BUG: Too many legend entries for the WorldBank viz --- git bisect
 figured out that the bug was introduced in this change
 https://github.com/tdhock/animint/commit/069c167117c169dea9277608e8a0cbed3c75fcff
+Test already created as "breaks are respected" in inst/tests/test-legends.R
 
 OUTPUT: Test SVG output after applying JavaScript? Is there some way
 we can apply the JavaScript non-interactively and then check the
@@ -30,16 +31,19 @@ OUTPUT: animint2shiny(ggList) renders the interactive animation as a shiny
 app, e.g.
 https://github.com/tdhock/interactive-tutorial/tree/master/animation/WorldBank
 
-Custom titles for the generated HTML page.
+DSL: Custom title for the generated HTML page using option
+title=list("TITLE")
 
-facets -- would be useful when we want to align axes in related plots,
-e.g. the last plot of examples/intreg.R. To implement facets it may be
-useful to use "margin convention" http://bl.ocks.org/mbostock/3019563
+GGPLOT: facets -- would be useful when we want to align axes in
+related plots, e.g. the last plot of examples/intreg.R. To implement
+facets it may be useful to use "margin convention"
+http://bl.ocks.org/mbostock/3019563
 
-coord_equal -- would be useful for maps e.g. examples/Tornadoes.R.
+GGPLOT: coord_equal -- would be useful for maps
+e.g. examples/Tornadoes.R.
 
-customizable alpha/color/size/fill/linetype for selected geoms, using
-selected.alpha, selected.color, etc aesthetics, see
+DSL: customizable alpha/color/size/fill/linetype for selected geoms,
+using selected.alpha, selected.color, etc aesthetics, see
 examples/Climate-selected.R. The first implementation should only
 allow this at the geom level,
 e.g. geom_point(aes(clickSelects=var),selected.color="red") means to
@@ -54,20 +58,25 @@ selected.color="black" and color="transparent" for
 e.g. geom_rect(aes(fill=numeric, clickSelects=id)) and otherwise,
 selected.alpha=1 and alpha=1/2.
 
-Why does it take so much memory to compile large data? e.g.
-examples/vervet.R.
+OPTIMIZATION: Why does it take so much memory to compile large data?
+e.g. My computer has 12GB RAM but starts swapping when I try to
+compile examples/vervet.R.
 
-Profile gg2animint() to see what part is slow, and speed it up!
+OPTIMIZATION: Profile gg2animint() to see what part is slow, and speed
+it up! e.g. the last viz in
+https://github.com/tdhock/animint-examples/blob/master/examples/scaffolds.R
+took 15 minutes to compile on my computer.
 
-Is it possible to download gzipped tsv files in JavaScript/D3?
+OPTIMIZATION: Is it possible to download gzipped tsv files in
+JavaScript/D3?
 
-Allow other variable names for the same selection variable,
+DSL: Allow other variable names for the same selection variable,
 e.g. insert and insert.show are 2 different columns in
 data=other.inserts, but they should both use the "insert" selection
 variable, in geom_point(aes(clickSelects=insert,
 showSelected=insert.show, data=other.inserts).
 
-OPTION: after clicking and changing the displayed data subset,
+DSL: after clicking and changing the displayed data subset,
 zoom/update the axes of related plots. For animations we clearly want
 to keep the same axes across animation frames, but for some other
 kinds of plots it would be nice if the axes automatically zoomed. Make
@@ -75,64 +84,67 @@ this an option theme_animint(updateAxes=c("x", "y")) which means that
 both the x and y axes should be updated. There should also be a button
 next to each axis that you can click to toggle zooming on and off.
 
-It would be nice to be able to resize plots interactively, like we can
-do in shiny+ggvis.
+RENDER: It would be nice to be able to resize plots interactively,
+like we can do in shiny+ggvis.
 
-multiple selection! currently, each interaction variable can only have
-a single selected value at a time, e.g. year=1996 and country=Japan in
-the WorldBank viz. In the future, we should be able to declare each
-interaction variable as either single or multiple selection using an
-option list: selection=list(year="single", country="multiple"). If
-this option list is not specified, the compiler should infer a
-default: multiple selection for interaction variables with only
-clickSelects and no showSelected elements (like country in the
-WorldBank viz), and single selection for interaction variables with
-showSelected elements (like year in the WorldBank viz). The interface
-to multiple selection should be simple: click a country to toggle the
-selection state from off to on.
+DSL: multiple selection! currently, each interaction variable can
+only have a single selected value at a time, e.g. year=1996 and
+country=Japan in the WorldBank viz. In the future, we should be able
+to declare each interaction variable as either single or multiple
+selection using an option list: selection=list(year="single",
+country="multiple"). If this option list is not specified, the
+compiler should infer a default: multiple selection for interaction
+variables with only clickSelects and no showSelected elements (like
+country in the WorldBank viz), and single selection for interaction
+variables with showSelected elements (like year in the WorldBank
+viz). The interface to multiple selection should be simple: click a
+country to toggle the selection state from off to on.
 
-Legends can be interactive: clicking a legend entry shows/hides that
-subset of data. For example, when we say aes(color=variable), this
-should imply aes(showSelectedColor=variable) on that geom, and
-selection=list(variable="multiple") on that plot.
+RENDER: Legends can be interactive: clicking a legend entry
+shows/hides that subset of data. For example, when we say
+aes(color=variable), this should imply aes(showSelectedColor=variable)
+on that geom, and selection=list(variable="multiple") on that plot.
 
-For each selector variable, render a widget for selecting values:
+RENDER: For each selector variable, render a widget for selecting values:
 - single selection variable: <select> or <input type="radio">
 - multiple selection categorical variable: <input type="checkbox">
 - multiple selection numeric/datetime variable: crossfilter.js
 http://square.github.io/crossfilter/
 
-OPTION: For each widget selector, should we show all available values,
+DSL: For each widget selector, should we show all available values,
 or just the values that are clickable onscreen? Or both? This may be
 specified by the designer using an option
 widgets=list(var1="onscreen", var2="all", var3="both").
 
-To accomplish interactivity like in this plot
+DSL: To accomplish interactivity like in this plot
 http://kbroman.github.io/qtlcharts/assets/chartexamples/iplotMScanone_example.html
 we could write geom_tile(aes(hoverSelects=var)) which means that the
 selected value of var should be changed when the user hovers the mouse
 over any tile. Raise an error if hoverSelects isused with clickSelects
 or multiple selection.
 
-theme(legend.position)
+GGPLOT: theme(legend.position)
 
-aes(tooltip=text) for specifying the text to show when you hover the
-mouse over something, e.g. issue #1.
+DSL: aes(tooltip=text) for specifying the text to show when you hover
+the mouse over something, e.g. issue #1.
 
-layout=matrix of plot names means render plots in an html table
-instead of in a line.
+DSL: option list(layout=matrix of plot names) means render plots in an
+html table instead of in a line.
 
-example with the pirates data.
+EXAMPLE: pirates data: world map?
 
-Is it possible to fix geom_rect and geom_text alignment? The
+RENDER: Is it possible to fix geom_rect and geom_text alignment? The
 underlying problem is that there is no equivalent of R's vjust in SVG
 (the equivalent of R's hjust=0.5|1|0 is CSS text-anchor:
 middle|end|start). See examples/align_rect_text.R.
 
-Should time=list(variable=2000) imply duration=list(variable=1000)? 
+DSL: if there was no duration specified, should
+time=list(variable=2000) imply duration=list(variable=1000)?
 
-Should we download all data in the background, even for non-animated
-plots?
+RENDER: Should we download all data in the background, even for
+non-animated plots? I have started some work on the loadall branch,
+but the preliminary answer is NO -- the browser freezes and the plot
+does not respond to mouse clicks while the data is loading.
 
 2014.5.9
 
