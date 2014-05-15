@@ -25,11 +25,21 @@ OUTPUT: animint2knitr(L) may be used SEVERAL times to include d3
 plots directly in knitr html output e.g.
 http://zvfak.blogspot.jp/2013/08/using-javascript-visualization.html
 Every animint should be saved in its own sub-directory, to avoid
-filename conflicts, e.g. plot.json.
+filename conflicts, e.g. plot.json. More detailed explanation at
+https://github.com/tdhock/animint/wiki/Renderer-details#animint
 
 OUTPUT: animint2shiny(ggList) renders the interactive animation as a shiny
 app, e.g.
 https://github.com/tdhock/interactive-tutorial/tree/master/animation/WorldBank
+
+OUTPUT: "shiny widgets" -- I guess it should be possible and useful to
+edit things like the variable plotted on the x/y axis, for example in
+the WorldBank data viz, instead of writing
+geom_point(aes(x=life.expectancy)) we could write
+geom_point(aes_string(x=input$xvar)) with selectInput('xvar', 'X
+Variable', names(dataset))). However I fear that it may end up not
+being very responsive, since the animint would have to be re-compiled
+by the shiny server after every change to the shiny input.
 
 DSL: Custom title for the generated HTML page using option
 title=list("TITLE")
@@ -105,8 +115,6 @@ shows/hides that subset of data. For example, when we say
 aes(color=variable), this should imply aes(showSelectedColor=variable)
 on that geom, and selection=list(variable="multiple") on that plot.
 
-RENDER: For each selector variable, render a widget for selecting values:
-
 RENDER: Easy legend decoding: draw an arrow next to the legend entry
 for the value of the element that the mouse is hovering over, e.g.
 http://www.highcharts.com/maps/demo/map-drilldown/dark-unica
@@ -116,6 +124,13 @@ RENDER: For each selector variable, render a widget for selecting values:
 - multiple selection categorical variable: <input type="checkbox">
 - multiple selection numeric/datetime variable: crossfilter.js
 http://square.github.io/crossfilter/
+Currently, it is only possible to change the selection by clicking on
+data points/lines, not widgets. To implement that you would probably
+just have to add a few lines of JavaScript code to add the widgets,
+right after the plot meta-data is loaded, in add_selector
+https://github.com/tdhock/animint/blob/master/inst/htmljs/animint.js#L261. Also
+for an example of adding a button to the web page in JavaScript, see
+https://github.com/tdhock/animint/blob/master/inst/htmljs/animint.js#L1114.
 
 DSL: For each widget selector, should we show all available values,
 or just the values that are clickable onscreen? Or both? This may be
