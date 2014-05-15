@@ -1,7 +1,7 @@
-library(animint)
-library(dplyr)
-library(reshape2)
-library(grid)
+works_with_R("3.1.0",
+             "tdhock/animint@507203aecc3076a66cca035fc44b3a16904462ea",
+             dplyr="0.2",
+             reshape2="1.2.2")
 
 data(vervet)
 
@@ -10,7 +10,7 @@ nonzero <- subset(vervetCounts, reads > 0)
 hist(vervet$samples[["Total Reads"]])
 with(vervet$samples, table(experiment, contamination))
 with(vervet$samples, table(monkey, contamination))
-ord <- order(nonzero$loc)
+ord <- order(nonzero$location)
 counts <- nonzero[ord,]
 experiment.colors <- c(reseqApril="green", sequenced="black")
 contamination.colors <- c(hostDNA="pink", none="blue")
@@ -33,7 +33,7 @@ monkey.list <- with(vervet, split(counts, counts$monkey))
 
 ## So instead lets do it by hand:
 monkey.cast <- list()
-levs <- levels(vervet$samp$loc)#[1:5]
+levs <- levels(vervet$samples$location)#[1:5]
 angle <- seq(0, 2*pi, l=length(levs)+1)[-1]
 circle.text <- data.frame(location=levs, x=cos(angle), y=sin(angle),
                           row.names=levs)
@@ -197,7 +197,7 @@ p <- ggplot()+
     }
   })+
   theme_bw()+
-  theme(panel.margin=unit(0, "cm"))+
+  theme(panel.margin=grid::unit(0, "cm"))+
   coord_equal()
 
 ## Create geom_rects for selecting nearby location pairs.
@@ -211,7 +211,7 @@ ggplot()+pair.select+
   ylim(levs)+
   facet_wrap("monkey")+
   theme_bw()+
-  theme(panel.margin=unit(0, "cm"))
+  theme(panel.margin=grid::unit(0, "cm"))
 
 ## Table with 1 row for each monkey.
 new.names <- c()
@@ -265,6 +265,7 @@ viz <-
        scale_colour_manual(values=experiment.colors)+
        scale_fill_manual(values=contamination.colors)+
        make_text(nonzero, -2, "duodenum", "id55mer"),
+
        samples=ggplot()+
        ggtitle("All samples")+
        make_text(vervetCounts, 750, 1000, "monkey")+
@@ -278,6 +279,7 @@ viz <-
        scale_colour_manual(values=experiment.colors)+
        scale_fill_manual(values=contamination.colors),
 ### TODO: plot a picture of the intestines in the background.
+
        circle=ggplot()+
        ggtitle("Location pairs")+
        make_text(vervetCounts, 0, 0, "monkey")+
@@ -287,6 +289,7 @@ viz <-
        geom_segment(aes(x, y, xend=xend, yend=yend,
                         showSelected=monkey, clickSelects=pair),
                     data=observed.segs, size=5, alpha=6/10),
+
        monkey=ggplot()+pair.select+ylim(levs)+
        ggtitle("All 55mer data for one monkey")+
        xlab(lab)+
@@ -310,6 +313,7 @@ viz <-
 ### let us jitter them up and down to avoid overlaps.
                   position=position_jitter(width=0))+
        make_text(nonzero, -2, "duodenum", "monkey"),
+
        scatter=ggplot()+
        geom_point(aes(mytrans(x), mytrans(y), showSelected=id55mer,
                       showSelected2=monkey, showSelected3=pair),
@@ -334,6 +338,7 @@ viz <-
        make_text(scatter$point, -2.5, -1/4, "monkey")+
        xlab(lab)+ylab(lab)+
        ggtitle("nearby location correlation"),
+
        table=ggplot()+
        ggtitle("Select monkey")+
        theme(axis.line=element_blank(), axis.text=element_blank(), 
@@ -358,7 +363,7 @@ viz <-
                  alpha=1/2, fill="yellow", colour=NA, data=table.rects),
        width=list(kmer=800, samples=300, circle=300, monkey=800),
        height=list(kmer=300, samples=300, circle=300, monkey=600))
-##viz$sca+facet_grid(pair~monkey)+theme_bw()+theme(panel.margin=unit(0,"cm"))
+##viz$sca+facet_grid(pair~monkey)+theme_bw()+theme(panel.margin=grid::unit(0,"cm"))
 ###print(viz$table)
 gg2animint(viz, "vervet-new")
 
