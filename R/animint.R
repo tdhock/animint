@@ -804,8 +804,12 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
   }
   json <- RJSONIO::toJSON(export.data)
   cat(json,file=file.path(out.dir,"plot.json"))
-  if(open.browser){
-    browseURL(sprintf("%s/index.html",out.dir))
+  if (open.browser) {
+    if (require(servr)) {
+      httd(dir = out.dir)
+    } else {
+      browseURL(sprintf("%s/index.html", out.dir))
+    }
   }
   invisible(meta)
   ### An invisible copy of the R list that was exported to JSON.
