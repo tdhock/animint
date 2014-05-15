@@ -6,7 +6,7 @@ clickSelects and showSelected aesthetics.
 
 ```s
 install.packages("devtools")
-devtools::install_github("tdhock/ggplot2", "tdhock/animint", build_vignettes=FALSE)
+devtools::install_github(c("tdhock/ggplot2", "tdhock/animint"), build_vignettes=FALSE)
 library(animint)
 example(gg2animint)
 ```
@@ -31,8 +31,10 @@ We have compiled
 [short](https://github.com/tdhock/interactive-tutorial/tree/master/animation)
 and
 [long](https://github.com/tdhock/animint/blob/master/etc/references.org)
-tables of related work explains the differences between animint and
-several similar R interactive graphics packages.
+tables of related work, and [written a conference
+paper](https://github.com/tdhock/animint-paper/blob/master/HOCKING-animint.pdf?raw=true)
+to explain the differences between animint and several similar
+interactive data viz packages.
 
 We created [some documentation for un-documented ggplot2 functions
 that we use in
