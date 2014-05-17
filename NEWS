@@ -21,13 +21,6 @@ is consistent with the other functions below.
 OUTPUT: animint2gist(L) uploads animint as a gist to github. Need to have a
 flat filesystem structure, with no sub-directories?
 
-OUTPUT: animint2knitr(L) may be used SEVERAL times to include d3
-plots directly in knitr html output e.g.
-http://zvfak.blogspot.jp/2013/08/using-javascript-visualization.html
-Every animint should be saved in its own sub-directory, to avoid
-filename conflicts, e.g. plot.json. More detailed explanation at
-https://github.com/tdhock/animint/wiki/Renderer-details#animint
-
 OUTPUT: animint2shiny(ggList) renders the interactive animation as a shiny
 app, e.g.
 https://github.com/tdhock/interactive-tutorial/tree/master/animation/WorldBank
@@ -173,6 +166,14 @@ RENDER: Should we download all data in the background, even for
 non-animated plots? I have started some work on the loadall branch,
 but the preliminary answer is NO -- the browser freezes and the plot
 does not respond to mouse clicks while the data is loading.
+
+2014.5.16
+
+The new knit_print.animint function tells knitr how to print
+objects of class "animint". This allows one to embed multiple
+animint plots in a single HTML via R Markdown and knitr. This
+is currently only possible with the dev version of knitr,
+but this won't be a problem when v1.6 is released to CRAN
 
 2014.5.15
 
