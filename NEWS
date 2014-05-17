@@ -1,10 +1,5 @@
 TODOs in approximate order of importance (higher is more important).
 
-BUG: Too many legend entries for the WorldBank viz --- git bisect
-figured out that the bug was introduced in this change
-https://github.com/tdhock/animint/commit/069c167117c169dea9277608e8a0cbed3c75fcff
-Test already created as "breaks are respected" in inst/tests/test-legends.R
-
 OUTPUT: Test SVG output after applying JavaScript? Is there some way
 we can apply the JavaScript non-interactively and then check the
 results?  Need to figure out which one(s) of these libraries could do
@@ -166,6 +161,14 @@ RENDER: Should we download all data in the background, even for
 non-animated plots? I have started some work on the loadall branch,
 but the preliminary answer is NO -- the browser freezes and the plot
 does not respond to mouse clicks while the data is loading.
+
+2014.5.17
+
+Fixed the "too many legend entires" bug. For more info,
+see the commit that introduced the bug  (and the note on
+why it doesn't work)
+
+https://github.com/tdhock/animint/commit/069c167117c169dea9277608e8a0cbed3c75fcff
 
 2014.5.16
 
