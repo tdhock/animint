@@ -665,12 +665,13 @@ is.showSelected <- function(x){
 #' @aliases animint
 #' @param plot.list a named list of ggplots and option lists.
 #' @param out.dir directory to store html/js/csv files.
+#' @param json.file character string that names the JSON file with metadata associated with the plot.
 #' @param open.browser Should R open a browser? If yes, be sure to configure your browser to allow access to local files, as some browsers block this by default (e.g. chrome).
 #' @return invisible list of ggplots in list format.
 #' @export 
 #' @seealso \code{\link{ggplot2}}
 #' @example examples/gg2animint.R
-gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()){
+gg2animint <- function(plot.list, out.dir=tempfile(), json.file = "plot.json", open.browser=interactive()){
   ## Check that it is a list and every element is named.
   stopifnot(is.list(plot.list))
   stopifnot(!is.null(names(plot.list)))
@@ -803,7 +804,7 @@ gg2animint <- function(plot.list, out.dir=tempfile(), open.browser=interactive()
     }
   }
   json <- RJSONIO::toJSON(export.data)
-  cat(json,file=file.path(out.dir,"plot.json"))
+  cat(json, file = file.path(out.dir, json.file))
   if (open.browser) {
     if (require(servr)) {
       httd(dir = out.dir)
