@@ -20,6 +20,8 @@ Depends:
     scales
 Suggests:
     knitr (>= 1.5.33),
+    servr,
     testthat,
-    servr
+    RSelenium,
+    XML
 Roxygen: list(wrap = TRUE)

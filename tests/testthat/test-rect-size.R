@@ -15,7 +15,7 @@ test_that("rect size param is translated to stroke-width", {
   expect_match(html, "stroke: violet")
   expect_match(html, "fill: black")
 })
-              
+
 test_that("zero rect size param is translated to stroke-width", {
   viz <- list(segs=ggplot()+
               geom_rect(aes(xmin=xmin, ymin=ymin, xmax=xmax, ymax=ymax),
@@ -24,7 +24,7 @@ test_that("zero rect size param is translated to stroke-width", {
   expect_match(html, "fill: violet")
   expect_match(html, "stroke-width: 0")
 })
-              
+
 test_that("rect size range is translated to stroke-width", {
   viz <- list(segs=ggplot()+
               geom_rect(aes(xmin=xmin, ymin=ymin, xmax=xmax, ymax=ymax,
@@ -36,5 +36,4 @@ test_that("rect size range is translated to stroke-width", {
   expect_match(html, "stroke: violet")
   expect_match(html, "stroke-width: 5")
 })
-              
 
