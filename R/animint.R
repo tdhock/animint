@@ -892,21 +892,21 @@ getLegend <- function(mb){
   ## legend, and then I bind the legend entries to <tr>, <td>, and
   ## <svg> elements.
   geoms <- sapply(mb$geoms, function(i) i$geom$objname)
-  cleanData <- function(data, key, geom, params){
-    if(nrow(data)==0) return(data.frame()); # if no rows, return an empty df.
-    if("guide"%in%names(params)){
-      if(params[["guide"]]=="none") return(data.frame()); # if no guide, return an empty df
+  cleanData <- function(data, key, geom, params) {
+    nd <- nrow(data)
+    nk <- nrow(key)
+    if (nd == 0) return(data.frame()); # if no rows, return an empty df.
+    if ("guide" %in% names(params)) {
+      if (params[["guide"]] == "none") return(data.frame()); # if no guide, return an empty df
     } 
-    data$order <- 1:nrow(data)
-    data <- merge(data, key)
-    data <- data[order(data$order),]
-    if(!".label"%in%names(data)) return(data.frame()); # if there are no labels, return an empty df.
-    if(nrow(data)==0) return(data.frame());
-    data <- data[,which(colSums(!is.na(data))>0)] # remove cols that are entirely na
-    if("colour"%in%names(data)) data[["colour"]] <- toRGB(data[["colour"]]) # color hex values
-    if("fill"%in%names(data)) data[["fill"]] <- toRGB(data[["fill"]]) # fill hex values
-    names(data) <- paste(geom, names(data), sep="") # aesthetics by geom
-    names(data) <- gsub(paste(geom, ".", sep=""), "", names(data), fixed=TRUE) # label isn't geom-specific
+    if (nd != nk) warning("key and data have different number of rows")
+    if (!".label" %in% names(key)) return(data.frame()); # if there are no labels, return an empty df.
+    data$`.label` <- key$`.label`
+    data <- data[, which(colSums(!is.na(data)) > 0)] # remove cols that are entirely na
+    if("colour" %in% names(data)) data[["colour"]] <- toRGB(data[["colour"]]) # color hex values
+    if("fill" %in% names(data)) data[["fill"]] <- toRGB(data[["fill"]]) # fill hex values
+    names(data) <- paste0(geom, names(data))# aesthetics by geom
+    names(data) <- gsub(paste0(geom, "."), "", names(data), fixed=TRUE) # label isn't geom-specific
     data
   }
   dataframes <- lapply(mb$geoms, function(i) cleanData(i$data, mb$key, i$geom$objname, i$params))
