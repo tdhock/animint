@@ -17,4 +17,3 @@ Depends: \tab RJSONIO, ggplot2, R (>= 2.10), proto, grid\cr}
 
 \keyword{ package }
 
-
