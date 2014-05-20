@@ -1,7 +1,6 @@
 # Setup an infrastructure that all tests will use
 # For more details, see this discussion  -- https://github.com/johndharrison/RSelenium/issues/17
 # @johndharrison
-
 library(testthat)
 library(animint)
 library(servr)
@@ -20,11 +19,10 @@ remDr$open(silent = TRUE)
 
 test_check("animint", filter = "labels")
 
+# Kill the local server
+killcmd <- paste0('pkill -f "servr::httd\\(port=4848"')
+system(killcmd)
 
-# List relevant processes (that you might want to kill)
+# List relevant processes
 #procs <- system('ps aux|grep "servr::httd"', intern = TRUE)
-
-# How to call this upon exiting the test?
-#killcmd <- paste0('pkill -f "servr::httd"')
-#on.exit(system(killcmd))
 
