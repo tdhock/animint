@@ -810,9 +810,12 @@ gg2animint <- function(plot.list, out.dir=tempfile(), json.file = "plot.json", o
   json <- RJSONIO::toJSON(export.data)
   cat(json, file = file.path(out.dir, json.file))
   if (open.browser) {
-    if (require(servr)) {
+    if (suppressMessages(suppressWarnings(require(servr)))) {
       httd(dir = out.dir)
     } else {
+      message('opening a web browser with a file:// URL; ',
+              'if the web page is blank, ',
+              'try devtools::install_github("yihui/servr")')
       browseURL(sprintf("%s/index.html", out.dir))
     }
   }
