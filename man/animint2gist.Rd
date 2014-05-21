@@ -33,8 +33,7 @@ options(github.username = "foo", github.password = "bar")
 }
 library(animint)
 iris$id <- 1:nrow(iris)
-viz <-
-  list(petal=ggplot()+
+viz <- list(petal=ggplot()+
          geom_point(aes(Petal.Width, Petal.Length, fill=Species,
                         clickSelects=id), data=iris),
        sepal=ggplot()+
