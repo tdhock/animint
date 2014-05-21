@@ -815,7 +815,7 @@ gg2animint <- function(plot.list, out.dir=tempfile(), json.file = "plot.json", o
     } else {
       message('opening a web browser with a file:// URL; ',
               'if the web page is blank, ',
-              'try devtools::install_github("yihui/servr")')
+              'try install.packages("servr")')
       browseURL(sprintf("%s/index.html", out.dir))
     }
   }

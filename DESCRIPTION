@@ -21,6 +21,7 @@ Depends:
 Suggests:
     knitr (>= 1.5.33),
     servr,
+    gistr,
     testthat,
     RSelenium,
     XML

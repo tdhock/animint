@@ -12,6 +12,8 @@ cmd <- paste0('R -e \"servr::httd(port=4848)\"')
 if (.Platform$OS.type != "unix") cmd <- paste0(cmd, " &")
 system(cmd, intern = FALSE, wait = FALSE)
 
+# Check to make sure that a selenium server exists, and if not, download it
+checkForServer(dir = system.file("bin", package = "RSelenium"))
 # We should use browser = "phantomjs" eventually, but it hangs during multiple tests
 remDr <- RSelenium::remoteDriver(browserName = "firefox")
 remDr$open(silent = TRUE)
