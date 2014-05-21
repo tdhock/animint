@@ -20,17 +20,20 @@ gg2animint_knitr <- function(plot.list){
 ##' @author Carson Sievert
 ##' @export
 knit_print.animint <- function(x, options, ...) {
-  # if available, use the chunk 'label' for naming JSON output and plot ids
-  #options$label <- if (!is.null(options$label)) "damnyou"
-  jsonFile <- paste0(options$label, '.json')
-  gg2animint(x, out.dir = '.', json.file = jsonFile, open.browser = FALSE)
-  # remove redundant files created by calling gg2animint()
-  file.remove("scripts.html", "index.html") 
-  res <- new_animint(id = options$label, json.file = jsonFile)
+  # the chunk 'label name' will define a directory to place the animints 
+  # since people love to use terrible chunk names, here is an attempt to improve it
+  # with help from -- http://stackoverflow.com/questions/8959243/r-remove-non-alphanumeric-symbols-from-a-string
+  dir <- gsub("[^[:alnum:]]", "", options$label)
+  # modify the directory name until we find a unique one
+  while (file.exists(dir)) {
+    dir <- paste0(dir, "2")
+  }
+  gg2animint(x, out.dir = dir, json.file = 'plot.json', open.browser = FALSE)
+  res <- new_animint(id = dir, json.file = file.path(dir, 'plot.json'))
   # if this is the first plot, place scripts just before the plot
   # there has to be a better way to do this, but this will do for now -- http://stackoverflow.com/questions/14308240/how-to-add-javascript-in-the-head-of-a-html-knitr-document
   if (length(knit_meta(class = "animint", clean = FALSE)) == 0) {
-    res <- paste0('<script type="text/javascript" src="vendor/d3.v3.js"></script>\n<script type="text/javascript" src="animint.js"></script>', res)
+    res <- paste0('<script type="text/javascript" src="', dir, '/vendor/d3.v3.js"></script>\n<script type="text/javascript" src="', dir, '/animint.js"></script>', res)
   }
   knitr::asis_output(res, meta = list(animint = structure("", class = "animint")))
 }

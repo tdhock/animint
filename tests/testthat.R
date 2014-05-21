@@ -1,6 +1,6 @@
 # Setup an infrastructure that all tests will use
 # For more details, see this discussion  -- https://github.com/johndharrison/RSelenium/issues/17
-# @johndharrison
+# Thanks for all the help @johndharrison!
 library(testthat)
 library(animint)
 library(servr)
@@ -12,17 +12,18 @@ cmd <- paste0('R -e \"servr::httd(port=4848)\"')
 if (.Platform$OS.type != "unix") cmd <- paste0(cmd, " &")
 system(cmd, intern = FALSE, wait = FALSE)
 
-# Setup a selenium remote webdriver instance via RSelenium
-# A much more sophisticated approach is located here -- https://github.com/johndharrison/RSelenium/blob/master/inst/tests/setup.r
-remDr <- remoteDriver()
+# We should use browser = "phantomjs" eventually, but it hangs during multiple tests
+remDr <- RSelenium::remoteDriver(browserName = "firefox")
 remDr$open(silent = TRUE)
 
-test_check("animint", filter = "labels")
+source("testthat/functions.R")
+test_dir("./testthat", filter = "labels|rect")
 
-# Kill the local server
+# Close the browser
+remDr$quit()
+# Kill the server
 killcmd <- paste0('pkill -f "servr::httd\\(port=4848"')
 system(killcmd)
 
 # List relevant processes
 #procs <- system('ps aux|grep "servr::httd"', intern = TRUE)
-
