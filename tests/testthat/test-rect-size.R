@@ -19,9 +19,11 @@ test_that("rect size translates to stroke-width", {
                                            aes(xmin = xmin, ymin = ymin, xmax = xmax, ymax = ymax)))
   info <- animint2HTML(viz, context, "size5")
   html <- parse_page(info)
-  style <- getStyle(html)
-  expect_equal(style[1], "opacity: 1; stroke-dasharray: 0; stroke-width: 5; fill: violet; stroke: violet;")
-  expect_equal(style[2], "opacity: 1; stroke-dasharray: 0; stroke-width: 5; fill: violet; stroke: violet;")
+  geom <- getNodeSet(html, '//rect[@class="geom"]')
+  style <- as.character(sapply(geom, function(x) xmlAttrs(x)["style"]))
+  styles <- strsplit(style, ";") #chop up style attributes
+  stroke <- sapply(styles, function(x) x[grep("stroke-width", x)]) # grab stroke-width
+  expect_that(stroke, matches("stroke-width: 5[a-z]*"))  # some browsers add 'px' to the value
 })
 
 test_that("zero rect size translates to stroke-width", {
@@ -29,18 +31,23 @@ test_that("zero rect size translates to stroke-width", {
                                           aes(xmin = xmin, ymin = ymin, xmax = xmax, ymax = ymax)))
   info <- animint2HTML(viz, context, "size0")
   html <- parse_page(info)
-  style <- getStyle(html)
-  expect_equal(style[1], "opacity: 1; stroke-dasharray: 0; stroke-width: 0; fill: violet; stroke: violet;")
-  expect_equal(style[2], "opacity: 1; stroke-dasharray: 0; stroke-width: 0; fill: violet; stroke: violet;")
+  geom <- getNodeSet(html, '//rect[@class="geom"]')
+  style <- as.character(sapply(geom, function(x) xmlAttrs(x)["style"]))
+  styles <- strsplit(style, ";")
+  stroke <- sapply(styles, function(x) x[grep("stroke-width", x)])
+  expect_that(stroke, matches("stroke-width: 0[a-z]*"))
 })
 
 test_that("rect size range translates to stroke-width", {
   viz <- list(segs = ggplot() + geom_rect(data = df, color = "violet",
                  aes(xmin = xmin, ymin = ymin, xmax = xmax, ymax = ymax, size = size)) +
                  scale_size_identity())
-  info <- animint2HTML(viz, context, "size") #suppressWarning?
+  info <- suppressWarnings(animint2HTML(viz, context, "size"))
   html <- parse_page(info)
-  style <- getStyle(html)
-  expect_equal(style, c("opacity: 1; stroke-dasharray: 0; stroke-width: 0; fill: violet; stroke: violet;",
-                         "opacity: 1; stroke-dasharray: 0; stroke-width: 5; fill: violet; stroke: violet;"))
+  geom <- getNodeSet(html, '//rect[@class="geom"]')
+  style <- as.character(sapply(geom, function(x) xmlAttrs(x)["style"]))
+  styles <- strsplit(style, ";")
+  stroke <- sapply(styles, function(x) x[grep("stroke-width", x)])
+  expect_that(stroke[1], matches("stroke-width: 0[a-z]*"))
+  expect_that(stroke[2], matches("stroke-width: 5[a-z]*"))
 })

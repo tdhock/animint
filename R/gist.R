@@ -7,15 +7,12 @@
 #' @param json.file character string that names the JSON file with metadata associated with the plot.
 #' @param domain website domain for viewing result. Browser is prompted only if there is \link{httr::url_success}.
 #' @param ... options passed onto \link{gistr::gist}
-#' @importFrom gistr gist
-#' @importFrom httr url_success
 #' @export
 #' 
 #' @examples
 #' \dontrun{
 #' devtools::install_github("rOpenSci/gistr") 
 #' options(github.username = "foo", github.password = "bar")
-#' }
 #' library(animint)
 #' iris$id <- 1:nrow(iris)
 #' viz <- list(petal=ggplot()+
@@ -25,6 +22,7 @@
 #'          geom_point(aes(Sepal.Width, Sepal.Length, fill=Species,
 #'                         clickSelects=id), data=iris))
 #' animint2gist(viz, description = "My animint plot")
+#' }
 
 
 animint2gist <- function(plot.list, out.dir = tempfile(), json.file = "plot.json", ...,
@@ -51,7 +49,7 @@ animint2gist <- function(plot.list, out.dir = tempfile(), json.file = "plot.json
   elem <- strsplit(gist, split = "/")[[1]]
   gist.code <- elem[length(elem)]
   url_name <- file.path(domain, gist.code)
-  if (httr::url_success(url_name)) browseURL(url_name)
+  if (interactive() && httr::url_success(url_name)) browseURL(url_name)
 }
 
   

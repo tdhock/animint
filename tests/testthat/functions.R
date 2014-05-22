@@ -31,9 +31,4 @@ parse_page <- function(info) {
   XML::htmlParse(remDr$getPageSource(), asText = TRUE)
 }
 
-getStyle <- function(html){
-  geom <- getNodeSet(html, '//rect[@class="geom"]')
-  as.character(sapply(geom, function(x) xmlAttrs(x)["style"]))
-}
-
 

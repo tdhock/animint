@@ -19,7 +19,7 @@ remDr <- RSelenium::remoteDriver(browserName = "firefox")
 remDr$open(silent = TRUE)
 
 source("testthat/functions.R")
-test_dir("./testthat", filter = "labels|rect")
+test_check("animint")
 
 # Close the browser
 remDr$quit()

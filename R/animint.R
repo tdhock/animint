@@ -874,7 +874,14 @@ getLegendList <- function(plistextra){
     } 
   
   position <- theme$legend.position
-  guides <- plyr::defaults(plot$guides, guides(colour="legend", fill="legend"))
+  # locate guide argument in scale_*, and use that for a default.
+  # Note, however, that guides(colour = ...) has precendence! See https://gist.github.com/cpsievert/ece28830a6c992b29ab6
+  colour.loc <- which(scales$find("colour"))
+  colour.guide <- if (length(colour.loc) == 1) scales$scales[[colour.loc]][["guide"]] else "legend"
+  # do a similar thing for fill
+  fill.loc <- which(scales$find("fill"))
+  fill.guide <- if (length(fill.loc) == 1) scales$scales[[fill.loc]][["guide"]] else "legend"
+  guides <- plyr::defaults(plot$guides, ggplot2::guides(colour = colour.guide, fill = fill.guide))
   labels <- plot$labels
   gdefs <- ggplot2:::guides_train(scales = scales, theme = theme, guides = guides, labels = labels)
   if (length(gdefs) != 0) {

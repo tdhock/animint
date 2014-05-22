@@ -32,9 +32,8 @@ motion.area <-
        geom_bar(aes(country, life.expectancy, fill=region,
                     showSelected=year, clickSelects=country),
                 data=WorldBank, stat="identity", position="identity")+
-       coord_flip(),
-       duration=list(year=1000),
-       height=list(bar=1500))
+       coord_flip() + theme_animint(height = 1500),
+       duration=list(year=1000))
 tornado.warn <- paste0("stat_bin is unpredictable ",
                        "when used with clickSelects/showSelected.\n",
                        "Use ddply to do the binning ",
