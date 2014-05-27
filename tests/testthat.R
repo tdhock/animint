@@ -15,8 +15,11 @@ system(cmd, intern = FALSE, wait = FALSE)
 # Check to make sure that a selenium server exists, and if not, download it
 checkForServer(dir = system.file("bin", package = "RSelenium"))
 # We should use browser = "phantomjs" eventually, but it hangs during multiple tests
-remDr <- RSelenium::remoteDriver(browserName = "firefox")
-remDr$open(silent = TRUE)
+startServer()
+remDr <- remoteDriver$new(browserName = "firefox")
+##str(remDr)
+remDr$open()
+
 
 source("testthat/functions.R")
 test_check("animint")

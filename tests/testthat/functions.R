@@ -26,7 +26,6 @@ animint2HTML <- function(plotList, dir = "", subdir = "") {
 #' @param info invisible ggplot2 object returned by animint
 #' @author Carson Sievert
 parse_page <- function(info) {
-  get("remDr")
   remDr$navigate(attr(info, "address"))
   XML::htmlParse(remDr$getPageSource(), asText = TRUE)
 }
