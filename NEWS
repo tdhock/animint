@@ -16,6 +16,9 @@ Variable', names(dataset))). However I fear that it may end up not
 being very responsive, since the animint would have to be re-compiled
 by the shiny server after every change to the shiny input.
 
+DSL: aes(link=sprintf("http://genome.ucsc.edu/%s", id)) to have
+clicking open a new web browser tab at that URL.
+
 DSL: Custom title for the generated HTML page using option
 title=list("TITLE")
 
