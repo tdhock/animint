@@ -807,6 +807,9 @@ animint2dir <- function(plot.list, out.dir=tempfile(), json.file = "plot.json", 
   ## Finally, copy html/js/json files to out.dir.
   src.dir <- system.file("htmljs",package="animint")
   to.copy <- Sys.glob(file.path(src.dir, "*"))
+  if("styles.css"%in%list.files(out.dir)){
+    to.copy <- to.copy[!grepl("styles.css", to.copy, fixed=TRUE)]
+  }
   file.copy(to.copy, out.dir, overwrite=TRUE, recursive=TRUE)
   export.names <-
     c("geoms", "time", "duration", "selectors", "plots")
