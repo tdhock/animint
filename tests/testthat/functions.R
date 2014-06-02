@@ -11,7 +11,7 @@ animint2HTML <- function(plotList, dir = "", subdir = "") {
   path <- file.path(dir, subdir)
   # create the directory if it doesn't already exist
   if (!file_test("-d", path)) dir.create(path)
-  res <- gg2animint(plotList, out.dir = path, open.browser = FALSE)
+  res <- animint2dir(plotList, out.dir = path, open.browser = FALSE)
   # save the address to be served as an attribute
   attr(res, "address") <- paste0("http://localhost:4848/testthat", "/", dir, "/", subdir, "/")
   res

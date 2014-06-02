@@ -9,9 +9,10 @@ Interactive animations using [ggplot2](https://github.com/hadley/ggplot2)'s gram
 if (!require(devtools)) install.packages("devtools")
 devtools::install_github(c("tdhock/ggplot2", "tdhock/animint"), build_vignettes=FALSE)
 library(animint)
+example(animint)
 ```
 
-NOTE: There are intentions to merge [tdhock/ggplot2](https://github.com/tdhock/ggplot2) with the main ggplot2 repo. This fork is required in order to use `theme_animint`.
+NOTE: There is a [pull request](https://github.com/hadley/ggplot2/pull/953) to merge [tdhock/ggplot2](https://github.com/tdhock/ggplot2) with the main ggplot2 repo. This fork is required in order to use `theme_animint`.
 
 ## Examples
 

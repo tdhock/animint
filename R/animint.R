@@ -1,8 +1,7 @@
-#' Convert a ggplot to a list. Called from gg2animint(). 
+#' Convert a ggplot to a list. 
 #' @param meta environment with previously calculated plot data, and a new plot to parse, already stored in plot and plot.name.
 #' @return nothing, info is stored in meta.
 #' @export
-#' @seealso \code{\link{gg2animint}}
 parsePlot <- function(meta){
   meta$built <- ggplot2::ggplot_build(meta$plot)
   plot.meta <- list()
@@ -136,7 +135,6 @@ parsePlot <- function(meta){
 #' @param meta environment of meta-data.
 #' @return list representing a layer, with corresponding aesthetics, ranges, and groups.
 #' @export
-#' @seealso \code{\link{gg2animint}}
 saveLayer <- function(l, d, meta){
   ranges <- meta$built$panel$ranges[[1]] #TODO:facets
   g <- list(geom=l$geom$objname)
@@ -594,6 +592,17 @@ is.showSelected <- function(x){
   grepl("showSelected", x)
 }
 
+##' Deprecated alias for animint2dir.
+##' @title animint2dir
+##' @param ... passed to animint2dir
+##' @return same as animint2dir
+##' @author Toby Dylan Hocking
+##' @export
+gg2animint <- function(...){
+  warning("gg2animint is deprecated, use animint2dir instead")
+  animint2dir(...)
+}
+
 #' Convert a list of ggplots to an interactive animation
 #' that can be viewed in a web browser. 
 #' Two new aesthetics control interactivity:
@@ -661,7 +670,7 @@ is.showSelected <- function(x){
 #' \item shape. Open and closed circles can be represented by manipulating fill and colour scales and using default (circle) points, but d3 does not support many R shape types, so mapping between the two is difficult.
 #' }
 #' 
-#' @title gg2animint
+#' @title animint2dir
 #' @aliases animint
 #' @param plot.list a named list of ggplots and option lists.
 #' @param out.dir directory to store html/js/csv files.
@@ -670,8 +679,8 @@ is.showSelected <- function(x){
 #' @return invisible list of ggplots in list format.
 #' @export 
 #' @seealso \code{\link{ggplot2}}
-#' @example examples/gg2animint.R
-gg2animint <- function(plot.list, out.dir=tempfile(), json.file = "plot.json", open.browser=interactive()){
+#' @example examples/animint.R
+animint2dir <- function(plot.list, out.dir=tempfile(), json.file = "plot.json", open.browser=interactive()){
   ## Check that it is a list and every element is named.
   stopifnot(is.list(plot.list))
   stopifnot(!is.null(names(plot.list)))
