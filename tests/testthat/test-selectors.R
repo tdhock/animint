@@ -18,7 +18,7 @@ test_that("first options are copied to selectors", {
          make_text(WorldBank, 5, 80, "year")+
          scale_size_animint(pixel.range=c(2,20), breaks=10^(4:9)),
          first=list(country="United States", year=1984))
-  info <- gg2animint(gapminder, open.browser=FALSE)
+  info <- animint2dir(gapminder, open.browser=FALSE)
   expect_identical(info$selectors$country$selected, "United States")
   expect_identical(info$selectors$year$selected, "1984")
 })

@@ -1,8 +1,5 @@
 TODOs in approximate order of importance (higher is more important).
 
-OUTPUT: animint2dir(L) is the same as gg2animint, but with a name that
-is consistent with the other functions below. Do we really need this?
-
 OUTPUT: animint2shiny(ggList) renders the interactive animation as a shiny
 app, e.g.
 https://github.com/tdhock/interactive-tutorial/tree/master/animation/WorldBank
@@ -15,6 +12,9 @@ geom_point(aes_string(x=input$xvar)) with selectInput('xvar', 'X
 Variable', names(dataset))). However I fear that it may end up not
 being very responsive, since the animint would have to be re-compiled
 by the shiny server after every change to the shiny input.
+
+DSL: aes(link=sprintf("http://genome.ucsc.edu/%s", id)) to have
+clicking open a new web browser tab at that URL.
 
 DSL: Custom title for the generated HTML page using option
 title=list("TITLE")
@@ -144,10 +144,25 @@ middle|end|start). See examples/align_rect_text.R.
 DSL: if there was no duration specified, should
 time=list(variable=2000) imply duration=list(variable=1000)?
 
+DSL: geom_tallrect(aes(xmin=chromStart, xmax=chromEnd,
+fill=annotation), edit=TRUE) means that we would like to interactively
+edit the data in this geom. In particular it means that the specified
+aesthetics may be edited by the user (xmin, xmax, fill) but the
+non-specified aesthetics may not (e.g. color in the example
+above). Save each TSV file with an _animint_id column which is unique
+for each drawn element. Start a web server that accepts POST requests
+and can edit the TSV files appropriately. This will probably take a
+lot of work, and a lot of geom-specific interactive editing code, so
+it is more of a research project than a feature request.
+
 RENDER: Should we download all data in the background, even for
 non-animated plots? I have started some work on the loadall branch,
 but the preliminary answer is NO -- the browser freezes and the plot
 does not respond to mouse clicks while the data is loading.
+
+2014.6.2
+
+OUTPUT: gg2animint is now deprecated, use animint2dir instead.
 
 2014.5.22
 
