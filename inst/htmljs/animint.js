@@ -1,12 +1,10 @@
 // Define functions to render linked interactive plots using d3.
 // Another script should define e.g.
 // <script>
-//   var plot = new animint("#plot","path/to/plot.json");
+//   var plot = new animint("#plot","plot.json");
 // </script>
 // Constructor for animint Object.
 var animint = function (to_select, json_file) {
-  var dirs = json_file.split("/");
-  dirs.pop(); //if a directory path exists, remove the JSON file from dirs
   var element = d3.select(to_select);
   this.element = element;
   var Widgets = {};
@@ -340,8 +338,7 @@ var animint = function (to_select, json_file) {
       return; // do not download twice.
     }
     g_info.download_status[tsv_name] = "downloading";
-    var tsv_file = dirs.concat(tsv_name).join("/"); //prefis tsv file with appropriate path
-    d3.tsv(tsv_file, function (error, response) {
+    d3.tsv(tsv_name, function (error, response) {
       // First convert to correct types.
       g_info.download_status[tsv_name] = "processing";
       response.forEach(function (d) {
@@ -867,8 +864,23 @@ var animint = function (to_select, json_file) {
       return "unsupported geom " + g_info.geom;
     }
     elements.exit().remove();
-    var enter = elements.enter().insert(eAppend, "." + g_info.nextgeom);
-    enter.attr("class", "geom");
+    var enter = elements.enter();
+    var linkActions = function(a_elements){
+      a_elements
+	.attr("xlink:href", function(d){ return d.link; })
+	.attr("target", "_blank")
+	.attr("class", "geom")
+      ;
+    }
+    if(g_info.aes.hasOwnProperty("link")){
+      enter = enter.append("svg:a")
+	.append("svg:"+eAppend)
+      ;
+    }else{
+      enter = enter.append(eAppend)
+	.attr("class", "geom")
+      ;
+    }
     if (g_info.aes.hasOwnProperty("clickSelects")) {
       var selected_funs = {
 	"opacity":{
@@ -967,11 +979,22 @@ var animint = function (to_select, json_file) {
         enter.style("opacity", get_alpha);
       }
     }
-    eActions(enter);
+    //eActions(enter); //Set attributes of only the entering elements... why??
     if(g_info.duration && g_info.duration.selector == selector_name) {
       elements = elements.transition().duration(g_info.duration.ms);
     }
-    eActions(elements);
+    if(g_info.aes.hasOwnProperty("link")){
+      // elements are <a>, children are e.g. <circle>
+      var linked_geoms = elements.selectAll(function(d){ 
+	return this.childNodes;
+      });
+      linked_geoms.data(elements.data());
+      eActions(linked_geoms);
+      linkActions(elements);
+    }else{
+      // elements are e.g. <circle>
+      eActions(elements); // Set the attributes of all elements (enter/exit/stay)
+    }
   }
   var update_selector = function (v_name, value) {
     Selectors[v_name].selected = value;
