@@ -733,6 +733,11 @@ animint2dir <- function(plot.list, out.dir=tempfile(), json.file = "plot.json", 
           print(update.vars[!has.var])
           stop("data does not have interactive variables")
         }
+        has.cs <- any(is.cs)
+        has.href <- "href" %in% names(L$mapping)
+        if(has.cs && has.href){
+          stop("aes(clickSelects) can not be used with aes(href)")
+        }
       }
       meta$plot <- p
       meta$plot.name <- list.name
