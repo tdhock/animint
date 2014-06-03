@@ -985,10 +985,8 @@ var animint = function (to_select, json_file) {
     }
     if(g_info.aes.hasOwnProperty("href")){
       // elements are <a>, children are e.g. <circle>
-      var linked_geoms = elements.selectAll(function(d){ 
-	return this.childNodes;
-      });
-      linked_geoms.data(elements.data());
+      var linked_geoms = elements.select(eAppend);
+      linked_geoms.data(elements.data(), key_fun);
       eActions(linked_geoms);
       linkActions(elements);
     }else{
