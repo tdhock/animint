@@ -159,7 +159,7 @@ does not respond to mouse clicks while the data is loading.
 
 2014.6.2
 
-DSL: aes(link=sprintf("http://genome.ucsc.edu/%s", id)) to have
+DSL: aes(href=sprintf("http://genome.ucsc.edu/%s", id)) to have
 clicking open a new web browser tab at that URL.
 
 OUTPUT: gg2animint is now deprecated, use animint2dir instead.
