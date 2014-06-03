@@ -867,12 +867,12 @@ var animint = function (to_select, json_file) {
     var enter = elements.enter();
     var linkActions = function(a_elements){
       a_elements
-	.attr("xlink:href", function(d){ return d.link; })
+	.attr("xlink:href", function(d){ return d.href; })
 	.attr("target", "_blank")
 	.attr("class", "geom")
       ;
     }
-    if(g_info.aes.hasOwnProperty("link")){
+    if(g_info.aes.hasOwnProperty("href")){
       enter = enter.append("svg:a")
 	.append("svg:"+eAppend)
       ;
@@ -983,7 +983,7 @@ var animint = function (to_select, json_file) {
     if(g_info.duration && g_info.duration.selector == selector_name) {
       elements = elements.transition().duration(g_info.duration.ms);
     }
-    if(g_info.aes.hasOwnProperty("link")){
+    if(g_info.aes.hasOwnProperty("href")){
       // elements are <a>, children are e.g. <circle>
       var linked_geoms = elements.selectAll(function(d){ 
 	return this.childNodes;
