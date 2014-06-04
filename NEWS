@@ -175,6 +175,10 @@ clicking open a new web browser tab at that URL.
 
 OUTPUT: gg2animint is now deprecated, use animint2dir instead.
 
+animint2gist now checks for and ignores directories and files of size
+0, which were causing
+Error: client error: (422) Unprocessable Entity (WebDAV; RFC 4918)
+
 2014.5.22
 
 All tests are now working.

@@ -3,8 +3,8 @@
 \title{Convert a list of ggplots to an interactive animation and post files as a gist}
 \usage{
 animint2gist(plot.list, out.dir = tempfile(), json.file = "plot.json", ...,
-  domain = paste("http://bl.ocks.org", getOption("github.username"), "raw",
-  sep = "/"))
+  url_prefix = sprintf("http://bl.ocks.org/\%s/raw",
+  getOption("github.username")))
 }
 \arguments{
   \item{plot.list}{a named list of ggplots and option
@@ -16,8 +16,10 @@ animint2gist(plot.list, out.dir = tempfile(), json.file = "plot.json", ...,
   \item{json.file}{character string that names the JSON
   file with metadata associated with the plot.}
 
-  \item{domain}{website domain for viewing result. Browser
-  is prompted only if there is \link{httr::url_success}.}
+  \item{url_prefix}{first part of URL for viewing result,
+  with http:// but without trailing / e.g.
+  "http://bl.ocks.org/tdhock/raw". Browser is prompted only
+  if there is \link{httr::url_success}.}
 
   \item{...}{options passed onto \link{gistr::gist}}
 }
