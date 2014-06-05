@@ -1,5 +1,8 @@
 TODOs in approximate order of importance (higher is more important).
 
+EXAMPLE: add a test for rendering HTML of multiple animints defined in
+a Rmd.
+
 DSL: Custom title for the generated HTML page using option
 title=list("TITLE")
 

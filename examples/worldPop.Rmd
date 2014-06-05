@@ -14,6 +14,7 @@ knit_meta() #either run this function once before knitting animint plots or knit
 
 ```{r "ggpopPlots"}
 data(worldPop)
+library(plyr)
 lvls <- ddply(worldPop, "subcontinent", summarise, mean(population))[,1]
 worldPop$subcontinent <- factor(worldPop$subcontinent, levels = lvls)
 years <- unique(worldPop["year"])
