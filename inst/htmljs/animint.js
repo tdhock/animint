@@ -1,7 +1,7 @@
 // Define functions to render linked interactive plots using d3.
 // Another script should define e.g.
 // <script>
-//   var plot = new animint("#plot","plot.json");
+//   var plot = new animint("#plot","path/to/plot.json");
 // </script>
 // Constructor for animint Object.
 var animint = function (to_select, json_file) {
