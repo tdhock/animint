@@ -342,7 +342,7 @@ var animint = function (to_select, json_file) {
     g_info.download_status[tsv_name] = "downloading";
     //prefix tsv file with appropriate path
     var tsv_file = dirs.concat(tsv_name).join("/"); 
-    d3.tsv(tsv_name, function (error, response) {
+    d3.tsv(tsv_file, function (error, response) {
       // First convert to correct types.
       g_info.download_status[tsv_name] = "processing";
       response.forEach(function (d) {
