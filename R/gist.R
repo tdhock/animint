@@ -79,10 +79,11 @@ animint2gist <- function
     cloned.dir <- file.path(tempdir(), cloned.dir.base)
     clone.cmd <- sprintf("git clone git@github.com:%s.git %s",
                          gist.code, cloned.dir)
+    system('pkill -f selenium-server-standalone') #kill the selenium server if it is currently running
     system(clone.cmd)
     startServer()
     Sys.sleep(2) # otherwise I get Error in function (type, msg, asError = TRUE)  : couldn't connect to host
-    remDr <- remoteDriver$new(browserName = "firefox", port = 4444)
+    dr <- remoteDriver$new(browserName = "firefox", port = 4444)
     dr$open()
     if (isTRUE(dr$value$takesScreenshot)){
       dr$navigate(url_name)
