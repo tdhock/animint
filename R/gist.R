@@ -100,7 +100,6 @@ animint2gist <- function
               "git commit thumbnail.png -m thumbnail &&",
               "git push")
       system(git.cmds)
-      browser()
     }
     dr$closeWindow()
     dr$quit()
