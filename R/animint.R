@@ -839,14 +839,11 @@ animint2dir <- function(plot.list, out.dir=tempfile(), json.file = "plot.json", 
   json <- RJSONIO::toJSON(export.data)
   cat(json, file = file.path(out.dir, json.file))
   if (open.browser) {
-    if (suppressMessages(suppressWarnings(require(servr)))) {
-      httd(dir = out.dir)
-    } else {
-      message('opening a web browser with a file:// URL; ',
-              'if the web page is blank, ',
-              'try install.packages("servr")')
+    message('opening a web browser with a file:// URL; ',
+            'if the web page is blank, try running
+install.packages("servr")
+servr::httd("', out.dir, '")')
       browseURL(sprintf("%s/index.html", out.dir))
-    }
   }
   invisible(meta)
   ### An invisible copy of the R list that was exported to JSON.
