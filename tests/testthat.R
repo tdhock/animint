@@ -6,23 +6,31 @@ library(animint)
 library(servr)
 library(RSelenium)
 library(XML)
+source("testthat/functions.R")
 
 ## Before starting the servers, kill any servers that are already
 ## running.
-ps.cmd <- sprintf("ps -C R -o pid")
-ps.lines <- system(ps.cmd, intern=TRUE)
-stopifnot(length(ps.lines) > 1)
-ps.table <- read.table(text=ps.lines, header=TRUE, colClasses="integer")
-pid <- ps.table$PID
-kill.pid <- pid[pid != Sys.getpid()]
-kill.cmd <- paste("kill -9", kill.pid)
-system("ps -C R")
-system(kill.cmd)
-system("ps -C R")
-
-system("ps -C java")
-system("pkill -9 java")
-system("ps -C java")
+kill.server <- function(port){
+  cmd <- paste0("netstat -tlpn|grep :", port)
+  netstat.lines <- system(cmd, intern=TRUE)
+  if(length(netstat.lines)){
+    pattern <-
+      paste0("(?<pid>[0-9]+)",
+             "/",
+             "(?<program>\\S+)")
+    match.mat <- str_match_perl(netstat.lines, pattern)
+    for(match.i in 1:nrow(match.mat)){
+      pid <- match.mat[match.i, "pid"]
+      if(!is.na(pid)){
+        kill.cmd <- paste("kill -9", pid)
+        print(kill.cmd)
+        system(kill.cmd)
+      }
+    }
+  }
+}
+kill.server("4444")
+kill.server("4848")
 
 # Initialize local server in a seperate R process
 cmd <- paste0('R -e \"servr::httd(port=4848)\"')
@@ -40,7 +48,6 @@ remDr <- remoteDriver$new(browserName = "firefox")
 remDr$open()
 
 
-source("testthat/functions.R")
 test_check("animint")
 
 # Close the browser
