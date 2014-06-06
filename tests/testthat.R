@@ -12,6 +12,8 @@ source("testthat/functions.R")
 ## running.
 system('pkill -f "servr::httd\\(port=4848"')
 system('pkill -f selenium-server-standalone')
+## To get the process long names look at
+system("ps u")
 
 # Initialize local server in a seperate R process
 cmd <- paste0('R -e \"servr::httd(port=4848)\"')
