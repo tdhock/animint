@@ -10,12 +10,8 @@ source("testthat/functions.R")
 
 ## Before starting the servers, kill any servers that are already
 ## running.
-kill.server <- function(port){
-  cmd <- sprintf("fuser %s/tcp -k", port)
-  system(cmd)
-}
-kill.server("4444")
-kill.server("4848")
+system('pkill -f "servr::httd\\(port=4848"')
+system('pkill -f selenium-server-standalone')
 
 # Initialize local server in a seperate R process
 cmd <- paste0('R -e \"servr::httd(port=4848)\"')
