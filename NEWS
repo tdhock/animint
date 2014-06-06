@@ -3,9 +3,6 @@ TODOs in approximate order of importance (higher is more important).
 EXAMPLE: add a test for rendering HTML of multiple animints defined in
 a Rmd.
 
-DSL: Custom title for the generated HTML page using option
-title=list("TITLE")
-
 GGPLOT: facets -- would be useful when we want to align axes in
 related plots, e.g. the last plot of examples/intreg.R. To implement
 facets it may be useful to use "margin convention"
@@ -172,6 +169,10 @@ being very responsive, since the animint would have to be re-compiled
 by the shiny server after every change to the shiny input.
 
 2014.6.2
+
+DSL: Custom title for the generated HTML page using option
+title="TITLE". This title is also used for the animint2gist
+description.
 
 DSL: aes(href=sprintf("http://genome.ucsc.edu/%s", id)) to have
 clicking open a new web browser tab at that URL.

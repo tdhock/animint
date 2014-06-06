@@ -56,10 +56,35 @@ animint2gist <- function
   html <- readLines(index.file)
   html <- gsub("vendor/", "", html)
   cat(html, file = index.file, sep = "\n")
+  ## Try rendering a screenshot using RSelenium.
+  if(require(RSelenium)){
+    startServer()
+    dr <- remoteDriver$new()
+    dr$open()
+    if(dr$value$takesScreenshot){
+      dr$navigate("http://bl.ocks.org/tdhock/raw/bfd7e9ae6650d5b64be9/")
+      screenshot <- file.path(out.dir, "screenshot.png")
+      dr$screenshot(file=screenshot)
+      ## thumbnail.png is usually 230x120 pixels.
+      thumbnail <- file.path(out.dir, "thumbnail.png")
+      cmd <- sprintf("convert %s -trim -resize 230 %s", screenshot, thumbnail)
+      status <- system(cmd)
+      if(status != 0){ # just use the full size image if we don't have convert.
+        file.copy(screenshot, thumbnail)
+      }
+    }
+    dr$closeWindow()
+    dr$quit()
+  }
+  ## Figure out which files to post.
   all.files <- Sys.glob(file.path(out.dir, "*"))
   all.file.info <- file.info(all.files)
   is.empty <- all.file.info$size == 0
-  is.ignored <- all.file.info$isdir | is.empty
+  is.tilde <- grepl("~$", all.files)
+  is.png <- grepl("[.]png$", all.files)
+  is.ignored <- all.file.info$isdir | is.empty | is.tilde
+  ## TODO: delete the next line when gist_create can upload PNGs.
+  is.ignored <- is.ignored | is.png 
   to.post <- all.files[!is.ignored]
   gist <- gist_create(to.post,
                       description=description,
@@ -67,7 +92,7 @@ animint2gist <- function
   elem <- strsplit(gist, split = "/")[[1]]
   gist.code <- elem[length(elem)]
   url_name <- file.path(url_prefix, gist.code)
-  if (interactive() && httr::url_success(url_name)) browseURL(url_name)
+  if(interactive() && httr::url_success(url_name)) browseURL(url_name)
 }
 
   
