@@ -6,23 +6,14 @@ library(animint)
 library(servr)
 library(RSelenium)
 library(XML)
+source("testthat/functions.R")
 
 ## Before starting the servers, kill any servers that are already
 ## running.
-ps.cmd <- sprintf("ps -C R -o pid")
-ps.lines <- system(ps.cmd, intern=TRUE)
-stopifnot(length(ps.lines) > 1)
-ps.table <- read.table(text=ps.lines, header=TRUE, colClasses="integer")
-pid <- ps.table$PID
-kill.pid <- pid[pid != Sys.getpid()]
-kill.cmd <- paste("kill -9", kill.pid)
-system("ps -C R")
-system(kill.cmd)
-system("ps -C R")
-
-system("ps -C java")
-system("pkill -9 java")
-system("ps -C java")
+system('pkill -f "servr::httd\\(port=4848"')
+system('pkill -f selenium-server-standalone')
+## To get the process long names look at
+system("ps u")
 
 # Initialize local server in a seperate R process
 cmd <- paste0('R -e \"servr::httd(port=4848)\"')
@@ -40,7 +31,6 @@ remDr <- remoteDriver$new(browserName = "firefox")
 remDr$open()
 
 
-source("testthat/functions.R")
 test_check("animint")
 
 # Close the browser

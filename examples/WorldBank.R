@@ -37,7 +37,7 @@ bad <-
                 data=WorldBank, stat="identity", position="identity")+
        coord_flip(),
        duration=list(year=1000))
-gg2animint(bad, "WorldBank-bad")
+animint2dir(bad, "WorldBank-bad")
 
 ## This example is good because it uses constancy
 ## http://bost.ocks.org/mike/constancy/
@@ -67,4 +67,4 @@ good <-
        coord_flip(),
        duration=list(year=1000),
        first=list(year=1975, country="United States"))
-gg2animint(good, "WorldBank-good")
+animint2dir(good, "WorldBank-good")

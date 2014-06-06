@@ -5,7 +5,13 @@
 #' @param plot.list a named list of ggplots and option lists.
 #' @param out.dir local directory to store html/js/csv files.
 #' @param json.file character string that names the JSON file with metadata associated with the plot.
-#' @param domain website domain for viewing result. Browser is prompted only if there is \link{httr::url_success}.
+#' @param url_prefix first part of URL for viewing result, with
+#' http:// but without trailing /
+#' e.g. "http://bl.ocks.org/tdhock/raw". Browser is prompted only if
+#' there is \link{httr::url_success}.
+#' @param description Brief description of gist.
+#' This is passed to gist_create
+#' and it becomes the plot title on the bl.ocks/username page.
 #' @param ... options passed onto \link{gistr::gist}
 #' @export
 #' 
@@ -23,11 +29,16 @@
 #'                         clickSelects=id), data=iris))
 #' animint2gist(viz, description = "My animint plot")
 #' }
-
-
-animint2gist <- function(plot.list, out.dir = tempfile(), json.file = "plot.json", ...,
-                         domain = paste("http://bl.ocks.org", getOption("github.username"), "raw", sep = "/")) {
-  gg2animint(plot.list, out.dir, json.file, open.browser = FALSE)
+animint2gist <- function
+(plot.list, out.dir = tempfile(), json.file = "plot.json", 
+ url_prefix = sprintf("http://bl.ocks.org/%s/raw",
+   getOption("github.username")),
+ description=plot.list$title,
+ ...){
+  if(!is.character(description))description <- ""
+  if(length(description) == 0)description <- ""
+  if(length(description) > 1)description <- description[[1]]
+  animint2dir(plot.list, out.dir, json.file, open.browser = FALSE)
   #if (is.null(getOption("github.username")) || is.null(getOption("github.password"))) 
   #  warning("Make sure 'github.username'", 
   #          "and 'github.password' are",
@@ -45,11 +56,43 @@ animint2gist <- function(plot.list, out.dir = tempfile(), json.file = "plot.json
   html <- readLines(index.file)
   html <- gsub("vendor/", "", html)
   cat(html, file = index.file, sep = "\n")
-  gist <- gistr::gist(file.path(out.dir, list.files(out.dir)), ...)
+  ## Try rendering a screenshot using RSelenium.
+  if(require(RSelenium)){
+    startServer()
+    dr <- remoteDriver$new()
+    dr$open()
+    if(dr$value$takesScreenshot){
+      dr$navigate("http://bl.ocks.org/tdhock/raw/bfd7e9ae6650d5b64be9/")
+      screenshot <- file.path(out.dir, "screenshot.png")
+      dr$screenshot(file=screenshot)
+      ## thumbnail.png is usually 230x120 pixels.
+      thumbnail <- file.path(out.dir, "thumbnail.png")
+      cmd <- sprintf("convert %s -trim -resize 230 %s", screenshot, thumbnail)
+      status <- system(cmd)
+      if(status != 0){ # just use the full size image if we don't have convert.
+        file.copy(screenshot, thumbnail)
+      }
+    }
+    dr$closeWindow()
+    dr$quit()
+  }
+  ## Figure out which files to post.
+  all.files <- Sys.glob(file.path(out.dir, "*"))
+  all.file.info <- file.info(all.files)
+  is.empty <- all.file.info$size == 0
+  is.tilde <- grepl("~$", all.files)
+  is.png <- grepl("[.]png$", all.files)
+  is.ignored <- all.file.info$isdir | is.empty | is.tilde
+  ## TODO: delete the next line when gist_create can upload PNGs.
+  is.ignored <- is.ignored | is.png 
+  to.post <- all.files[!is.ignored]
+  gist <- gist_create(to.post,
+                      description=description,
+                      ...)
   elem <- strsplit(gist, split = "/")[[1]]
   gist.code <- elem[length(elem)]
-  url_name <- file.path(domain, gist.code)
-  if (interactive() && httr::url_success(url_name)) browseURL(url_name)
+  url_name <- file.path(url_prefix, gist.code)
+  if(interactive() && httr::url_success(url_name)) browseURL(url_name)
 }
 
   
