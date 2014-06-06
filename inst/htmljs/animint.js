@@ -1,12 +1,10 @@
 // Define functions to render linked interactive plots using d3.
 // Another script should define e.g.
 // <script>
-//   var plot = new animint("#plot","path/to/plot.json");
+//   var plot = new animint("#plot","plot.json");
 // </script>
 // Constructor for animint Object.
 var animint = function (to_select, json_file) {
-  var dirs = json_file.split("/");
-  dirs.pop(); //if a directory path exists, remove the JSON file from dirs
   var element = d3.select(to_select);
   this.element = element;
   var Widgets = {};
@@ -340,9 +338,7 @@ var animint = function (to_select, json_file) {
       return; // do not download twice.
     }
     g_info.download_status[tsv_name] = "downloading";
-    //prefix tsv file with appropriate path
-    var tsv_file = dirs.concat(tsv_name).join("/"); 
-    d3.tsv(tsv_file, function (error, response) {
+    d3.tsv(tsv_name, function (error, response) {
       // First convert to correct types.
       g_info.download_status[tsv_name] = "processing";
       response.forEach(function (d) {
@@ -1125,6 +1121,9 @@ var animint = function (to_select, json_file) {
   
   // Download the main description of the interactive plot.
   d3.json(json_file, function (error, response) {
+    if(response.hasOwnProperty("title")){
+      d3.select("title").text(response.title);
+    }
     // Add plots.
     for (var p_name in response.plots) {
       add_plot(p_name, response.plots[p_name]);

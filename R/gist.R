@@ -9,6 +9,9 @@
 #' http:// but without trailing /
 #' e.g. "http://bl.ocks.org/tdhock/raw". Browser is prompted only if
 #' there is \link{httr::url_success}.
+#' @param description Brief description of gist.
+#' This is passed to gist_create
+#' and it becomes the plot title on the bl.ocks/username page.
 #' @param ... options passed onto \link{gistr::gist}
 #' @export
 #' 
@@ -27,9 +30,14 @@
 #' animint2gist(viz, description = "My animint plot")
 #' }
 animint2gist <- function
-(plot.list, out.dir = tempfile(), json.file = "plot.json", ...,
+(plot.list, out.dir = tempfile(), json.file = "plot.json", 
  url_prefix = sprintf("http://bl.ocks.org/%s/raw",
-   getOption("github.username"))){
+   getOption("github.username")),
+ description=plot.list$title,
+ ...){
+  if(!is.character(description))description <- ""
+  if(length(description) == 0)description <- ""
+  if(length(description) > 1)description <- description[[1]]
   animint2dir(plot.list, out.dir, json.file, open.browser = FALSE)
   #if (is.null(getOption("github.username")) || is.null(getOption("github.password"))) 
   #  warning("Make sure 'github.username'", 
@@ -53,7 +61,9 @@ animint2gist <- function
   is.empty <- all.file.info$size == 0
   is.ignored <- all.file.info$isdir | is.empty
   to.post <- all.files[!is.ignored]
-  gist <- gistr::gist_create(to.post, ...)
+  gist <- gist_create(to.post,
+                      description=description,
+                      ...)
   elem <- strsplit(gist, split = "/")[[1]]
   gist.code <- elem[length(elem)]
   url_name <- file.path(url_prefix, gist.code)

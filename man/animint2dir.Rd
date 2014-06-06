@@ -1,7 +1,7 @@
 \name{animint2dir}
 \alias{animint}
 \alias{animint2dir}
-\title{animint2dir}
+\title{Compile and render an animint in a local directory}
 \usage{
 animint2dir(plot.list, out.dir = tempfile(), json.file = "plot.json",
   open.browser = interactive())
@@ -24,15 +24,17 @@ animint2dir(plot.list, out.dir = tempfile(), json.file = "plot.json",
 invisible list of ggplots in list format.
 }
 \description{
-Convert a list of ggplots to an interactive animation that
-can be viewed in a web browser. Two new aesthetics control
-interactivity: \itemize{ \item
+An animint is a list of ggplots and options that defines an
+interactive animation and can be viewed in a web browser.
+Several new aesthetics control interactivity. The most
+important two are \itemize{ \item
 \code{aes(showSelected=variable)} means that only the
 subset of the data that corresponds to the selected value
 of variable will be shown. \item
 \code{aes(clickSelects=variable)} means that clicking this
 geom will change the currently selected value of variable.
-}
+} The others are described on
+https://github.com/tdhock/animint/wiki/Advanced-features-present-animint-but-not-in-ggplot2
 }
 \details{
 Supported ggplot2 geoms: \itemize{ \item point \item jitter

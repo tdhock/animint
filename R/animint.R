@@ -603,9 +603,12 @@ gg2animint <- function(...){
   animint2dir(...)
 }
 
-#' Convert a list of ggplots to an interactive animation
-#' that can be viewed in a web browser. 
-#' Two new aesthetics control interactivity:
+#' Compile and render an animint in a local directory
+#'
+#' An animint is a list of ggplots and options that defines
+#' an interactive animation and can be viewed in a web browser. 
+#' Several new aesthetics control interactivity.
+#' The most important two are 
 #' \itemize{
 #' \item \code{aes(showSelected=variable)} means that
 #'   only the subset of the data that corresponds to
@@ -613,6 +616,7 @@ gg2animint <- function(...){
 #' \item \code{aes(clickSelects=variable)} means that clicking
 #'   this geom will change the currently selected value of variable.
 #' }
+#' The others are described on https://github.com/tdhock/animint/wiki/Advanced-features-present-animint-but-not-in-ggplot2
 #' 
 #' Supported ggplot2 geoms: 
 #' \itemize{
@@ -670,7 +674,6 @@ gg2animint <- function(...){
 #' \item shape. Open and closed circles can be represented by manipulating fill and colour scales and using default (circle) points, but d3 does not support many R shape types, so mapping between the two is difficult.
 #' }
 #' 
-#' @title animint2dir
 #' @aliases animint
 #' @param plot.list a named list of ggplots and option lists.
 #' @param out.dir directory to store html/js/csv files.
@@ -711,6 +714,15 @@ animint2dir <- function(plot.list, out.dir=tempfile(), json.file = "plot.json", 
     stopifnot(length(time.var)==1)
   }
 
+  ## The title option should just be a character, not a list.
+  if(is.list(plot.list$title)){
+    plot.list$title <- plot.list$title[[1]]
+  }
+  if(is.character(plot.list$title)){
+    meta$title <- plot.list$title[[1]]
+    plot.list$title <- NULL
+  }
+
   ## Extract essential info from ggplots, reality checks.
   for(list.name in names(plot.list)){
     p <- plot.list[[list.name]]
@@ -745,7 +757,7 @@ animint2dir <- function(plot.list, out.dir=tempfile(), json.file = "plot.json", 
     }else if(is.list(p)){ ## for options.
       meta[[list.name]] <- p
     }else{
-      stop("list items must be ggplots or option lists")
+      stop("list items must be ggplots or option lists, problem: ", list.name)
     }
   }
   
@@ -817,7 +829,7 @@ animint2dir <- function(plot.list, out.dir=tempfile(), json.file = "plot.json", 
   }
   file.copy(to.copy, out.dir, overwrite=TRUE, recursive=TRUE)
   export.names <-
-    c("geoms", "time", "duration", "selectors", "plots")
+    c("geoms", "time", "duration", "selectors", "plots", "title")
   export.data <- list()
   for(export.name in export.names){
     if(export.name %in% ls(meta)){
