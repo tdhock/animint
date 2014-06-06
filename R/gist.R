@@ -53,7 +53,7 @@ animint2gist <- function
   is.empty <- all.file.info$size == 0
   is.ignored <- all.file.info$isdir | is.empty
   to.post <- all.files[!is.ignored]
-  gist <- gistr::gist(to.post, ...)
+  gist <- gistr::gist_create(to.post, ...)
   elem <- strsplit(gist, split = "/")[[1]]
   gist.code <- elem[length(elem)]
   url_name <- file.path(url_prefix, gist.code)
