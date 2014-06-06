@@ -56,26 +56,6 @@ animint2gist <- function
   html <- readLines(index.file)
   html <- gsub("vendor/", "", html)
   cat(html, file = index.file, sep = "\n")
-  ## Try rendering a screenshot using RSelenium.
-  if(require(RSelenium)){
-    startServer()
-    dr <- remoteDriver$new()
-    dr$open()
-    if(dr$value$takesScreenshot){
-      dr$navigate("http://bl.ocks.org/tdhock/raw/bfd7e9ae6650d5b64be9/")
-      screenshot <- file.path(out.dir, "screenshot.png")
-      dr$screenshot(file=screenshot)
-      ## thumbnail.png is usually 230x120 pixels.
-      thumbnail <- file.path(out.dir, "thumbnail.png")
-      cmd <- sprintf("convert %s -trim -resize 230 %s", screenshot, thumbnail)
-      status <- system(cmd)
-      if(status != 0){ # just use the full size image if we don't have convert.
-        file.copy(screenshot, thumbnail)
-      }
-    }
-    dr$closeWindow()
-    dr$quit()
-  }
   ## Figure out which files to post.
   all.files <- Sys.glob(file.path(out.dir, "*"))
   all.file.info <- file.info(all.files)
@@ -93,6 +73,45 @@ animint2gist <- function
   gist.code <- elem[length(elem)]
   url_name <- file.path(url_prefix, gist.code)
   if(interactive() && httr::url_success(url_name)) browseURL(url_name)
+  ## Try rendering a screenshot using RSelenium.
+  if(require(RSelenium)){
+    cloned.dir.base <- paste0("gist-", gist.code)
+    cloned.dir <- file.path(tempdir(), cloned.dir.base)
+    clone.cmd <- sprintf("git clone git@github.com:%s.git %s",
+                         gist.code, cloned.dir)
+    system(clone.cmd)
+    startServer()
+    dr <- remoteDriver$new()
+    dr$open()
+    if(dr$value$takesScreenshot){
+      dr$navigate(url_name)
+      screenshot <- file.path(cloned.dir, "screenshot.png")
+      dr$screenshot(file=screenshot)
+      ## thumbnail.png is usually 230x120 pixels.
+      thumbnail <- file.path(cloned.dir, "thumbnail.png")
+      cmd <- sprintf("convert %s -trim -resize 230 %s", screenshot, thumbnail)
+      status <- system(cmd)
+      if(status != 0){ # just use the full size image if we don't have convert.
+        file.copy(screenshot, thumbnail)
+      }
+      git.cmds <-
+        paste("cd", cloned.dir, "&&",
+              "git add thumbnail.png &&",
+              "git commit thumbnail.png -m thumbnail &&",
+              "git push")
+      system(git.cmds)
+      browser()
+    }
+    dr$closeWindow()
+    dr$quit()
+    thumb.url <- sprintf("https://gist.github.com/%s/%s#file-thumbnail-png",
+                         getOption("github.username"),
+                         gist.code)
+    message("pushed thumbnail.png from ",
+            cloned.dir,
+            " to ",
+            thumb.url)
+  }
 }
 
   
