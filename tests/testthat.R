@@ -29,8 +29,8 @@ kill.server <- function(port){
     }
   }
 }
-kill.server("4444")
-kill.server("4848")
+##kill.server("4444")
+##kill.server("4848")
 
 # Initialize local server in a seperate R process
 cmd <- paste0('R -e \"servr::httd(port=4848)\"')
