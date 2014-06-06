@@ -8,10 +8,11 @@ library(RSelenium)
 library(XML)
 source("testthat/functions.R")
 
-## Before starting the servers, kill any servers that are already
-## running.
-system('pkill -f "servr::httd\\(port=4848"')
-system('pkill -f selenium-server-standalone')
+## Before starting the servers, kill any servers that are already running.
+killservr <- 'pkill -f "servr::httd\\(port=4848"'
+killsel <- 'pkill -f selenium-server-standalone'
+system(killservr)
+system(killsel)
 ## To get the process long names look at
 system("ps u")
 
@@ -36,8 +37,9 @@ test_check("animint")
 # Close the browser
 remDr$quit()
 # Kill the server
-killcmd <- paste0('pkill -f "servr::httd\\(port=4848"')
-system(killcmd)
+
+system(killservr)
+system(killsel)
 
 # List relevant processes
 #procs <- system('ps aux|grep "servr::httd"', intern = TRUE)
