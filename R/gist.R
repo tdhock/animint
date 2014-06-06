@@ -81,9 +81,10 @@ animint2gist <- function
                          gist.code, cloned.dir)
     system(clone.cmd)
     startServer()
-    dr <- remoteDriver$new()
+    Sys.sleep(2) # otherwise I get Error in function (type, msg, asError = TRUE)  : couldn't connect to host
+    remDr <- remoteDriver$new(browserName = "firefox", port = 4444)
     dr$open()
-    if(dr$value$takesScreenshot){
+    if (isTRUE(dr$value$takesScreenshot)){
       dr$navigate(url_name)
       screenshot <- file.path(cloned.dir, "screenshot.png")
       dr$screenshot(file=screenshot)

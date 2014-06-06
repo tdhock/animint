@@ -27,7 +27,7 @@ checkForServer(dir = system.file("bin", package = "RSelenium"))
 startServer()
 
 Sys.sleep(2) # otherwise I get Error in function (type, msg, asError = TRUE)  : couldn't connect to host
-remDr <- remoteDriver$new(browserName = "firefox")
+remDr <- remoteDriver$new(browserName = "firefox", port = 4444)
 ##str(remDr)
 remDr$open()
 
