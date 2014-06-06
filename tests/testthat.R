@@ -11,16 +11,8 @@ source("testthat/functions.R")
 ## Before starting the servers, kill any servers that are already
 ## running.
 kill.server <- function(port){
-  cmd <- sprintf("fuser %s/tcp", port)
-  fuser.lines <- system(cmd, intern=TRUE)
-  if(length(fuser.lines)){
-    pids <- sub(".*:", "", fuser.lines)
-    for(pid in pids){
-      kill.cmd <- paste("kill -9", pid)
-      print(kill.cmd)
-      system(kill.cmd)
-    }
-  }
+  cmd <- sprintf("fuser %s/tcp -k", port)
+  system(cmd)
 }
 kill.server("4444")
 kill.server("4848")
