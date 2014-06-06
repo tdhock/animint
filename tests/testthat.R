@@ -11,26 +11,19 @@ source("testthat/functions.R")
 ## Before starting the servers, kill any servers that are already
 ## running.
 kill.server <- function(port){
-  cmd <- paste0("netstat -tlpn|grep :", port)
-  netstat.lines <- system(cmd, intern=TRUE)
-  if(length(netstat.lines)){
-    pattern <-
-      paste0("(?<pid>[0-9]+)",
-             "/",
-             "(?<program>\\S+)")
-    match.mat <- str_match_perl(netstat.lines, pattern)
-    for(match.i in 1:nrow(match.mat)){
-      pid <- match.mat[match.i, "pid"]
-      if(!is.na(pid)){
-        kill.cmd <- paste("kill -9", pid)
-        print(kill.cmd)
-        system(kill.cmd)
-      }
+  cmd <- sprintf("fuser %s/tcp", port)
+  fuser.lines <- system(cmd, intern=TRUE)
+  if(length(fuser.lines)){
+    pids <- sub(".*:", "", fuser.lines)
+    for(pid in pids){
+      kill.cmd <- paste("kill -9", pid)
+      print(kill.cmd)
+      system(kill.cmd)
     }
   }
 }
-##kill.server("4444")
-##kill.server("4848")
+kill.server("4444")
+kill.server("4848")
 
 # Initialize local server in a seperate R process
 cmd <- paste0('R -e \"servr::httd(port=4848)\"')
