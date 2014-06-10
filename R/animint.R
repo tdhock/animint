@@ -95,7 +95,7 @@ parsePlot <- function(meta){
     plot.meta$axis[[s("%sline")]] <- !is.blank(s("axis.line.%s"))
     plot.meta$axis[[s("%sticks")]] <- !is.blank(s("axis.ticks.%s"))
   }
-  
+
   plot.meta$legend <- getLegendList(meta$built)
   if(length(plot.meta$legend)>0){
     plot.meta$legend <-
@@ -902,12 +902,19 @@ getLegendList <- function(plistextra){
   position <- theme$legend.position
   # locate guide argument in scale_*, and use that for a default.
   # Note, however, that guides(colour = ...) has precendence! See https://gist.github.com/cpsievert/ece28830a6c992b29ab6
-  colour.loc <- which(scales$find("colour"))
-  colour.guide <- if (length(colour.loc) == 1) scales$scales[[colour.loc]][["guide"]] else "legend"
-  # do a similar thing for fill
-  fill.loc <- which(scales$find("fill"))
-  fill.guide <- if (length(fill.loc) == 1) scales$scales[[fill.loc]][["guide"]] else "legend"
-  guides <- plyr::defaults(plot$guides, ggplot2::guides(colour = colour.guide, fill = fill.guide))
+  guides.args <- list()
+  for(aes.name in c("colour", "fill")){
+    aes.loc <- which(scales$find(aes.name))
+    guide.type <- if (length(aes.loc) == 1){
+      scales$scales[[aes.loc]][["guide"]]
+    }else{
+      "legend"
+    }
+    if(guide.type=="colourbar")guide.type <- "legend"
+    guides.args[[aes.name]] <- guide.type
+  }
+  guides.result <- do.call(ggplot2::guides, guides.args)
+  guides <- plyr::defaults(plot$guides, guides.result)
   labels <- plot$labels
   gdefs <- ggplot2:::guides_train(scales = scales, theme = theme, guides = guides, labels = labels)
   if (length(gdefs) != 0) {

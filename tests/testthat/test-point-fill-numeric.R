@@ -13,5 +13,5 @@ viz <-
 test_that("legends are produced", {
   info <- animint2dir(viz, open.browser=FALSE)
   expect_identical(names(info$plots$fill$legend), "Petal.Length")
-  expect_identical(names(info$plots$fill$legend), "Sepal.Length")
+  expect_identical(names(info$plots$size$legend), "Sepal.Length")
 })
