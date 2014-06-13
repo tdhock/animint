@@ -4,9 +4,10 @@ EXAMPLE: add a test for rendering HTML of multiple animints defined in
 a Rmd.
 
 GGPLOT: facets -- would be useful when we want to align axes in
-related plots, e.g. the last plot of examples/intreg.R. To implement
-facets it may be useful to use "margin convention"
-http://bl.ocks.org/mbostock/3019563
+related plots, e.g. the last plot of examples/intreg.R. One way to
+implement facets is to use "margin convention"
+http://bl.ocks.org/mbostock/3019563 Another way to do it is to just
+use a HTML table, each td has an SVG element.
 
 GGPLOT: coord_equal -- would be useful for maps
 e.g. examples/Tornadoes.R.
@@ -31,13 +32,13 @@ OPTIMIZATION: Why does it take so much memory to compile large data?
 e.g. My computer has 12GB RAM but starts swapping when I try to
 compile examples/vervet.R.
 
-OPTIMIZATION: Profile gg2animint() to see what part is slow, and speed
+OPTIMIZATION: Profile animint2dir() to see what part is slow, and speed
 it up! e.g. the last viz in
 https://github.com/tdhock/animint-examples/blob/master/examples/scaffolds.R
 took 15 minutes to compile on my computer.
 
 OPTIMIZATION: Is it possible to download gzipped tsv files in
-JavaScript/D3?
+JavaScript/D3? This could reduce disk space and download time.
 
 DSL: Allow other variable names for the same selection variable,
 e.g. insert and insert.show are 2 different columns in
@@ -52,7 +53,12 @@ to keep the same axes across animation frames, but for some other
 kinds of plots it would be nice if the axes automatically zoomed. Make
 this an option theme_animint(updateAxes=c("x", "y")) which means that
 both the x and y axes should be updated. There should also be a button
-next to each axis that you can click to toggle zooming on and off.
+next to each axis that you can click to toggle zooming on and off. The
+compiler would have to look at every showSelected subset and compute
+the axes ranges for each.
+
+RENDER: it would be nice to zoom by dragging a rectangle on the plot
+background, as in plotly. Then double-click to zoom back out.
 
 RENDER: It would be nice to be able to resize plots interactively,
 like we can do in shiny+ggvis.
