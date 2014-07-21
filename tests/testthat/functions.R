@@ -1,6 +1,7 @@
-#### helper functions to be resued in testing #####
+#### helper functions to be reused in testing #####
 
-#' Convert a ggplot object to 
+#' Apply `animint2dir` to a list ggplots and extract the (rendered) page source via RSelenium
+#' 
 #' @details This function assumes an object named 'context' exists -- this should be a 
 #' character string as it will be used specify a directory which is bound to a testing context.
 #' @author Carson Sievert
