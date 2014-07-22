@@ -20,15 +20,20 @@ gg2animint_knitr <- function(plot.list){
 ##' @author Carson Sievert
 ##' @export
 knit_print.animint <- function(x, options, ...) {
-  # the chunk 'label name' will define a directory to place the animints 
-  # since people love to use terrible chunk names, here is an attempt to improve it
-  # with help from -- http://stackoverflow.com/questions/8959243/r-remove-non-alphanumeric-symbols-from-a-string
+  if (!require(knitr)) warning("Please install.packages('knitr')")
+  wd <- getwd()
+  on.exit(setwd(wd))
+  # This function should be evaluated in knitr's output directory
+  setwd(knitr::opts_knit$get()[["output.dir"]])
+  # the current knitr chunk 'label' defines a directory to place the animints 
+  # hopefully this regular expression is safe enough to workaround bad chunk names
+  # http://stackoverflow.com/questions/8959243/r-remove-non-alphanumeric-symbols-from-a-string
   dir <- gsub("[^[:alnum:]]", "", options$label)
   # modify the directory name until we find a unique one
   while (file.exists(dir)) {
     dir <- paste0(dir, "2")
   }
-  gg2animint(x, out.dir = dir, json.file = 'plot.json', open.browser = FALSE)
+  animint2dir(x, out.dir = dir, json.file = 'plot.json', open.browser = FALSE)
   res <- new_animint(id = dir, json.file = file.path(dir, 'plot.json'))
   # if this is the first plot, place scripts just before the plot
   # there has to be a better way to do this, but this will do for now -- http://stackoverflow.com/questions/14308240/how-to-add-javascript-in-the-head-of-a-html-knitr-document
@@ -44,5 +49,20 @@ new_animint <- function(id, json.file) {
   idjs <- paste0("'#", id, "'")
   # using chunk labels is problematic for JS variable names is problematic since '-', '.', etc are illegal
   paste0('<p></p>\n<div id="', id, '"></div>\n<script>var plot = new animint(', idjs, ', ', jsonFile, ');</script>')
+}
+
+
+#' Create an shiny output binding
+#' @export
+
+animintOutput <- function(inputId) {
+  # attach the appropriate class to the animint div
+  gsub('></div>', paste0(' class="shiny-animint-binding"></div>'), 
+       new_animint(inputId, "plot.json"))
+}
+
+renderAnimint <- function(){
+  
+  
 }
 
