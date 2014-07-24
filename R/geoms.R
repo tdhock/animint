@@ -7,7 +7,7 @@
 #' @return ggplot2 layer
 #' @export
 #' @seealso \code{\link{gg2animint}}
-#' @example examples/breakpoints.R
+#' @example inst/examples/breakpoints.R
 geom_tallrect <- function(mapping=NULL, data=NULL, stat="identity", position="identity", ...){
   GeomTallRect <- proto(ggplot2:::GeomRect,{
     objname <- "tallrect"
