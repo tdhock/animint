@@ -31,20 +31,13 @@ parsePlot <- function(meta){
     ## evaluates the aesthetic mapping.
     df <- meta$built$data[[layer.i]]
     
-    ## Facets were implemented with help from
-    ## @xsaintmleux's pull request to rOpensci/plotly 
-    ## https://github.com/ropensci/plotly/pull/44
-    
-    ## Add PANEL, ROW, & COL info to df 
-    ## Also keep original ordering while merging.
-    df$order <- seq_len(nrow(df))
-    df <- merge(df, meta$built$panel$layout[,c("PANEL","ROW","COL")])
-    df <- df[order(df$order),]
-    df$order <- NULL
-    
     ## This extracts essential info for this geom/layer.
     g <- saveLayer(L, df, meta)
-
+    
+    ## 'strips' are really titles for the different facet panels
+    plot.meta$strips <- with(meta$built, getStrips(plot$facet, panel))
+    ## the layout tells us how to subset and where to plot on the JS side
+    plot.meta$layout <- with(meta$built, flag_axis(plot$facet, panel$layout))
     plot.meta$geoms <- c(plot.meta$geoms, list(g$classed))
   }
   ## For each geom, save the nextgeom to preserve drawing order.
@@ -76,34 +69,22 @@ parsePlot <- function(meta){
     x <- ggplot2::calc_element(el.name, meta$plot$theme)
     "element_blank"%in%attr(x,"class")
   }
-  ranges <- with(meta$built, 
-                 filter_range(plot$facet, 
-                              panel$ranges, 
-                              panel$layout))
-  # do we need to save this info below as JSON?
-  #plot.meta$layout <- meta$built$panel$layout
-  #plot.meta$facet <- meta$built$plot$facet
 
   # Instead of an "axis" JSON object for each plot, 
   # allow for "axis1", "axis2", etc. where 
   # "axis1" corresponds to the 1st PANEL
+  ranges <- meta$built$panel$ranges
   n.axis <- length(ranges)
   axes <- setNames(vector("list", n.axis), 
                    paste0("axis", seq_len(n.axis)))
   plot.meta <- c(plot.meta, axes)
-  
+
   # extract axis info
   ctr <- 0
   for (axis in names(axes)) {
     ctr <- ctr + 1
     range <- ranges[[ctr]]
-    nms <- names(range)
-    if (length(nms)) {
-      xys <- unique(sapply(strsplit(nms, "\\."), "[", 1))
-    } else {
-      next
-    }
-    for(xy in xys){
+    for(xy in c("x", "y")){
       s <- function(tmp)sprintf(tmp, xy)
       plot.meta[[axis]][[xy]] <- range[[s("%s.major")]]
       plot.meta[[axis]][[s("%slab")]] <- if(is.blank(s("axis.text.%s"))){
@@ -129,7 +110,6 @@ parsePlot <- function(meta){
       plot.meta[[axis]][[s("%sticks")]] <- !is.blank(s("axis.ticks.%s"))
     }
   }
-  
 
   plot.meta$legend <- getLegendList(meta$built)
   if(length(plot.meta$legend)>0){
@@ -147,8 +127,6 @@ parsePlot <- function(meta){
   } else {
     plot.meta$title <- meta$plot$labels$title
   }
-  
-  # set titles if facets exist?
 
   ## Set plot width and height from animint.* options if they are
   ## present.
@@ -440,6 +418,7 @@ saveLayer <- function(l, d, meta){
   g.data <- do.call("rbind", mapply(function(x, y) { 
     ggplot2:::coord_transform(meta$plot$coord, x, y)
   }, split(g.data, g.data[["PANEL"]]), ranges, SIMPLIFY = FALSE))
+  
   ## Output types
   ## Check to see if character type is d3's rgb type. 
   is.linetype <- function(x){
@@ -545,8 +524,6 @@ saveLayer <- function(l, d, meta){
       chunk.cols <- NULL
     }
   }
-  ## Facets should be split into chunks?!?
-  chunk.cols <- c(chunk.cols, "PANEL")
   ## Split into chunks and save tsv files.
   meta$classed <- g$classed
   meta$chunk.i <- 1L
@@ -571,6 +548,14 @@ saveLayer <- function(l, d, meta){
   g$subset_order <- g$nest_order
   if("group" %in% names(g$aes)){
     g$nest_order <- c(g$nest_order, "group")
+  }
+  
+  # If there is only one PANEL, we don't need it anymore.
+  if (length(unique(g.data[["PANEL"]])) == 1) {
+    g.data <- g.data[!grepl("PANEL", names(g.data), fixed = TRUE)]
+  } else { #otherwise, add panel to subset_order/nest_order
+    g$subset_order <- c(g$subset_order, "PANEL")
+    g$nest_order <- c(g$nest_order, "PANEL")
   }
   
   ## Get unique values of time variable.
@@ -883,7 +868,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
   if (open.browser) {
     message('opening a web browser with a file:// URL; ',
             'if the web page is blank, try running
-install.packages("servr")
+if (!require("servr")) install.packages("servr")
 servr::httd("', out.dir, '")')
       browseURL(sprintf("%s/index.html", out.dir))
   }

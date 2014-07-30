@@ -97,152 +97,26 @@ var animint = function (to_select, json_file) {
     // Each plot may have one or more legends. To make space for the
     // legends, we put each plot in a table with one row and two
     // columns: tdLeft and tdRight.
-      var plot_table = element.append("table")
-	      .style("display", "inline-block")
-      ;
-      var plot_tr = plot_table.append("tr");
-      var tdLeft = plot_tr.append("td");
-      var tdRight = plot_tr.append("td")
-	  .attr("id",p_name+"_legend")
-      ;
+    var plot_table = element.append("table").style("display", "inline-block");
+    var plot_tr = plot_table.append("tr");
+    var tdLeft = plot_tr.append("td");
+    var tdRight = plot_tr.append("td").attr("id", p_name+"_legend");
     var svg = tdLeft.append("svg")
       .attr("id", p_name)
       .attr("height", p_info.options.height)
       .attr("width", p_info.options.width);
 
-    //forces values to be in an array
-    var xaxisvals = [];
-    var xaxislabs = [];
-    var yaxisvals = [];
-    var yaxislabs = [];
-    
-    //function to write labels and breaks to their respective arrays
-    var axislabs = function(breaks, labs, axis){
-      if(axis=="x"){
-        outbreaks = xaxisvals;
-        outlabs = xaxislabs;
-      } else {
-        outbreaks = yaxisvals;
-        outlabs = yaxislabs;
-      } // set appropriate variable names
-      
-      if (isArray(breaks)) {
-        breaks.forEach(function (d) {
-          outbreaks.push(d);
-        });
-        if(labs){
-          labs.forEach(function (d) {
-            outlabs.push(d);
-            // push each label provided into the array
-          });
-        } else {
-          breaks.forEach(function (d) {
-            outlabs.push(""); 
-            // push a blank string to the array for each axis tick 
-            // if the specified label is null
-          });
-        }
-      } else {
-        outbreaks.push(breaks);
-        if(labs){
-          outlabs.push(labs);
-        } else {
-          outlabs.push("");
-        }
-      }
-    }    
-    
-    axislabs(p_info.axis.x, p_info.axis.xlab, "x");
-    axislabs(p_info.axis.y, p_info.axis.ylab, "y");
+    // divvy up width/height based on the panel layout
+    var nrows = Math.max.apply(null, p_info.layout.ROW);
+    var ncols = Math.max.apply(null, p_info.layout.COL);
+    var npanels = Math.max.apply(null, p_info.layout.PANEL);
+    plotdim.width = p_info.options.width / ncols;
+    plotdim.height = p_info.options.height / nrows;
 
-    titlepadding = measureText(p_info.title, 20).height+10;
-    axispaddingy = 5 + Math.max.apply(null, yaxislabs.map(function(entry){return measureText(entry, 11).width;}));
-    axispaddingx = 5 + Math.max.apply(null, xaxislabs.map(function(entry){return measureText(entry, 11).height;}));
-    labelpaddingy = 5 + measureText(p_info.axis.yname, 11).height;
-    labelpaddingx = 5 + measureText(p_info.axis.xname, 11).height;
-    margin.left= labelpaddingy + axispaddingy;
-    margin.bottom = labelpaddingx + axispaddingx;
-    margin.top = titlepadding;
-    margin.right = 5 + xaxislabs.map(function(entry){return measureText(entry, 11).height;})[xaxislabs.length-1]/2; // to ensure the last x-axis label doesn't get cut off.
-    plotdim.margin = margin;
-    
-    // calculate plot dimensions to be used in placing axes, labels, etc.
-    plotdim.width = p_info.options.width;
-    plotdim.height = p_info.options.height;
-    plotdim.graph.width = plotdim.width - plotdim.margin.left - plotdim.margin.right;
-    plotdim.graph.height = plotdim.height - plotdim.margin.top - plotdim.margin.bottom;
-    plotdim.xstart = plotdim.margin.left;
-    plotdim.xend = plotdim.graph.width + margin.left;
-    plotdim.ystart = plotdim.margin.top;
-    plotdim.yend = plotdim.graph.height + margin.top;
-    plotdim.xlab.x = plotdim.xstart + plotdim.graph.width / 2;
-    plotdim.xlab.y = axispaddingx + labelpaddingx / 2;
-    plotdim.ylab.x = axispaddingy + labelpaddingy / 2;
-    plotdim.ylab.y = plotdim.yend - plotdim.graph.height / 2;
-    plotdim.title.x = plotdim.xstart + plotdim.graph.width / 2;
+    // Draw the title
+    titlepadding = measureText(p_info.title, 20).height + 10;
+    plotdim.title.x = plotdim.xstart + p_info.options.width / 2;
     plotdim.title.y = plotdim.margin.top / 2;
-
-    // for each of the x and y axes, there is a "real" and fake
-    // version. The real version will be used for plotting the
-    // data, and the fake version is just for the display of the
-    // axes.
-    svg.x = d3.scale.linear()
-      .domain([0, 1])
-      .range([plotdim.xstart, plotdim.xend]);
-    svg.x_fake = d3.scale.linear()
-      .domain(p_info.axis.xrange)
-      .range([plotdim.xstart, plotdim.xend]);
-    svg.y = d3.scale.linear()
-      .domain([0, 1])
-      .range([plotdim.yend, plotdim.ystart]);
-    svg.y_fake = d3.scale.linear()
-      .domain([p_info.axis.yrange[1], p_info.axis.yrange[0]])
-      .range([plotdim.ystart, plotdim.yend]);
-    var xaxis = d3.svg.axis()
-      .scale(svg.x)
-      .tickValues(xaxisvals)
-      .tickFormat(function (d) {
-        return xaxislabs[xaxisvals.indexOf(d)].toString();
-      })
-      .orient("bottom");
-    svg.append("g")
-      .attr("class", "axis")
-      .attr("id", "xaxis")
-      .attr("transform", "translate(0," + plotdim.yend + ")")
-      .call(xaxis)
-      .append("text")
-      .text(p_info.axis.xname)
-      .attr("class", "label")
-      .style("text-anchor", "middle")
-      .attr("transform", "translate(" +
-        plotdim.xlab.x + "," + plotdim.xlab.y + ")");
-    var yaxis = d3.svg.axis()
-      .scale(svg.y)
-      .tickValues(yaxisvals)
-      .tickFormat(function (d) {
-        return yaxislabs[yaxisvals.indexOf(d)].toString();
-      })
-      .orient("left");
-    svg.append("g")
-      .attr("class", "axis")
-      .attr("id", "yaxis")
-      .attr("transform", "translate(" + (plotdim.xstart) + ",0)")
-      .call(yaxis)
-      .append("text")
-      .text(p_info.axis.yname)
-      .attr("class", "label")
-      .style("text-anchor", "middle")
-      .attr("transform", "rotate(270)translate(" + (-plotdim.ylab.y) +
-        "," + (-plotdim.ylab.x) + ")")
-    // translate coordinates are specified in (-y, -x)
-    ;
-    
-    if(!p_info.axis.xline) styles.push("#"+p_name+" #xaxis"+" path{stroke:none;}");
-    if(!p_info.axis.xticks) styles.push("#"+p_name+" #xaxis .tick"+" line{stroke:none;}");
-    if(!p_info.axis.yline) styles.push("#"+p_name+" #yaxis"+" path{stroke:none;}");
-    if(!p_info.axis.yticks) styles.push("#"+p_name+" #yaxis .tick"+" line{stroke:none;}");
-    
-
     svg.append("text")
       .text(p_info.title)
       .attr("id", "plottitle")
@@ -252,13 +126,221 @@ var animint = function (to_select, json_file) {
       .attr("transform", "translate(" + (plotdim.title.x) + "," + (
         plotdim.title.y) + ")")
       .style("text-anchor", "middle");
+
+    // Bind plot data to this plot's SVG element
     svg.plot = p_info;
+    // Create 
     p_info.geoms.forEach(function (g_name) {
       svg.append("g").attr("class", g_name);
       SVGs[g_name] = svg;
     });
     Plots[p_name] = p_info;
-  }
+
+    // If we are to draw more than one panel, 
+    // create a grouping for strip labels
+    if (npanels > 1) {
+      svg.append("g")
+        .attr("class", "strip")
+        .attr("id", "top_strip");
+      svg.append("g")
+        .attr("class", "strip")
+        .attr("id", "right_strip");
+    }
+
+    // Draw a plot outline for every panel
+    for (i = 0; i < npanels; i++) {
+      var j = i + 1;
+      var axis  = p_info["axis" + j];
+
+      //forces values to be in an array
+      var xaxisvals = [];
+      var xaxislabs = [];
+      var yaxisvals = [];
+      var yaxislabs = [];
+      
+      //function to write labels and breaks to their respective arrays
+      var axislabs = function(breaks, labs, axis){
+        if(axis=="x"){
+          outbreaks = xaxisvals;
+          outlabs = xaxislabs;
+        } else {
+          outbreaks = yaxisvals;
+          outlabs = yaxislabs;
+        } // set appropriate variable names
+        
+        if (isArray(breaks)) {
+          breaks.forEach(function (d) {
+            outbreaks.push(d);
+          });
+          if(labs){
+            labs.forEach(function (d) {
+              outlabs.push(d);
+              // push each label provided into the array
+            });
+          } else {
+            breaks.forEach(function (d) {
+              outlabs.push(""); 
+              // push a blank string to the array for each axis tick 
+              // if the specified label is null
+            });
+          }
+        } else {
+          outbreaks.push(breaks);
+          if(labs){
+            outlabs.push(labs);
+          } else {
+            outlabs.push("");
+          }
+        }
+      }    
+      
+      axislabs(axis.x, axis.xlab, "x");
+      axislabs(axis.y, axis.ylab, "y");
+      // TODO: pull this out of the loop and use the max padding for each panel
+      axispaddingy = 5 + Math.max.apply(null, yaxislabs.map(function(entry){return measureText(entry, 11).width;}));
+      axispaddingx = 5 + Math.max.apply(null, xaxislabs.map(function(entry){return measureText(entry, 11).height;}));
+      labelpaddingy = 5 + measureText(axis.yname, 11).height;
+      labelpaddingx = 5 + measureText(axis.xname, 11).height;
+      margin.left= labelpaddingy + axispaddingy;
+      margin.bottom = labelpaddingx + axispaddingx;
+      margin.top = titlepadding;
+      margin.right = 5 + xaxislabs.map(function(entry){return measureText(entry, 11).height;})[xaxislabs.length-1]/2; // to ensure the last x-axis label doesn't get cut off.
+      plotdim.margin = margin;
+      
+      var current_row = p_info.layout.ROW[i]; 
+      var current_col = p_info.layout.COL[i]; 
+      var xdisplace = (current_col - 1) * plotdim.width;
+      var ydisplace = (current_row - 1) * plotdim.height;
+
+      // calculate plot dimensions to be used in placing axes, labels, etc.
+      plotdim.graph.width = plotdim.width - plotdim.margin.left - plotdim.margin.right;
+      plotdim.graph.height = plotdim.height - plotdim.margin.top - plotdim.margin.bottom;
+      plotdim.xstart = xdisplace + plotdim.margin.left;
+      plotdim.xend = plotdim.xstart + plotdim.graph.width;
+      plotdim.ystart = ydisplace + plotdim.margin.top;
+      plotdim.yend = plotdim.ystart + plotdim.graph.height;
+
+      plotdim.xlab.x = plotdim.xstart + plotdim.graph.width / 2;
+      plotdim.xlab.y = axispaddingx + labelpaddingx / 2;
+      plotdim.ylab.x = axispaddingy + labelpaddingy / 2;
+      plotdim.ylab.y = plotdim.yend - plotdim.graph.height / 2;
+
+      // idea: use the top/right margins to draw the facet title/strips
+      // problem: how do we guarantee strips are readable for an arbitrary
+      // number of strips?
+      if (npanels > 1) {
+        
+        var stripLabels = {'top': [], 'right': []};
+        var strip_location = {};
+        strip_location.top = {'x': plotdim.xlab.x, 'y': ydisplace + plotdim.margin.top/2};
+        strip_location.right = {'x': plotdim.xend, 'y': plotdim.ylab.y};
+
+        draw_strip = function(side) {
+          var x = strip_location[side].x;
+          var y = strip_location[side].y;
+          var stripLabs = stripLabels[side];
+          //create a group
+          d3.select("#" + side + "_strip")
+            .selectAll("." + side + "_strips")
+            .data(stripLabs)
+            .enter()
+              .append("text")
+              .style("text-anchor", "middle")
+              .text(function(d, i) { return d; })
+              // NOTE: there could be multiple strips per panel
+              // TODO: is there a better way to manage spacing?
+              .attr("transform", function(d, i) { 
+                if (side == "top") {
+                  var y2 = y + i * 12; 
+                  return "translate(" + x + "," + y + ")rotate(0)";
+                } else if (side == "right") { //right
+                  var x2 = x - i * 12; 
+                  return "translate(" + x2 + "," + y + ")rotate(90)";
+                }
+              });
+        }
+
+        // if Array, facet_wrap() was used; otherwise, facet_grid()
+        if (p_info.strips instanceof Array) {
+          // strips should always be on top for facet_wrap(), right?
+          stripLabels.top = [p_info.strips[i]];
+          draw_strip("top");
+        } else {
+          if (current_row == 1) {
+            stripLabels.top = [p_info.strips.top[current_col - 1]];
+            draw_strip("top");
+          } 
+          if (current_col == ncols) {
+            stripLabels.right = [p_info.strips.right[current_row - 1]];
+            draw_strip("right");
+          }
+        }
+
+
+      }
+      
+
+      // for each of the x and y axes, there is a "real" and fake
+      // version. The real version will be used for plotting the
+      // data, and the fake version is just for the display of the
+      // axes.
+      svg.x = d3.scale.linear()
+        .domain([0, 1])
+        .range([plotdim.xstart, plotdim.xend]);
+      svg.x_fake = d3.scale.linear()
+        .domain(axis.xrange)
+        .range([plotdim.xstart, plotdim.xend]);
+      svg.y = d3.scale.linear()
+        .domain([0, 1])
+        .range([plotdim.yend, plotdim.ystart]);
+      svg.y_fake = d3.scale.linear()
+        .domain([axis.yrange[1], axis.yrange[0]])
+        .range([plotdim.ystart, plotdim.yend]);
+      var xaxis = d3.svg.axis()
+        .scale(svg.x)
+        .tickValues(xaxisvals)
+        .tickFormat(function (d) {
+          return xaxislabs[xaxisvals.indexOf(d)].toString();
+        })
+        .orient("bottom");
+      svg.append("g")
+        .attr("class", "axis")
+        .attr("id", "xaxis")
+        .attr("transform", "translate(0," + plotdim.yend + ")")
+        .call(xaxis)
+        .append("text")
+        .text(axis.xname)
+        .attr("class", "label")
+        .style("text-anchor", "middle")
+        .attr("transform", "translate(" +
+          plotdim.xlab.x + "," + plotdim.xlab.y + ")");
+      var yaxis = d3.svg.axis()
+        .scale(svg.y)
+        .tickValues(yaxisvals)
+        .tickFormat(function (d) {
+          return yaxislabs[yaxisvals.indexOf(d)].toString();
+        })
+        .orient("left");
+      svg.append("g")
+        .attr("class", "axis")
+        .attr("id", "yaxis")
+        .attr("transform", "translate(" + (plotdim.xstart) + ",0)")
+        .call(yaxis)
+        .append("text")
+        .text(axis.yname)
+        .attr("class", "label")
+        .style("text-anchor", "middle")
+        // translate coordinates are specified in (-y, -x)
+        .attr("transform", "rotate(270)translate(" + (-plotdim.ylab.y) +
+          "," + (-plotdim.ylab.x) + ")");
+      
+      if(!axis.xline) styles.push("#"+p_name+" #xaxis"+" path{stroke:none;}");
+      if(!axis.xticks) styles.push("#"+p_name+" #xaxis .tick"+" line{stroke:none;}");
+      if(!axis.yline) styles.push("#"+p_name+" #yaxis"+" path{stroke:none;}");
+      if(!axis.yticks) styles.push("#"+p_name+" #yaxis .tick"+" line{stroke:none;}");
+
+    } //end of for loop 
+  } //end of add_plot()
   var add_selector = function (s_name, s_info) {
     Selectors[s_name] = s_info;
   }
@@ -489,11 +571,10 @@ var animint = function (to_select, json_file) {
     var key_fun = null;
     if(g_info.aes.hasOwnProperty("key")){
       key_fun = function(d){ 
-	return d.key;
+        return d.key;
       };
     }
-    if (g_info.geom == "line" || g_info.geom == "path" || g_info.geom ==
-	"polygon" || g_info.geom == "ribbon") {
+    if (g_info.geom == "line" || g_info.geom == "path" || g_info.geom == "polygon" || g_info.geom == "ribbon") {
 
       // Lines, paths, polygons, and ribbons are a bit special. For
       // every unique value of the group variable, we take the
@@ -550,10 +631,10 @@ var animint = function (to_select, json_file) {
       //id's) -- the kv variable. Then each separate object is plotted
       //using path (case of only 1 thing and no groups).
       if (!aes.hasOwnProperty("group")) {
-	// There is either 1 or 0 groups.
-	if(data.length == 0){
-	  kv = [];
-	}else{
+	       // There is either 1 or 0 groups.
+         if(data.length == 0){
+          kv = [];
+	       } else {
           kv = [{
             "key": 0,
             "value": 0
@@ -561,7 +642,7 @@ var animint = function (to_select, json_file) {
           data = {
             0: data
           };
-	}
+        }
       } else {
         // we need to use a path for each group.
         var kv = d3.entries(d3.keys(data));
