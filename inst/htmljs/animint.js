@@ -464,14 +464,19 @@ var animint = function (to_select, json_file) {
   }
   // update_geom is responsible for obtaining a chunk of downloaded
   // data, and then calling draw_geom to actually draw it.
-  var draw_geom = function(g_info, chunk, selector_name){
+  var draw_geom = function(g_info, chunk, selector_name, PANEL){
     g_info.tr.select("td.status").text("displayed");
     var svg = SVGs[g_info.classed];
     var data = chunk;
     g_info.subset_order.forEach(function (aes_name) {
+      var value;
       if (aes_name != "group") {
-        var v_name = g_info.aes[aes_name];
-        var value = Selectors[v_name].selected;
+	if(aes_name == "PANEL"){
+	  value = PANEL;
+	}else{
+          var v_name = g_info.aes[aes_name];
+          value = Selectors[v_name].selected;
+	}
         if (data.hasOwnProperty(value)) {
           data = data[value];
         } else {
