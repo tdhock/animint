@@ -128,14 +128,14 @@ var animint = function (to_select, json_file) {
       .style("text-anchor", "middle");
 
     // Bind plot data to this plot's SVG element
+
     svg.plot = p_info;
-    // Create 
+    Plots[p_name] = p_info;
     p_info.geoms.forEach(function (g_name) {
       svg.append("g").attr("class", g_name);
       SVGs[g_name] = svg;
     });
-    Plots[p_name] = p_info;
-
+    
     // If we are to draw more than one panel, 
     // create a grouping for strip labels
     if (npanels > 1) {
@@ -146,7 +146,9 @@ var animint = function (to_select, json_file) {
         .attr("class", "strip")
         .attr("id", "right_strip");
     }
-
+    // this will hold x/y scales for each panel
+    // eventually we inject this into Plots[p_name]
+    var scales = {};
     // Draw a plot outline for every panel
     for (i = 0; i < npanels; i++) {
       var j = i + 1;
@@ -284,20 +286,21 @@ var animint = function (to_select, json_file) {
       // version. The real version will be used for plotting the
       // data, and the fake version is just for the display of the
       // axes.
-      svg.x = d3.scale.linear()
+      scales[j] = {};
+      scales[j].x = d3.scale.linear()
         .domain([0, 1])
         .range([plotdim.xstart, plotdim.xend]);
-      svg.x_fake = d3.scale.linear()
+      scales[j].x_fake = d3.scale.linear()
         .domain(axis.xrange)
         .range([plotdim.xstart, plotdim.xend]);
-      svg.y = d3.scale.linear()
+      scales[j].y = d3.scale.linear()
         .domain([0, 1])
         .range([plotdim.yend, plotdim.ystart]);
-      svg.y_fake = d3.scale.linear()
+      scales[j].y_fake = d3.scale.linear()
         .domain([axis.yrange[1], axis.yrange[0]])
         .range([plotdim.ystart, plotdim.yend]);
       var xaxis = d3.svg.axis()
-        .scale(svg.x)
+        .scale(scales[j].x)
         .tickValues(xaxisvals)
         .tickFormat(function (d) {
           return xaxislabs[xaxisvals.indexOf(d)].toString();
@@ -315,7 +318,7 @@ var animint = function (to_select, json_file) {
         .attr("transform", "translate(" +
           plotdim.xlab.x + "," + plotdim.xlab.y + ")");
       var yaxis = d3.svg.axis()
-        .scale(svg.y)
+        .scale(scales[j].y)
         .tickValues(yaxisvals)
         .tickFormat(function (d) {
           return yaxislabs[yaxisvals.indexOf(d)].toString();
@@ -340,7 +343,11 @@ var animint = function (to_select, json_file) {
       if(!axis.yticks) styles.push("#"+p_name+" #yaxis .tick"+" line{stroke:none;}");
 
     } //end of for loop 
+
+    Plots[p_name].scales = scales;
+
   } //end of add_plot()
+
   var add_selector = function (s_name, s_info) {
     Selectors[s_name] = s_info;
   }
@@ -353,6 +360,10 @@ var animint = function (to_select, json_file) {
     var g_info = Geoms[g_name];
     // First apply chunk_order selector variables.
     var chunk_id = g_info.chunks;
+    // derive the plot name from the geometry name
+    var g_names = g_info.classed.split("_");
+    var p_name = g_names[g_names.length - 1];
+    var panels = Plots[p_name].layout.PANEL;
     g_info.chunk_order.forEach(function (v_name) {
       if(chunk_id == null){
 	return; //no data in a higher up chunk var.
@@ -365,14 +376,18 @@ var animint = function (to_select, json_file) {
       }
     });
     if(chunk_id == null){
-      draw_geom(g_info, [], selector_name); //draw nothing.
+      panels.forEach(function(panel) {
+        draw_geom(g_info, [], selector_name, panel); //draw nothing.
+      })
       return;
     }
     var tsv_name = get_tsv(g_info, chunk_id);
     // get the data if it has not yet been downloaded.
     g_info.tr.select("td.chunk").text(tsv_name);
     if(g_info.data.hasOwnProperty(tsv_name)){
-      draw_geom(g_info, g_info.data[tsv_name], selector_name);
+      panels.forEach(function(panel) {
+        draw_geom(g_info, g_info.data[tsv_name], selector_name, panel);
+      })
     }else{
       g_info.tr.select("td.status").text("downloading");
       var svg = SVGs[g_name];
@@ -386,7 +401,9 @@ var animint = function (to_select, json_file) {
       ;
       download_chunk(g_info, tsv_name, function(chunk){
       	loading.remove();
-	draw_geom(g_info, chunk, selector_name);
+        panels.forEach(function(panel) {
+	       draw_geom(g_info, chunk, selector_name, panel);
+        });
       });
     }
   }
@@ -468,6 +485,10 @@ var animint = function (to_select, json_file) {
     g_info.tr.select("td.status").text("displayed");
     var svg = SVGs[g_info.classed];
     var data = chunk;
+    // derive the plot name from the geometry name
+    var g_names = g_info.classed.split("_");
+    var p_name = g_names[g_names.length - 1];
+    var scales = Plots[p_name].scales[PANEL];
     g_info.subset_order.forEach(function (aes_name) {
       var value;
       if (aes_name != "group") {
@@ -487,7 +508,7 @@ var animint = function (to_select, json_file) {
     var aes = g_info.aes;
     var toXY = function (xy, a) {
       return function (d) {
-        return svg[xy](d[a]);
+        return scales[xy](d[a]);
       }
     }
     var g_element = svg.select("g." + g_info.classed);
@@ -740,16 +761,16 @@ var animint = function (to_select, json_file) {
       elements = elements.data(data, key_fun);
       eActions = function (e) {
         e.attr("x1", function (d) {
-          return svg.x(d["x"]);
+          return scales.x(d["x"]);
         })
           .attr("x2", function (d) {
-            return svg.x(d["xend"]);
+            return scales.x(d["xend"]);
           })
           .attr("y1", function (d) {
-            return svg.y(d["y"]);
+            return scales.y(d["y"]);
           })
           .attr("y2", function (d) {
-            return svg.y(d["yend"]);
+            return scales.y(d["yend"]);
           })
           .style("stroke-dasharray", get_dasharray)
           .style("stroke-width", get_size)
@@ -760,16 +781,16 @@ var animint = function (to_select, json_file) {
       elements = elements.data(data, key_fun);
       eActions = function (e) {
         e.attr("x1", function (d) {
-          return svg.x(d["x"]);
+          return scales.x(d["x"]);
         })
           .attr("x2", function (d) {
-            return svg.x(d["x"]);
+            return scales.x(d["x"]);
           })
           .attr("y1", function (d) {
-            return svg.y(d["ymax"]);
+            return scales.y(d["ymax"]);
           })
           .attr("y2", function (d) {
-            return svg.y(d["ymin"]);
+            return scales.y(d["ymin"]);
           })
           .style("stroke-dasharray", get_dasharray)
           .style("stroke-width", get_size)
@@ -781,8 +802,8 @@ var animint = function (to_select, json_file) {
       eActions = function (e) {
         e.attr("x1", toXY("x", "xintercept"))
           .attr("x2", toXY("x", "xintercept"))
-          .attr("y1", svg.y.range()[0])
-          .attr("y2", svg.y.range()[1])
+          .attr("y1", scales.y.range()[0])
+          .attr("y2", scales.y.range()[1])
           .style("stroke-dasharray", get_dasharray)
           .style("stroke-width", get_size)
           .style("stroke", get_colour);
@@ -794,8 +815,8 @@ var animint = function (to_select, json_file) {
       eActions = function (e) {
         e.attr("y1", toXY("y", "yintercept"))
           .attr("y2", toXY("y", "yintercept"))
-          .attr("x1", svg.x.range()[0] + plotdim.margin.left)
-          .attr("x2", svg.x.range()[1] - plotdim.margin.right)
+          .attr("x1", scales.x.range()[0] + plotdim.margin.left)
+          .attr("x2", scales.x.range()[1] - plotdim.margin.right)
           .style("stroke-dasharray", get_dasharray)
           .style("stroke-width", get_size)
           .style("stroke", get_colour);
@@ -842,10 +863,10 @@ var animint = function (to_select, json_file) {
       eActions = function (e) {
         e.attr("x", toXY("x", "xmin"))
           .attr("width", function (d) {
-            return svg.x(d["xmax"]) - svg.x(d["xmin"]);
+            return scales.x(d["xmax"]) - scales.x(d["xmin"]);
           })
-          .attr("y", svg.y.range()[1])
-          .attr("height", svg.y.range()[0] - svg.y.range()[1])
+          .attr("y", scales.y.range()[1])
+          .attr("height", scales.y.range()[0] - scales.y.range()[1])
           .style("fill", get_fill)
           .style("stroke-width", get_size)
           .style("stroke", get_colour);
@@ -856,11 +877,11 @@ var animint = function (to_select, json_file) {
       eActions = function (e) {
         e.attr("x", toXY("x", "xmin"))
           .attr("width", function (d) {
-            return Math.abs(svg.x(d.xmax) - svg.x(d.xmin));
+            return Math.abs(scales.x(d.xmax) - scales.x(d.xmin));
           })
           .attr("y", toXY("y", "ymax"))
           .attr("height", function (d) {
-            return Math.abs(svg.y(d.ymin) - svg.y(d.ymax));
+            return Math.abs(scales.y(d.ymin) - scales.y(d.ymax));
           })
           .style("stroke-dasharray", get_dasharray)
           .style("stroke-width", get_size)
@@ -886,48 +907,48 @@ var animint = function (to_select, json_file) {
       eActions = function (e) {
         e.append("line")
           .attr("x1", function (d) {
-            return svg.x(d["x"]);
+            return scales.x(d["x"]);
           })
           .attr("x2", function (d) {
-            return svg.x(d["x"]);
+            return scales.x(d["x"]);
           })
           .attr("y1", function (d) {
-            return svg.y(d["ymin"]);
+            return scales.y(d["ymin"]);
           })
           .attr("y2", function (d) {
-            return svg.y(d["lower"]);
+            return scales.y(d["lower"]);
           })
           .style("stroke-dasharray", get_dasharray)
           .style("stroke-width", get_size)
           .style("stroke", get_colour);
         e.append("line")
           .attr("x1", function (d) {
-            return svg.x(d["x"]);
+            return scales.x(d["x"]);
           })
           .attr("x2", function (d) {
-            return svg.x(d["x"]);
+            return scales.x(d["x"]);
           })
           .attr("y1", function (d) {
-            return svg.y(d["upper"]);
+            return scales.y(d["upper"]);
           })
           .attr("y2", function (d) {
-            return svg.y(d["ymax"]);
+            return scales.y(d["ymax"]);
           })
           .style("stroke-dasharray", get_dasharray)
           .style("stroke-width", get_size)
           .style("stroke", get_colour);
         e.append("rect")
           .attr("x", function (d) {
-            return svg.x(d["xmin"]);
+            return scales.x(d["xmin"]);
           })
           .attr("width", function (d) {
-            return svg.x(d["xmax"]) - svg.x(d["xmin"]);
+            return scales.x(d["xmax"]) - scales.x(d["xmin"]);
           })
           .attr("y", function (d) {
-            return svg.y(d["upper"]);
+            return scales.y(d["upper"]);
           })
           .attr("height", function (d) {
-            return Math.abs(svg.y(d["upper"]) - svg.y(d["lower"]));
+            return Math.abs(scales.y(d["upper"]) - scales.y(d["lower"]));
           })
           .style("stroke-dasharray", get_dasharray)
           .style("stroke-width", get_size)
@@ -935,16 +956,16 @@ var animint = function (to_select, json_file) {
           .style("fill", get_fill);
         e.append("line")
           .attr("x1", function (d) {
-            return svg.x(d["xmin"]);
+            return scales.x(d["xmin"]);
           })
           .attr("x2", function (d) {
-            return svg.x(d["xmax"]);
+            return scales.x(d["xmax"]);
           })
           .attr("y1", function (d) {
-            return svg.y(d["middle"]);
+            return scales.y(d["middle"]);
           })
           .attr("y2", function (d) {
-            return svg.y(d["middle"]);
+            return scales.y(d["middle"]);
           })
           .style("stroke-dasharray", get_dasharray)
           .style("stroke-width", get_size)
