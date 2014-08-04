@@ -9,9 +9,9 @@ viz <-
        scale_x_continuous(breaks=seq(1900, 2010, by=10))+
        facet_grid(.~period, scales="free", space="free"))
 viz$fixed <- viz$free+facet_grid(.~period, scales="free")
-viz$free_y <- viz$free+facet_grid(.~period, scales="free", space="free_y")
-viz$free_x <- viz$free+facet_grid(.~period, scales="free", space="free_x")
-viz$no.panels <- viz$free+facet_null()
+viz$freeY <- viz$free+facet_grid(.~period, scales="free", space="free_y")
+viz$freeX <- viz$free+facet_grid(.~period, scales="free", space="free_x")
+##viz$noPanels <- viz$free+facet_null()
 panels <- list()
 facets <- list()
 space_free <- list()
@@ -25,3 +25,4 @@ for(plot.name in names(viz)){
 str(facets)
 ## the difference is in space_free:
 str(space_free)
+animint2dir(viz, "facet-space-free")

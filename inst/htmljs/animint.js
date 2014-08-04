@@ -109,7 +109,8 @@ var animint = function (to_select, json_file) {
     // divvy up width/height based on the panel layout
     var nrows = Math.max.apply(null, p_info.layout.ROW);
     var ncols = Math.max.apply(null, p_info.layout.COL);
-    var npanels = Math.max.apply(null, p_info.layout.PANEL);
+    var panel_names = p_info.layout.PANEL;
+    var npanels = Math.max.apply(null, panel_names);
     plotdim.width = p_info.options.width / ncols;
     plotdim.height = p_info.options.height / nrows;
 
@@ -132,7 +133,10 @@ var animint = function (to_select, json_file) {
     svg.plot = p_info;
     Plots[p_name] = p_info;
     p_info.geoms.forEach(function (g_name) {
-      svg.append("g").attr("class", g_name);
+      var layer_g_element = svg.append("g").attr("class", g_name);
+      panel_names.forEach(function(PANEL){
+	layer_g_element.append("g").attr("class", "PANEL" + PANEL);
+      });
       SVGs[g_name] = svg;
     });
     
@@ -360,10 +364,6 @@ var animint = function (to_select, json_file) {
     var g_info = Geoms[g_name];
     // First apply chunk_order selector variables.
     var chunk_id = g_info.chunks;
-    // derive the plot name from the geometry name
-    var g_names = g_info.classed.split("_");
-    var p_name = g_names[g_names.length - 1];
-    var panels = Plots[p_name].layout.PANEL;
     g_info.chunk_order.forEach(function (v_name) {
       if(chunk_id == null){
 	return; //no data in a higher up chunk var.
@@ -376,18 +376,14 @@ var animint = function (to_select, json_file) {
       }
     });
     if(chunk_id == null){
-      panels.forEach(function(panel) {
-        draw_geom(g_info, [], selector_name, panel); //draw nothing.
-      })
+      draw_panels(g_info, [], selector_name); //draw nothing.
       return;
     }
     var tsv_name = get_tsv(g_info, chunk_id);
     // get the data if it has not yet been downloaded.
     g_info.tr.select("td.chunk").text(tsv_name);
     if(g_info.data.hasOwnProperty(tsv_name)){
-      panels.forEach(function(panel) {
-        draw_geom(g_info, g_info.data[tsv_name], selector_name, panel);
-      })
+      draw_panels(g_info, g_info.data[tsv_name], selector_name);
     }else{
       g_info.tr.select("td.status").text("downloading");
       var svg = SVGs[g_name];
@@ -401,11 +397,18 @@ var animint = function (to_select, json_file) {
       ;
       download_chunk(g_info, tsv_name, function(chunk){
       	loading.remove();
-        panels.forEach(function(panel) {
-	       draw_geom(g_info, chunk, selector_name, panel);
-        });
+	draw_panels(g_info, chunk, selector_name);
       });
     }
+  }
+  var draw_panels = function(g_info, chunk, selector_name) {
+    // derive the plot name from the geometry name
+    var g_names = g_info.classed.split("_");
+    var p_name = g_names[g_names.length - 1];
+    var panels = Plots[p_name].layout.PANEL;
+    panels.forEach(function(panel) {
+      draw_geom(g_info, chunk, selector_name, panel);
+    });
   }
   var download_sequence = function(g_name, s_name, seq){
     var g_info = Geoms[g_name];
@@ -511,8 +514,9 @@ var animint = function (to_select, json_file) {
         return scales[xy](d[a]);
       }
     }
-    var g_element = svg.select("g." + g_info.classed);
-    var elements = g_element.selectAll(".geom");
+    var layer_g_element = svg.select("g." + g_info.classed);
+    var panel_g_element = layer_g_element.select("g.PANEL" + PANEL);
+    var elements = panel_g_element.selectAll(".geom");
     // TODO: standardize this code across aes/styles.
     var base_opacity = 1;
     if (g_info.params.alpha) {
