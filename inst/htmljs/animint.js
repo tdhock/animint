@@ -399,12 +399,12 @@ var animint = function (to_select, json_file) {
 	.style("fill", "red")
 	//.attr("x", svg.attr("width")/2)
       ;
-      download_chunk(g_info, tsv_name, function(chunk){
-      	loading.remove();
-        panels.forEach(function(panel) {
-	       draw_geom(g_info, chunk, selector_name, panel);
+      for (i = 0; i < panels.length; i++) {
+        download_chunk(g_info, tsv_name, function(chunk){
+          loading.remove();
+          draw_geom(g_info, chunk, selector_name, i);
         });
-      });
+      }
     }
   }
   var download_sequence = function(g_name, s_name, seq){
@@ -435,7 +435,9 @@ var animint = function (to_select, json_file) {
   // download_chunk is called from update_geom and download_sequence.
   var download_chunk = function(g_info, tsv_name, funAfter){
     if(g_info.download_status.hasOwnProperty(tsv_name)){
-      funAfter();
+      for (i = 0; i < 6; i++) {
+        funAfter();
+      }
       return; // do not download twice.
     }
     g_info.download_status[tsv_name] = "downloading";
