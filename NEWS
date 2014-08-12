@@ -1,5 +1,7 @@
 TODOs in approximate order of importance (higher is more important).
 
+ASK JS GUYS: grey after mouseout on ff?
+
 EXAMPLE: add a test for rendering HTML of multiple animints defined in
 a Rmd.
 
@@ -37,8 +39,27 @@ it up! e.g. the last viz in
 https://github.com/tdhock/animint-examples/blob/master/examples/scaffolds.R
 took 15 minutes to compile on my computer.
 
-OPTIMIZATION: Is it possible to download gzipped tsv files in
-JavaScript/D3? This could reduce disk space and download time.
+OPTIMIZATION: to save disk space, we can compress the TSV file
+database to .tsv.gz files. But for this to work with
+d3.tsv("path/to/file.tsv.gz"), we need a web server that serves .gz
+files with the Content-Encoding: gzip header -- is this possible with
+standard web servers? With servers like gist.github.com, all .json
+files are served with Content-Encoding: gzip, so they use
+http://en.wikipedia.org/wiki/HTTP_compression over the network. In
+firefox Inspect Element -> network it seems like they do not compress
+.tsv files. In curl it seems like it depends on the --compress flag
+
+thocking@silene:~/projects/chip-seq-paper(master*)$ curl --compress -# --head https://gist.githubusercontent.com/tdhock/914ab9c19038cae238a4/raw/geom10_rect_profiles_chunk9.tsv |grep Content-Encoding
+
+Content-Encoding: gzip
+thocking@silene:~/projects/chip-seq-paper(master*)$ curl -# --head https://gist.githubusercontent.com/tdhock/914ab9c19038cae238a4/raw/geom10_rect_profiles_chunk9.tsv |grep Content-Encoding
+
+thocking@silene:~/projects/chip-seq-paper(master*)$ curl --compress -# --head https://gist.githubusercontent.com/tdhock/914ab9c19038cae238a4/raw/plot.json |grep Content-Encoding
+
+Content-Encoding: gzip
+thocking@silene:~/projects/chip-seq-paper(master*)$ curl -# --head https://gist.githubusercontent.com/tdhock/914ab9c19038cae238a4/raw/plot.json |grep Content-Encoding
+
+thocking@silene:~/projects/chip-seq-paper(master*)$ 
 
 DSL: Allow other variable names for the same selection variable,
 e.g. insert and insert.show are 2 different columns in
