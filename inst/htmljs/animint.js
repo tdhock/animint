@@ -212,23 +212,6 @@ var animint = function (to_select, json_file) {
       margin.right = 5 + xaxislabs.map(function(entry){return measureText(entry, 11).height;})[xaxislabs.length-1]/2; // to ensure the last x-axis label doesn't get cut off.
       plotdim.margin = margin;
       
-      // grab the x/y proportions for every row/column that 
-      // is lower than the current one and add them together
-      // to get x/y 'displacement'
-      
-
-      /*
-      var xdisplace = 0;
-      for (j = 0; j < current_col; j++) {
-        var idx = p_info.layout.COL.indexOf(j);
-        if (idx > -1) xdisplace = xdisplace + p_info.layout.SPACE_X[idx];
-      }
-      var ydisplace = 0;
-      for (j = 0; j < current_row; j++) {
-        var idx = p_info.layout.ROW.indexOf(j);
-        if (idx > -1) ydisplace = ydisplace + p_info.layout.SPACE_Y[idx];
-      }
-      */
       var xdisplace = p_info.layout.xdisplace[i]
       var ydisplace = p_info.layout.ydisplace[i]
       // calculate plot dimensions to be used in placing axes, labels, etc.
