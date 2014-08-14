@@ -23,6 +23,16 @@ animint2HTML <- function(plotList, out.dir = "htmltest") {
   res
 }
 
+expect_transform <- function(actual, expected, context = "translate", tolerance = 5) {
+  # supports multiple contexts
+  nocontext <- gsub(paste(context, collapse = "||"), "", actual)
+  # reduce to some 'vector' of numbers: (a, b, c, ...)
+  vec <- gsub("\\)\\(", ",", nocontext)
+  clean <- gsub("\\)", "", gsub("\\(", "", vec))
+  nums <- as.numeric(strsplit(clean, split = "\\,")[[1]])
+  expect_equal(nums, expected, tolerance, scale = 1)
+}
+
 expect_links <- function(info, urls){
   expect_attrs(info, "a", "href", urls)
 }

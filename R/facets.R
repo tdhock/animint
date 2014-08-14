@@ -41,12 +41,96 @@ getStrips.null <- function(facet, panel, ...) {
   return("")
 }
 
+# TODO: how to 'train_layout' for non-cartesian coordinates?
+# https://github.com/hadley/ggplot2/blob/dfcb56ec067910e1a3a04693d8f1e146cc7fb796/R/coord-.r
+
+train_layout <- function(facet, coord, layout, ranges) {
+  npanels <- dim(layout)[1]
+  nrows <- max(layout$ROW)
+  ncols <- max(layout$COL)
+  ydiffs <- sapply(ranges, function(z) diff(z$y.range))
+  xdiffs <- sapply(ranges, function(z) diff(z$x.range))
+  # if x or y scale is 'free', then ignore the ratio
+  if (length(unique(xdiffs)) > 1 || length(unique(ydiffs)) > 1) 
+    coord$ratio <- NULL
+  has.ratio <- !is.null(coord$ratio)
+  if (has.ratio) { 
+    spaces <- fixed_spaces(ranges, coord$ratio)
+    layout <- cbind(layout, width_proportion = spaces$x, height_proportion = spaces$y)
+    layout$width_proportion <- layout$width_proportion/ncols
+    layout$height_proportion <- layout$height_proportion/nrows
+  } else {
+    vars <- NULL
+    if (isTRUE(facet$space_free$x)) vars <- c(vars, "x")
+    if (isTRUE(facet$space_free$y)) vars <- c(vars, "y")
+    if (is.null(vars)) { # fill the entire space and give panels equal area
+      layout <- cbind(layout, width_proportion = rep(1/ncols, npanels),
+                      height_proportion = rep(1/nrows, npanels))
+    } else { #special handling for 'free' space
+      for (xy in vars) {
+        u.type <- toupper(xy)
+        l.type <- tolower(xy)
+        scale.type <- paste0("SCALE_", u.type)
+        range.type <- paste0(l.type, ".range")
+        space.type <- paste0("SPACE_", u.type)
+        vals <- layout[[scale.type]]
+        uv <- unique(vals)
+        diffs <- sapply(ranges[which(vals %in% uv)],
+                        function(x) { diff(x[[range.type]]) })
+        udiffs <- unique(diffs)
+        # decide the proportion of the height/width each scale deserves based on the range
+        props <- data.frame(tmp1 = uv, tmp2 = udiffs / sum(udiffs))
+        names(props) <- c(scale.type, space.type)
+        layout <- plyr::join(layout, props, by = scale.type)
+      }
+      names(layout) <- gsub("SPACE_X", "width_proportion", names(layout), fixed = TRUE)
+      names(layout) <- gsub("SPACE_Y", "height_proportion", names(layout), fixed = TRUE)
+    }
+  }
+  getDisplacement(layout)
+}
+
+# fixed cartesian coordinates (on a 0-1 scale)
+# inspired from https://github.com/hadley/ggplot2/blob/dfcb56ec067910e1a3a04693d8f1e146cc7fb796/R/coord-fixed.r#L34-36
+fixed_spaces <- function(ranges, ratio = 1) {
+  aspect <- sapply(ranges, 
+                   function(z) diff(z$y.range) / diff(z$x.range) * ratio)
+  spaces <- list(y = aspect)
+  spaces$x <- 1/spaces$y
+  lapply(spaces, function(z) min(z, 1))
+}
+
+# compute x/y coordinates of where to start drawing each panel
+getDisplacement <- function(layout) {
+  npanels <- dim(layout)[1]
+  if (npanels == 1) {
+    xdisplace <- (1 - layout$width_proportion)/2
+    ydisplace <- (1 - layout$height_proportion)/2
+    layout <- cbind(layout, xdisplace, ydisplace)
+  } else {
+    xvars <- c("COL", "width_proportion")
+    x <- unique(layout[xvars])
+    xinit <- (1 - sum(x$width_proportion))/2
+    xprop <- x$width_proportion
+    x$xdisplace <- cumsum(c(xinit, xprop[-length(xprop)]))
+    yvars <- c("ROW", "height_proportion")
+    y <- unique(layout[yvars])
+    yinit <- (1 - sum(y$height_proportion))/2
+    yprop <- y$height_proportion
+    y$ydisplace <- cumsum(c(yinit, yprop[-length(yprop)]))
+    layout <- plyr::join(layout, x, by = xvars)
+    layout <- plyr::join(layout, y, by = yvars)
+  }
+  layout
+}
+
 
 # Attach AXIS_X/AXIS_Y columns to the panel layout if 
 # facet_grids is used.
-
+# Currently every axis is rendered,
+# but this could be helpful if we decide not to that.
 flag_axis <- function(facet, layout) 
- UseMethod("flag_axis")
+  UseMethod("flag_axis")
 
 flag_axis.grid <- function(facet, layout) {
   # 'grid rules' are to draw y-axis on panels with COL == 1
@@ -65,7 +149,6 @@ flag_axis.wrap <- function(facet, layout) {
 flag_axis.null <- function(facet, layout) {
   cbind(layout, AXIS_X = TRUE, AXIS_Y = TRUE)
 }
-
 
 
 #####

@@ -38,6 +38,8 @@ parsePlot <- function(meta){
     plot.meta$strips <- with(meta$built, getStrips(plot$facet, panel))
     ## the layout tells us how to subset and where to plot on the JS side
     plot.meta$layout <- with(meta$built, flag_axis(plot$facet, panel$layout))
+    plot.meta$layout <- with(meta$built, train_layout(plot$facet, plot$coordinates, plot.meta$layout, 
+                                                     panel$ranges))
     plot.meta$geoms <- c(plot.meta$geoms, list(g$classed))
   }
   ## For each geom, save the nextgeom to preserve drawing order.

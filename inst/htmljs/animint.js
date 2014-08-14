@@ -202,7 +202,6 @@ var animint = function (to_select, json_file) {
       
       axislabs(axis.x, axis.xlab, "x");
       axislabs(axis.y, axis.ylab, "y");
-      // TODO: pull this out of the loop and use the max padding for each panel
       axispaddingy = 5 + Math.max.apply(null, yaxislabs.map(function(entry){return measureText(entry, 11).width;}));
       axispaddingx = 5 + Math.max.apply(null, xaxislabs.map(function(entry){return measureText(entry, 11).height;}));
       labelpaddingy = 5 + measureText(axis.yname, 11).height;
@@ -213,17 +212,33 @@ var animint = function (to_select, json_file) {
       margin.right = 5 + xaxislabs.map(function(entry){return measureText(entry, 11).height;})[xaxislabs.length-1]/2; // to ensure the last x-axis label doesn't get cut off.
       plotdim.margin = margin;
       
-      var current_row = p_info.layout.ROW[i]; 
-      var current_col = p_info.layout.COL[i]; 
-      var xdisplace = (current_col - 1) * plotdim.width;
-      var ydisplace = (current_row - 1) * plotdim.height;
+      // grab the x/y proportions for every row/column that 
+      // is lower than the current one and add them together
+      // to get x/y 'displacement'
+      
 
+      /*
+      var xdisplace = 0;
+      for (j = 0; j < current_col; j++) {
+        var idx = p_info.layout.COL.indexOf(j);
+        if (idx > -1) xdisplace = xdisplace + p_info.layout.SPACE_X[idx];
+      }
+      var ydisplace = 0;
+      for (j = 0; j < current_row; j++) {
+        var idx = p_info.layout.ROW.indexOf(j);
+        if (idx > -1) ydisplace = ydisplace + p_info.layout.SPACE_Y[idx];
+      }
+      */
+      var xdisplace = p_info.layout.xdisplace[i]
+      var ydisplace = p_info.layout.ydisplace[i]
       // calculate plot dimensions to be used in placing axes, labels, etc.
+      plotdim.width = p_info.layout.width_proportion[i] * p_info.options.width;
+      plotdim.height = p_info.layout.height_proportion[i] * p_info.options.height;
       plotdim.graph.width = plotdim.width - plotdim.margin.left - plotdim.margin.right;
       plotdim.graph.height = plotdim.height - plotdim.margin.top - plotdim.margin.bottom;
-      plotdim.xstart = xdisplace + plotdim.margin.left;
+      plotdim.xstart = xdisplace * p_info.options.width + plotdim.margin.left;
       plotdim.xend = plotdim.xstart + plotdim.graph.width;
-      plotdim.ystart = ydisplace + plotdim.margin.top;
+      plotdim.ystart = ydisplace * p_info.options.height + plotdim.margin.top;
       plotdim.yend = plotdim.ystart + plotdim.graph.height;
 
       plotdim.xlab.x = plotdim.xstart + plotdim.graph.width / 2;
@@ -238,7 +253,7 @@ var animint = function (to_select, json_file) {
         
         var stripLabels = {'top': [], 'right': []};
         var strip_location = {};
-        strip_location.top = {'x': plotdim.xlab.x, 'y': ydisplace + plotdim.margin.top/2};
+        strip_location.top = {'x': plotdim.xlab.x, 'y': plotdim.ystart - plotdim.margin.top/2};
         strip_location.right = {'x': plotdim.xend, 'y': plotdim.ylab.y};
 
         draw_strip = function(side) {
@@ -265,7 +280,8 @@ var animint = function (to_select, json_file) {
                 }
               });
         }
-
+        var current_row = p_info.layout.ROW[i]; 
+        var current_col = p_info.layout.COL[i]; 
         // if Array, facet_wrap() was used; otherwise, facet_grid()
         if (p_info.strips instanceof Array) {
           // strips should always be on top for facet_wrap(), right?
