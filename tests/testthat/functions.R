@@ -8,9 +8,10 @@
 #' @param plotList A named list of ggplot2 objects
 #' @param dir a name for a directory (this should be specific to a testing context)
 #' @param subdir a name for a subdirectory (under dir) to place files
-animint2HTML <- function(plotList, out.dir = "htmltest") {
-  res <- animint2dir(plotList, out.dir, open.browser = FALSE)
-  address <- sprintf("http://localhost:4848/testthat/%s/", out.dir)
+animint2HTML <- function(plotList) {
+  unlink("htmltest", recursive=TRUE)
+  res <- animint2dir(plotList, our.dir="htmltest", open.browser = FALSE)
+  address <- "http://localhost:4848/htmltest"
   remDr$navigate(address)
   ## find/get methods are kinda slow in RSelenium (here is an example)
   ## remDr$navigate(attr(info, "address"))
@@ -19,7 +20,6 @@ animint2HTML <- function(plotList, out.dir = "htmltest") {
 
   ## I think parsing using XML::htmlParse() and XML::getNodeSet() is faster/easier
   res$html <- XML::htmlParse(remDr$getPageSource(), asText = TRUE)
-
   res
 }
 

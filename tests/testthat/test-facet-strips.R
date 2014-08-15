@@ -4,11 +4,15 @@ p <- ggplot(mtcars, aes(mpg, wt)) +
   geom_point(colour='grey50', size = 4) + 
   geom_point(aes(colour = cyl)) 
 
-viz1 <- p + facet_grid(cyl~am, labeller = label_both)
-viz2 <- p + facet_wrap(~cyl+am)
+gridViz <-
+  list(gridPlot=p +
+       facet_grid(cyl~am, labeller = label_both))
+wrapViz <-
+  list(wrapPlot=p +
+       facet_wrap(~cyl+am))
 
 test_that("facet_grid() strip labels are placed correctly", {
-  info <- animint2HTML(list(plot = viz1))
+  info <- animint2HTML(gridViz)
   top <- getNodeSet(info$html, "//g[@id='top_strip']")
   # there should one be one 'top_strip' group (their children contain the vital info)
   kids <- xmlChildren(top[[1]])
@@ -35,7 +39,7 @@ test_that("facet_grid() strip labels are placed correctly", {
 })
 
 test_that("facet_wrap() strip labels are placed correctly", {
-  info <- animint2HTML(list(plot = viz2))
+  info <- animint2HTML(wrapViz)
   top <- getNodeSet(info$html, "//g[@id='top_strip']")
   kids <- xmlChildren(top[[1]])
   labs <- as.character(sapply(kids, xmlValue))
