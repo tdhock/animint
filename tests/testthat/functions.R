@@ -10,8 +10,8 @@
 #' @param subdir a name for a subdirectory (under dir) to place files
 animint2HTML <- function(plotList) {
   unlink("htmltest", recursive=TRUE)
-  res <- animint2dir(plotList, our.dir="htmltest", open.browser = FALSE)
-  address <- "http://localhost:4848/htmltest"
+  res <- animint2dir(plotList, out.dir="htmltest", open.browser = FALSE)
+  address <- "http://localhost:4848/htmltest/"
   remDr$navigate(address)
   ## find/get methods are kinda slow in RSelenium (here is an example)
   ## remDr$navigate(attr(info, "address"))
