@@ -11,7 +11,7 @@ Depends:
     proto,
     R (>= 2.10)
 Imports:
-    RJSONIO,
+    RJSONIO (>= 1.3),
     grid,
     plyr,
     maps,

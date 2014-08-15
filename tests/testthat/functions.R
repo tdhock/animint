@@ -9,6 +9,11 @@
 #' @param dir a name for a directory (this should be specific to a testing context)
 #' @param subdir a name for a subdirectory (under dir) to place files
 animint2HTML <- function(plotList) {
+  ## When we do test_package("animint") it does
+  ## setwd("animint/tests/testthat") so when we call this function
+  ## inside of the tests, it will write the viz to
+  ## animint/tests/testthat/htmltest, so we also need to start the
+  ## servr in animint/tests/testthat.
   unlink("htmltest", recursive=TRUE)
   res <- animint2dir(plotList, out.dir="htmltest", open.browser = FALSE)
   address <- "http://localhost:4848/htmltest/"

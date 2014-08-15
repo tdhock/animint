@@ -17,7 +17,7 @@ system(killsel)
 system("ps u")
 
 # Initialize local server in a seperate R process
-cmd <- paste0('R -e \"servr::httd(port=4848)\"')
+cmd <- paste0('cd testthat && R -e \"servr::httd(port=4848)\"')
 if (.Platform$OS.type != "unix") cmd <- paste0(cmd, " &")
 system(cmd, intern = FALSE, wait = FALSE)
 

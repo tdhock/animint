@@ -71,3 +71,8 @@ test_that("pixels between 15 and 20 is constant or variable", {
   xdiff <- lapply(x.axes, get1520diff)
   expect_true(both.equal(xdiff))
 })
+
+
+test_that("panel size is constant or variable", {
+  x.axes <- getNodeSet(info$html, "//svg[@id='freeBoth']//g[@id='xaxis']")
+})
