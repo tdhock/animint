@@ -26,7 +26,7 @@ checkForServer(dir = system.file("bin", package = "RSelenium"))
 # We should use browser = "phantomjs" eventually, but it hangs during multiple tests
 startServer()
 
-Sys.sleep(2) # otherwise I get Error in function (type, msg, asError = TRUE)  : couldn't connect to host
+Sys.sleep(3) # otherwise I get Error in function (type, msg, asError = TRUE)  : couldn't connect to host
 remDr <- remoteDriver$new(browserName = "firefox", port = 4444)
 ##str(remDr)
 remDr$open()

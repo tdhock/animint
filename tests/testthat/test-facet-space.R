@@ -14,6 +14,24 @@ viz <-
 
 info <- animint2HTML(viz)
 
+getTextValue <- function(tick)xmlValue(getNodeSet(tick, "text")[[1]])
+getTransform <- function(tick)xmlAttrs(tick)[["transform"]]
+get1520diff <- function(xaxis){
+  g.ticks <- getNodeSet(xaxis, "g[@class='tick major']")
+  tick.labels <- sapply(g.ticks, getTextValue)
+  names(g.ticks) <- tick.labels
+  tick.transform <- sapply(g.ticks[c("15", "20")], getTransform)
+  x.txt <- sub("translate[(](.*?),.*", "\\1", tick.transform)
+  x.num <- as.numeric(x.txt)
+  diff(x.num)
+}
+both.equal <- function(x){
+  if(is.null(x) || !is.vector(x) || length(x) != 2){
+    return(FALSE)
+  }
+  isTRUE(all.equal(x[[1]], x[[2]]))
+}
+
 test_that("each plot has two x axes and 1 y axis", {
   for(plot.name in names(viz)){
     svg.xpath <- sprintf("//svg[@id='%s']", plot.name)
@@ -23,6 +41,15 @@ test_that("each plot has two x axes and 1 y axis", {
     y.xpath <- paste0(svg.xpath, "//g[@id='yaxis']")
     y.axes <- getNodeSet(info$html, y.xpath)
     expect_equal(length(y.axes), 1)
+  }
+})
+
+test_that("each plot has only one x axis label", {
+  for(plot.name in names(viz)){
+    svg.xpath <- sprintf("//svg[@id='%s']", plot.name)
+    text.xpath <- paste0(svg.xpath, "//g[@id='xaxis']//text[@class='label']")
+    x.labels <- getNodeSet(info$html, text.xpath)
+    expect_equal(length(x.labels), 1)
   }
 })
 
@@ -38,21 +65,6 @@ test_that("top strips present in each plot", {
 })
 
 test_that("pixels between 15 and 20 is constant or variable", {
-  getTextValue <- function(tick)xmlValue(getNodeSet(tick, "text")[[1]])
-  getTransform <- function(tick)xmlAttrs(tick)[["transform"]]
-  get1520diff <- function(xaxis){
-    g.ticks <- getNodeSet(xaxis, "g[@class='tick major']")
-    tick.labels <- sapply(g.ticks, getTextValue)
-    names(g.ticks) <- tick.labels
-    tick.transform <- sapply(g.ticks[c("15", "20")], getTransform)
-    x.txt <- sub("translate[(](.*?),.*", "\\1", tick.transform)
-    x.num <- as.numeric(x.txt)
-    diff(x.num)
-  }
-  both.equal <- function(x){
-    isTRUE(all.equal(x[[1]], x[[2]]))
-  }
-
   ## scale="fixed" means the distance between ticks 15 and 20 should
   ## be the same across the 2 panels.
   x.axes <- getNodeSet(info$html, "//svg[@id='fixed']//g[@id='xaxis']")
@@ -73,6 +85,8 @@ test_that("pixels between 15 and 20 is constant or variable", {
 })
 
 
-test_that("panel size is constant or variable", {
-  x.axes <- getNodeSet(info$html, "//svg[@id='freeBoth']//g[@id='xaxis']")
+test_that("width_proportion is constant or variable", {
+  expect_true(both.equal(info$plots$fixed$layout$width_proportion))
+  expect_true(both.equal(info$plots$freeScale$layout$width_proportion))
+  expect_true(!both.equal(info$plots$freeBoth$layout$width_proportion))
 })
