@@ -154,9 +154,9 @@ var animint = function (to_select, json_file) {
     // eventually we inject this into Plots[p_name]
     var scales = {};
     // Draw a plot outline for every panel
-    for (i = 0; i < npanels; i++) {
-      var j = i + 1;
-      var axis  = p_info["axis" + j];
+    for (var layout_i = 0; layout_i < npanels; layout_i++) {
+      var panel_i = layout_i + 1;
+      var axis  = p_info["axis" + panel_i];
 
       //forces values to be in an array
       var xaxisvals = [];
@@ -218,12 +218,13 @@ var animint = function (to_select, json_file) {
       })[xaxislabs.length-1]/2; // to ensure the last x-axis label doesn't get cut off.
       plotdim.margin = margin;
       
-      var xdisplace = p_info.layout.xdisplace[i]
-      var ydisplace = p_info.layout.ydisplace[i]
+      var xdisplace = p_info.layout.xdisplace[layout_i]
+      var ydisplace = p_info.layout.ydisplace[layout_i]
       // calculate plot dimensions to be used in placing axes, labels, etc.
-      plotdim.width = p_info.layout.width_proportion[i] * p_info.options.width;
+      plotdim.width = 
+	p_info.layout.width_proportion[layout_i] * p_info.options.width;
       plotdim.height = 
-	p_info.layout.height_proportion[i] * p_info.options.height;
+	p_info.layout.height_proportion[layout_i] * p_info.options.height;
       plotdim.graph.width = 
 	plotdim.width - plotdim.margin.left - plotdim.margin.right;
       plotdim.graph.height = 
@@ -278,12 +279,12 @@ var animint = function (to_select, json_file) {
                 }
               });
         }
-        var current_row = p_info.layout.ROW[i]; 
-        var current_col = p_info.layout.COL[i]; 
+        var current_row = p_info.layout.ROW[layout_i]; 
+        var current_col = p_info.layout.COL[layout_i]; 
         // if Array, facet_wrap() was used; otherwise, facet_grid()
         if (p_info.strips instanceof Array) {
           // strips should always be on top for facet_wrap(), right?
-          stripLabels.top = [p_info.strips[i]];
+          stripLabels.top = [p_info.strips[layout_i]];
           draw_strip("top");
         } else {
           if (current_row == 1) {
@@ -299,66 +300,77 @@ var animint = function (to_select, json_file) {
 
       }
       
-
       // for each of the x and y axes, there is a "real" and fake
       // version. The real version will be used for plotting the
       // data, and the fake version is just for the display of the
       // axes.
-      scales[j] = {};
-      scales[j].x = d3.scale.linear()
+      scales[panel_i] = {};
+      scales[panel_i].x = d3.scale.linear()
         .domain([0, 1])
         .range([plotdim.xstart, plotdim.xend]);
-      scales[j].x_fake = d3.scale.linear()
+      scales[panel_i].x_fake = d3.scale.linear()
         .domain(axis.xrange)
         .range([plotdim.xstart, plotdim.xend]);
-      scales[j].y = d3.scale.linear()
+      scales[panel_i].y = d3.scale.linear()
         .domain([0, 1])
         .range([plotdim.yend, plotdim.ystart]);
-      scales[j].y_fake = d3.scale.linear()
+      scales[panel_i].y_fake = d3.scale.linear()
         .domain([axis.yrange[1], axis.yrange[0]])
         .range([plotdim.ystart, plotdim.yend]);
-      var xaxis = d3.svg.axis()
-        .scale(scales[j].x)
-        .tickValues(xaxisvals)
-        .tickFormat(function (d) {
-          return xaxislabs[xaxisvals.indexOf(d)].toString();
-        })
-        .orient("bottom");
-      svg.append("g")
-        .attr("class", "axis")
-        .attr("id", "xaxis")
-        .attr("transform", "translate(0," + plotdim.yend + ")")
-        .call(xaxis)
-        .append("text")
-        .text(axis.xname)
-        .attr("class", "label")
-        .style("text-anchor", "middle")
-        .attr("transform", "translate(" +
-          plotdim.xlab.x + "," + plotdim.xlab.y + ")");
-      var yaxis = d3.svg.axis()
-        .scale(scales[j].y)
-        .tickValues(yaxisvals)
-        .tickFormat(function (d) {
-          return yaxislabs[yaxisvals.indexOf(d)].toString();
-        })
-        .orient("left");
-      svg.append("g")
-        .attr("class", "axis")
-        .attr("id", "yaxis")
-        .attr("transform", "translate(" + (plotdim.xstart) + ",0)")
-        .call(yaxis)
-        .append("text")
-        .text(axis.yname)
-        .attr("class", "label")
-        .style("text-anchor", "middle")
+      if(p_info.layout.AXIS_X[layout_i]){
+	var xaxis = d3.svg.axis()
+          .scale(scales[panel_i].x)
+          .tickValues(xaxisvals)
+          .tickFormat(function (d) {
+            return xaxislabs[xaxisvals.indexOf(d)].toString();
+          })
+          .orient("bottom");
+	svg.append("g")
+          .attr("class", "axis")
+          .attr("id", "xaxis")
+          .attr("transform", "translate(0," + plotdim.yend + ")")
+          .call(xaxis)
+          .append("text")
+          .text(axis.xname)
+          .attr("class", "label")
+          .style("text-anchor", "middle")
+          .attr("transform", "translate(" +
+		plotdim.xlab.x + "," + plotdim.xlab.y + ")");
+      }
+      if(p_info.layout.AXIS_Y[layout_i]){
+	var yaxis = d3.svg.axis()
+          .scale(scales[panel_i].y)
+          .tickValues(yaxisvals)
+          .tickFormat(function (d) {
+            return yaxislabs[yaxisvals.indexOf(d)].toString();
+          })
+          .orient("left");
+	svg.append("g")
+          .attr("class", "axis")
+          .attr("id", "yaxis")
+          .attr("transform", "translate(" + (plotdim.xstart) + ",0)")
+          .call(yaxis)
+          .append("text")
+          .text(axis.yname)
+          .attr("class", "label")
+          .style("text-anchor", "middle")
         // translate coordinates are specified in (-y, -x)
-        .attr("transform", "rotate(270)translate(" + (-plotdim.ylab.y) +
-          "," + (-plotdim.ylab.x) + ")");
-      
-      if(!axis.xline) styles.push("#"+p_name+" #xaxis"+" path{stroke:none;}");
-      if(!axis.xticks) styles.push("#"+p_name+" #xaxis .tick"+" line{stroke:none;}");
-      if(!axis.yline) styles.push("#"+p_name+" #yaxis"+" path{stroke:none;}");
-      if(!axis.yticks) styles.push("#"+p_name+" #yaxis .tick"+" line{stroke:none;}");
+          .attr("transform", "rotate(270)translate(" + (-plotdim.ylab.y) +
+		"," + (-plotdim.ylab.x) + ")");
+	
+	if(!axis.xline) {
+	  styles.push("#"+p_name+" #xaxis"+" path{stroke:none;}");
+	}
+	if(!axis.xticks) {
+	  styles.push("#"+p_name+" #xaxis .tick"+" line{stroke:none;}");
+	}
+	if(!axis.yline) {
+	  styles.push("#"+p_name+" #yaxis"+" path{stroke:none;}");
+	}
+	if(!axis.yticks) {
+	  styles.push("#"+p_name+" #yaxis .tick"+" line{stroke:none;}");
+	}
+      }
 
     } //end of for loop 
 
