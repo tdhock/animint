@@ -202,23 +202,32 @@ var animint = function (to_select, json_file) {
       
       axislabs(axis.x, axis.xlab, "x");
       axislabs(axis.y, axis.ylab, "y");
-      axispaddingy = 5 + Math.max.apply(null, yaxislabs.map(function(entry){return measureText(entry, 11).width;}));
-      axispaddingx = 5 + Math.max.apply(null, xaxislabs.map(function(entry){return measureText(entry, 11).height;}));
+      axispaddingy = 5 + Math.max.apply(null, yaxislabs.map(function(entry){
+	return measureText(entry, 11).width;
+      }));
+      axispaddingx = 5 + Math.max.apply(null, xaxislabs.map(function(entry){
+	return measureText(entry, 11).height;
+      }));
       labelpaddingy = 5 + measureText(axis.yname, 11).height;
       labelpaddingx = 5 + measureText(axis.xname, 11).height;
-      margin.left= labelpaddingy + axispaddingy;
+      margin.left = labelpaddingy + axispaddingy;
       margin.bottom = labelpaddingx + axispaddingx;
       margin.top = titlepadding;
-      margin.right = 5 + xaxislabs.map(function(entry){return measureText(entry, 11).height;})[xaxislabs.length-1]/2; // to ensure the last x-axis label doesn't get cut off.
+      margin.right = 5 + xaxislabs.map(function(entry){
+	return measureText(entry, 11).height;
+      })[xaxislabs.length-1]/2; // to ensure the last x-axis label doesn't get cut off.
       plotdim.margin = margin;
       
       var xdisplace = p_info.layout.xdisplace[i]
       var ydisplace = p_info.layout.ydisplace[i]
       // calculate plot dimensions to be used in placing axes, labels, etc.
       plotdim.width = p_info.layout.width_proportion[i] * p_info.options.width;
-      plotdim.height = p_info.layout.height_proportion[i] * p_info.options.height;
-      plotdim.graph.width = plotdim.width - plotdim.margin.left - plotdim.margin.right;
-      plotdim.graph.height = plotdim.height - plotdim.margin.top - plotdim.margin.bottom;
+      plotdim.height = 
+	p_info.layout.height_proportion[i] * p_info.options.height;
+      plotdim.graph.width = 
+	plotdim.width - plotdim.margin.left - plotdim.margin.right;
+      plotdim.graph.height = 
+	plotdim.height - plotdim.margin.top - plotdim.margin.bottom;
       plotdim.xstart = xdisplace * p_info.options.width + plotdim.margin.left;
       plotdim.xend = plotdim.xstart + plotdim.graph.width;
       plotdim.ystart = ydisplace * p_info.options.height + plotdim.margin.top;
@@ -236,15 +245,21 @@ var animint = function (to_select, json_file) {
         
         var stripLabels = {'top': [], 'right': []};
         var strip_location = {};
-        strip_location.top = {'x': plotdim.xlab.x, 'y': plotdim.ystart - plotdim.margin.top/2};
-        strip_location.right = {'x': plotdim.xend, 'y': plotdim.ylab.y};
+        strip_location.top = {
+	  'x': plotdim.xlab.x, 
+	  'y': plotdim.ystart - plotdim.margin.top/2
+	};
+        strip_location.right = {
+	  'x': plotdim.xend, 
+	  'y': plotdim.ylab.y
+	};
 
         draw_strip = function(side) {
           var x = strip_location[side].x;
           var y = strip_location[side].y;
           var stripLabs = stripLabels[side];
           //create a group
-          d3.select("#" + side + "_strip")
+          svg.select("#" + side + "_strip")
             .selectAll("." + side + "_strips")
             .data(stripLabs)
             .enter()
