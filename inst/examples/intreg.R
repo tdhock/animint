@@ -99,6 +99,12 @@ animint2dir(mmir.plot)
 mmir.facet <- 
   list(signal=mmir.plot$signal,
        penalty=ggplot()+
+       geom_tallrect(aes(xmin=min.L, xmax=max.L,
+                         showSelected=signal,
+                         clickSelects=segments),
+                     data=data.frame(intreg$selection, what="segments"),
+                     alpha=1/2)+
+       ylab("")+
        theme_animint(height=500, width=800)+
        geom_segment(aes(min.L, feature, xend=max.L, yend=feature,
                         clickSelects=signal),
@@ -116,12 +122,6 @@ mmir.facet <-
        geom_segment(aes(min.L, segments, xend=max.L, yend=segments,
                         showSelected=signal),
                     data=data.frame(intreg$selection, what="segments"))+
-       geom_tallrect(aes(xmin=min.L, xmax=max.L,
-                         showSelected=signal,
-                         clickSelects=segments),
-                     data=data.frame(intreg$selection, what="segments"),
-                     alpha=1/2)+
-       ylab("")+
        xlab("penalty value $L=f(x)$")+ # TODO: mathjax.
        facet_grid(what~.,scales="free"))
 animint2dir(mmir.facet) # doesn't work yet.
