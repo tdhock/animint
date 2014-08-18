@@ -1,4 +1,4 @@
-Context("Interactive facets")
+context("Interactive facets")
 
 ## Example: 4 plots, 2 selectors.
 data(intreg)
