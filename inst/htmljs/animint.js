@@ -116,7 +116,7 @@ var animint = function (to_select, json_file) {
 
     // Draw the title
     titlepadding = measureText(p_info.title, 20).height + 10;
-    plotdim.title.x = plotdim.xstart + p_info.options.width / 2;
+    plotdim.title.x = p_info.options.width / 2;
     plotdim.title.y = plotdim.margin.top / 2;
     svg.append("text")
       .text(p_info.title)
@@ -128,14 +128,47 @@ var animint = function (to_select, json_file) {
         plotdim.title.y) + ")")
       .style("text-anchor", "middle");
 
-    // Bind plot data to this plot's SVG element
+    // Draw & measure the axis "names" 
+    // names are "shared" across panels (just like the title)
+    var xname = {};
+    var yname = {};
+    xname.txt = p_info["xname"];
+    yname.txt = p_info["yname"];
+    // TODO: add an option to adjust font size?
+    labelpaddingx = 5 + measureText(xname.txt, 11).height;
+    labelpaddingy = 5 + measureText(yname.txt, 11).height;
+    xname.x = plotdim.title.x;
+    xname.y = p_info.options.height - labelpaddingx / 2;
+    yname.x = labelpaddingy / 2;
+    yname.y = p_info.options.height / 2;
+    svg.append("text")
+        .text(xname.txt)
+        .attr("class", "label")
+        .attr("id", "xname")
+        .style("text-anchor", "middle")
+        .attr("transform", "translate(" + xname.x + "," + xname.y + ")");
+    svg.append("text")
+        .text(yname.txt)
+        .attr("class", "label")
+        .attr("id", "yname")
+        .style("text-anchor", "middle")
+        .attr("transform", "translate(" + yname.x + "," + yname.y + ")rotate(270)");
 
+    // grab max text size over axis labels and panels for each axis
+    axispaddingy = 5 + Math.max.apply(null, p_info.ylabs.map(function(entry){
+       return measureText(entry, 11).width;
+    }));
+    axispaddingx = 5 + Math.max.apply(null, p_info.xlabs.map(function(entry){
+       return measureText(entry, 11).height;
+    }));
+
+    // Bind plot data to this plot's SVG element
     svg.plot = p_info;
     Plots[p_name] = p_info;
     p_info.geoms.forEach(function (g_name) {
       var layer_g_element = svg.append("g").attr("class", g_name);
       panel_names.forEach(function(PANEL){
-	layer_g_element.append("g").attr("class", "PANEL" + PANEL);
+	     layer_g_element.append("g").attr("class", "PANEL" + PANEL);
       });
       SVGs[g_name] = svg;
     });
@@ -202,19 +235,12 @@ var animint = function (to_select, json_file) {
       
       axislabs(axis.x, axis.xlab, "x");
       axislabs(axis.y, axis.ylab, "y");
-      axispaddingy = 5 + Math.max.apply(null, yaxislabs.map(function(entry){
-	return measureText(entry, 11).width;
-      }));
-      axispaddingx = 5 + Math.max.apply(null, xaxislabs.map(function(entry){
-	return measureText(entry, 11).height;
-      }));
-      labelpaddingy = 5 + measureText(axis.yname, 11).height;
-      labelpaddingx = 5 + measureText(axis.xname, 11).height;
+      
       margin.left = labelpaddingy + axispaddingy;
       margin.bottom = labelpaddingx + axispaddingx;
       margin.top = titlepadding;
       margin.right = 5 + xaxislabs.map(function(entry){
-	return measureText(entry, 11).height;
+	     return measureText(entry, 11).height;
       })[xaxislabs.length-1]/2; // to ensure the last x-axis label doesn't get cut off.
       plotdim.margin = margin;
       
@@ -247,13 +273,13 @@ var animint = function (to_select, json_file) {
         var stripLabels = {'top': [], 'right': []};
         var strip_location = {};
         strip_location.top = {
-	  'x': plotdim.xlab.x, 
-	  'y': plotdim.ystart - plotdim.margin.top/2
-	};
+	       'x': plotdim.xlab.x, 
+	       'y': plotdim.ystart - plotdim.margin.top/2
+        };
         strip_location.right = {
-	  'x': plotdim.xend, 
-	  'y': plotdim.ylab.y
-	};
+	       'x': plotdim.xend, 
+	       'y': plotdim.ylab.y
+        };
 
         draw_strip = function(side) {
           var x = strip_location[side].x;
@@ -279,6 +305,7 @@ var animint = function (to_select, json_file) {
                 }
               });
         }
+
         var current_row = p_info.layout.ROW[layout_i]; 
         var current_col = p_info.layout.COL[layout_i]; 
         // if Array, facet_wrap() was used; otherwise, facet_grid()
@@ -318,45 +345,33 @@ var animint = function (to_select, json_file) {
         .domain([axis.yrange[1], axis.yrange[0]])
         .range([plotdim.ystart, plotdim.yend]);
       if(p_info.layout.AXIS_X[layout_i]){
-	var xaxis = d3.svg.axis()
+	     var xaxis = d3.svg.axis()
           .scale(scales[panel_i].x)
           .tickValues(xaxisvals)
           .tickFormat(function (d) {
             return xaxislabs[xaxisvals.indexOf(d)].toString();
           })
           .orient("bottom");
-	svg.append("g")
+	     svg.append("g")
           .attr("class", "axis")
           .attr("id", "xaxis")
           .attr("transform", "translate(0," + plotdim.yend + ")")
-          .call(xaxis)
-          .append("text")
-          .text(axis.xname)
-          .attr("class", "label")
-          .style("text-anchor", "middle")
-          .attr("transform", "translate(" +
-		plotdim.xlab.x + "," + plotdim.xlab.y + ")");
+          .call(xaxis);
       }
       if(p_info.layout.AXIS_Y[layout_i]){
-	var yaxis = d3.svg.axis()
+	     var yaxis = d3.svg.axis()
           .scale(scales[panel_i].y)
           .tickValues(yaxisvals)
           .tickFormat(function (d) {
             return yaxislabs[yaxisvals.indexOf(d)].toString();
           })
           .orient("left");
-	svg.append("g")
+	     svg.append("g")
           .attr("class", "axis")
           .attr("id", "yaxis")
           .attr("transform", "translate(" + (plotdim.xstart) + ",0)")
-          .call(yaxis)
-          .append("text")
-          .text(axis.yname)
-          .attr("class", "label")
-          .style("text-anchor", "middle")
-        // translate coordinates are specified in (-y, -x)
-          .attr("transform", "rotate(270)translate(" + (-plotdim.ylab.y) +
-		"," + (-plotdim.ylab.x) + ")");
+          .call(yaxis);
+      }
 	
 	if(!axis.xline) {
 	  styles.push("#"+p_name+" #xaxis"+" path{stroke:none;}");
@@ -370,7 +385,6 @@ var animint = function (to_select, json_file) {
 	if(!axis.yticks) {
 	  styles.push("#"+p_name+" #yaxis .tick"+" line{stroke:none;}");
 	}
-      }
 
     } //end of for loop 
 

@@ -6,11 +6,11 @@ no.panels <- ggplot(mtcars, aes(mpg, wt)) +
 
 viz <-
   list(freeBoth = no.panels +
-       facet_grid(.~am, space = "free", scales = "free", labeller=label_both),
+         facet_grid(.~am, space = "free", scales = "free", labeller=label_both),
        freeScale = no.panels +
-       facet_grid(.~am, scales="free", labeller=label_both),
+         facet_grid(.~am, scales="free", labeller=label_both),
        fixed = no.panels +
-       facet_grid(.~am, labeller=label_both))
+         facet_grid(.~am, labeller=label_both))
 
 info <- animint2HTML(viz)
 
@@ -47,7 +47,7 @@ test_that("each plot has two x axes and 1 y axis", {
 test_that("each plot has only one x axis label", {
   for(plot.name in names(viz)){
     svg.xpath <- sprintf("//svg[@id='%s']", plot.name)
-    text.xpath <- paste0(svg.xpath, "//g[@id='xaxis']//text[@class='label']")
+    text.xpath <- paste0(svg.xpath, "//text[@id='xname']")
     x.labels <- getNodeSet(info$html, text.xpath)
     expect_equal(length(x.labels), 1)
   }
@@ -67,16 +67,17 @@ test_that("top strips present in each plot", {
 test_that("pixels between 15 and 20 is constant or variable", {
   ## scale="fixed" means the distance between ticks 15 and 20 should
   ## be the same across the 2 panels.
+  browser()
   x.axes <- getNodeSet(info$html, "//svg[@id='fixed']//g[@id='xaxis']")
   xdiff <- lapply(x.axes, get1520diff)
   expect_true(both.equal(xdiff))
-
+  
   ## scale="free" means the distance between ticks 15 and 20 should
   ## be different across the 2 panels.
   x.axes <- getNodeSet(info$html, "//svg[@id='freeScale']//g[@id='xaxis']")
   xdiff <- lapply(x.axes, get1520diff)
   expect_true(!both.equal(xdiff))
-
+  
   ## scale="free" and space="free" means the distance between ticks 15
   ## and 20 should be the same across the 2 panels.
   x.axes <- getNodeSet(info$html, "//svg[@id='freeBoth']//g[@id='xaxis']")

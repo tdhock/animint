@@ -81,37 +81,44 @@ parsePlot <- function(meta){
                    paste0("axis", seq_len(n.axis)))
   plot.meta <- c(plot.meta, axes)
 
-  # extract axis info
-  ctr <- 0
-  for (axis in names(axes)) {
-    ctr <- ctr + 1
-    range <- ranges[[ctr]]
-    for(xy in c("x", "y")){
-      s <- function(tmp)sprintf(tmp, xy)
+  # translate axis information
+  for (xy in c("x", "y")) {
+    s <- function(tmp) sprintf(tmp, xy)
+    # one axis name per plot (ie, a xname/yname is shared across panels)
+    plot.meta[[s("%sname")]] <- if(is.blank(s("axis.title.%s"))){
+      ""
+    } else {
+      scale.i <- which(meta$plot$scales$find(xy))
+      lab.or.null <- if(length(scale.i) == 1){
+        meta$plot$scales$scales[[scale.i]]$name
+      }
+      if(is.null(lab.or.null)){
+        meta$plot$labels[[xy]]
+      }else{
+        lab.or.null
+      }
+    }
+    # translate panel specific axis info
+    ctr <- 0
+    for (axis in names(axes)) {
+      ctr <- ctr + 1
+      range <- ranges[[ctr]]
       plot.meta[[axis]][[xy]] <- range[[s("%s.major")]]
       plot.meta[[axis]][[s("%slab")]] <- if(is.blank(s("axis.text.%s"))){
         NULL
-      }else{
+      } else {
         range[[s("%s.labels")]]
       }
       plot.meta[[axis]][[s("%srange")]] <- range[[s("%s.range")]]
-      plot.meta[[axis]][[s("%sname")]] <- if(is.blank(s("axis.title.%s"))){
-        ""
-      }else{
-        scale.i <- which(meta$plot$scales$find(xy))
-        lab.or.null <- if(length(scale.i) == 1){
-          meta$plot$scales$scales[[scale.i]]$name
-        }
-        if(is.null(lab.or.null)){
-          meta$plot$labels[[xy]]
-        }else{
-          lab.or.null
-        }
-      }
       plot.meta[[axis]][[s("%sline")]] <- !is.blank(s("axis.line.%s"))
       plot.meta[[axis]][[s("%sticks")]] <- !is.blank(s("axis.ticks.%s"))
     }
   }
+  # grab the unique axis labels (makes rendering simpler)
+  axis.info <- plot.meta[grepl("^axis[0-9]+$", names(plot.meta))]
+  plot.meta$xlabs <- unique(unlist(lapply(axis.info, "[", "xlab")))
+  plot.meta$ylabs <- unique(unlist(lapply(axis.info, "[", "ylab")))
+  
 
   plot.meta$legend <- getLegendList(meta$built)
   if(length(plot.meta$legend)>0){
