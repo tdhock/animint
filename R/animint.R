@@ -877,7 +877,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
     message('opening a web browser with a file:// URL; ',
             'if the web page is blank, try running
 if (!require("servr")) install.packages("servr")
-servr::httd("', out.dir, '")')
+servr::httd("', normalizePath( out.dir,winslash="/" ), '")')
       browseURL(sprintf("%s/index.html", out.dir))
   }
   invisible(meta)
