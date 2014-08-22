@@ -1,16 +1,6 @@
 TODOs in approximate order of importance (higher is more important).
 
-EXAMPLE: add a test for rendering HTML of multiple animints defined in
-a Rmd.
-
-GGPLOT: facets -- would be useful when we want to align axes in
-related plots, e.g. the last plot of examples/intreg.R. One way to
-implement facets is to use "margin convention"
-http://bl.ocks.org/mbostock/3019563 Another way to do it is to just
-use a HTML table, each td has an SVG element.
-
-GGPLOT: coord_equal -- would be useful for maps
-e.g. examples/Tornadoes.R.
+ASK JS GUYS: grey after mouseout on ff?
 
 DSL: customizable alpha/color/size/fill/linetype for selected geoms,
 using selected.alpha, selected.color, etc aesthetics, see
@@ -37,8 +27,27 @@ it up! e.g. the last viz in
 https://github.com/tdhock/animint-examples/blob/master/examples/scaffolds.R
 took 15 minutes to compile on my computer.
 
-OPTIMIZATION: Is it possible to download gzipped tsv files in
-JavaScript/D3? This could reduce disk space and download time.
+OPTIMIZATION: to save disk space, we can compress the TSV file
+database to .tsv.gz files. But for this to work with
+d3.tsv("path/to/file.tsv.gz"), we need a web server that serves .gz
+files with the Content-Encoding: gzip header -- is this possible with
+standard web servers? With servers like gist.github.com, all .json
+files are served with Content-Encoding: gzip, so they use
+http://en.wikipedia.org/wiki/HTTP_compression over the network. In
+firefox Inspect Element -> network it seems like they do not compress
+.tsv files. In curl it seems like it depends on the --compress flag
+
+thocking@silene:~/projects/chip-seq-paper(master*)$ curl --compress -# --head https://gist.githubusercontent.com/tdhock/914ab9c19038cae238a4/raw/geom10_rect_profiles_chunk9.tsv |grep Content-Encoding
+
+Content-Encoding: gzip
+thocking@silene:~/projects/chip-seq-paper(master*)$ curl -# --head https://gist.githubusercontent.com/tdhock/914ab9c19038cae238a4/raw/geom10_rect_profiles_chunk9.tsv |grep Content-Encoding
+
+thocking@silene:~/projects/chip-seq-paper(master*)$ curl --compress -# --head https://gist.githubusercontent.com/tdhock/914ab9c19038cae238a4/raw/plot.json |grep Content-Encoding
+
+Content-Encoding: gzip
+thocking@silene:~/projects/chip-seq-paper(master*)$ curl -# --head https://gist.githubusercontent.com/tdhock/914ab9c19038cae238a4/raw/plot.json |grep Content-Encoding
+
+thocking@silene:~/projects/chip-seq-paper(master*)$ 
 
 DSL: Allow other variable names for the same selection variable,
 e.g. insert and insert.show are 2 different columns in
@@ -173,6 +182,10 @@ geom_point(aes_string(x=input$xvar)) with selectInput('xvar', 'X
 Variable', names(dataset))). However I fear that it may end up not
 being very responsive, since the animint would have to be re-compiled
 by the shiny server after every change to the shiny input.
+
+2014.8.14
+
+GGPLOT: facet_* and coord_fixed are now fully functional.
 
 2014.6.10
 

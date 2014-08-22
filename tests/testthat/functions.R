@@ -8,9 +8,15 @@
 #' @param plotList A named list of ggplot2 objects
 #' @param dir a name for a directory (this should be specific to a testing context)
 #' @param subdir a name for a subdirectory (under dir) to place files
-animint2HTML <- function(plotList, out.dir = "htmltest") {
-  res <- animint2dir(plotList, out.dir, open.browser = FALSE)
-  address <- sprintf("http://localhost:4848/testthat/%s/", out.dir)
+animint2HTML <- function(plotList) {
+  ## When we do test_package("animint") it does
+  ## setwd("animint/tests/testthat") so when we call this function
+  ## inside of the tests, it will write the viz to
+  ## animint/tests/testthat/htmltest, so we also need to start the
+  ## servr in animint/tests/testthat.
+  unlink("htmltest", recursive=TRUE)
+  res <- animint2dir(plotList, out.dir="htmltest", open.browser = FALSE)
+  address <- "http://localhost:4848/htmltest/"
   remDr$navigate(address)
   ## find/get methods are kinda slow in RSelenium (here is an example)
   ## remDr$navigate(attr(info, "address"))
@@ -19,8 +25,17 @@ animint2HTML <- function(plotList, out.dir = "htmltest") {
 
   ## I think parsing using XML::htmlParse() and XML::getNodeSet() is faster/easier
   res$html <- XML::htmlParse(remDr$getPageSource(), asText = TRUE)
-
   res
+}
+
+expect_transform <- function(actual, expected, context = "translate", tolerance = 5) {
+  # supports multiple contexts
+  nocontext <- gsub(paste(context, collapse = "||"), "", actual)
+  # reduce to some 'vector' of numbers: (a, b, c, ...)
+  vec <- gsub("\\)\\(", ",", nocontext)
+  clean <- gsub("\\)", "", gsub("\\(", "", vec))
+  nums <- as.numeric(strsplit(clean, split = "\\,")[[1]])
+  expect_equal(nums, expected, tolerance, scale = 1)
 }
 
 expect_links <- function(info, urls){
