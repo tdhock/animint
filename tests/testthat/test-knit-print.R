@@ -7,7 +7,7 @@ test_that("knit_print.animint works as intended", {
             output = "index.html")
   remDr$navigate("http://localhost:4848/index.html")
   html <- XML::htmlParse(remDr$getPageSource(), asText = TRUE)
-  nodes <- getNodeSet(html, "//text[@id='xname']")
+  nodes <- getNodeSet(html, "//text[@id='xtitle']")
   xlabel1 <- xmlValue(nodes[[1]])
   expect_match(xlabel1, "Worthless label 1")
   xlabel2 <- xmlValue(nodes[[2]])

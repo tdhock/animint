@@ -8,30 +8,39 @@ test_that("coord_flip works", {
   ## First test without flip.
   no.flip <- animint2dir(list(bars=bars), open.browser=FALSE)
   ax <- no.flip$plots$bars
-  expect_identical(ax$xname, "subcontinent")
-  expect_identical(ax$yname, "population")
+  expect_identical(ax$xtitle, "subcontinent")
+  expect_identical(ax$ytitle, "population")
   ## Then test with flip.
   flip <- animint2dir(list(bars=bars+coord_flip()), open.browser=FALSE)
   ax <- flip$plots$bars
-  expect_identical(ax$yname, "subcontinent")
-  expect_identical(ax$xname, "population")
+  expect_identical(ax$ytitle, "subcontinent")
+  expect_identical(ax$xtitle, "population")
 })
 
-test_that("coord_fixed works", { 
-  p <- ggplot(mtcars, aes(mpg, wt)) + 
-    geom_point(colour='grey50', size = 4) + 
-    geom_point(aes(colour = cyl))
-  # CASE 1: y-axis is 'shrunk'
-  viz1 <- p + coord_fixed(ratio = 3)
+p <- ggplot(mtcars, aes(mpg, wt)) + 
+  geom_point(colour='grey50', size = 4) + 
+  geom_point(aes(colour = cyl))
+
+test_that("coord_fixed with shrinking y-axis", {
+  ratio3 <- 3
+  viz1 <- p + coord_fixed(ratio3)
   info <- animint2HTML(list(plot = viz1))
-  nodes <- getNodeSet(info$html, "//g[@id='xaxis']")
-  # grab transform attribute value for the xaxis
-  translate <- xmlAttrs(nodes[[1]])["transform"]
-  expect_transform(translate, c(0, 266))
-  # CASE 2: x-axis is 'shrunk'
-  viz2 <- p + coord_fixed(ratio = 10)
+  x.axes <- getNodeSet(info$html, "//g[@id='xaxis']")
+  y.axes <- getNodeSet(info$html, "//g[@id='yaxis']")
+  xdiff <- getTickDiff(x.axes[[1]])
+  ydiff <- getTickDiff(y.axes[[1]], axis = "y")
+  diffs <- normDiffs(xdiff, ydiff, ratio3)
+  expect_equal(diffs[1], diffs[2], tolerance = 1, scale = 1)
+})
+
+test_that("coord_fixed with shrinking x-axis", {
+  ratio10 <- 10
+  viz2 <- p + coord_fixed(ratio10)
   info <- animint2HTML(list(plot = viz2))
-  nodes <- getNodeSet(info$html, "//g[@id='yaxis']")
-  translate <- xmlAttrs(nodes[[1]])["transform"]
-  expect_transform(translate, c(108, 0))
+  x.axes <- getNodeSet(info$html, "//g[@id='xaxis']")
+  y.axes <- getNodeSet(info$html, "//g[@id='yaxis']")
+  xdiff <- getTickDiff(x.axes[[1]])
+  ydiff <- getTickDiff(y.axes[[1]], axis = "y")
+  diffs <- normDiffs(xdiff, ydiff, ratio10)
+  expect_equal(diffs[1], diffs[2], tolerance = 1, scale = 1)
 })

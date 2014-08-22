@@ -54,6 +54,7 @@ train_layout <- function(facet, coord, layout, ranges) {
   if (length(unique(xdiffs)) > 1 || length(unique(ydiffs)) > 1) 
     coord$ratio <- NULL
   has.ratio <- !is.null(coord$ratio)
+  layout$coord_fixed <- has.ratio
   if (has.ratio) { 
     spaces <- fixed_spaces(ranges, coord$ratio)
     layout <- cbind(layout, width_proportion = spaces$x, height_proportion = spaces$y)

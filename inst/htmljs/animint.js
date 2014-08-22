@@ -128,31 +128,10 @@ var animint = function (to_select, json_file) {
         plotdim.title.y) + ")")
       .style("text-anchor", "middle");
 
-    // Draw & measure the axis "names" 
-    // names are "shared" across panels (just like the title)
-    var xname = {};
-    var yname = {};
-    xname.txt = p_info["xname"];
-    yname.txt = p_info["yname"];
+    // Note axis names are "shared" across panels (just like the title)
     // TODO: add an option to adjust font size?
-    labelpaddingx = 5 + measureText(xname.txt, 11).height;
-    labelpaddingy = 5 + measureText(yname.txt, 11).height;
-    xname.x = plotdim.title.x;
-    xname.y = p_info.options.height - labelpaddingx / 2;
-    yname.x = labelpaddingy / 2;
-    yname.y = p_info.options.height / 2;
-    svg.append("text")
-        .text(xname.txt)
-        .attr("class", "label")
-        .attr("id", "xname")
-        .style("text-anchor", "middle")
-        .attr("transform", "translate(" + xname.x + "," + xname.y + ")");
-    svg.append("text")
-        .text(yname.txt)
-        .attr("class", "label")
-        .attr("id", "yname")
-        .style("text-anchor", "middle")
-        .attr("transform", "translate(" + yname.x + "," + yname.y + ")rotate(270)");
+    labelpaddingx = 5 + measureText(p_info["xname"], 11).height;
+    labelpaddingy = 5 + measureText(p_info["yname"], 11).height;
 
     // grab max text size over axis labels and panels for each axis
     axispaddingy = 5 + Math.max.apply(null, p_info.ylabs.map(function(entry){
@@ -162,6 +141,44 @@ var animint = function (to_select, json_file) {
        return measureText(entry, 11).height;
     }));
 
+    // margins should be fixed across panels
+    margin.left = labelpaddingy + axispaddingy;
+    margin.top = titlepadding;
+    margin.bottom = labelpaddingx + axispaddingx;
+    margin.right = 5 + Math.max.apply(null, p_info.xlabs.map(function(entry){
+       return measureText(entry, 11).width;
+    })); // to ensure the last x-axis label doesn't get cut off.
+    plotdim.margin = margin;
+
+    // the *entire plot* height/width
+    plotdim.width = p_info.options.width;
+    plotdim.height = p_info.options.height;
+    // the *entire graph* height/width
+    var graph_width = plotdim.width - ncols * (margin.left + margin.right);
+    var graph_height = plotdim.height - nrows * (margin.top + margin.bottom);
+    // Impose the pixelated aspect ratio of the graph upon the width/height
+    // proportions calculated by the compiler. This has to be done on the 
+    // rendering side since the precomputed proportions apply to the *graph* 
+    // and the graph size depends upon results of measureText()
+    if (p_info.layout.coord_fixed[0]) {
+      var aspect = (graph_height / nrows) / (graph_width / ncols);
+    } else {
+      var aspect = 1;
+    }
+    var wp = p_info.layout.width_proportion.map(function(x){ 
+      return x * Math.min(1, aspect); 
+    })
+    var hp = p_info.layout.height_proportion.map(function(x){ 
+      return x * Math.min(1, 1/aspect); 
+    })
+    // add any change in the width/height proportion to x/y displacement
+    var xdisplace = p_info.layout.xdisplace;
+    var ydisplace = p_info.layout.ydisplace;
+    for (var layout_i = 0; layout_i < npanels; layout_i++) {
+      xdisplace[layout_i] = xdisplace[layout_i] + (p_info.layout.width_proportion[layout_i] - wp[layout_i])/2;
+      ydisplace[layout_i] = ydisplace[layout_i] + (p_info.layout.height_proportion[layout_i] - hp[layout_i])/2;
+    }
+  
     // Bind plot data to this plot's SVG element
     svg.plot = p_info;
     Plots[p_name] = p_info;
@@ -196,7 +213,6 @@ var animint = function (to_select, json_file) {
       var xaxislabs = [];
       var yaxisvals = [];
       var yaxislabs = [];
-      
       //function to write labels and breaks to their respective arrays
       var axislabs = function(breaks, labs, axis){
         if(axis=="x"){
@@ -232,38 +248,50 @@ var animint = function (to_select, json_file) {
           }
         }
       }    
-      
       axislabs(axis.x, axis.xlab, "x");
       axislabs(axis.y, axis.ylab, "y");
-      
-      margin.left = labelpaddingy + axispaddingy;
-      margin.bottom = labelpaddingx + axispaddingx;
-      margin.top = titlepadding;
-      margin.right = 5 + xaxislabs.map(function(entry){
-	     return measureText(entry, 11).height;
-      })[xaxislabs.length-1]/2; // to ensure the last x-axis label doesn't get cut off.
-      plotdim.margin = margin;
-      
-      var xdisplace = p_info.layout.xdisplace[layout_i]
-      var ydisplace = p_info.layout.ydisplace[layout_i]
-      // calculate plot dimensions to be used in placing axes, labels, etc.
-      plotdim.width = 
-	p_info.layout.width_proportion[layout_i] * p_info.options.width;
-      plotdim.height = 
-	p_info.layout.height_proportion[layout_i] * p_info.options.height;
-      plotdim.graph.width = 
-	plotdim.width - plotdim.margin.left - plotdim.margin.right;
-      plotdim.graph.height = 
-	plotdim.height - plotdim.margin.top - plotdim.margin.bottom;
-      plotdim.xstart = xdisplace * p_info.options.width + plotdim.margin.left;
-      plotdim.xend = plotdim.xstart + plotdim.graph.width;
-      plotdim.ystart = ydisplace * p_info.options.height + plotdim.margin.top;
-      plotdim.yend = plotdim.ystart + plotdim.graph.height;
+      var current_row = p_info.layout.ROW[layout_i]; 
+      var current_col = p_info.layout.COL[layout_i]; 
 
+      // calculate panel specific width/height to be used in placing axes, labels, etc.
+      // note that width/height proportion/displacement applies to the graph (not margins)
+      plotdim.graph.width = wp[layout_i] * graph_width;
+      plotdim.graph.height = hp[layout_i] * graph_height;
+      plotdim.xstart = xdisplace[layout_i] * graph_width + 
+                        current_col * plotdim.margin.left +
+                        (current_col - 1) * plotdim.margin.right;
+      plotdim.xend = plotdim.xstart + plotdim.graph.width;
+      plotdim.ystart = ydisplace[layout_i] * graph_height + 
+                        current_row * plotdim.margin.top +
+                        (current_row - 1) * plotdim.margin.bottom;
+      plotdim.yend = plotdim.ystart + plotdim.graph.height;
       plotdim.xlab.x = plotdim.xstart + plotdim.graph.width / 2;
       plotdim.xlab.y = axispaddingx + labelpaddingx / 2;
       plotdim.ylab.x = axispaddingy + labelpaddingy / 2;
       plotdim.ylab.y = plotdim.yend - plotdim.graph.height / 2;
+
+    // draw the y-axis title when drawing the first panel
+    if (layout_i === 0) {
+      svg.append("text")
+        .text(p_info["ytitle"])
+        .attr("class", "label")
+        .attr("id", "ytitle")
+        .style("text-anchor", "middle")
+        .style("font-size", "11px")
+        .attr("transform", "translate(" + (plotdim.xstart - axispaddingy - labelpaddingy / 2)
+          + "," + (p_info.options.height / 2) + ")rotate(270)");
+    }
+    // draw the x-axis title when drawing the last panel
+    if (layout_i === (npanels - 1)) {
+      svg.append("text")
+        .text(p_info["xtitle"])
+        .attr("class", "label")
+        .attr("id", "xtitle")
+        .style("text-anchor", "middle")
+        .style("font-size", "11px")
+        .attr("transform", "translate(" + plotdim.title.x 
+          + "," + (plotdim.yend + axispaddingx + labelpaddingx / 2) + ")");
+    }
 
       // idea: use the top/right margins to draw the facet title/strips
       // problem: how do we guarantee strips are readable for an arbitrary
@@ -306,8 +334,6 @@ var animint = function (to_select, json_file) {
               });
         }
 
-        var current_row = p_info.layout.ROW[layout_i]; 
-        var current_col = p_info.layout.COL[layout_i]; 
         // if Array, facet_wrap() was used; otherwise, facet_grid()
         if (p_info.strips instanceof Array) {
           // strips should always be on top for facet_wrap(), right?
@@ -373,18 +399,18 @@ var animint = function (to_select, json_file) {
           .call(yaxis);
       }
 	
-	if(!axis.xline) {
-	  styles.push("#"+p_name+" #xaxis"+" path{stroke:none;}");
-	}
-	if(!axis.xticks) {
-	  styles.push("#"+p_name+" #xaxis .tick"+" line{stroke:none;}");
-	}
-	if(!axis.yline) {
-	  styles.push("#"+p_name+" #yaxis"+" path{stroke:none;}");
-	}
-	if(!axis.yticks) {
-	  styles.push("#"+p_name+" #yaxis .tick"+" line{stroke:none;}");
-	}
+    	if(!axis.xline) {
+    	  styles.push("#"+p_name+" #xaxis"+" path{stroke:none;}");
+    	}
+    	if(!axis.xticks) {
+    	  styles.push("#"+p_name+" #xaxis .tick"+" line{stroke:none;}");
+    	}
+    	if(!axis.yline) {
+    	  styles.push("#"+p_name+" #yaxis"+" path{stroke:none;}");
+    	}
+    	if(!axis.yticks) {
+    	  styles.push("#"+p_name+" #yaxis .tick"+" line{stroke:none;}");
+    	}
 
     } //end of for loop 
 

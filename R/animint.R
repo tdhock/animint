@@ -84,8 +84,8 @@ parsePlot <- function(meta){
   # translate axis information
   for (xy in c("x", "y")) {
     s <- function(tmp) sprintf(tmp, xy)
-    # one axis name per plot (ie, a xname/yname is shared across panels)
-    plot.meta[[s("%sname")]] <- if(is.blank(s("axis.title.%s"))){
+    # one axis name per plot (ie, a xtitle/ytitle is shared across panels)
+    plot.meta[[s("%stitle")]] <- if(is.blank(s("axis.title.%s"))){
       ""
     } else {
       scale.i <- which(meta$plot$scales$find(xy))
@@ -119,7 +119,6 @@ parsePlot <- function(meta){
   plot.meta$xlabs <- unique(unlist(lapply(axis.info, "[", "xlab")))
   plot.meta$ylabs <- unique(unlist(lapply(axis.info, "[", "ylab")))
   
-
   plot.meta$legend <- getLegendList(meta$built)
   if(length(plot.meta$legend)>0){
     plot.meta$legend <-

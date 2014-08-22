@@ -14,24 +14,6 @@ viz <-
 
 info <- animint2HTML(viz)
 
-getTextValue <- function(tick)xmlValue(getNodeSet(tick, "text")[[1]])
-getTransform <- function(tick)xmlAttrs(tick)[["transform"]]
-get1520diff <- function(xaxis){
-  g.ticks <- getNodeSet(xaxis, "g[@class='tick major']")
-  tick.labels <- sapply(g.ticks, getTextValue)
-  names(g.ticks) <- tick.labels
-  tick.transform <- sapply(g.ticks[c("15", "20")], getTransform)
-  x.txt <- sub("translate[(](.*?),.*", "\\1", tick.transform)
-  x.num <- as.numeric(x.txt)
-  diff(x.num)
-}
-both.equal <- function(x){
-  if(is.null(x) || !is.vector(x) || length(x) != 2){
-    return(FALSE)
-  }
-  isTRUE(all.equal(x[[1]], x[[2]]))
-}
-
 test_that("each plot has two x axes and 1 y axis", {
   for(plot.name in names(viz)){
     svg.xpath <- sprintf("//svg[@id='%s']", plot.name)
@@ -47,7 +29,7 @@ test_that("each plot has two x axes and 1 y axis", {
 test_that("each plot has only one x axis label", {
   for(plot.name in names(viz)){
     svg.xpath <- sprintf("//svg[@id='%s']", plot.name)
-    text.xpath <- paste0(svg.xpath, "//text[@id='xname']")
+    text.xpath <- paste0(svg.xpath, "//text[@id='xtitle']")
     x.labels <- getNodeSet(info$html, text.xpath)
     expect_equal(length(x.labels), 1)
   }
@@ -67,21 +49,20 @@ test_that("top strips present in each plot", {
 test_that("pixels between 15 and 20 is constant or variable", {
   ## scale="fixed" means the distance between ticks 15 and 20 should
   ## be the same across the 2 panels.
-  browser()
   x.axes <- getNodeSet(info$html, "//svg[@id='fixed']//g[@id='xaxis']")
-  xdiff <- lapply(x.axes, get1520diff)
+  xdiff <- lapply(x.axes, getTickDiff)
   expect_true(both.equal(xdiff))
   
   ## scale="free" means the distance between ticks 15 and 20 should
   ## be different across the 2 panels.
   x.axes <- getNodeSet(info$html, "//svg[@id='freeScale']//g[@id='xaxis']")
-  xdiff <- lapply(x.axes, get1520diff)
+  xdiff <- lapply(x.axes, getTickDiff)
   expect_true(!both.equal(xdiff))
   
   ## scale="free" and space="free" means the distance between ticks 15
   ## and 20 should be the same across the 2 panels.
   x.axes <- getNodeSet(info$html, "//svg[@id='freeBoth']//g[@id='xaxis']")
-  xdiff <- lapply(x.axes, get1520diff)
+  xdiff <- lapply(x.axes, getTickDiff)
   expect_true(both.equal(xdiff))
 })
 
