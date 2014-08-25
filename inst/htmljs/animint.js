@@ -208,23 +208,7 @@ var animint = function (to_select, json_file) {
       var panel_i = layout_i + 1;
       var axis  = p_info["axis" + panel_i];
 
-/*
-      // assume these are arrays, but overwrite accordingly if they are objects
-      var xaxisvals = axis.x;
-      var xaxislabs = axis.xlab;
-      var yaxisvals = axis.y;
-      var yaxislabs = axis.ylab;
-      if (typeof(axis.x) === "object") {
-        xaxisvals = values(axis.x);
-        xaxislabs = keys(axis.x);
-      }
-      if (typeof(axis.x) === "object") {
-        xaxisvals = values(axis.x);
-        xaxislabs = keys(axis.x);
-      }
-*/
-
-            //forces values to be in an array
+      //forces values to be in an array
       var xaxisvals = [];
       var xaxislabs = [];
       var yaxisvals = [];
@@ -265,7 +249,6 @@ var animint = function (to_select, json_file) {
       
       axislabs(axis.x, axis.xlab, "x");
       axislabs(axis.y, axis.ylab, "y");
-
 
       var current_row = p_info.layout.ROW[layout_i]; 
       var current_col = p_info.layout.COL[layout_i]; 
