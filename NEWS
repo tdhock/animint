@@ -183,9 +183,10 @@ Variable', names(dataset))). However I fear that it may end up not
 being very responsive, since the animint would have to be re-compiled
 by the shiny server after every change to the shiny input.
 
-2014.8.14
+2014.8.25
 
 GGPLOT: facet_* and coord_fixed are now fully functional.
+BUGFIX: scale_x_time ticks/labels are now rendered properly.
 
 2014.6.10
 
