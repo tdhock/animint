@@ -45,3 +45,18 @@ test_that("scale_x_continuous(breaks)+xlab(name) converts", {
   xticks <- getNodeSet(info$html, "//g[@id='xaxis']/g[@class='tick major']")
   expect_identical(sapply(xticks, xmlValue), c("1.5", "6.5"))
 })
+
+
+stocks <- data.frame(
+  time = as.Date('2009-01-01') + 0:89,
+  vars = rep(c("A", "B", "C"), 30),
+  value = rnorm(90)
+)
+
+series <- ggplot() + geom_line(aes(x = time, y = value, group = vars), data = stocks)
+
+test_that("scale_x_time ticks/labels work", { 
+  info <- animint2HTML(list(series = series))
+  xticks <- getNodeSet(info$html, "//g[@id='xaxis']/g[@class='tick major']")
+  expect_true(length(xticks) > 1)
+})
