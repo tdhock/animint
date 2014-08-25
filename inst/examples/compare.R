@@ -65,4 +65,4 @@ for(model in c("compare", "rank")){
   names(L) <- model
   dots <- c(dots, L)
 }
-gg2animint(dots, "interactive-dots")
+animint2dir(dots, "interactive-dots")

@@ -8,9 +8,15 @@
 #' @param plotList A named list of ggplot2 objects
 #' @param dir a name for a directory (this should be specific to a testing context)
 #' @param subdir a name for a subdirectory (under dir) to place files
-animint2HTML <- function(plotList, out.dir = "htmltest") {
-  res <- animint2dir(plotList, out.dir, open.browser = FALSE)
-  address <- sprintf("http://localhost:4848/testthat/%s/", out.dir)
+animint2HTML <- function(plotList) {
+  ## When we do test_package("animint") it does
+  ## setwd("animint/tests/testthat") so when we call this function
+  ## inside of the tests, it will write the viz to
+  ## animint/tests/testthat/htmltest, so we also need to start the
+  ## servr in animint/tests/testthat.
+  unlink("htmltest", recursive=TRUE)
+  res <- animint2dir(plotList, out.dir="htmltest", open.browser = FALSE)
+  address <- "http://localhost:4848/htmltest/"
   remDr$navigate(address)
   ## find/get methods are kinda slow in RSelenium (here is an example)
   ## remDr$navigate(attr(info, "address"))
@@ -19,8 +25,17 @@ animint2HTML <- function(plotList, out.dir = "htmltest") {
 
   ## I think parsing using XML::htmlParse() and XML::getNodeSet() is faster/easier
   res$html <- XML::htmlParse(remDr$getPageSource(), asText = TRUE)
-
   res
+}
+
+expect_transform <- function(actual, expected, context = "translate", tolerance = 5) {
+  # supports multiple contexts
+  nocontext <- gsub(paste(context, collapse = "||"), "", actual)
+  # reduce to some 'vector' of numbers: (a, b, c, ...)
+  vec <- gsub("\\)\\(", ",", nocontext)
+  clean <- gsub("\\)", "", gsub("\\(", "", vec))
+  nums <- as.numeric(strsplit(clean, split = "\\,")[[1]])
+  expect_equal(nums, expected, tolerance, scale = 1)
 }
 
 expect_links <- function(info, urls){
@@ -111,3 +126,39 @@ str_match_all_perl <- function(string,pattern){
     m
   })
 }
+
+getTextValue <- function(tick)xmlValue(getNodeSet(tick, "text")[[1]])
+getTransform <- function(tick)xmlAttrs(tick)[["transform"]]
+# get difference between axis ticks in both pixels and on original data scale
+# @param doc rendered HTML document
+# @param ticks which ticks? (can use text label of the tick)
+# @param axis which axis?
+getTickDiff <- function(doc, ticks = c(1, 2), axis = "x"){
+  g.ticks <- getNodeSet(doc, "g[@class='tick major']")
+  tick.labs <- sapply(g.ticks, getTextValue)
+  names(g.ticks) <- tick.labs
+  g.ticks <- g.ticks[ticks]
+  tick.transform <- sapply(g.ticks, getTransform)
+  expr <- if (axis == "x") "translate[(](.*?),.*" else "translate[(][0-9]+?,(.*)[)]"
+  txt <- sub(expr, "\\1", tick.transform)
+  num <- as.numeric(txt)
+  val <- abs(diff(num))
+  attr(val, "label-diff") <- diff(as.numeric(names(tick.transform)))
+  val
+}
+both.equal <- function(x, tolerance = 0.1){
+  if(is.null(x) || !is.vector(x) || length(x) != 2){
+    return(FALSE)
+  }
+  isTRUE(all.equal(x[[1]], x[[2]], tolerance))
+}
+
+# normalizes tick differences obtained by getTickDiff
+normDiffs <- function(xdiff, ydiff, ratio = 1) {
+  xlab <- attr(xdiff, "label-diff")
+  ylab <- attr(ydiff, "label-diff")
+  if (is.null(xlab) || is.null(ylab)) warning("label-diff attribute is missing")
+  c(ratio * xdiff / xlab, ydiff / ylab)
+}
+
+

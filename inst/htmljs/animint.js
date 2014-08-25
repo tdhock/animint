@@ -97,40 +97,143 @@ var animint = function (to_select, json_file) {
     // Each plot may have one or more legends. To make space for the
     // legends, we put each plot in a table with one row and two
     // columns: tdLeft and tdRight.
-      var plot_table = element.append("table")
-	      .style("display", "inline-block")
-      ;
-      var plot_tr = plot_table.append("tr");
-      var tdLeft = plot_tr.append("td");
-      var tdRight = plot_tr.append("td")
-	  .attr("id",p_name+"_legend")
-      ;
+    var plot_table = element.append("table").style("display", "inline-block");
+    var plot_tr = plot_table.append("tr");
+    var tdLeft = plot_tr.append("td");
+    var tdRight = plot_tr.append("td").attr("id", p_name+"_legend");
     var svg = tdLeft.append("svg")
       .attr("id", p_name)
       .attr("height", p_info.options.height)
       .attr("width", p_info.options.width);
 
-    //forces values to be in an array
-    var xaxisvals = [];
-    var xaxislabs = [];
-    var yaxisvals = [];
-    var yaxislabs = [];
+    // divvy up width/height based on the panel layout
+    var nrows = Math.max.apply(null, p_info.layout.ROW);
+    var ncols = Math.max.apply(null, p_info.layout.COL);
+    var panel_names = p_info.layout.PANEL;
+    var npanels = Math.max.apply(null, panel_names);
+    plotdim.width = p_info.options.width / ncols;
+    plotdim.height = p_info.options.height / nrows;
+
+    // Draw the title
+    titlepadding = measureText(p_info.title, 20).height + 10;
+    plotdim.title.x = p_info.options.width / 2;
+    plotdim.title.y = plotdim.margin.top / 2;
+    svg.append("text")
+      .text(p_info.title)
+      .attr("id", "plottitle")
+      .attr("class", "title")
+      .attr("font-family", "sans-serif")
+      .attr("font-size", "20px")
+      .attr("transform", "translate(" + (plotdim.title.x) + "," + (
+        plotdim.title.y) + ")")
+      .style("text-anchor", "middle");
+
+    // Note axis names are "shared" across panels (just like the title)
+    // TODO: add an option to adjust font size?
+    labelpaddingx = 5 + measureText(p_info["xname"], 11).height;
+    labelpaddingy = 5 + measureText(p_info["yname"], 11).height;
+
+    // grab max text size over axis labels and panels for each axis
+    axispaddingy = 5 + Math.max.apply(null, p_info.ylabs.map(function(entry){
+       return measureText(entry, 11).width;
+    }));
+    axispaddingx = 5 + Math.max.apply(null, p_info.xlabs.map(function(entry){
+       return measureText(entry, 11).height;
+    }));
+
+    // margins should be fixed across panels
+    margin.left = labelpaddingy + axispaddingy;
+    margin.top = titlepadding;
+    margin.bottom = labelpaddingx + axispaddingx;
+    margin.right = 5 + Math.max.apply(null, p_info.xlabs.map(function(entry){
+       return measureText(entry, 11).width;
+    })); // to ensure the last x-axis label doesn't get cut off.
+    plotdim.margin = margin;
+
+    // the *entire plot* height/width
+    plotdim.width = p_info.options.width;
+    plotdim.height = p_info.options.height;
+    // the *entire graph* height/width
+    var graph_width = plotdim.width - ncols * (margin.left + margin.right);
+    var graph_height = plotdim.height - nrows * (margin.top + margin.bottom);
+    // Impose the pixelated aspect ratio of the graph upon the width/height
+    // proportions calculated by the compiler. This has to be done on the 
+    // rendering side since the precomputed proportions apply to the *graph* 
+    // and the graph size depends upon results of measureText()
+    if (p_info.layout.coord_fixed[0]) {
+      var aspect = (graph_height / nrows) / (graph_width / ncols);
+    } else {
+      var aspect = 1;
+    }
+    var wp = p_info.layout.width_proportion.map(function(x){ 
+      return x * Math.min(1, aspect); 
+    })
+    var hp = p_info.layout.height_proportion.map(function(x){ 
+      return x * Math.min(1, 1/aspect); 
+    })
+    // add any change in the width/height proportion to x/y displacement
+    var xdisplace = p_info.layout.xdisplace;
+    var ydisplace = p_info.layout.ydisplace;
+    for (var layout_i = 0; layout_i < npanels; layout_i++) {
+      xdisplace[layout_i] = xdisplace[layout_i] + (p_info.layout.width_proportion[layout_i] - wp[layout_i])/2;
+      ydisplace[layout_i] = ydisplace[layout_i] + (p_info.layout.height_proportion[layout_i] - hp[layout_i])/2;
+    }
+  
+    // Bind plot data to this plot's SVG element
+    svg.plot = p_info;
+    Plots[p_name] = p_info;
+    p_info.geoms.forEach(function (g_name) {
+      var layer_g_element = svg.append("g").attr("class", g_name);
+      panel_names.forEach(function(PANEL){
+	     layer_g_element.append("g").attr("class", "PANEL" + PANEL);
+      });
+      SVGs[g_name] = svg;
+    });
     
-    //function to write labels and breaks to their respective arrays
-    var axislabs = function(breaks, labs, axis){
-      if(axis=="x"){
-        outbreaks = xaxisvals;
-        outlabs = xaxislabs;
-      } else {
-        outbreaks = yaxisvals;
-        outlabs = yaxislabs;
-      } // set appropriate variable names
+    // If we are to draw more than one panel, 
+    // create a grouping for strip labels
+    if (npanels > 1) {
+      svg.append("g")
+        .attr("class", "strip")
+        .attr("id", "top_strip");
+      svg.append("g")
+        .attr("class", "strip")
+        .attr("id", "right_strip");
+    }
+    // this will hold x/y scales for each panel
+    // eventually we inject this into Plots[p_name]
+    var scales = {};
+    // Draw a plot outline for every panel
+    for (var layout_i = 0; layout_i < npanels; layout_i++) {
+      var panel_i = layout_i + 1;
+      var axis  = p_info["axis" + panel_i];
+
+      //forces values to be in an array
+      var xaxisvals = [];
+      var xaxislabs = [];
+      var yaxisvals = [];
+      var yaxislabs = [];
       
-      if (isArray(breaks)) {
-        breaks.forEach(function (d) {
-          outbreaks.push(d);
-        });
-        if(labs){
+      //function to write labels and breaks to their respective arrays
+      var axislabs = function(breaks, labs, axis){
+        if(axis=="x"){
+          outbreaks = xaxisvals;
+          outlabs = xaxislabs;
+        } else {
+          outbreaks = yaxisvals;
+          outlabs = yaxislabs;
+        } // set appropriate variable names
+        if (isArray(breaks)) {
+          breaks.forEach(function (d) {
+            outbreaks.push(d);
+          })
+        } else {
+          //breaks can be an object!
+          for (key in breaks) {
+            outbreaks.push(breaks[key]);
+          }
+        }
+        if (labs){
           labs.forEach(function (d) {
             outlabs.push(d);
             // push each label provided into the array
@@ -142,123 +245,179 @@ var animint = function (to_select, json_file) {
             // if the specified label is null
           });
         }
-      } else {
-        outbreaks.push(breaks);
-        if(labs){
-          outlabs.push(labs);
-        } else {
-          outlabs.push("");
+      }    
+      
+      axislabs(axis.x, axis.xlab, "x");
+      axislabs(axis.y, axis.ylab, "y");
+
+      var current_row = p_info.layout.ROW[layout_i]; 
+      var current_col = p_info.layout.COL[layout_i]; 
+
+      // calculate panel specific width/height to be used in placing axes, labels, etc.
+      // note that width/height proportion/displacement applies to the graph (not margins)
+      plotdim.graph.width = wp[layout_i] * graph_width;
+      plotdim.graph.height = hp[layout_i] * graph_height;
+      plotdim.xstart = xdisplace[layout_i] * graph_width + 
+                        current_col * plotdim.margin.left +
+                        (current_col - 1) * plotdim.margin.right;
+      plotdim.xend = plotdim.xstart + plotdim.graph.width;
+      plotdim.ystart = ydisplace[layout_i] * graph_height + 
+                        current_row * plotdim.margin.top +
+                        (current_row - 1) * plotdim.margin.bottom;
+      plotdim.yend = plotdim.ystart + plotdim.graph.height;
+      plotdim.xlab.x = plotdim.xstart + plotdim.graph.width / 2;
+      plotdim.xlab.y = axispaddingx + labelpaddingx / 2;
+      plotdim.ylab.x = axispaddingy + labelpaddingy / 2;
+      plotdim.ylab.y = plotdim.yend - plotdim.graph.height / 2;
+
+    // draw the y-axis title when drawing the first panel
+    if (layout_i === 0) {
+      svg.append("text")
+        .text(p_info["ytitle"])
+        .attr("class", "label")
+        .attr("id", "ytitle")
+        .style("text-anchor", "middle")
+        .style("font-size", "11px")
+        .attr("transform", "translate(" + (plotdim.xstart - axispaddingy - labelpaddingy / 2)
+          + "," + (p_info.options.height / 2) + ")rotate(270)");
+    }
+    // draw the x-axis title when drawing the last panel
+    if (layout_i === (npanels - 1)) {
+      svg.append("text")
+        .text(p_info["xtitle"])
+        .attr("class", "label")
+        .attr("id", "xtitle")
+        .style("text-anchor", "middle")
+        .style("font-size", "11px")
+        .attr("transform", "translate(" + plotdim.title.x 
+          + "," + (plotdim.yend + axispaddingx + labelpaddingx / 2) + ")");
+    }
+
+      // idea: use the top/right margins to draw the facet title/strips
+      // problem: how do we guarantee strips are readable for an arbitrary
+      // number of strips?
+      if (npanels > 1) {
+        
+        var stripLabels = {'top': [], 'right': []};
+        var strip_location = {};
+        strip_location.top = {
+	       'x': plotdim.xlab.x, 
+	       'y': plotdim.ystart - plotdim.margin.top/2
+        };
+        strip_location.right = {
+	       'x': plotdim.xend, 
+	       'y': plotdim.ylab.y
+        };
+
+        draw_strip = function(side) {
+          var x = strip_location[side].x;
+          var y = strip_location[side].y;
+          var stripLabs = stripLabels[side];
+          //create a group
+          svg.select("#" + side + "_strip")
+            .selectAll("." + side + "_strips")
+            .data(stripLabs)
+            .enter()
+              .append("text")
+              .style("text-anchor", "middle")
+              .text(function(d, i) { return d; })
+              // NOTE: there could be multiple strips per panel
+              // TODO: is there a better way to manage spacing?
+              .attr("transform", function(d, i) { 
+                if (side == "top") {
+                  var y2 = y + i * 12; 
+                  return "translate(" + x + "," + y + ")rotate(0)";
+                } else if (side == "right") { //right
+                  var x2 = x - i * 12; 
+                  return "translate(" + x2 + "," + y + ")rotate(90)";
+                }
+              });
         }
+
+        // if Array, facet_wrap() was used; otherwise, facet_grid()
+        if (p_info.strips instanceof Array) {
+          // strips should always be on top for facet_wrap(), right?
+          stripLabels.top = [p_info.strips[layout_i]];
+          draw_strip("top");
+        } else {
+          if (current_row == 1) {
+            stripLabels.top = [p_info.strips.top[current_col - 1]];
+            draw_strip("top");
+          } 
+          if (current_col == ncols) {
+            stripLabels.right = [p_info.strips.right[current_row - 1]];
+            draw_strip("right");
+          }
+        }
+
+
       }
-    }    
-    
-    axislabs(p_info.axis.x, p_info.axis.xlab, "x");
-    axislabs(p_info.axis.y, p_info.axis.ylab, "y");
+      
+      // for each of the x and y axes, there is a "real" and fake
+      // version. The real version will be used for plotting the
+      // data, and the fake version is just for the display of the
+      // axes.
+      scales[panel_i] = {};
+      scales[panel_i].x = d3.scale.linear()
+        .domain([0, 1])
+        .range([plotdim.xstart, plotdim.xend]);
+      scales[panel_i].x_fake = d3.scale.linear()
+        .domain(axis.xrange)
+        .range([plotdim.xstart, plotdim.xend]);
+      scales[panel_i].y = d3.scale.linear()
+        .domain([0, 1])
+        .range([plotdim.yend, plotdim.ystart]);
+      scales[panel_i].y_fake = d3.scale.linear()
+        .domain([axis.yrange[1], axis.yrange[0]])
+        .range([plotdim.ystart, plotdim.yend]);
+      if(p_info.layout.AXIS_X[layout_i]){
+	     var xaxis = d3.svg.axis()
+          .scale(scales[panel_i].x)
+          .tickValues(xaxisvals)
+          .tickFormat(function (d) {
+            return xaxislabs[xaxisvals.indexOf(d)].toString();
+          })
+          .orient("bottom");
+	     svg.append("g")
+          .attr("class", "axis")
+          .attr("id", "xaxis")
+          .attr("transform", "translate(0," + plotdim.yend + ")")
+          .call(xaxis);
+      }
+      if(p_info.layout.AXIS_Y[layout_i]){
+	     var yaxis = d3.svg.axis()
+          .scale(scales[panel_i].y)
+          .tickValues(yaxisvals)
+          .tickFormat(function (d) {
+            return yaxislabs[yaxisvals.indexOf(d)].toString();
+          })
+          .orient("left");
+	     svg.append("g")
+          .attr("class", "axis")
+          .attr("id", "yaxis")
+          .attr("transform", "translate(" + (plotdim.xstart) + ",0)")
+          .call(yaxis);
+      }
+	
+    	if(!axis.xline) {
+    	  styles.push("#"+p_name+" #xaxis"+" path{stroke:none;}");
+    	}
+    	if(!axis.xticks) {
+    	  styles.push("#"+p_name+" #xaxis .tick"+" line{stroke:none;}");
+    	}
+    	if(!axis.yline) {
+    	  styles.push("#"+p_name+" #yaxis"+" path{stroke:none;}");
+    	}
+    	if(!axis.yticks) {
+    	  styles.push("#"+p_name+" #yaxis .tick"+" line{stroke:none;}");
+    	}
 
-    titlepadding = measureText(p_info.title, 20).height+10;
-    axispaddingy = 5 + Math.max.apply(null, yaxislabs.map(function(entry){return measureText(entry, 11).width;}));
-    axispaddingx = 5 + Math.max.apply(null, xaxislabs.map(function(entry){return measureText(entry, 11).height;}));
-    labelpaddingy = 5 + measureText(p_info.axis.yname, 11).height;
-    labelpaddingx = 5 + measureText(p_info.axis.xname, 11).height;
-    margin.left= labelpaddingy + axispaddingy;
-    margin.bottom = labelpaddingx + axispaddingx;
-    margin.top = titlepadding;
-    margin.right = 5 + xaxislabs.map(function(entry){return measureText(entry, 11).height;})[xaxislabs.length-1]/2; // to ensure the last x-axis label doesn't get cut off.
-    plotdim.margin = margin;
-    
-    // calculate plot dimensions to be used in placing axes, labels, etc.
-    plotdim.width = p_info.options.width;
-    plotdim.height = p_info.options.height;
-    plotdim.graph.width = plotdim.width - plotdim.margin.left - plotdim.margin.right;
-    plotdim.graph.height = plotdim.height - plotdim.margin.top - plotdim.margin.bottom;
-    plotdim.xstart = plotdim.margin.left;
-    plotdim.xend = plotdim.graph.width + margin.left;
-    plotdim.ystart = plotdim.margin.top;
-    plotdim.yend = plotdim.graph.height + margin.top;
-    plotdim.xlab.x = plotdim.xstart + plotdim.graph.width / 2;
-    plotdim.xlab.y = axispaddingx + labelpaddingx / 2;
-    plotdim.ylab.x = axispaddingy + labelpaddingy / 2;
-    plotdim.ylab.y = plotdim.yend - plotdim.graph.height / 2;
-    plotdim.title.x = plotdim.xstart + plotdim.graph.width / 2;
-    plotdim.title.y = plotdim.margin.top / 2;
+    } //end of for loop 
 
-    // for each of the x and y axes, there is a "real" and fake
-    // version. The real version will be used for plotting the
-    // data, and the fake version is just for the display of the
-    // axes.
-    svg.x = d3.scale.linear()
-      .domain([0, 1])
-      .range([plotdim.xstart, plotdim.xend]);
-    svg.x_fake = d3.scale.linear()
-      .domain(p_info.axis.xrange)
-      .range([plotdim.xstart, plotdim.xend]);
-    svg.y = d3.scale.linear()
-      .domain([0, 1])
-      .range([plotdim.yend, plotdim.ystart]);
-    svg.y_fake = d3.scale.linear()
-      .domain([p_info.axis.yrange[1], p_info.axis.yrange[0]])
-      .range([plotdim.ystart, plotdim.yend]);
-    var xaxis = d3.svg.axis()
-      .scale(svg.x)
-      .tickValues(xaxisvals)
-      .tickFormat(function (d) {
-        return xaxislabs[xaxisvals.indexOf(d)].toString();
-      })
-      .orient("bottom");
-    svg.append("g")
-      .attr("class", "axis")
-      .attr("id", "xaxis")
-      .attr("transform", "translate(0," + plotdim.yend + ")")
-      .call(xaxis)
-      .append("text")
-      .text(p_info.axis.xname)
-      .attr("class", "label")
-      .style("text-anchor", "middle")
-      .attr("transform", "translate(" +
-        plotdim.xlab.x + "," + plotdim.xlab.y + ")");
-    var yaxis = d3.svg.axis()
-      .scale(svg.y)
-      .tickValues(yaxisvals)
-      .tickFormat(function (d) {
-        return yaxislabs[yaxisvals.indexOf(d)].toString();
-      })
-      .orient("left");
-    svg.append("g")
-      .attr("class", "axis")
-      .attr("id", "yaxis")
-      .attr("transform", "translate(" + (plotdim.xstart) + ",0)")
-      .call(yaxis)
-      .append("text")
-      .text(p_info.axis.yname)
-      .attr("class", "label")
-      .style("text-anchor", "middle")
-      .attr("transform", "rotate(270)translate(" + (-plotdim.ylab.y) +
-        "," + (-plotdim.ylab.x) + ")")
-    // translate coordinates are specified in (-y, -x)
-    ;
-    
-    if(!p_info.axis.xline) styles.push("#"+p_name+" #xaxis"+" path{stroke:none;}");
-    if(!p_info.axis.xticks) styles.push("#"+p_name+" #xaxis .tick"+" line{stroke:none;}");
-    if(!p_info.axis.yline) styles.push("#"+p_name+" #yaxis"+" path{stroke:none;}");
-    if(!p_info.axis.yticks) styles.push("#"+p_name+" #yaxis .tick"+" line{stroke:none;}");
-    
+    Plots[p_name].scales = scales;
 
-    svg.append("text")
-      .text(p_info.title)
-      .attr("id", "plottitle")
-      .attr("class", "title")
-      .attr("font-family", "sans-serif")
-      .attr("font-size", "20px")
-      .attr("transform", "translate(" + (plotdim.title.x) + "," + (
-        plotdim.title.y) + ")")
-      .style("text-anchor", "middle");
-    svg.plot = p_info;
-    p_info.geoms.forEach(function (g_name) {
-      svg.append("g").attr("class", g_name);
-      SVGs[g_name] = svg;
-    });
-    Plots[p_name] = p_info;
-  }
+  } //end of add_plot()
+
   var add_selector = function (s_name, s_info) {
     Selectors[s_name] = s_info;
   }
@@ -283,14 +442,14 @@ var animint = function (to_select, json_file) {
       }
     });
     if(chunk_id == null){
-      draw_geom(g_info, [], selector_name); //draw nothing.
+      draw_panels(g_info, [], selector_name); //draw nothing.
       return;
     }
     var tsv_name = get_tsv(g_info, chunk_id);
     // get the data if it has not yet been downloaded.
     g_info.tr.select("td.chunk").text(tsv_name);
     if(g_info.data.hasOwnProperty(tsv_name)){
-      draw_geom(g_info, g_info.data[tsv_name], selector_name);
+      draw_panels(g_info, g_info.data[tsv_name], selector_name);
     }else{
       g_info.tr.select("td.status").text("downloading");
       var svg = SVGs[g_name];
@@ -304,9 +463,18 @@ var animint = function (to_select, json_file) {
       ;
       download_chunk(g_info, tsv_name, function(chunk){
       	loading.remove();
-	draw_geom(g_info, chunk, selector_name);
+	draw_panels(g_info, chunk, selector_name);
       });
     }
+  }
+  var draw_panels = function(g_info, chunk, selector_name) {
+    // derive the plot name from the geometry name
+    var g_names = g_info.classed.split("_");
+    var p_name = g_names[g_names.length - 1];
+    var panels = Plots[p_name].layout.PANEL;
+    panels.forEach(function(panel) {
+      draw_geom(g_info, chunk, selector_name, panel);
+    });
   }
   var download_sequence = function(g_name, s_name, seq){
     var g_info = Geoms[g_name];
@@ -336,7 +504,9 @@ var animint = function (to_select, json_file) {
   // download_chunk is called from update_geom and download_sequence.
   var download_chunk = function(g_info, tsv_name, funAfter){
     if(g_info.download_status.hasOwnProperty(tsv_name)){
-      funAfter();
+      for (i = 0; i < 6; i++) {
+        funAfter();
+      }
       return; // do not download twice.
     }
     g_info.download_status[tsv_name] = "downloading";
@@ -382,14 +552,23 @@ var animint = function (to_select, json_file) {
   }
   // update_geom is responsible for obtaining a chunk of downloaded
   // data, and then calling draw_geom to actually draw it.
-  var draw_geom = function(g_info, chunk, selector_name){
+  var draw_geom = function(g_info, chunk, selector_name, PANEL){
     g_info.tr.select("td.status").text("displayed");
     var svg = SVGs[g_info.classed];
     var data = chunk;
+    // derive the plot name from the geometry name
+    var g_names = g_info.classed.split("_");
+    var p_name = g_names[g_names.length - 1];
+    var scales = Plots[p_name].scales[PANEL];
     g_info.subset_order.forEach(function (aes_name) {
+      var value;
       if (aes_name != "group") {
-        var v_name = g_info.aes[aes_name];
-        var value = Selectors[v_name].selected;
+	if(aes_name == "PANEL"){
+	  value = PANEL;
+	}else{
+          var v_name = g_info.aes[aes_name];
+          value = Selectors[v_name].selected;
+	}
         if (data.hasOwnProperty(value)) {
           data = data[value];
         } else {
@@ -400,11 +579,12 @@ var animint = function (to_select, json_file) {
     var aes = g_info.aes;
     var toXY = function (xy, a) {
       return function (d) {
-        return svg[xy](d[a]);
+        return scales[xy](d[a]);
       }
     }
-    var g_element = svg.select("g." + g_info.classed);
-    var elements = g_element.selectAll(".geom");
+    var layer_g_element = svg.select("g." + g_info.classed);
+    var panel_g_element = layer_g_element.select("g.PANEL" + PANEL);
+    var elements = panel_g_element.selectAll(".geom");
     // TODO: standardize this code across aes/styles.
     var base_opacity = 1;
     if (g_info.params.alpha) {
@@ -489,11 +669,10 @@ var animint = function (to_select, json_file) {
     var key_fun = null;
     if(g_info.aes.hasOwnProperty("key")){
       key_fun = function(d){ 
-	return d.key;
+        return d.key;
       };
     }
-    if (g_info.geom == "line" || g_info.geom == "path" || g_info.geom ==
-	"polygon" || g_info.geom == "ribbon") {
+    if (g_info.geom == "line" || g_info.geom == "path" || g_info.geom == "polygon" || g_info.geom == "ribbon") {
 
       // Lines, paths, polygons, and ribbons are a bit special. For
       // every unique value of the group variable, we take the
@@ -550,10 +729,10 @@ var animint = function (to_select, json_file) {
       //id's) -- the kv variable. Then each separate object is plotted
       //using path (case of only 1 thing and no groups).
       if (!aes.hasOwnProperty("group")) {
-	// There is either 1 or 0 groups.
-	if(data.length == 0){
-	  kv = [];
-	}else{
+	       // There is either 1 or 0 groups.
+         if(data.length == 0){
+          kv = [];
+	       } else {
           kv = [{
             "key": 0,
             "value": 0
@@ -561,7 +740,7 @@ var animint = function (to_select, json_file) {
           data = {
             0: data
           };
-	}
+        }
       } else {
         // we need to use a path for each group.
         var kv = d3.entries(d3.keys(data));
@@ -654,16 +833,16 @@ var animint = function (to_select, json_file) {
       elements = elements.data(data, key_fun);
       eActions = function (e) {
         e.attr("x1", function (d) {
-          return svg.x(d["x"]);
+          return scales.x(d["x"]);
         })
           .attr("x2", function (d) {
-            return svg.x(d["xend"]);
+            return scales.x(d["xend"]);
           })
           .attr("y1", function (d) {
-            return svg.y(d["y"]);
+            return scales.y(d["y"]);
           })
           .attr("y2", function (d) {
-            return svg.y(d["yend"]);
+            return scales.y(d["yend"]);
           })
           .style("stroke-dasharray", get_dasharray)
           .style("stroke-width", get_size)
@@ -674,16 +853,16 @@ var animint = function (to_select, json_file) {
       elements = elements.data(data, key_fun);
       eActions = function (e) {
         e.attr("x1", function (d) {
-          return svg.x(d["x"]);
+          return scales.x(d["x"]);
         })
           .attr("x2", function (d) {
-            return svg.x(d["x"]);
+            return scales.x(d["x"]);
           })
           .attr("y1", function (d) {
-            return svg.y(d["ymax"]);
+            return scales.y(d["ymax"]);
           })
           .attr("y2", function (d) {
-            return svg.y(d["ymin"]);
+            return scales.y(d["ymin"]);
           })
           .style("stroke-dasharray", get_dasharray)
           .style("stroke-width", get_size)
@@ -695,8 +874,8 @@ var animint = function (to_select, json_file) {
       eActions = function (e) {
         e.attr("x1", toXY("x", "xintercept"))
           .attr("x2", toXY("x", "xintercept"))
-          .attr("y1", svg.y.range()[0])
-          .attr("y2", svg.y.range()[1])
+          .attr("y1", scales.y.range()[0])
+          .attr("y2", scales.y.range()[1])
           .style("stroke-dasharray", get_dasharray)
           .style("stroke-width", get_size)
           .style("stroke", get_colour);
@@ -708,8 +887,8 @@ var animint = function (to_select, json_file) {
       eActions = function (e) {
         e.attr("y1", toXY("y", "yintercept"))
           .attr("y2", toXY("y", "yintercept"))
-          .attr("x1", svg.x.range()[0] + plotdim.margin.left)
-          .attr("x2", svg.x.range()[1] - plotdim.margin.right)
+          .attr("x1", scales.x.range()[0] + plotdim.margin.left)
+          .attr("x2", scales.x.range()[1] - plotdim.margin.right)
           .style("stroke-dasharray", get_dasharray)
           .style("stroke-width", get_size)
           .style("stroke", get_colour);
@@ -756,10 +935,10 @@ var animint = function (to_select, json_file) {
       eActions = function (e) {
         e.attr("x", toXY("x", "xmin"))
           .attr("width", function (d) {
-            return svg.x(d["xmax"]) - svg.x(d["xmin"]);
+            return scales.x(d["xmax"]) - scales.x(d["xmin"]);
           })
-          .attr("y", svg.y.range()[1])
-          .attr("height", svg.y.range()[0] - svg.y.range()[1])
+          .attr("y", scales.y.range()[1])
+          .attr("height", scales.y.range()[0] - scales.y.range()[1])
           .style("fill", get_fill)
           .style("stroke-width", get_size)
           .style("stroke", get_colour);
@@ -770,11 +949,11 @@ var animint = function (to_select, json_file) {
       eActions = function (e) {
         e.attr("x", toXY("x", "xmin"))
           .attr("width", function (d) {
-            return Math.abs(svg.x(d.xmax) - svg.x(d.xmin));
+            return Math.abs(scales.x(d.xmax) - scales.x(d.xmin));
           })
           .attr("y", toXY("y", "ymax"))
           .attr("height", function (d) {
-            return Math.abs(svg.y(d.ymin) - svg.y(d.ymax));
+            return Math.abs(scales.y(d.ymin) - scales.y(d.ymax));
           })
           .style("stroke-dasharray", get_dasharray)
           .style("stroke-width", get_size)
@@ -800,48 +979,48 @@ var animint = function (to_select, json_file) {
       eActions = function (e) {
         e.append("line")
           .attr("x1", function (d) {
-            return svg.x(d["x"]);
+            return scales.x(d["x"]);
           })
           .attr("x2", function (d) {
-            return svg.x(d["x"]);
+            return scales.x(d["x"]);
           })
           .attr("y1", function (d) {
-            return svg.y(d["ymin"]);
+            return scales.y(d["ymin"]);
           })
           .attr("y2", function (d) {
-            return svg.y(d["lower"]);
+            return scales.y(d["lower"]);
           })
           .style("stroke-dasharray", get_dasharray)
           .style("stroke-width", get_size)
           .style("stroke", get_colour);
         e.append("line")
           .attr("x1", function (d) {
-            return svg.x(d["x"]);
+            return scales.x(d["x"]);
           })
           .attr("x2", function (d) {
-            return svg.x(d["x"]);
+            return scales.x(d["x"]);
           })
           .attr("y1", function (d) {
-            return svg.y(d["upper"]);
+            return scales.y(d["upper"]);
           })
           .attr("y2", function (d) {
-            return svg.y(d["ymax"]);
+            return scales.y(d["ymax"]);
           })
           .style("stroke-dasharray", get_dasharray)
           .style("stroke-width", get_size)
           .style("stroke", get_colour);
         e.append("rect")
           .attr("x", function (d) {
-            return svg.x(d["xmin"]);
+            return scales.x(d["xmin"]);
           })
           .attr("width", function (d) {
-            return svg.x(d["xmax"]) - svg.x(d["xmin"]);
+            return scales.x(d["xmax"]) - scales.x(d["xmin"]);
           })
           .attr("y", function (d) {
-            return svg.y(d["upper"]);
+            return scales.y(d["upper"]);
           })
           .attr("height", function (d) {
-            return Math.abs(svg.y(d["upper"]) - svg.y(d["lower"]));
+            return Math.abs(scales.y(d["upper"]) - scales.y(d["lower"]));
           })
           .style("stroke-dasharray", get_dasharray)
           .style("stroke-width", get_size)
@@ -849,16 +1028,16 @@ var animint = function (to_select, json_file) {
           .style("fill", get_fill);
         e.append("line")
           .attr("x1", function (d) {
-            return svg.x(d["xmin"]);
+            return scales.x(d["xmin"]);
           })
           .attr("x2", function (d) {
-            return svg.x(d["xmax"]);
+            return scales.x(d["xmax"]);
           })
           .attr("y1", function (d) {
-            return svg.y(d["middle"]);
+            return scales.y(d["middle"]);
           })
           .attr("y2", function (d) {
-            return svg.y(d["middle"]);
+            return scales.y(d["middle"]);
           })
           .style("stroke-dasharray", get_dasharray)
           .style("stroke-width", get_size)

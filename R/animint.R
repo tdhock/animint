@@ -26,14 +26,20 @@ parsePlot <- function(meta){
     
     ## This is the layer from the original ggplot object.
     L <- meta$plot$layers[[layer.i]]
-
+    
     ## for each layer, there is a correpsonding data.frame which
     ## evaluates the aesthetic mapping.
     df <- meta$built$data[[layer.i]]
-
+    
     ## This extracts essential info for this geom/layer.
     g <- saveLayer(L, df, meta)
-
+    
+    ## 'strips' are really titles for the different facet panels
+    plot.meta$strips <- with(meta$built, getStrips(plot$facet, panel))
+    ## the layout tells us how to subset and where to plot on the JS side
+    plot.meta$layout <- with(meta$built, flag_axis(plot$facet, panel$layout))
+    plot.meta$layout <- with(meta$built, train_layout(plot$facet, plot$coordinates, plot.meta$layout, 
+                                                     panel$ranges))
     plot.meta$geoms <- c(plot.meta$geoms, list(g$classed))
   }
   ## For each geom, save the nextgeom to preserve drawing order.
@@ -56,10 +62,6 @@ parsePlot <- function(meta){
   ## Flip labels if coords are flipped - transform does not take care
   ## of this. Do this BEFORE checking if it is blank or not, so that
   ## individual axes can be hidden appropriately, e.g. #1.
-  if(nrow(meta$built$panel$layout) > 1){
-    stop("animint does not yet support facets")
-  }
-  ranges <- meta$built$panel$ranges[[1]]
   if("flip"%in%attr(meta$plot$coordinates, "class")){
     temp <- meta$plot$labels$x
     meta$plot$labels$x <- meta$plot$labels$y
@@ -69,19 +71,23 @@ parsePlot <- function(meta){
     x <- ggplot2::calc_element(el.name, meta$plot$theme)
     "element_blank"%in%attr(x,"class")
   }
-  plot.meta$axis <- list()
-  for(xy in c("x","y")){
-    s <- function(tmp)sprintf(tmp, xy)
-    plot.meta$axis[[xy]] <- ranges[[s("%s.major")]]
-    plot.meta$axis[[s("%slab")]] <- if(is.blank(s("axis.text.%s"))){
-      NULL
-    }else{
-      ranges[[s("%s.labels")]]
-    }
-    plot.meta$axis[[s("%srange")]] <- ranges[[s("%s.range")]]
-    plot.meta$axis[[s("%sname")]] <- if(is.blank(s("axis.title.%s"))){
+
+  # Instead of an "axis" JSON object for each plot, 
+  # allow for "axis1", "axis2", etc. where 
+  # "axis1" corresponds to the 1st PANEL
+  ranges <- meta$built$panel$ranges
+  n.axis <- length(ranges)
+  axes <- setNames(vector("list", n.axis), 
+                   paste0("axis", seq_len(n.axis)))
+  plot.meta <- c(plot.meta, axes)
+
+  # translate axis information
+  for (xy in c("x", "y")) {
+    s <- function(tmp) sprintf(tmp, xy)
+    # one axis name per plot (ie, a xtitle/ytitle is shared across panels)
+    plot.meta[[s("%stitle")]] <- if(is.blank(s("axis.title.%s"))){
       ""
-    }else{
+    } else {
       scale.i <- which(meta$plot$scales$find(xy))
       lab.or.null <- if(length(scale.i) == 1){
         meta$plot$scales$scales[[scale.i]]$name
@@ -92,10 +98,27 @@ parsePlot <- function(meta){
         lab.or.null
       }
     }
-    plot.meta$axis[[s("%sline")]] <- !is.blank(s("axis.line.%s"))
-    plot.meta$axis[[s("%sticks")]] <- !is.blank(s("axis.ticks.%s"))
+    # translate panel specific axis info
+    ctr <- 0
+    for (axis in names(axes)) {
+      ctr <- ctr + 1
+      range <- ranges[[ctr]]
+      plot.meta[[axis]][[xy]] <- range[[s("%s.major")]]
+      plot.meta[[axis]][[s("%slab")]] <- if(is.blank(s("axis.text.%s"))){
+        NULL
+      } else {
+        range[[s("%s.labels")]]
+      }
+      plot.meta[[axis]][[s("%srange")]] <- range[[s("%s.range")]]
+      plot.meta[[axis]][[s("%sline")]] <- !is.blank(s("axis.line.%s"))
+      plot.meta[[axis]][[s("%sticks")]] <- !is.blank(s("axis.ticks.%s"))
+    }
   }
-
+  # grab the unique axis labels (makes rendering simpler)
+  axis.info <- plot.meta[grepl("^axis[0-9]+$", names(plot.meta))]
+  plot.meta$xlabs <- unique(unlist(lapply(axis.info, "[", "xlab")))
+  plot.meta$ylabs <- unique(unlist(lapply(axis.info, "[", "ylab")))
+  
   plot.meta$legend <- getLegendList(meta$built)
   if(length(plot.meta$legend)>0){
     plot.meta$legend <-
@@ -136,7 +159,7 @@ parsePlot <- function(meta){
 #' @return list representing a layer, with corresponding aesthetics, ranges, and groups.
 #' @export
 saveLayer <- function(l, d, meta){
-  ranges <- meta$built$panel$ranges[[1]] #TODO:facets
+  ranges <- meta$built$panel$ranges
   g <- list(geom=l$geom$objname)
   g.data <- d
   g$classed <-
@@ -330,6 +353,8 @@ saveLayer <- function(l, d, meta){
     ##   specifies group, polygons aren't possible to plot
     ##   using d3, because group will have a different meaning
     ##   than "one single polygon".
+    # CPS (07-24-14) what about this? -- 
+    # http://tdhock.github.io/animint/geoms/polygon/index.html
     newdata <- ddply(g.data, .(group), function(df){
       df$xcenter <- df$x
       df$ycenter <- df$y
@@ -394,15 +419,14 @@ saveLayer <- function(l, d, meta){
   ## e.g. geom-rect.r in ggplot2 to see how they deal with this by
   ## doing a piecewise linear interpolation of the shape.
 
-  g.data <-
-    ggplot2:::coord_transform(meta$plot$coord,
-                              g.data,
-                              ranges)
+  # Apply coord_transform seperately to each panel
+  # Note the plotly implementation does not use 
+  # coord_transform...do they take care of the transformation
+  # at a different point in time?
+  g.data <- do.call("rbind", mapply(function(x, y) { 
+    ggplot2:::coord_transform(meta$plot$coord, x, y)
+  }, split(g.data, g.data[["PANEL"]]), ranges, SIMPLIFY = FALSE))
   
-  ## TODO:facets. Right now we delete PANEL info since it just takes
-  ## up space for no reason in the CSV database.
-  g.data <- g.data[names(g.data) != "PANEL"]
-
   ## Output types
   ## Check to see if character type is d3's rgb type. 
   is.linetype <- function(x){
@@ -467,7 +491,6 @@ saveLayer <- function(l, d, meta){
   ##     names(vec.list)
   ##   }
   ## }
-
   subset.vec <- unlist(g$subset_order)
   if("chunk_vars" %in% names(g$params)){ #designer-specified chunk vars.
     designer.chunks <- g$params$chunk_vars
@@ -509,7 +532,6 @@ saveLayer <- function(l, d, meta){
       chunk.cols <- NULL
     }
   }
-
   ## Split into chunks and save tsv files.
   meta$classed <- g$classed
   meta$chunk.i <- 1L
@@ -534,6 +556,14 @@ saveLayer <- function(l, d, meta){
   g$subset_order <- g$nest_order
   if("group" %in% names(g$aes)){
     g$nest_order <- c(g$nest_order, "group")
+  }
+  
+  # If there is only one PANEL, we don't need it anymore.
+  if (length(unique(g.data[["PANEL"]])) == 1) {
+    g.data <- g.data[!grepl("PANEL", names(g.data), fixed = TRUE)]
+  } else { #otherwise, add panel to subset_order/nest_order
+    g$subset_order <- c(g$subset_order, "PANEL")
+    g$nest_order <- c(g$nest_order, "PANEL")
   }
   
   ## Get unique values of time variable.
@@ -682,12 +712,16 @@ gg2animint <- function(...){
 #' @return invisible list of ggplots in list format.
 #' @export 
 #' @seealso \code{\link{ggplot2}}
-#' @example examples/animint.R
-animint2dir <- function(plot.list, out.dir=tempfile(), json.file = "plot.json", open.browser=interactive()){
-  ## Check that it is a list and every element is named.
-  stopifnot(is.list(plot.list))
-  stopifnot(!is.null(names(plot.list)))
-  stopifnot(all(names(plot.list)!=""))
+#' @example inst/examples/animint.R
+animint2dir <- function(plot.list, out.dir = tempfile(), 
+                        json.file = "plot.json", open.browser = interactive()) {
+  ## Check that plot.list is a list and every element is named.
+  if (!is.list(plot.list)) 
+    stop("plot.list must be a list of ggplots")
+  if (is.null(names(plot.list))) 
+    stop("plot.list must be a named list")
+  if (any(names(plot.list)=="")) 
+    stop("plot.list must have names with non-empty strings")
   
   ## Store meta-data in this environment, so we can alter state in the
   ## lower-level functions.
@@ -701,6 +735,7 @@ animint2dir <- function(plot.list, out.dir=tempfile(), json.file = "plot.json", 
 
   ## Save the animation variable so we can treat it specially when we
   ## process each geom.
+  # CPS (7-22-14): What if the user doesn't specify milliseconds? Could we provide a reasonable default?
   if(is.list(plot.list$time)){
     meta$time <- plot.list$time
     ms <- meta$time$ms
@@ -841,8 +876,8 @@ animint2dir <- function(plot.list, out.dir=tempfile(), json.file = "plot.json", 
   if (open.browser) {
     message('opening a web browser with a file:// URL; ',
             'if the web page is blank, try running
-install.packages("servr")
-servr::httd("', out.dir, '")')
+if (!require("servr")) install.packages("servr")
+servr::httd("', normalizePath( out.dir,winslash="/" ), '")')
       browseURL(sprintf("%s/index.html", out.dir))
   }
   invisible(meta)
