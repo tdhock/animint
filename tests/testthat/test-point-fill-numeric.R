@@ -21,8 +21,3 @@ test_that("legends are produced", {
   expect_identical(names(info$plots$size$legend), "Sepal.Length")
   expect_identical(names(info$plots$color$legend), "petal length")
 })
-
-test_that("phantomjs is a bitch", {
-  info <- animint2HTML(viz)
-  expect_equal(1, 1)
-})
