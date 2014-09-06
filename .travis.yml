@@ -14,6 +14,7 @@ install:
   - ./travis-tool.sh install_deps
   - ./travis-tool.sh install_github yihui/servr
   - ./travis-tool.sh install_github ropensci/RSelenium
+  - ./travis-tool.sh install_github tdhcock/ggplot2
   - ./travis-tool.sh install_github cpsievert/animint
   - ./travis-tool.sh r_binary_install XML
 script:
