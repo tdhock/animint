@@ -195,10 +195,10 @@ var animint = function (to_select, json_file) {
     if (npanels > 1) {
       svg.append("g")
         .attr("class", "strip")
-        .attr("id", "top_strip");
+        .attr("id", "topStrip");
       svg.append("g")
         .attr("class", "strip")
-        .attr("id", "right_strip");
+        .attr("id", "rightStrip");
     }
     // this will hold x/y scales for each panel
     // eventually we inject this into Plots[p_name]
@@ -302,7 +302,7 @@ var animint = function (to_select, json_file) {
         var strip_location = {};
         strip_location.top = {
 	       'x': plotdim.xlab.x, 
-	       'y': plotdim.ystart - plotdim.margin.top/2
+	       'y': (plotdim.ystart - plotdim.margin.top/2)
         };
         strip_location.right = {
 	       'x': plotdim.xend, 
@@ -314,8 +314,8 @@ var animint = function (to_select, json_file) {
           var y = strip_location[side].y;
           var stripLabs = stripLabels[side];
           //create a group
-          svg.select("#" + side + "_strip")
-            .selectAll("." + side + "_strips")
+          svg.select("#" + side + "Strip")
+            .selectAll("." + side + "Strips")
             .data(stripLabs)
             .enter()
               .append("text")
@@ -325,11 +325,11 @@ var animint = function (to_select, json_file) {
               // TODO: is there a better way to manage spacing?
               .attr("transform", function(d, i) { 
                 if (side == "top") {
-                  var y2 = y + i * 12; 
+                  //var y2 = y + i * 12; 
                   return "translate(" + x + "," + y + ")rotate(0)";
                 } else if (side == "right") { //right
-                  var x2 = x - i * 12; 
-                  return "translate(" + x2 + "," + y + ")rotate(90)";
+                  //var x2 = x - i * 12; 
+                  return "translate(" + x + "," + y + ")rotate(90)";
                 }
               });
         }
