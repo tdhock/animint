@@ -14,9 +14,10 @@ install:
   - ./travis-tool.sh install_deps
   - ./travis-tool.sh install_github yihui/servr
   - ./travis-tool.sh install_github ropensci/RSelenium
+  - ./travis-tool.sh install_github cpsievert/animint
   - ./travis-tool.sh r_binary_install XML
 script:
-  - R -e 'library(animint)'
+  - R -e 'setwd(system.file("tests", package = "animint")); source("testthat.R")'
 
 after_failure:
   - ./travis-tool.sh dump_logs
