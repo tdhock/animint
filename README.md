@@ -14,11 +14,24 @@ library(animint)
 example(animint)
 ```
 
-NOTE: There is a [pull request](https://github.com/hadley/ggplot2/pull/953) to merge [tdhock/ggplot2](https://github.com/tdhock/ggplot2) with the main ggplot2 repo. This fork is required in order to use `theme_animint`.
+NOTE: tdhock/ggplot2 is required in order to use `theme_animint` --
+there is a [pull request](https://github.com/hadley/ggplot2/pull/953)
+to merge [tdhock/ggplot2](https://github.com/tdhock/ggplot2) with the
+main ggplot2 repo.
 
 ## Examples
 
-The best way to learn animint is through examples. The [animint tutorial](http://tdhock.github.io/animint/) has the most complete collection of examples with explanations. In addition, there is an [examples web site](http://sugiyama-www.cs.titech.ac.jp/~toby/animint/index.html), [examples distributed with animint](https://github.com/tdhock/animint/tree/master/examples), as well as more complex 'big data' examples in the [tdhock/animint-examples repo](https://github.com/tdhock/animint-examples/tree/master/examples).
+The best way to learn animint is through examples. A couple of good
+introductions are Carson Sievert's [Interactive animations of
+PITCHf/x](http://cpsievert.github.io/baseballR/20140818/) and Susan
+VanderPlas' [animint tutorial](http://tdhock.github.io/animint/). In
+addition, there is an [examples web
+site](http://sugiyama-www.cs.titech.ac.jp/~toby/animint/index.html),
+[examples distributed with
+animint](https://github.com/tdhock/animint/tree/master/examples), as
+well as more complex 'big data' examples in the
+[tdhock/animint-examples
+repo](https://github.com/tdhock/animint-examples/tree/master/examples).
 
 ## Animint paper
 
@@ -54,10 +67,7 @@ We keep a TODO list at top of the [NEWS](https://github.com/tdhock/animint/blob/
 
 #### Submitting contributions
 
-We welcome pull requests, but please `R CMD check` your changes:
+We welcome pull requests, but please `R CMD check` to run the package
+[tests](https://github.com/tdhock/animint/wiki/Testing). You may
+ignore WARNINGS and NOTES, but make sure there are no errors.
 
-```s
-devtools::check('path/to/animint')
-```
-
-You may ignore (or fix :) the various WARNINGS/NOTES, but make sure there are no errors and the [tests](https://github.com/tdhock/animint/wiki/Testing) run smoothly before submitting.
