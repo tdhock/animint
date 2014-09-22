@@ -22,6 +22,7 @@ if(interactive()){
   checkForServer(dir=system.file("bin", package="RSelenium"))
   startServer()
   remDr <- remoteDriver$new(browserName="firefox")
+  remDr$open()
 }else{
 # Note: it might be a good idea to attempt to kill phantomjs at this point
 # If phantomjs is already running, the driver returns error but the tests
