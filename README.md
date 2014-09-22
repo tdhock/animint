@@ -67,7 +67,4 @@ We keep a TODO list at top of the [NEWS](https://github.com/tdhock/animint/blob/
 
 #### Submitting contributions
 
-We welcome pull requests, but please `R CMD check` to run the package
-[tests](https://github.com/tdhock/animint/wiki/Testing). You may
-ignore WARNINGS and NOTES, but make sure there are no errors.
-
+We are open to pull requests. If your changes pass [our tests](https://github.com/tdhock/animint/wiki/Testing), then we are happy to merge them.
