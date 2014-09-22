@@ -77,7 +77,7 @@ test_that("plot renders with theme(axis.text.x=element_blank())", {
   xticks <- getTickText(info$html, "xaxis")
   expect_true(is.blank(xticks))
   yticks <- getTickText(info$html, "yaxis")
-  expect_equal(!is.blank(yticks)
+  expect_true(!is.blank(yticks))
 })
 
 test_that("plot renders with theme(axis.text.y=element_blank())", {
@@ -86,7 +86,7 @@ test_that("plot renders with theme(axis.text.y=element_blank())", {
   xticks <- getTickText(info$html, "xaxis")
   expect_true(!is.blank(xticks))
   yticks <- getTickText(info$html, "yaxis")
-  expect_equal(is.blank(yticks)
+  expect_true(is.blank(yticks))
 })
 
 test_that("plot renders with theme(axis.text=element_blank())", {
@@ -95,6 +95,6 @@ test_that("plot renders with theme(axis.text=element_blank())", {
   xticks <- getTickText(info$html, "xaxis")
   expect_true(is.blank(xticks))
   yticks <- getTickText(info$html, "yaxis")
-  expect_equal(is.blank(yticks)
+  expect_true(is.blank(yticks))
 })
 
