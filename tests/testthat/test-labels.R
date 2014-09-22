@@ -60,3 +60,41 @@ test_that("scale_x_time ticks/labels work", {
   xticks <- getNodeSet(info$html, "//g[@id='xaxis']/g[@class='tick major']")
   expect_true(length(xticks) > 1)
 })
+
+getTickText <- function(html, id){
+  xpath <- sprintf("//g[@id='%s']//g[@class='tick major']//text", id)
+  nodes <- getNodeSet(html, xpath)
+  sapply(nodes, xmlValue)
+}
+
+is.blank <- function(ticks){
+  all(ticks == "")
+}
+
+test_that("plot renders with theme(axis.text.x=element_blank())", {
+  viz <- list(series=series+theme(axis.text.x=element_blank()))
+  info <- animint2HTML(viz)
+  xticks <- getTickText(info$html, "xaxis")
+  expect_true(is.blank(xticks))
+  yticks <- getTickText(info$html, "yaxis")
+  expect_equal(!is.blank(yticks)
+})
+
+test_that("plot renders with theme(axis.text.y=element_blank())", {
+  viz <- list(series=series+theme(axis.text.y=element_blank()))
+  info <- animint2HTML(viz)
+  xticks <- getTickText(info$html, "xaxis")
+  expect_true(!is.blank(xticks))
+  yticks <- getTickText(info$html, "yaxis")
+  expect_equal(is.blank(yticks)
+})
+
+test_that("plot renders with theme(axis.text=element_blank())", {
+  viz <- list(series=series+theme(axis.text=element_blank()))
+  info <- animint2HTML(viz)
+  xticks <- getTickText(info$html, "xaxis")
+  expect_true(is.blank(xticks))
+  yticks <- getTickText(info$html, "yaxis")
+  expect_equal(is.blank(yticks)
+})
+

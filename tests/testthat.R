@@ -1,45 +1,45 @@
-# Setup an infrastructure that all tests will use
-# For more details, see this discussion  -- https://github.com/johndharrison/RSelenium/issues/17
-# Thanks for all the help @johndharrison!
 library(testthat)
 library(animint)
 library(servr)
 library(RSelenium)
 library(XML)
-source("testthat/functions.R")
+# source some convenience functions
+source(file.path(getwd(), "testthat", "functions.R"))
 
-## Before starting the servers, kill any servers that are already running.
+# Before starting the servers, kill any servers that may be already running.
 killservr <- 'pkill -f "servr::httd\\(port=4848"'
-killsel <- 'pkill -f selenium-server-standalone'
 system(killservr)
-system(killsel)
-## To get the process long names look at
+# ## To get the process long names look at
 system("ps u")
 
-# Initialize local server in a seperate R process
-cmd <- paste0('cd testthat && R -e \"servr::httd(port=4848)\"')
-if (.Platform$OS.type != "unix") cmd <- paste0(cmd, " &")
+# IDEA: If we can access the process ID (with Sys.getpid()) from this child session
+# we could kill the file server with tools::pskill(). This would help testing be 
+# platform independent -- I just don't know how to transfer objects between sessions
+cmd <- "R -e \'servr::httd(port=4848, dir=file.path(getwd(), \"testthat\"), launch.browser=FALSE)\'"
 system(cmd, intern = FALSE, wait = FALSE)
 
-# Check to make sure that a selenium server exists, and if not, download it
-checkForServer(dir = system.file("bin", package = "RSelenium"))
-# We should use browser = "phantomjs" eventually, but it hangs during multiple tests
-startServer()
+if(interactive()){
+  checkForServer(dir=system.file("bin", package="RSelenium"))
+  startServer()
+  remDr <- remoteDriver$new(browserName="firefox")
+  remDr$open()
+}else{
+# Note: it might be a good idea to attempt to kill phantomjs at this point
+# If phantomjs is already running, the driver returns error but the tests
+# should still run.
 
-Sys.sleep(3) # otherwise I get Error in function (type, msg, asError = TRUE)  : couldn't connect to host
-remDr <- remoteDriver$new(browserName = "firefox", port = 4444)
-##str(remDr)
-remDr$open()
+## phantomjs doesn't need a selenium server (and is lightning fast!)
+## Idea is from -- vignette("RSelenium-headless", package = "RSelenium")
+  pJS <- RSelenium::phantom()
+  Sys.sleep(5) # give the binary a moment
+  remDr <- remoteDriver(browserName = 'phantomjs')
+  remDr$open(silent = TRUE)
+}
 
-
+# run the tests
 test_check("animint")
 
-# Close the browser
-remDr$quit()
-# Kill the server
-
+# stop phantomjs
+pJS$stop()
+# kill the file server
 system(killservr)
-system(killsel)
-
-# List relevant processes
-#procs <- system('ps aux|grep "servr::httd"', intern = TRUE)

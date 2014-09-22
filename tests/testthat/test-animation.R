@@ -1,7 +1,7 @@
+context("animation")
+
 library(maps)
 library(plyr)
-library(ggplot2)
-library(animint)
 data(UStornadoes)
 stateOrder <- data.frame(state = unique(UStornadoes$state)[order(unique(UStornadoes$TornadoesSqMile), decreasing=T)], rank = 1:49) # order states by tornadoes per square mile
 UStornadoes$state <- factor(UStornadoes$state, levels=stateOrder$state, ordered=TRUE)
@@ -26,6 +26,11 @@ tornado.anim <-
                  data=UStornadoCounts, alpha=3/5, size=4),
        time=list(variable="year",ms=2000))
 
+test_that("tornado animation frames correct", {
+  info <- animint2dir(tornado.anim, open.browser=FALSE)
+  expect_identical(info$time$sequence, as.character(1950:2012))
+})
+
 ## WorldBank/gapminder example.
 data(WorldBank)
 motion <-
@@ -42,6 +47,11 @@ motion <-
                  data=WorldBank, size=4, alpha=3/5),
        time=list(variable="year",ms=3000),
        duration=list(year=1000))
+
+test_that("WorldBank animation frames correct", {
+  info <- animint2dir(motion, open.browser=FALSE)
+  expect_identical(info$time$sequence, as.character(1960:2012))
+})
 
 ## Evolution.
 data(generation.loci)
@@ -79,12 +89,7 @@ evolution <-
        duration=list(generation=1000),
        time=list(variable="generation",ms=2000))
 
-tests <- list(list(tornado.anim, 1950:2012),
-              list(motion, 1960:2012),
-              list(evolution, 1:100))
-for(L in tests){
-  plist <- L[[1]]
-  expected <- L[[2]]
-  info <- gg2animint(plist, open.browser=FALSE)
-  stopifnot(info$time$sequence == expected)
-}
+test_that("tornado animation frames correct", {
+  info <- animint2dir(evolution, open.browser=FALSE)
+  expect_identical(info$time$sequence, as.character(1:100))
+})

@@ -15,4 +15,3 @@ GSoC application.txt
 .Rbuildignore
 .directory
 animint.Rproj
-.travis.yml

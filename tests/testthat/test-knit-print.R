@@ -12,5 +12,8 @@ test_that("knit_print.animint works as intended", {
   expect_match(xlabel1, "Worthless label 1")
   xlabel2 <- xmlValue(nodes[[2]])
   expect_match(xlabel2, "Worthless label 2")
+  unlink("index.html")
+  unlink("plot1", recursive = TRUE)
+  unlink("plot2", recursive = TRUE)
 })
 
