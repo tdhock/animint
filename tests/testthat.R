@@ -18,16 +18,22 @@ system("ps u")
 cmd <- "R -e \'servr::httd(port=4848, dir=file.path(getwd(), \"testthat\"), launch.browser=FALSE)\'"
 system(cmd, intern = FALSE, wait = FALSE)
 
+if(interactive()){
+  checkForServer(dir=system.file("bin", package="RSelenium"))
+  startServer()
+  remDr <- remoteDriver$new(browserName="firefox")
+}else{
 # Note: it might be a good idea to attempt to kill phantomjs at this point
 # If phantomjs is already running, the driver returns error but the tests
 # should still run.
 
 ## phantomjs doesn't need a selenium server (and is lightning fast!)
 ## Idea is from -- vignette("RSelenium-headless", package = "RSelenium")
-pJS <- RSelenium::phantom()
-Sys.sleep(5) # give the binary a moment
-remDr <- remoteDriver(browserName = 'phantomjs')
-remDr$open(silent = TRUE)
+  pJS <- RSelenium::phantom()
+  Sys.sleep(5) # give the binary a moment
+  remDr <- remoteDriver(browserName = 'phantomjs')
+  remDr$open(silent = TRUE)
+}
 
 # run the tests
 test_check("animint")
