@@ -134,20 +134,24 @@ var animint = function (to_select, json_file) {
     labelpaddingy = 5 + measureText(p_info["yname"], 11).height;
 
     // grab max text size over axis labels and panels for each axis
-    axispaddingy = 5 + Math.max.apply(null, p_info.ylabs.map(function(entry){
-       return measureText(entry, 11).width;
-    }));
-    axispaddingx = 5 + Math.max.apply(null, p_info.xlabs.map(function(entry){
-       return measureText(entry, 11).height;
-    }));
+    if(p_info.hasOwnProperty("ylabs")){
+      axispaddingy = 5 + Math.max.apply(null, p_info.ylabs.map(function(entry){
+	return measureText(entry, 11).width;
+      }));
+    }
+    if(p_info.hasOwnProperty("xlabs")){
+      axispaddingx = 5 + Math.max.apply(null, p_info.xlabs.map(function(entry){
+	return measureText(entry, 11).height;
+      }));
+      margin.right = 5 + Math.max.apply(null, p_info.xlabs.map(function(entry){
+	return measureText(entry, 11).width;
+      })); // to ensure the last x-axis label doesn't get cut off.
+    }
 
     // margins should be fixed across panels
-    margin.left = labelpaddingy + axispaddingy;
     margin.top = titlepadding;
     margin.bottom = labelpaddingx + axispaddingx;
-    margin.right = 5 + Math.max.apply(null, p_info.xlabs.map(function(entry){
-       return measureText(entry, 11).width;
-    })); // to ensure the last x-axis label doesn't get cut off.
+    margin.left = labelpaddingy + axispaddingy;
     plotdim.margin = margin;
 
     // the *entire plot* height/width
@@ -195,10 +199,10 @@ var animint = function (to_select, json_file) {
     if (npanels > 1) {
       svg.append("g")
         .attr("class", "strip")
-        .attr("id", "top_strip");
+        .attr("id", "topStrip");
       svg.append("g")
         .attr("class", "strip")
-        .attr("id", "right_strip");
+        .attr("id", "rightStrip");
     }
     // this will hold x/y scales for each panel
     // eventually we inject this into Plots[p_name]
@@ -302,7 +306,7 @@ var animint = function (to_select, json_file) {
         var strip_location = {};
         strip_location.top = {
 	       'x': plotdim.xlab.x, 
-	       'y': plotdim.ystart - plotdim.margin.top/2
+	       'y': (plotdim.ystart - plotdim.margin.top/2)
         };
         strip_location.right = {
 	       'x': plotdim.xend, 
@@ -314,8 +318,8 @@ var animint = function (to_select, json_file) {
           var y = strip_location[side].y;
           var stripLabs = stripLabels[side];
           //create a group
-          svg.select("#" + side + "_strip")
-            .selectAll("." + side + "_strips")
+          svg.select("#" + side + "Strip")
+            .selectAll("." + side + "Strips")
             .data(stripLabs)
             .enter()
               .append("text")
@@ -325,11 +329,11 @@ var animint = function (to_select, json_file) {
               // TODO: is there a better way to manage spacing?
               .attr("transform", function(d, i) { 
                 if (side == "top") {
-                  var y2 = y + i * 12; 
+                  //var y2 = y + i * 12; 
                   return "translate(" + x + "," + y + ")rotate(0)";
                 } else if (side == "right") { //right
-                  var x2 = x - i * 12; 
-                  return "translate(" + x2 + "," + y + ")rotate(90)";
+                  //var x2 = x - i * 12; 
+                  return "translate(" + x + "," + y + ")rotate(90)";
                 }
               });
         }
