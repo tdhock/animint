@@ -559,9 +559,14 @@ saveLayer <- function(l, d, meta){
   }
   
   # If there is only one PANEL, we don't need it anymore.
-  if (length(unique(g.data[["PANEL"]])) == 1) {
-    g.data <- g.data[!grepl("PANEL", names(g.data), fixed = TRUE)]
-  } else { #otherwise, add panel to subset_order/nest_order
+  g$PANEL <- unique(g.data[["PANEL"]])
+  if (length(g$PANEL) == 1) {
+    g.data <- g.data[names(g.data) != "PANEL"]
+  }
+
+  ## If this plot has more than one PANEL then add it to subset_order
+  ## and nest_order.
+  if(nrow(meta$built$panel$layout) > 1){
     g$subset_order <- c(g$subset_order, "PANEL")
     g$nest_order <- c(g$nest_order, "PANEL")
   }

@@ -91,7 +91,7 @@ sig.facets <- mmir.plot$sig+
   theme_bw()+
   theme(panel.margin=grid::unit(0,"cm"))
 print(sig.facets)
-animint2dir(mmir.plot)
+animint2dir(mmir.plot, "intreg-nofacets")
 
 ## TODO: mmir.plot is way too complicated, since facets are not yet
 ## implemented in animint. The easier facetted version would look
@@ -124,7 +124,7 @@ mmir.facet <-
                     data=data.frame(intreg$selection, what="segments"))+
        xlab("penalty value $L=f(x)$")+ # TODO: mathjax.
        facet_grid(what~.,scales="free"))
-animint2dir(mmir.facet) # doesn't work yet.
+animint2dir(mmir.facet, "intreg-facets") # doesn't work yet.
 ## This plot has an additional facet for signal, which would not be
 ## present in the interactive plot, but is useful here to see all
 ## the data in regular ggplot2.
