@@ -28,7 +28,7 @@ VanderPlas' [animint tutorial](http://tdhock.github.io/animint/). In
 addition, there is an [examples web
 site](http://sugiyama-www.cs.titech.ac.jp/~toby/animint/index.html),
 [examples distributed with
-animint](https://github.com/tdhock/animint/tree/master/examples), as
+animint](https://github.com/tdhock/animint/tree/master/inst/examples), as
 well as more complex 'big data' examples in the
 [tdhock/animint-examples
 repo](https://github.com/tdhock/animint-examples/tree/master/examples).
