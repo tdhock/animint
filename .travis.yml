@@ -15,7 +15,7 @@ install:
   - ./travis-tool.sh install_github yihui/servr
   - ./travis-tool.sh install_github ropensci/RSelenium
   - ./travis-tool.sh install_github tdhock/ggplot2
-  - ./travis-tool.sh install_github cpsievert/animint
+  - ./travis-tool.sh install_github tdhock/animint
   - ./travis-tool.sh r_binary_install XML
 script:
   - R -e 'setwd(system.file("tests", package = "animint")); source("testthat.R")'

@@ -1,7 +1,7 @@
 animint
 =======
 
-[![Build Status](https://travis-ci.org/cpsievert/animint.png?branch=master)](https://travis-ci.org/cpsievert/animint)
+[![Build Status](https://travis-ci.org/tdhock/animint.png?branch=master)](https://travis-ci.org/tdhock/animint)
 
 Interactive animations using [ggplot2](https://github.com/hadley/ggplot2)'s grammar of graphics implementation combined with clickSelects and showSelected aesthetics.
 
