@@ -134,20 +134,24 @@ var animint = function (to_select, json_file) {
     labelpaddingy = 5 + measureText(p_info["yname"], 11).height;
 
     // grab max text size over axis labels and panels for each axis
-    axispaddingy = 5 + Math.max.apply(null, p_info.ylabs.map(function(entry){
-       return measureText(entry, 11).width;
-    }));
-    axispaddingx = 5 + Math.max.apply(null, p_info.xlabs.map(function(entry){
-       return measureText(entry, 11).height;
-    }));
+    if(p_info.hasOwnProperty("ylabs")){
+      axispaddingy = 5 + Math.max.apply(null, p_info.ylabs.map(function(entry){
+	return measureText(entry, 11).width;
+      }));
+    }
+    if(p_info.hasOwnProperty("xlabs")){
+      axispaddingx = 5 + Math.max.apply(null, p_info.xlabs.map(function(entry){
+	return measureText(entry, 11).height;
+      }));
+      margin.right = 5 + Math.max.apply(null, p_info.xlabs.map(function(entry){
+	return measureText(entry, 11).width;
+      })); // to ensure the last x-axis label doesn't get cut off.
+    }
 
     // margins should be fixed across panels
-    margin.left = labelpaddingy + axispaddingy;
     margin.top = titlepadding;
     margin.bottom = labelpaddingx + axispaddingx;
-    margin.right = 5 + Math.max.apply(null, p_info.xlabs.map(function(entry){
-       return measureText(entry, 11).width;
-    })); // to ensure the last x-axis label doesn't get cut off.
+    margin.left = labelpaddingy + axispaddingy;
     plotdim.margin = margin;
 
     // the *entire plot* height/width

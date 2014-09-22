@@ -60,3 +60,31 @@ test_that("scale_x_time ticks/labels work", {
   xticks <- getNodeSet(info$html, "//g[@id='xaxis']/g[@class='tick major']")
   expect_true(length(xticks) > 1)
 })
+
+test_that("plot renders with theme(axis.text.x=element_blank())", {
+  viz <- list(series=series+theme(axis.text.x=element_blank()))
+  info <- animint2HTML(viz)
+  xtitle <- getNodeSet(info$html, "//text[@id='xtitle']")
+  expect_equal(length(xtitle), 0)
+  ytitle <- getNodeSet(info$html, "//text[@id='ytitle']")
+  expect_equal(length(ytitle), 1)
+})
+
+test_that("plot renders with theme(axis.text.y=element_blank())", {
+  viz <- list(series=series+theme(axis.text.y=element_blank()))
+  info <- animint2HTML(viz)
+  xtitle <- getNodeSet(info$html, "//text[@id='xtitle']")
+  expect_equal(length(xtitle), 1)
+  ytitle <- getNodeSet(info$html, "//text[@id='ytitle']")
+  expect_equal(length(ytitle), 0)
+})
+
+test_that("plot renders with theme(axis.text=element_blank())", {
+  viz <- list(series=series+theme(axis.text=element_blank()))
+  info <- animint2HTML(viz)
+  xtitle <- getNodeSet(info$html, "//text[@id='xtitle']")
+  expect_equal(length(xtitle), 0)
+  ytitle <- getNodeSet(info$html, "//text[@id='ytitle']")
+  expect_equal(length(ytitle), 0)
+})
+
