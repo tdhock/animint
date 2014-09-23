@@ -86,9 +86,9 @@ test_that("red lines are only drawn in panel 2", {
            "//line")
   }
   PANEL1lines <- getNodeSet(info$html, panelPath(1))
-  #expect_equal(length(PANEL1lines), 0)
+  expect_equal(length(PANEL1lines), 0)
   PANEL2lines <- getNodeSet(info$html, panelPath(2))
-  #expect_equal(length(PANEL2lines), 6)
+  expect_equal(length(PANEL2lines), 6)
   PANEL3lines <- getNodeSet(info$html, panelPath(3))
-  #expect_equal(length(PANEL3lines), 0)
+  expect_equal(length(PANEL3lines), 0)
 })
