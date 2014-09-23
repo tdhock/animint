@@ -243,7 +243,7 @@ var animint = function (to_select, json_file) {
             // push each label provided into the array
           });
         } else {
-          breaks.forEach(function (d) {
+          outbreaks.forEach(function (d) {
             outlabs.push(""); 
             // push a blank string to the array for each axis tick 
             // if the specified label is null
