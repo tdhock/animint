@@ -17,7 +17,7 @@ two.selectors.not.animated <-
                     data=generation.loci),
        duration=list(generation=1000)
   )
-gg2animint(two.selectors.not.animated)
+animint2dir(two.selectors.not.animated)
 
 ## Example: 2 plots, 2 selectors, with color legends.
 colormap <- c(blue="blue",red="red",ancestral="black",neutral="grey30")
@@ -50,7 +50,7 @@ two.selectors.color <-
                      label=sprintf("generation %d",generation)),
                  data=data.frame(generations,locus=35,frequency=1)),
        duration=list(generation=1000))
-gg2animint(two.selectors.color)
+animint2dir(two.selectors.color)
 
 ## Example: 3 plots, 1 selector.
 first <- subset(generation.loci,generation==1)
@@ -81,7 +81,7 @@ one.selector.not.animated <-
                     data=loci, alpha=1/2, lwd=4)+
          geom_point(aes(locus, frequency), data=generation.loci.last)
   )
-gg2animint(one.selector.not.animated)
+animint2dir(one.selector.not.animated)
 
 ## Example: animated time series with 3 plots and 2 selectors.
 two.selectors.animated <- 
@@ -102,5 +102,5 @@ two.selectors.animated <-
                     data=generation.loci),
        duration=list(generation=1000),
        time=list(variable="generation",ms=2000))
-gg2animint(two.selectors.animated)
+animint2dir(two.selectors.animated)
 
