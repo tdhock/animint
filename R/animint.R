@@ -220,9 +220,10 @@ saveLayer <- function(l, d, meta){
     v.name <- update.vars[[sel.i]]
     col.name <- names(update.vars)[[sel.i]]
     if(!v.name %in% names(meta$selectors)){
-      ## select the first one. TODO: customize.
       value <- g.data[[col.name]][1]
-      meta$selectors[[v.name]] <- list(selected=as.character(value))
+      meta$selectors[[v.name]] <-
+        list(selected=as.character(value),
+             type="multiple")
     }
     meta$selectors[[v.name]]$update <-
       c(meta$selectors[[v.name]]$update, as.list(g$classed))
@@ -838,6 +839,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
   ## all the values used in those geoms.
   if("time" %in% ls(meta)){
     geom.names <- meta$selectors[[time.var]]$update
+    meta$selectors[[meta$time$variable]]$type <- "single"
     anim.values <- lapply(meta$geoms, "[[", "timeValues")
     anim.not.null <- anim.values[!sapply(anim.values, is.null)]
     meta$time$sequence <- if(all(sapply(anim.not.null, is.numeric))){

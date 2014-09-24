@@ -217,6 +217,7 @@ var animint = function (to_select, json_file) {
       var xaxislabs = [];
       var yaxisvals = [];
       var yaxislabs = [];
+      var outbreaks, outlabs;
       
       //function to write labels and breaks to their respective arrays
       var axislabs = function(breaks, labs, axis){
@@ -424,6 +425,11 @@ var animint = function (to_select, json_file) {
 
   var add_selector = function (s_name, s_info) {
     Selectors[s_name] = s_info;
+    if(s_info.type == "multiple"){
+      if(!isArray(s_info.selected)){
+	s_info.selected = [s_info.selected];
+      }
+    }
   }
   var get_tsv = function(g_info, chunk_id){
     return g_info.classed + "_chunk" + chunk_id + ".tsv";  
@@ -508,7 +514,7 @@ var animint = function (to_select, json_file) {
   // download_chunk is called from update_geom and download_sequence.
   var download_chunk = function(g_info, tsv_name, funAfter){
     if(g_info.download_status.hasOwnProperty(tsv_name)){
-      for (i = 0; i < 6; i++) {
+      for (var i = 0; i < 6; i++) {
         funAfter();
       }
       return; // do not download twice.
@@ -559,25 +565,49 @@ var animint = function (to_select, json_file) {
   var draw_geom = function(g_info, chunk, selector_name, PANEL){
     g_info.tr.select("td.status").text("displayed");
     var svg = SVGs[g_info.classed];
-    var data = chunk;
     // derive the plot name from the geometry name
     var g_names = g_info.classed.split("_");
     var p_name = g_names[g_names.length - 1];
     var scales = Plots[p_name].scales[PANEL];
+    var selected_arrays = [ [] ]; //double array necessary.
     g_info.subset_order.forEach(function (aes_name) {
-      var value;
-      if (aes_name != "group") {
+      var selected, values, old_array, value, new_array;
+      //if (aes_name != "group") { // why do we need this?
 	if(aes_name == "PANEL"){
-	  value = PANEL;
+	  selected = PANEL;
 	}else{
           var v_name = g_info.aes[aes_name];
-          value = Selectors[v_name].selected;
+          selected = Selectors[v_name].selected;
 	}
-        if (data.hasOwnProperty(value)) {
-          data = data[value];
+	if(isArray(selected)){
+	  values = selected;
+	}else{
+	  values = [selected];
+	}
+	var new_arrays = [];
+	values.forEach(function(value){
+	  selected_arrays.forEach(function(old_array){
+	    new_array = old_array.concat(value);
+	    new_arrays.push(new_array);
+	  })
+	})
+	selected_arrays = new_arrays;
+    //}
+    })
+    var data = []
+    selected_arrays.forEach(function(value_array){
+      var some_data = chunk;
+      value_array.forEach(function(value){
+        if (some_data.hasOwnProperty(value)) {
+          some_data = some_data[value];
         } else {
-          data = [];
+          some_data = [];
         }
+      })
+      if(isArray(some_data)){
+	data = data.concat(some_data);
+      }else{
+	data = some_data;
       }
     });
     var aes = g_info.aes;
@@ -1139,11 +1169,8 @@ var animint = function (to_select, json_file) {
         })
         .on("click", function (d) {
 	  // The main idea of how clickSelects works: when we click
-	  // something, we calls update_selector and then
-	  // update_geom. Inside, I select the relevant subset of data
-	  // and store it in the data variable, which is
-	  // e.g. [{row1},{row2},...]. These are bound to SVG elements
-	  // using D3 to update the plot.
+	  // something, we call update_selector with the clicked
+	  // value.
           var v_name = g_info.aes.clickSelects;
           update_selector(v_name, d.clickSelects);
         })
@@ -1182,14 +1209,35 @@ var animint = function (to_select, json_file) {
     }
   }
   var update_selector = function (v_name, value) {
-    Selectors[v_name].selected = value;
-    Selectors[v_name].update.forEach(function(g_name){
-      update_geom(g_name, v_name);
-    });
-    //Selectors[v_name].hilite.forEach(update_geom);
+    var s_info = Selectors[v_name];
+    if(s_info.type == "single"){
+      // value is the new selection.
+      s_info.selected = value;
+      s_info.update.forEach(function(g_name){
+	update_geom(g_name, v_name);
+      });
+    }else{
+      // value should be added or removed from the selection.
+      var i_value = s_info.selected.indexOf(value);
+      if(i_value == -1){ 
+	// not found, add to selection.
+	s_info.selected.push(value);
+      }else{
+	// found, remove from selection.
+	s_info.selected.splice(i_value, 1);
+      }
+      //alert(s_info.selected);
+    }
   }
   var ifSelectedElse = function (d, v_name, selected, not_selected) {
-    if (d.clickSelects == Selectors[v_name].selected) {
+    var is_selected;
+    var s_info = Selectors[v_name];
+    if(s_info.type == "single"){
+      is_selected = d.clickSelects == s_info.selected;
+    }else{
+      is_selected = s_info.selected.indexOf(d.clickSelects) != -1;
+    }
+    if(is_selected){
       return selected;
     } else {
       return not_selected;
@@ -1376,7 +1424,7 @@ var animint = function (to_select, json_file) {
 	}
 	download_sequence(g_name, Animation.variable, Animation.sequence);
       });
-      for (i = 0; i < Animation.sequence.length; i++) {
+      for (var i = 0; i < Animation.sequence.length; i++) {
         if (i == 0) {
           prev = Animation.sequence[Animation.sequence.length-1];
         } else {

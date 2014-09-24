@@ -72,18 +72,16 @@ background, as in plotly. Then double-click to zoom back out.
 RENDER: It would be nice to be able to resize plots interactively,
 like we can do in shiny+ggvis.
 
-DSL: multiple selection! currently, each interaction variable can
-only have a single selected value at a time, e.g. year=1996 and
+DSL: multiple selection! currently, each interaction variable can only
+have a single selected value at a time, e.g. year=1996 and
 country=Japan in the WorldBank viz. In the future, we should be able
 to declare each interaction variable as either single or multiple
 selection using an option list: selection=list(year="single",
 country="multiple"). If this option list is not specified, the
-compiler should infer a default: multiple selection for interaction
-variables with only clickSelects and no showSelected elements (like
-country in the WorldBank viz), and single selection for interaction
-variables with showSelected elements (like year in the WorldBank
-viz). The interface to multiple selection should be simple: click a
-country to toggle the selection state from off to on.
+compiler should infer a default: single selection for the animated
+variable and multiple selection for non-animated variables. The
+interface to multiple selection should be simple: click a country to
+toggle the selection state from off to on.
 
 RENDER: Legends can be interactive: clicking a legend entry
 shows/hides that subset of data. For example, when we say
