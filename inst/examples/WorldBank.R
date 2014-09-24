@@ -66,5 +66,6 @@ good <-
                 data=WorldBank, stat="identity", position="identity")+
        coord_flip(),
        duration=list(year=1000),
-       first=list(year=1975, country="United States"))
+       first=list(year=1975, country="United States"),
+       title="World Bank data (multiple selection)")
 animint2dir(good, "WorldBank-good")
