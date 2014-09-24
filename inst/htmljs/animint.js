@@ -514,9 +514,7 @@ var animint = function (to_select, json_file) {
   // download_chunk is called from update_geom and download_sequence.
   var download_chunk = function(g_info, tsv_name, funAfter){
     if(g_info.download_status.hasOwnProperty(tsv_name)){
-      for (var i = 0; i < 6; i++) {
         funAfter();
-      }
       return; // do not download twice.
     }
     g_info.download_status[tsv_name] = "downloading";
