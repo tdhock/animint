@@ -1212,12 +1212,10 @@ var animint = function (to_select, json_file) {
   }
   var update_selector = function (v_name, value) {
     var s_info = Selectors[v_name];
+    value = value + "";
     if(s_info.type == "single"){
       // value is the new selection.
       s_info.selected = value;
-      s_info.update.forEach(function(g_name){
-	update_geom(g_name, v_name);
-      });
     }else{
       // value should be added or removed from the selection.
       var i_value = s_info.selected.indexOf(value);
@@ -1228,16 +1226,19 @@ var animint = function (to_select, json_file) {
 	// found, remove from selection.
 	s_info.selected.splice(i_value, 1);
       }
-      //alert(s_info.selected);
     }
+    s_info.update.forEach(function(g_name){
+      update_geom(g_name, v_name);
+    });
   }
   var ifSelectedElse = function (d, v_name, selected, not_selected) {
     var is_selected;
+    var value = d.clickSelects + "";
     var s_info = Selectors[v_name];
     if(s_info.type == "single"){
-      is_selected = d.clickSelects == s_info.selected;
+      is_selected = value == s_info.selected;
     }else{
-      is_selected = s_info.selected.indexOf(d.clickSelects) != -1;
+      is_selected = s_info.selected.indexOf(value) != -1;
     }
     if(is_selected){
       return selected;
