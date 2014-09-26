@@ -71,23 +71,23 @@ good <-
 animint2dir(good, "WorldBank-good")
 
 ## This example additionally uses multiple selection on countries.
-good <-
-  list(scatter=ggplot()+
-       geom_point(aes(life.expectancy, fertility.rate, clickSelects=country,
-                      showSelected=year, colour=region, size=population,
-                      key=country), # key aesthetic for animated transitions!
-                  data=not.na)+
-       geom_text(aes(life.expectancy, fertility.rate, label=country,
-                     showSelected=country, showSelected2=year,
-                     key=country), #also use key here!
-                 data=not.na)+
-       scale_size_animint(breaks=10^(5:9))+
-       make_text(WorldBank, 55, 9, "year"),
-       ts=ggplot()+
+wb.mult <-
+  list(ts=ggplot()+
        make_tallrect(WorldBank, "year")+
        geom_line(aes(year, life.expectancy, group=country, colour=region,
                      clickSelects=country),
                  data=WorldBank, size=4, alpha=3/5),
+       scatter=ggplot()+
+       geom_point(aes(fertility.rate, life.expectancy, clickSelects=country,
+                      showSelected=year, colour=region, size=population,
+                      key=country), # key aesthetic for animated transitions!
+                  data=not.na)+
+       geom_text(aes(fertility.rate, life.expectancy, label=country,
+                     showSelected=country, showSelected2=year,
+                     key=country), #also use key here!
+                 data=not.na)+
+       scale_size_animint(breaks=10^(5:9))+
+       make_text(WorldBank, 5, 85, "year"),
        time=list(variable="year",ms=3000),
        bar=ggplot()+
        theme_animint(height=2400)+
@@ -99,4 +99,4 @@ good <-
        first=list(year=1975, country="United States"),
        selector.types=list(country="multiple"),
        title="World Bank data (multiple selection)")
-animint2dir(good, "WorldBank-good")
+animint2dir(wb.mult, "WorldBank-multiple")
