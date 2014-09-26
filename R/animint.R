@@ -871,7 +871,9 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
   ## The first selection:
   for(selector.name in names(meta$first)){
     first <- as.character(meta$first[[selector.name]])
-    stopifnot(length(first) == 1)
+    if(meta$selectors[[selector.name]]$type == "single"){
+      stopifnot(length(first) == 1)
+    }
     meta$selectors[[selector.name]]$selected <- first
   }
 

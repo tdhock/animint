@@ -607,7 +607,12 @@ var animint = function (to_select, json_file) {
       if(isArray(some_data)){
 	data = data.concat(some_data);
       }else{
-	data = some_data;
+	if(isArray(data)){
+	  data = {};
+	}
+	for(k in some_data){
+	  data[k] = some_data[k];
+	}
       }
     });
     var aes = g_info.aes;
