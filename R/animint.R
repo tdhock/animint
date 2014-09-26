@@ -862,6 +862,14 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
     stopifnot(length(first) == 1)
     meta$selectors[[selector.name]]$selected <- first
   }
+  ## Multiple selection:
+ for(selector.name in names(meta$selector.types)){
+   selector.type <- meta$selector.types[[selector.name]]
+   stopifnot(is.character(selector.type))
+   stopifnot(length(selector.type)==1)
+   stopifnot(selector.type %in% c("single", "multiple"))
+   meta$selectors[[selector.name]]$type <- selector.type
+ }
 
   ## Finally, copy html/js/json files to out.dir.
   src.dir <- system.file("htmljs",package="animint")
