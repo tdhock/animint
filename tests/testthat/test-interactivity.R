@@ -172,7 +172,7 @@ tornado.lines <-
                 data=UStornadoCounts),
        selector.types=list(state="multiple"),
        first=list(state=c("CA", "NY"), year=1950))
-animint2dir(tornado.lines, "tornado-lines")
+##animint2dir(tornado.lines, "tornado-lines")
 info <- animint2HTML(tornado.lines)
 
 test_that("default is 2 <path> and <text> elements", {
@@ -184,17 +184,17 @@ test_that("default is 2 <path> and <text> elements", {
 
 test_that("clickSelects CO adds 1 <path> and 1 <text>", {
   html <- clickHTML(id="CO")
-  nodes <- getNodeSet(info$html, '//g[@class="geom7_line_ts"]//path')
+  nodes <- getNodeSet(html, '//g[@class="geom7_line_ts"]//path')
   expect_equal(length(nodes), 3)
-  nodes <- getNodeSet(info$html, '//g[@class="geom5_text_ts"]//text')
+  nodes <- getNodeSet(html, '//g[@class="geom5_text_ts"]//text')
   expect_equal(length(nodes), 3)
 })
 
 test_that("clickSelects CA removes 1 <path> and 1 <text>", {
   html <- clickHTML(id="CA")
-  nodes <- getNodeSet(info$html, '//g[@class="geom7_line_ts"]//path')
+  nodes <- getNodeSet(html, '//g[@class="geom7_line_ts"]//path')
   expect_equal(length(nodes), 2)
-  nodes <- getNodeSet(info$html, '//g[@class="geom5_text_ts"]//text')
+  nodes <- getNodeSet(html, '//g[@class="geom5_text_ts"]//text')
   expect_equal(length(nodes), 2)
 })
 
