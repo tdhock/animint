@@ -31,7 +31,8 @@ breakpointError <-
                        key=samples,
                        clickSelects=samples),
                    data=only.error, lwd=4),
-       first=list(samples=150, segments=4))
+       first=list(samples=150, segments=4),
+       title="breakpointError (select one model size)")
 
 info <- animint2HTML(breakpointError)
 
@@ -75,6 +76,8 @@ test_that("clickSelects 1 changes to 1 <line> element", {
 breakpointError$selector.types <-
   list(segments="multiple",
        samples="single")
+breakpointError$title <-
+  "breakpointError (select several model sizes)"
 info <- animint2HTML(breakpointError)
 
 test_that("selector.types are converted to JSON", {

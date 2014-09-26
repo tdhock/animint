@@ -223,7 +223,7 @@ saveLayer <- function(l, d, meta){
       value <- g.data[[col.name]][1]
       meta$selectors[[v.name]] <-
         list(selected=as.character(value),
-             type="multiple")
+             type="single")
     }
     meta$selectors[[v.name]]$update <-
       c(meta$selectors[[v.name]]$update, as.list(g$classed))
