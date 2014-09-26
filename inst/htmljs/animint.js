@@ -514,7 +514,9 @@ var animint = function (to_select, json_file) {
   // download_chunk is called from update_geom and download_sequence.
   var download_chunk = function(g_info, tsv_name, funAfter){
     if(g_info.download_status.hasOwnProperty(tsv_name)){
+      for (var i = 0; i < 6; i++) {
         funAfter();
+      }
       return; // do not download twice.
     }
     g_info.download_status[tsv_name] = "downloading";
@@ -803,16 +805,15 @@ var animint = function (to_select, json_file) {
 	;
       }
       //select the correct group before returning anything.
-      var group_key_fun = null;
       if(key_fun != null){
-	group_key_fun = function(group_info){
+	key_fun = function(group_info){
 	  var one_group = data[group_info.value];
 	  var one_row = one_group[0];
 	  //take key from first value in the group.
-	  return key_fun(one_row);
+	  return one_row.key;
 	};
       }
-      elements = elements.data(kv); 
+      elements = elements.data(kv, key_fun); 
       eActions = function (e) {
         e.attr("d", function (d) {
           var one_group = data[d.value];
@@ -1194,6 +1195,9 @@ var animint = function (to_select, json_file) {
     //eActions(enter); //Set attributes of only the entering elements... why??
     if(g_info.duration && g_info.duration.selector == selector_name) {
       elements = elements.transition().duration(g_info.duration.ms);
+    }
+    if(g_info.aes.hasOwnProperty("key")){
+      elements.attr("id", key_fun);
     }
     if(g_info.aes.hasOwnProperty("href")){
       // elements are <a>, children are e.g. <circle>

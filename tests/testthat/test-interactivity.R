@@ -34,6 +34,7 @@ breakpointError <-
        first=list(samples=150, segments=4),
        title="breakpointError (select one model size)")
 
+##animint2dir(breakpointError, "breakpointError-single")
 info <- animint2HTML(breakpointError)
 
 test_that("default is single selection", {
