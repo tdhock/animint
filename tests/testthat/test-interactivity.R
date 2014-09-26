@@ -102,7 +102,7 @@ test_that("selector.types are converted to JSON", {
 test_that("default is 150 and 4 <circle> elements", {
   nodes <- getNodeSet(info$html, '//g[@class="geom1_point_signal"]//circle')
   expect_equal(length(nodes), 150)
-  nodes <- getNodeSet(html, '//g[@class="geom5_point_points"]//circle')
+  nodes <- getNodeSet(info$html, '//g[@class="geom5_point_points"]//circle')
   expect_equal(length(nodes), 4)
 })
 

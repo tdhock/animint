@@ -503,37 +503,43 @@ saveLayer <- function(l, d, meta){
     chunk.cols <- subset.vec[is.chunk]
     nest.cols <- subset.vec[!is.chunk]
   }else{ #infer a default, either 0 or 1 chunk vars:
-    selector.types <- sapply(meta$selectors, "[[", "type")
-    selector.names <- g$aes[subset.vec]
-    subset.types <- selector.types[selector.names]
-    can.chunk <- subset.types != "multiple"
-    if(all(!can.chunk)){
-      ## no possible chunk variables, just make 1 chunk.
+    if(length(meta$selectors)==0){
+      ## no selectors, just make 1 chunk.
       nest.cols <- subset.vec
       chunk.cols <- NULL
     }else{
-      can.chunk.i <- which(can.chunk)[[1]]
-      several.chunks <- if(length(g$subset_order)){
-        chunk.var <- subset.vec[[can.chunk.i]]
-        chunk.vec <- g.data[[chunk.var]]
-        counts <- table(chunk.vec)
-        if(length(counts) == 1){
-          stop("only 1 chunk") # do we ever get here?
-        }
-        if(all(counts == 1)){
-          FALSE #each chunk has only 1 row -- chunks are too small.
-        }else{
-          TRUE
-        }
-      }else{
-        FALSE
-      }
-      if(several.chunks){
-        nest.cols <- subset.vec[-can.chunk.i]
-        chunk.cols <- chunk.var
-      }else{
+      selector.types <- sapply(meta$selectors, "[[", "type")
+      selector.names <- g$aes[subset.vec]
+      subset.types <- selector.types[selector.names]
+      can.chunk <- subset.types != "multiple"
+      if(all(!can.chunk)){
+        ## no possible chunk variables, just make 1 chunk.
         nest.cols <- subset.vec
         chunk.cols <- NULL
+      }else{
+        can.chunk.i <- which(can.chunk)[[1]]
+        several.chunks <- if(length(g$subset_order)){
+          chunk.var <- subset.vec[[can.chunk.i]]
+          chunk.vec <- g.data[[chunk.var]]
+          counts <- table(chunk.vec)
+          if(length(counts) == 1){
+            stop("only 1 chunk") # do we ever get here?
+          }
+          if(all(counts == 1)){
+            FALSE #each chunk has only 1 row -- chunks are too small.
+          }else{
+            TRUE
+          }
+        }else{
+          FALSE
+        }
+        if(several.chunks){
+          nest.cols <- subset.vec[-can.chunk.i]
+          chunk.cols <- chunk.var
+        }else{
+          nest.cols <- subset.vec
+          chunk.cols <- NULL
+        }
       }
     }
   }
