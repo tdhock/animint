@@ -220,9 +220,15 @@ saveLayer <- function(l, d, meta){
     v.name <- update.vars[[sel.i]]
     col.name <- names(update.vars)[[sel.i]]
     if(!v.name %in% names(meta$selectors)){
-      ## select the first one. TODO: customize.
       value <- g.data[[col.name]][1]
-      meta$selectors[[v.name]] <- list(selected=as.character(value))
+      selector.type <- meta$selector.types[[v.name]]
+      if(is.null(selector.type))selector.type <- "single"
+      stopifnot(is.character(selector.type))
+      stopifnot(length(selector.type)==1)
+      stopifnot(selector.type %in% c("single", "multiple"))
+      meta$selectors[[v.name]] <-
+        list(selected=as.character(value),
+             type=selector.type)
     }
     meta$selectors[[v.name]]$update <-
       c(meta$selectors[[v.name]]$update, as.list(g$classed))
@@ -479,18 +485,6 @@ saveLayer <- function(l, d, meta){
   ## when year is clicked, we may need to download some new data for
   ## this geom.
 
-  ## Old code which allows several chunk variables:
-  ## nest.cols <- NULL
-  ## chunk.cols <- if(length(g$subset_order)){
-  ##   vec.list <- g.data[unlist(g$subset_order)]
-  ##   counts <- do.call(table, vec.list)
-  ##   if(all(counts == 1)){
-  ##     nest.cols <- names(vec.list)[length(vec.list)]
-  ##     names(vec.list)[-length(vec.list)]
-  ##   }else{
-  ##     names(vec.list)
-  ##   }
-  ## }
   subset.vec <- unlist(g$subset_order)
   if("chunk_vars" %in% names(g$params)){ #designer-specified chunk vars.
     designer.chunks <- g$params$chunk_vars
@@ -509,27 +503,44 @@ saveLayer <- function(l, d, meta){
     chunk.cols <- subset.vec[is.chunk]
     nest.cols <- subset.vec[!is.chunk]
   }else{ #infer a default, either 0 or 1 chunk vars:
-    several.chunks <- if(length(g$subset_order)){
-      chunk.var <- subset.vec[[1]]
-      chunk.vec <- g.data[[chunk.var]]
-      counts <- table(chunk.vec)
-      if(length(counts) == 1){
-        stop("only 1 chunk") # do we ever get here?
-      }
-      if(all(counts == 1)){
-        FALSE #each chunk has only 1 row -- chunks are too small.
-      }else{
-        TRUE
-      }
-    }else{
-      FALSE
-    }
-    if(several.chunks){
-      nest.cols <- subset.vec[-1]
-      chunk.cols <- chunk.var
-    }else{
+    if(length(meta$selectors)==0){
+      ## no selectors, just make 1 chunk.
       nest.cols <- subset.vec
       chunk.cols <- NULL
+    }else{
+      selector.types <- sapply(meta$selectors, "[[", "type")
+      selector.names <- g$aes[subset.vec]
+      subset.types <- selector.types[selector.names]
+      can.chunk <- subset.types != "multiple"
+      if(all(!can.chunk)){
+        ## no possible chunk variables, just make 1 chunk.
+        nest.cols <- subset.vec
+        chunk.cols <- NULL
+      }else{
+        can.chunk.i <- which(can.chunk)[[1]]
+        several.chunks <- if(length(g$subset_order)){
+          chunk.var <- subset.vec[[can.chunk.i]]
+          chunk.vec <- g.data[[chunk.var]]
+          counts <- table(chunk.vec)
+          if(length(counts) == 1){
+            stop("only 1 chunk") # do we ever get here?
+          }
+          if(all(counts == 1)){
+            FALSE #each chunk has only 1 row -- chunks are too small.
+          }else{
+            TRUE
+          }
+        }else{
+          FALSE
+        }
+        if(several.chunks){
+          nest.cols <- subset.vec[-can.chunk.i]
+          chunk.cols <- chunk.var
+        }else{
+          nest.cols <- subset.vec
+          chunk.cols <- NULL
+        }
+      }
     }
   }
   ## Split into chunks and save tsv files.
@@ -734,6 +745,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
   meta$plots <- list()
   meta$geoms <- list()
   meta$selectors <- list()
+  meta$selector.types <- plot.list$selector.types
   dir.create(out.dir,showWarnings=FALSE)
   meta$out.dir <- out.dir
   meta$geom.count <- 1
@@ -838,6 +850,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
   ## all the values used in those geoms.
   if("time" %in% ls(meta)){
     geom.names <- meta$selectors[[time.var]]$update
+    meta$selectors[[meta$time$variable]]$type <- "single"
     anim.values <- lapply(meta$geoms, "[[", "timeValues")
     anim.not.null <- anim.values[!sapply(anim.values, is.null)]
     meta$time$sequence <- if(all(sapply(anim.not.null, is.numeric))){
@@ -854,10 +867,13 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
     }
     meta$selectors[[time.var]]$selected <- meta$time$sequence[[1]]
   }
+  
   ## The first selection:
   for(selector.name in names(meta$first)){
     first <- as.character(meta$first[[selector.name]])
-    stopifnot(length(first) == 1)
+    if(meta$selectors[[selector.name]]$type == "single"){
+      stopifnot(length(first) == 1)
+    }
     meta$selectors[[selector.name]]$selected <- first
   }
 

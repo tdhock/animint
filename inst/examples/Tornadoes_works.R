@@ -97,8 +97,8 @@ tornado.points <-
 gg2animint(tornado.points, "tornado-points")
 
 ## It would be nice to be able to specify the width/height using
-## animint.* theme options, but this currently gives an error... is
-## there any work-around?
+## animint.* theme options, but this gives an error in ggplot2
+## 1.0... the work-around is to use tdhock/ggplot2.
 tornado.points <-
   list(map=ggplot()+
        make_text(UStornadoCounts, -100, 50, "year", "Tornadoes in %d")+
@@ -117,3 +117,29 @@ tornado.points <-
        geom_bar(aes(year, count, clickSelects=year, showSelected=state),
                 data=UStornadoCounts, stat="identity", position="identity"))
 gg2animint(tornado.points, "tornado-points")
+
+## Tornado multiple selection.
+tornado.lines <-
+  list(map=ggplot()+
+       make_text(UStornadoCounts, -100, 50, "year", "Tornadoes in %d")+
+       geom_polygon(aes(x=long, y=lat, group=group, clickSelects=state),
+                    data=USpolygons, fill="black", colour="grey") +
+       geom_segment(aes(x=startLong, y=startLat, xend=endLong, yend=endLat,
+                        showSelected=year),
+                    colour=seg.color, data=UStornadoes)+
+       scale_fill_manual(values=c(end=seg.color))+
+       theme_animint(width=750, height=500)+
+       geom_point(aes(endLong, endLat, fill=place, showSelected=year),
+                    colour=seg.color,
+                  data=data.frame(UStornadoes,place="end")),
+       ts=ggplot()+
+       geom_text(aes(year, count, showSelected=state, label=state),
+                 data=subset(UStornadoCounts, year==max(year)))+
+       geom_line(aes(year, count,
+                     clickSelects=year,
+                     showSelected=state,
+                     group=state),
+                data=UStornadoCounts, hjust=0),
+       selector.types=list(state="multiple"))
+gg2animint(tornado.lines, "tornado-lines")
+
