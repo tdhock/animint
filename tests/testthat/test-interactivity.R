@@ -26,12 +26,12 @@ breakpointError <-
        points=ggplot()+
        geom_point(aes(samples, error,
                       showSelected=segments,
-                      key=samples,
+                      id=samples,
                       clickSelects=samples),
                   data=only.error, stat="identity"),
        error=ggplot()+
        geom_vline(aes(xintercept=segments, clickSelects=segments,
-                      key=segments),
+                      id=segments),
                   data=only.segments, lwd=17, alpha=1/2)+
        geom_line(aes(segments, error, group=samples,
                      ##key=samples,
@@ -99,9 +99,11 @@ test_that("selector.types are converted to JSON", {
   expect_match(selector.types$segments, "multiple")
 })
 
-test_that("default is 150 <circle> elements", {
+test_that("default is 150 and 4 <circle> elements", {
   nodes <- getNodeSet(info$html, '//g[@class="geom1_point_signal"]//circle')
   expect_equal(length(nodes), 150)
+  nodes <- getNodeSet(html, '//g[@class="geom5_point_points"]//circle')
+  expect_equal(length(nodes), 4)
 })
 
 test_that("clickSelects 300 makes 300 <circle> elements", {
@@ -110,14 +112,27 @@ test_that("clickSelects 300 makes 300 <circle> elements", {
   expect_equal(length(nodes), 300)
 })
 
-test_that("clickSelects 1 adds 1 <line> element", {
+test_that("clickSelects 1 adds 1 <line> and 4 <circle>", {
   html <- clickHTML(id=1)
   nodes <- getNodeSet(html, '//g[@class="geom3_segment_signal"]//line')
   expect_equal(length(nodes), 5)
+  nodes <- getNodeSet(html, '//g[@class="geom5_point_points"]//circle')
+  expect_equal(length(nodes), 8)
 })
 
-test_that("clickSelects 4 removes 4 <line> elements", {
+test_that("clickSelects 4 removes 4 <line> elements and 4 <circle>", {
   html <- clickHTML(id=4)
   nodes <- getNodeSet(html, '//g[@class="geom3_segment_signal"]//line')
   expect_equal(length(nodes), 1)
+  nodes <- getNodeSet(html, '//g[@class="geom5_point_points"]//circle')
+  expect_equal(length(nodes), 4)
 })
+
+test_that("clickSelects 1 removes all <line> elements and all <circle>", {
+  html <- clickHTML(id=1)
+  nodes <- getNodeSet(html, '//g[@class="geom3_segment_signal"]//line')
+  expect_equal(length(nodes), 0)
+  nodes <- getNodeSet(html, '//g[@class="geom5_point_points"]//circle')
+  expect_equal(length(nodes), 0)
+})
+

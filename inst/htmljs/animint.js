@@ -701,6 +701,9 @@ var animint = function (to_select, json_file) {
 
     var eActions, eAppend;
     var key_fun = null;
+    var id_fun = function(d){ 
+      return d.id;
+    };
     if(g_info.aes.hasOwnProperty("key")){
       key_fun = function(d){ 
         return d.key;
@@ -813,6 +816,12 @@ var animint = function (to_select, json_file) {
 	  return one_row.key;
 	};
       }
+      id_fun = function(group_info){
+	var one_group = data[group_info.value];
+	var one_row = one_group[0];
+	//take key from first value in the group.
+	return one_row.id;
+      };
       elements = elements.data(kv, key_fun); 
       eActions = function (e) {
         e.attr("d", function (d) {
@@ -1196,8 +1205,8 @@ var animint = function (to_select, json_file) {
     if(g_info.duration && g_info.duration.selector == selector_name) {
       elements = elements.transition().duration(g_info.duration.ms);
     }
-    if(g_info.aes.hasOwnProperty("key")){
-      elements.attr("id", key_fun);
+    if(g_info.aes.hasOwnProperty("id")){
+      elements.attr("id", id_fun);
     }
     if(g_info.aes.hasOwnProperty("href")){
       // elements are <a>, children are e.g. <circle>
