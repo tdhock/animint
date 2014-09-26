@@ -68,8 +68,7 @@ clickHTML <- function(...){
   v <- c(...)
   stopifnot(length(v) == 1)
   e <- remDr$findElement(names(v), as.character(v))
-  remDr$mouseMoveToLocation(webElement=e)
-  remDr$click()
+  e$clickElement()
   XML::htmlParse(remDr$getPageSource(), asText = TRUE)
 }  
 
