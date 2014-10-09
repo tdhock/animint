@@ -171,6 +171,11 @@ Variable', names(dataset))). However I fear that it may end up not
 being very responsive, since the animint would have to be re-compiled
 by the shiny server after every change to the shiny input.
 
+2014.10.9
+
+BUGFIX: use eActions(enter_elements) to prevent them from flying in
+from the upper left.
+
 2014.9.26
 
 DSL: multiple selection! Now you can declare each interaction variable
