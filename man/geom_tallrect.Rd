@@ -8,7 +8,7 @@ geom_tallrect(mapping = NULL, data = NULL, stat = "identity",
 \arguments{
   \item{mapping}{aesthetic mapping}
 
-  \item{data}{data mapping}
+  \item{data}{data set}
 
   \item{stat}{statistic mapping, defaults to identity}
 
@@ -58,8 +58,5 @@ breakpointError <-
                    data=only.error, lwd=4))
 gg2animint(breakpointError)
 
-}
-\seealso{
-\code{\link{gg2animint}}
 }
 

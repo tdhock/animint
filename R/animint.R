@@ -565,10 +565,7 @@ saveLayer <- function(l, d, meta){
   names(g$chunk_order) <- NULL
   names(g$nest_order) <- NULL
   g$subset_order <- g$nest_order
-  if("group" %in% names(g$aes)){
-    g$nest_order <- c(g$nest_order, "group")
-  }
-  
+
   # If there is only one PANEL, we don't need it anymore.
   g$PANEL <- unique(g.data[["PANEL"]])
   if (length(g$PANEL) == 1) {
@@ -580,6 +577,11 @@ saveLayer <- function(l, d, meta){
   if(nrow(meta$built$panel$layout) > 1){
     g$subset_order <- c(g$subset_order, "PANEL")
     g$nest_order <- c(g$nest_order, "PANEL")
+  }
+
+  ## group should be the last thing in nest_order, if it is present.
+  if("group" %in% names(g$aes)){
+    g$nest_order <- c(g$nest_order, "group")
   }
   
   ## Get unique values of time variable.

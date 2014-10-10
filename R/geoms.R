@@ -1,12 +1,11 @@
 #' ggplot2 geom with xmin and xmax aesthetics that covers the entire y range, useful for clickSelects background elements.
 #' @param mapping aesthetic mapping
-#' @param data data mapping
+#' @param data data set
 #' @param stat statistic mapping, defaults to identity
 #' @param position position mapping, defaults to identity
 #' @param ... other arguments
 #' @return ggplot2 layer
 #' @export
-#' @seealso \code{\link{gg2animint}}
 #' @example inst/examples/breakpoints.R
 geom_tallrect <- function(mapping=NULL, data=NULL, stat="identity", position="identity", ...){
   GeomTallRect <- proto(ggplot2:::GeomRect,{
@@ -29,6 +28,39 @@ geom_tallrect <- function(mapping=NULL, data=NULL, stat="identity", position="id
     }
   })
   GeomTallRect$new(mapping = mapping, data = data, stat = stat,
+                   position = position, ...)
+}
+
+#' ggplot2 geom with ymin and ymax aesthetics that covers the entire x range, useful for clickSelects background elements.
+#' @param mapping aesthetic mapping
+#' @param data data set
+#' @param stat statistic mapping, defaults to identity
+#' @param position position mapping, defaults to identity
+#' @param ... other arguments
+#' @return ggplot2 layer
+#' @export
+#' @example inst/examples/WorldBank.R
+geom_widerect <- function(mapping=NULL, data=NULL, stat="identity", position="identity", ...){
+  GeomWideRect <- proto(ggplot2:::GeomRect,{
+    objname <- "widerect"
+    required_aes <- c("ymin", "ymax")
+    draw <- draw_groups <- function(.,data,scales,coordinates,
+                                    xmin=0,xmax=1,...){
+      xmin <- grid::unit(xmin,"npc")
+      xmax <- grid::unit(xmax,"npc")
+      with(ggplot2:::coord_transform(coordinates, data, scales),
+           ggname(.$my_name(), {
+        rectGrob(xmin, ymin, xmax - xmin, ymax-ymin,
+                 default.units = "native", just = c("left", "bottom"), 
+                 gp=gpar(
+                   col=colour, fill=alpha(fill, alpha), 
+                   lwd=size * .pt, lty=linetype, lineend="butt"
+                   )
+                 )
+      }))
+    }
+  })
+  GeomWideRect$new(mapping = mapping, data = data, stat = stat,
                    position = position, ...)
 }
 

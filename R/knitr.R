@@ -12,13 +12,11 @@ gg2animint_knitr <- function(plot.list){
   cat(slines,sep="\n")
 }
 
-
-##' Insert an interactive animation into an R markdown document using a customized print method.
-##' 
-##' @param x named list of ggplots and option lists to pass to gg2animint.
-##' @references https://github.com/yihui/knitr/blob/master/vignettes/knit_print.Rmd
-##' @author Carson Sievert
-##' @export
+#' Insert an interactive animation into an R markdown document using a customized print method.
+#' @param x named list of ggplots and option lists to pass to gg2animint.
+#' @references https://github.com/yihui/knitr/blob/master/vignettes/knit_print.Rmd
+#' @author Carson Sievert
+#' @export
 knit_print.animint <- function(x, options, ...) {
   if (!requireNamespace("knitr")) warning("Please install.packages('knitr')")
   wd <- getwd()

@@ -169,6 +169,14 @@ You can also incorporate animint plots into interactive documents:
 https://github.com/tdhock/animint/tree/master/inst/examples/rmarkdown
 
 
+2014.10.10
+
+GGPLOT: geom_widerect is now defined in geoms.R and it is rendered by
+animint.js.
+
+BUGFIX: when nest_order contains PANEL and group, group should come
+last.
+
 2014.10.9
 
 BUGFIX: use eActions(enter_elements) to prevent them from flying in

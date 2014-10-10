@@ -1,3 +1,30 @@
+\name{geom_widerect}
+\alias{geom_widerect}
+\title{ggplot2 geom with ymin and ymax aesthetics that covers the entire x range, useful for clickSelects background elements.}
+\usage{
+geom_widerect(mapping = NULL, data = NULL, stat = "identity",
+  position = "identity", ...)
+}
+\arguments{
+  \item{mapping}{aesthetic mapping}
+
+  \item{data}{data set}
+
+  \item{stat}{statistic mapping, defaults to identity}
+
+  \item{position}{position mapping, defaults to identity}
+
+  \item{...}{other arguments}
+}
+\value{
+ggplot2 layer
+}
+\description{
+ggplot2 geom with ymin and ymax aesthetics that covers the
+entire x range, useful for clickSelects background
+elements.
+}
+\examples{
 library(animint)
 data(WorldBank)
 
@@ -72,9 +99,9 @@ animint2dir(good, "WorldBank-good")
 
 ## This example additionally uses multiple selection on countries.
 library(dplyr)
-max.years <- not.na %.%
-  group_by(country) %.%
-  filter(year==max(year)) %.%
+max.years <- not.na \%.\%
+  group_by(country) \%.\%
+  filter(year==max(year)) \%.\%
   mutate(year=2012)
 wb.mult <-
   list(ts=ggplot()+
@@ -126,9 +153,9 @@ TS <- function(df)BOTH(df, "Years", "Life expectancy")
 SCATTER <- function(df)BOTH(df, "Fertility rate", "Life expectancy")
 TS2 <- function(df)BOTH(df, "Fertility rate", "Years")
 years <- unique(not.na[, "year", drop=FALSE])
-min.years <- not.na %.%
-  group_by(country) %.%
-  filter(year==min(year)) %.%
+min.years <- not.na \%.\%
+  group_by(country) \%.\%
+  filter(year==min(year)) \%.\%
   mutate(year=1958)
 wb.facets <-
   list(ts=ggplot()+
@@ -186,3 +213,5 @@ wb.facets <-
        selector.types=list(country="multiple"),
        title="World Bank data (multiple selection, facets)")
 animint2dir(wb.facets, "WorldBank-facets")
+}
+
