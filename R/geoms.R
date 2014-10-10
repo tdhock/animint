@@ -1,5 +1,4 @@
-#' ggplot2 geom with xmin and xmax aesthetics that covers the entire y range,
-#' useful for clickSelects background elements.
+#' ggplot2 geom with xmin and xmax aesthetics that covers the entire y range, useful for clickSelects background elements.
 #' @param mapping aesthetic mapping
 #' @param data data set
 #' @param stat statistic mapping, defaults to identity
@@ -32,8 +31,7 @@ geom_tallrect <- function(mapping=NULL, data=NULL, stat="identity", position="id
                    position = position, ...)
 }
 
-#' ggplot2 geom with ymin and ymax aesthetics that covers the entire x range,
-#' useful for clickSelects background elements.
+#' ggplot2 geom with ymin and ymax aesthetics that covers the entire x range, useful for clickSelects background elements.
 #' @param mapping aesthetic mapping
 #' @param data data set
 #' @param stat statistic mapping, defaults to identity
