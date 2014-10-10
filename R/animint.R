@@ -755,7 +755,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
   # CPS (7-22-14): What if the user doesn't specify milliseconds? Could we provide a reasonable default?
   if(is.list(plot.list$time)){
     meta$time <- plot.list$time
-    ms <- as.integer(meta$time$ms)
+    ms <- meta$time$ms
     stopifnot(is.numeric(ms))
     stopifnot(length(ms)==1)
     ## NOTE: although we do not use olist$ms for anything in the R
