@@ -6,7 +6,7 @@
 #' @param ... other arguments
 #' @return ggplot2 layer
 #' @export
-#' #' @example inst/examples/breakpoints.R
+#' @example inst/examples/breakpoints.R
 geom_tallrect <- function(mapping=NULL, data=NULL, stat="identity", position="identity", ...){
   GeomTallRect <- proto(ggplot2:::GeomRect,{
     objname <- "tallrect"
