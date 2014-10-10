@@ -20,7 +20,7 @@ gg2animint_knitr <- function(plot.list){
 ##' @author Carson Sievert
 ##' @export
 knit_print.animint <- function(x, options, ...) {
-  if (!requireNamespace(knitr)) warning("Please install.packages('knitr')")
+  if (!requireNamespace("knitr")) warning("Please install.packages('knitr')")
   wd <- getwd()
   on.exit(setwd(wd))
   # This function should be evaluated in knitr's output directory
@@ -66,40 +66,14 @@ new_animint <- function(attrs, json.file) {
 
 #' Shiny ui output function
 #' @param outputId output variable to read the plot from
+#' @seealso http://shiny.rstudio.com/articles/building-outputs.html
 #' @export
 #' 
-animintOutput <- function(outputId, jsonFile) {
-  # first, tell shiny where to find animint dependencies
-  # i think the resource path should be the current directory as opposed to 
-  # the installed package directory to avoid versioning hell
-#   aniDir <- file.path(getwd(), 'animint_assets')
-#   if (!file.exists(aniDir)) dir.create(aniDir)
-#   addResourcePath('animint_assets', aniDir)
-  # animint2dir will not output shinyAnimint.js (the custom js for the 
-  # shiny binding) so we copy it over now
-#   file.copy(system.file('shiny', 'shinyAnimint.js', package = 'animint'),
-#             aniDir)
-  
-#   tags$html(
-#     # inject the necessary scripts into the header of the app
-#     tags$head(
-#       tags$script(src = "animint_assets/vendor/d3.v3.js"),
-#       tags$script(src = "animint_assets/animint.js"),
-#       tags$script(src = "animint_assets/shinyAnimint.js")
-#     ),
-    # the div which will contain the animint plot
-    #tags$body(
-      #tags$div(id = outputId, class = 'shinyAnimint')
-      #tags$script(paste0("var plot = animint('#", outputId, "', ", jsonFile))
-    #)
+animintOutput <- function(outputId) {
+  # Note that requireNamespace("shiny") should load digest & htmltools (both used later on)
   if (!requireNamespace("shiny")) message("Please install.packages('shiny')")
-  
-  deps <- list(html_dependency_d3(),
-               html_dependency_animint(),
-               html_dependency_shinyAnimint())
-  deps <- lapply(deps, shiny::createWebDependency)
+  deps <- lapply(animint_dependencies(), shiny::createWebDependency)
   htmltools::attachDependencies(tags$div(id = outputId, class = 'shinyAnimint'), deps)
-  
 }
 
 #' Create an animint output element
@@ -113,50 +87,37 @@ animintOutput <- function(outputId, jsonFile) {
 #' @seealso http://shiny.rstudio.com/articles/building-outputs.html
 #' @export
 #' 
-renderAnimint <- function(expr, env=parent.frame(), quoted=FALSE) {
+renderAnimint <- function(expr, env = parent.frame(), quoted = FALSE) {
   # Note that requireNamespace("shiny") should load digest & htmltools (both used later on)
   if (!requireNamespace("shiny")) message("Please install.packages('shiny')")
   
-  # I don't have to put this inside renderFunc like htmlwidgets::shinyRenderWidget does, right?
-  #browser()
-  
-  
   # Convert the expression + environment into a function
   func <- shiny::exprToFunction(expr, env, quoted)
-  # set up a temporary directory that will hold animint assets
-  #tmp <- tempdir()
-  #addResourcePath("animint_assets", tmp)
-  #file.copy(system.file('shiny', 'shinyAnimint.js', package = 'animint'), tmp)
   
-  # this will tell knitr how to print animint in an interactive document
-  # similar implementation to htmlwidgets::shinyRenderWidget
+  # this will tell knitr how to place animint into an interactive document
+  # implementation is similar to htmlwidgets::shinyRenderWidget
   # we can't use that in our case since we must call animint2dir
   # everytime shiny calls renderFunc
   renderFunc <- function(shinysession, name, ...) {
-    #browser()
     val <- func()
     # using digest will guarantee a unique json file name for each animint plot
-    jsonFile <- paste0(digest(val), '.json')
-    
-    # PROBLEM: how to remove 'old' json files without removing files 
-    # that might be needed by the currently running app?
-    # outDir <- file.path(getwd(), 'animint_assets')
+    jsonFile <- paste0(digest::digest(val), '.json')
     tmp <- tempdir()
     stuff <- animint2dir(val, out.dir = tmp, json.file = jsonFile, open.browser = FALSE)
-    #plotPath <- file.path(tmp, jsonFile)
     addResourcePath("animintAssets", tmp)
-    
-    #deps <- shiny::createWebDependency(html_dependency_plotJSON(tmp, jsonFile))
     list(jsonFile = jsonFile)
-    
-    
   }
   shiny::markRenderFunction(animint::animintOutput, renderFunc)
-
 }
 
-
 # html dependencies according htmltools protocols
+# these are here basically so we can take advantage of shiny::createWebDependency
+animint_dependencies <- function() {
+  list(html_dependency_d3(),
+       html_dependency_animint(),
+       html_dependency_shinyAnimint())
+}
+
 html_dependency_d3 <- function() {
   htmltools::htmlDependency(name = "d3",
                  version = "3.0.0",

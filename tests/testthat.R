@@ -54,7 +54,7 @@ run_test <- function() {
   }
   remDr$open(silent = TRUE)
   # run the tests
-  test_check("animint", filter = "shiny")
+  test_check("animint")
 }
 
 run_test()
