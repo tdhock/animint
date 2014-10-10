@@ -1,7 +1,7 @@
 Package: animint
 Maintainer: Toby Dylan Hocking <toby@sg.cs.titech.ac.jp>
 Author: Toby Dylan Hocking, Susan VanderPlas, Carson Sievert
-Version: 2014.10.9
+Version: 2014.10.10
 License: GPL-3
 Title: Interactive animations
 Description: An interactive animation can be defined using a list of
@@ -18,12 +18,14 @@ Imports:
     reshape2,
     MASS,
     hexbin,
-    scales,
-    digest
+    scales
 Suggests:
     knitr (>= 1.5.33),
     servr,
     gistr,
+    shiny,
+    rmarkdown,
+    digest,
     testthat,
     RSelenium,
     XML

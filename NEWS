@@ -159,15 +159,15 @@ non-animated plots? I have started some work on the loadall branch,
 but the preliminary answer is NO -- the browser freezes and the plot
 does not respond to mouse clicks while the data is loading.
 
-OUTPUT: animint2shiny(ggList) renders the interactive animation as a shiny
-app, e.g.
-https://github.com/tdhock/interactive-tutorial/tree/master/animation/WorldBank
-
-2014.10.9
+2014.10.10
 
 "shiny bindings" are now possible using the renderAnimint() and 
-animintOutput() convenience functions. See here for simple example
+animintOutput() convenience functions. See here for simple shiny app:
 https://github.com/tdhock/animint/tree/master/inst/examples/shiny
+
+You can also incorporate animint plots into interactive documents:
+https://github.com/tdhock/animint/tree/master/inst/examples/rmarkdown
+
 
 2014.10.9
 
