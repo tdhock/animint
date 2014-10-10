@@ -149,15 +149,15 @@ wb.facets <-
                      clickSelects=country),
                   data=TS(min.years), hjust=1)+
        
+       geom_widerect(aes(ymin=year-1/2, ymax=year+1/2,
+                         clickSelects=year),
+                     data=TS2(years), alpha=1/2)+
        geom_line(aes(fertility.rate, year, group=country, colour=region,
                      clickSelects=country),
                  data=TS2(not.na), size=4, alpha=3/5)+
        geom_point(aes(fertility.rate, year, color=region, size=population,
                       showSelected=country, clickSelects=country),
                   data=TS2(not.na))+
-       geom_widerect(aes(ymin=year-1/2, ymax=year+1/2,
-                         clickSelects=year),
-                     data=TS2(years), alpha=1/2)+
        
        geom_point(aes(fertility.rate, life.expectancy, clickSelects=country,
                       showSelected=year, colour=region, size=population,
