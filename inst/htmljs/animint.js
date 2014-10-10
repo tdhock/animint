@@ -1206,7 +1206,10 @@ var animint = function (to_select, json_file) {
         enter.style("opacity", get_alpha);
       }
     }
-    //eActions(enter); //Set attributes of only the entering elements... why??
+    //Set attributes of only the entering elements. This is needed to
+    //prevent things from flying around from the upper left when they
+    //enter the plot.
+    eActions(enter);  //DO NOT DELETE!
     if(g_info.duration && g_info.duration.selector == selector_name) {
       elements = elements.transition().duration(g_info.duration.ms);
     }
