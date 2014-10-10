@@ -17,7 +17,6 @@ install:
   - ./travis-tool.sh install_github ropensci/gistr
   - ./travis-tool.sh install_github tdhock/ggplot2
   - ./travis-tool.sh r_binary_install XML
-  - ./travis-tool.sh r_binary_install dplyr
 
 script: ./travis-tool.sh run_tests
 
