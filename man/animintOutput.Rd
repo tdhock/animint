@@ -3,7 +3,7 @@
 \alias{animintOutput}
 \title{Shiny ui output function}
 \usage{
-animintOutput(outputId)
+animintOutput(outputId, jsonFile)
 }
 \arguments{
   \item{outputId}{output variable to read the plot from}
