@@ -991,6 +991,20 @@ var animint = function (to_select, json_file) {
           .style("stroke", get_colour);
       }
       eAppend = "rect";
+    } else if (g_info.geom == "widerect") {
+      elements = elements.data(data, key_fun);
+      eActions = function (e) {
+        e.attr("y", toXY("y", "ymin"))
+          .attr("height", function (d) {
+            return scales.x(d["ymax"]) - scales.x(d["ymin"]);
+          })
+          .attr("x", scales.x.range()[0])
+          .attr("width", scales.x.range()[1] - scales.x.range()[0])
+          .style("fill", get_fill)
+          .style("stroke-width", get_size)
+          .style("stroke", get_colour);
+      }
+      eAppend = "rect";
     } else if (g_info.geom == "rect") {
       elements = elements.data(data, key_fun);
       eActions = function (e) {
