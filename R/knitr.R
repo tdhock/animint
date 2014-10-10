@@ -18,6 +18,7 @@ gg2animint_knitr <- function(plot.list){
 ##' @param x named list of ggplots and option lists to pass to gg2animint.
 ##' @references https://github.com/yihui/knitr/blob/master/vignettes/knit_print.Rmd
 ##' @author Carson Sievert
+##' @import knitr
 ##' @export
 knit_print.animint <- function(x, options, ...) {
   if (!require(knitr)) warning("Please install.packages('knitr')")
@@ -54,15 +55,8 @@ new_animint <- function(id, json.file) {
 
 #' Create an shiny output binding
 #' @export
-
 animintOutput <- function(inputId) {
   # attach the appropriate class to the animint div
   gsub('></div>', paste0(' class="shiny-animint-binding"></div>'), 
        new_animint(inputId, "plot.json"))
 }
-
-renderAnimint <- function(){
-  
-  
-}
-
