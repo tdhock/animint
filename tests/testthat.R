@@ -3,6 +3,7 @@ library(animint)
 library(servr)
 library(RSelenium)
 library(XML)
+library(shiny)
 # source some convenience functions
 source(file.path(getwd(), "testthat", "functions.R"))
 
@@ -10,9 +11,12 @@ source(file.path(getwd(), "testthat", "functions.R"))
 system("ps u")
 
 kill_driver <- function() {
+  # quit the remote driver
+  remDr$quit()
   if(interactive()){
-    # stop selenium server
-    remDr$quit()
+    # kill selenium server
+    killsel <- 'pkill -f selenium-server-standalone'
+    on.exit(system(killsel), add = TRUE)
   } else {
     # stop phantomjs
     pJS$stop()
@@ -50,7 +54,7 @@ run_test <- function() {
   }
   remDr$open(silent = TRUE)
   # run the tests
-  test_check("animint")
+  test_check("animint", filter = "shiny")
 }
 
 run_test()

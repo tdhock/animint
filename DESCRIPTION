@@ -18,7 +18,8 @@ Imports:
     reshape2,
     MASS,
     hexbin,
-    scales
+    scales,
+    digest
 Suggests:
     knitr (>= 1.5.33),
     servr,

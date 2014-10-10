@@ -162,14 +162,11 @@ OUTPUT: animint2shiny(ggList) renders the interactive animation as a shiny
 app, e.g.
 https://github.com/tdhock/interactive-tutorial/tree/master/animation/WorldBank
 
-OUTPUT: "shiny widgets" -- I guess it should be possible and useful to
-edit things like the variable plotted on the x/y axis, for example in
-the WorldBank data viz, instead of writing
-geom_point(aes(x=life.expectancy)) we could write
-geom_point(aes_string(x=input$xvar)) with selectInput('xvar', 'X
-Variable', names(dataset))). However I fear that it may end up not
-being very responsive, since the animint would have to be re-compiled
-by the shiny server after every change to the shiny input.
+2014.10.9
+
+"shiny bindings" are now possible using the renderAnimint() and 
+animintOutput() convenience functions. See here for simple example
+https://github.com/tdhock/animint/tree/master/inst/examples/shiny
 
 2014.9.26
 

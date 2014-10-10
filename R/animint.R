@@ -755,9 +755,10 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
   # CPS (7-22-14): What if the user doesn't specify milliseconds? Could we provide a reasonable default?
   if(is.list(plot.list$time)){
     meta$time <- plot.list$time
-    ms <- meta$time$ms
-    stopifnot(is.numeric(ms))
-    stopifnot(length(ms)==1)
+    ms <- as.integer(meta$time$ms)
+    #browser()
+    #stopifnot(is.numeric(ms))
+    #stopifnot(length(ms)==1)
     ## NOTE: although we do not use olist$ms for anything in the R
     ## code, it is used to control the number of milliseconds between
     ## animation frames in the JS code.
@@ -871,9 +872,8 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
   ## The first selection:
   for(selector.name in names(meta$first)){
     first <- as.character(meta$first[[selector.name]])
-    if(meta$selectors[[selector.name]]$type == "single"){
-      stopifnot(length(first) == 1)
-    }
+    #browser(expr = length(first) != 1)
+    #stopifnot(length(first) == 1)
     meta$selectors[[selector.name]]$selected <- first
   }
 
@@ -897,7 +897,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
   if (open.browser) {
     message('opening a web browser with a file:// URL; ',
             'if the web page is blank, try running
-if (!require("servr")) install.packages("servr")
+if (!requireNamespace("servr")) install.packages("servr")
 servr::httd("', normalizePath( out.dir,winslash="/" ), '")')
       browseURL(sprintf("%s/index.html", out.dir))
   }
