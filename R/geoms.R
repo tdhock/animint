@@ -39,7 +39,10 @@ geom_tallrect <- function(mapping=NULL, data=NULL, stat="identity", position="id
 #' @param ... other arguments
 #' @return ggplot2 layer
 #' @export
-#' @example inst/examples/WorldBank.R
+#' @examples
+#'  \dontrun{ 
+#'    source(system.file("examples/WorldBank.R", package = "animint"))
+#'  }
 geom_widerect <- function(mapping=NULL, data=NULL, stat="identity", position="identity", ...){
   GeomWideRect <- proto(ggplot2:::GeomRect,{
     objname <- "widerect"
