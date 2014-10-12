@@ -7,12 +7,20 @@ getStrips <- function(facet, panel, ...)
   UseMethod("getStrips")
 
 getStrips.grid <- function(facet, panel, ...) {
-  col_vars <- unique(panel$layout[names(facet$cols)])
+  npanels <- nrow(panel$layout)
+  # preallocate strip labels to a default of ""
+  strips.empty <- strips.right <- strips.top <- rep("", npanels)
+  # right strips in a grid are only drawn on the last column
   row_vars <- unique(panel$layout[names(facet$rows)])
-  list(
-    right = build_strip(panel, row_vars, facet$labeller, side = "right", ...),
-    top = build_strip(panel, col_vars, facet$labeller, side = "top", ...)
-  )
+  strips.right[with(panel$layout, COL == max(COL))] <- 
+    build_strip(panel, row_vars, facet$labeller, side = "right", ...)
+  # top strips in a grid layout are only drawn on the first row
+  col_vars <- unique(panel$layout[names(facet$cols)])
+  strips.top[panel$layout$ROW == 1] <-
+    build_strip(panel, col_vars, facet$labeller, side = "top", ...)
+  strips <- list(right = strips.right, top = strips.top)
+  # the right/top element should exist if there are non-trivial labels
+  strips[sapply(strips, function(x) !identical(x, strips.empty))]
 }
 
 build_strip <- function(panel, label_df, labeller, side = "right", ...) {
@@ -28,17 +36,21 @@ build_strip <- function(panel, label_df, labeller, side = "right", ...) {
   for (i in seq_len(ncol(label_df))) {
     labels[, i] <- labeller(names(label_df)[i], label_df[, i])
   }
-  labels
+  # unlike ggplot2, we collapse "layers" of strips into 1 layer
+  apply(labels, 1, paste, collapse = "; ")
 }
 
 getStrips.wrap <- function(facet, panel, ...) {
   labels_df <- panel$layout[names(facet$facets)]
   labels_df[] <- plyr::llply(labels_df, format, justify = "none")
-  apply(labels_df, 1, paste, collapse = ", ")
+  # facet_wrap labels always go on top
+  # we return a list so p_info.strips is always an object (on the JS side)
+  l <- list(top = apply(labels_df, 1, paste, collapse = ", "))
+  l[!identical(l$top, rep("", nrow(panel$layout)))]
 }
 
 getStrips.null <- function(facet, panel, ...) {
-  return("")
+  return(list())
 }
 
 # TODO: how to 'train_layout' for non-cartesian coordinates?

@@ -147,11 +147,26 @@ var animint = function (to_select, json_file) {
 	return measureText(entry, 11).width;
       })); // to ensure the last x-axis label doesn't get cut off.
     }
-
+    if(p_info.strips.hasOwnProperty("top")){
+      strippaddingy = 5 + Math.max.apply(null, p_info.strips.top.map(function(entry){
+  return measureText(entry, 11).height;
+      })); 
+    } else {
+      strippaddingy = 0;
+    }
+    if(p_info.strips.hasOwnProperty("right")){
+      strippaddingx = 5 + Math.max.apply(null, p_info.strips.right.map(function(entry){
+  return measureText(entry, 11).height;
+      })); 
+    } else {
+      strippaddingx = 0;
+    }
+    
     // margins should be fixed across panels
-    margin.top = titlepadding;
+    margin.top = titlepadding + strippaddingy;
     margin.bottom = labelpaddingx + axispaddingx;
     margin.left = labelpaddingy + axispaddingy;
+    margin.right = labelpaddingx;
     plotdim.margin = margin;
 
     // the *entire plot* height/width
@@ -328,34 +343,23 @@ var animint = function (to_select, json_file) {
               .text(function(d, i) { return d; })
               // NOTE: there could be multiple strips per panel
               // TODO: is there a better way to manage spacing?
-              .attr("transform", function(d, i) { 
+              .attr("transform", function(d) { 
                 if (side == "top") {
-                  //var y2 = y + i * 12; 
                   return "translate(" + x + "," + y + ")rotate(0)";
-                } else if (side == "right") { //right
-                  //var x2 = x - i * 12; 
+                } else if (side == "right") { 
                   return "translate(" + x + "," + y + ")rotate(90)";
                 }
               });
         }
 
-        // if Array, facet_wrap() was used; otherwise, facet_grid()
-        if (p_info.strips instanceof Array) {
-          // strips should always be on top for facet_wrap(), right?
-          stripLabels.top = [p_info.strips[layout_i]];
+        if (p_info.strips.hasOwnProperty("top")) {
+          stripLabels.top = [p_info.strips.top[layout_i]];
           draw_strip("top");
-        } else {
-          if (current_row == 1) {
-            stripLabels.top = [p_info.strips.top[current_col - 1]];
-            draw_strip("top");
-          } 
-          if (current_col == ncols) {
-            stripLabels.right = [p_info.strips.right[current_row - 1]];
-            draw_strip("right");
-          }
+        } 
+        if (p_info.strips.hasOwnProperty("right")) {
+          stripLabels.right = [p_info.strips.right[layout_i]];
+          draw_strip("right");
         }
-
-
       }
       
       // for each of the x and y axes, there is a "real" and fake
