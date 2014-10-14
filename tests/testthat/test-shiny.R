@@ -1,32 +1,64 @@
 context("shiny")
 
+#just in case, try to kill process that we may have started
+killservr <- 'pkill -f "shiny::runApp\\(port=6012"'
+system(killservr)
+# serve the app using a seperate R session so we can execute subsequent commands
+cmd <- "R -e \'shiny::runApp(port=6012, appDir=system.file(\"examples/shiny\", package = \"animint\"))\'"
+system(cmd, intern = FALSE, wait = FALSE)
+
+
 test_that("animint plot renders in a shiny app", {
-  # serve the app using a seperate R session so we can execute subsequent commands
-  killservr <- 'pkill -f "shiny::runApp\\(port=6012"'
-  system(killservr)
-  cmd <- "R -e \'shiny::runApp(port=6012, appDir=system.file(\"examples\", \"shiny\", package = \"animint\"))\'"
-  system(cmd, intern = FALSE, wait = FALSE)
   Sys.sleep(5) # give shiny a second to do it's thing
   remDr$navigate("http://localhost:6012/")
-  Sys.sleep(10) # I suppose we need to wait until animint2dir has time to run
+  Sys.sleep(10)
   html <- XML::htmlParse(remDr$getPageSource(), asText = TRUE)
   circles <- getNodeSet(html, "//div[@id='animint']//circle")
   expect_true(length(circles) >= 1)
-  killservr <- 'pkill -f "shiny::runApp\\(port=6012"'
-  system(killservr)
 })
 
+# kill the shiny app
+killservr <- 'pkill -f "shiny::runApp\\(port=6012"'
+system(killservr)
+#just in case, try to kill process that we may have started
+killrmd <- 'pkill -f "rmarkdown::run\\(shiny_args=list\\(port=6014"'
+system(killrmd)
+
+# serve the "app" using a seperate R session so we can execute subsequent commands
+rmd <- "R -e \'rmarkdown::run(shiny_args=list(port=6014), system.file(\"examples/rmarkdown/index.Rmd\", package = \"animint\"))\'"
+system(rmd, intern = FALSE, wait = FALSE)
+
 test_that("animint plot renders in an interactive document", {
-  killrmd <- 'pkill -f "rmarkdown::run\\(shiny_args=list\\(port=6014"'
-  system(killrmd)
-  rmd <- "R -e \'rmarkdown::run(shiny_args=list(port=6014), system.file(\"examples/rmarkdown/index.Rmd\", package = \"animint\"))\'"
-  system(rmd, intern = FALSE, wait = FALSE)
   Sys.sleep(5) # give shiny a second to do it's thing
   remDr$navigate("http://localhost:6014/")
-  Sys.sleep(10) # I suppose we need to wait until animint2dir has time to run
+  Sys.sleep(10)
   html <- XML::htmlParse(remDr$getPageSource(), asText = TRUE)
   circles <- getNodeSet(html, "//svg//circle")
   expect_true(length(circles) >= 1)
-  killrmd <- 'pkill -f "rmarkdown::run\\(shiny_args=list\\(port=6014"'
-  system(killrmd)
 })
+
+killrmd <- 'pkill -f "rmarkdown::run\\(shiny_args=list\\(port=6014"'
+system(killrmd)
+
+# this isn't optimal, but it can't figure out why travisCI has problems with runApp()
+# for error message, see https://travis-ci.org/tdhock/animint/builds/37962781
+# anyway, for now, we can deploy the apps to Carson's shinyapps account
+# if (Sys.getenv("USER") == "cpsievert") {
+#   shinyapps::deployApp(system.file("examples/shiny", package = "animint"), "animintShiny")
+#   shinyapps::deployApp(system.file("examples/rmarkdown", package = "animint"), "animintRmarkdown")
+# }
+# 
+# app_url <- function(app) <- paste0("http://", Sys.getenv("USER"), ".shinyapps.io/", app)
+
+# test_that("animint plot renders in a shiny app", {
+#   remDr$navigate(app_url("animintShiny"))
+#   html <- XML::htmlParse(remDr$getPageSource(), asText = TRUE)
+#   circles <- getNodeSet(html, "//div[@id='animint']//circle")
+#   expect_true(length(circles) >= 1)
+# })
+# test_that("animint plot renders in an interactive document", {
+#   remDr$navigate(app_url("animintRmarkdown"))
+#   html <- XML::htmlParse(remDr$getPageSource(), asText = TRUE)
+#   circles <- getNodeSet(html, "//svg//circle")
+#   expect_true(length(circles) >= 1)
+# })
