@@ -11,14 +11,10 @@ before_install:
   - chmod 755 ./travis-tool.sh
   - ./travis-tool.sh bootstrap
 install:
-  # Basic dependencies for installing/testing animint
+  # Basic dependencies for using animint installing/testing animint
   - ./travis-tool.sh install_deps
-  - ./travis-tool.sh install_github ropensci/RSelenium
-  - ./travis-tool.sh r_binary_install servr
-  - ./travis-tool.sh r_binary_install XML
-  - ./travis-tool.sh install_github ropensci/gistr
   - ./travis-tool.sh install_github tdhock/ggplot2
-  # Dependencies for testing shiny/rmarkdown integration
+  # Dependencies for shiny/rmarkdown integration
   # Thanks RStudio! https://github.com/rstudio/rmarkdown/blob/master/.travis.yml
   # Install binary pandoc from Rstudio 
   - mkdir -p $HOME/opt/pandoc
@@ -28,8 +24,13 @@ install:
   - chmod +x $HOME/opt/pandoc/pandoc*
   - rm pandoc-1.12.3.zip
   - $HOME/opt/pandoc/pandoc --version
+  # Dependencies for running animint tests
+  - ./travis-tool.sh r_binary_install servr
+  - ./travis-tool.sh r_binary_install XML
   - ./travis-tool.sh r_binary_install shiny
-  - ./travis-tool.sh r_binary_install rmarkdown
+  # Binary install of rmarkdown doesn't work (currently?)
+  - ./travis-tool.sh install_github rmarkdown
+  - ./travis-tool.sh install_github ropensci/RSelenium
 
 script: ./travis-tool.sh run_tests
 
