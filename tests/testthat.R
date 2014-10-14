@@ -3,6 +3,7 @@ library(animint)
 library(servr)
 library(RSelenium)
 library(XML)
+library(shiny)
 # source some convenience functions
 source(file.path(getwd(), "testthat", "functions.R"))
 
@@ -10,6 +11,8 @@ source(file.path(getwd(), "testthat", "functions.R"))
 system("ps u")
 
 kill_driver <- function() {
+  # quit the remote driver
+  remDr$quit()
   if(interactive()){
     # close Firefox & stop selenium server
     remDr$closeWindow()

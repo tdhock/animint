@@ -23,6 +23,9 @@ Suggests:
     knitr (>= 1.5.33),
     servr,
     gistr,
+    shiny,
+    rmarkdown,
+    digest,
     testthat,
     RSelenium,
     XML
