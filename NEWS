@@ -169,6 +169,12 @@ You can also incorporate animint plots into interactive documents:
 https://github.com/tdhock/animint/tree/master/inst/examples/rmarkdown
 
 
+2014.10.13
+
+BUGFIX: Main title will no longer overlap with facet titles -- see
+https://github.com/tdhock/animint/issues/26 
+Also, space management between panels was reduced/improved.
+
 2014.10.10
 
 GGPLOT: geom_widerect is now defined in geoms.R and it is rendered by

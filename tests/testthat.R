@@ -14,9 +14,9 @@ kill_driver <- function() {
   # quit the remote driver
   remDr$quit()
   if(interactive()){
-    # kill selenium server
-    killsel <- 'pkill -f selenium-server-standalone'
-    on.exit(system(killsel), add = TRUE)
+    # close Firefox & stop selenium server
+    remDr$closeWindow()
+    remDr$closeServer()
   } else {
     # stop phantomjs
     pJS$stop()
