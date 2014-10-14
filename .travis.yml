@@ -18,7 +18,7 @@ install:
   - ./travis-tool.sh install_github tdhock/ggplot2
   - ./travis-tool.sh r_binary_install XML
   - ./travis-tool.sh r_binary_install shiny
-- ./travis-tool.sh r_binary_install rmarkdown
+  - ./travis-tool.sh r_binary_install rmarkdown
 
 script: ./travis-tool.sh run_tests
 
