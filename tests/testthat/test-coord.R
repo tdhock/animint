@@ -22,14 +22,14 @@ p <- ggplot(mtcars, aes(mpg, wt)) +
   geom_point(aes(colour = cyl))
 
 test_that("coord_fixed with shrinking y-axis", {
-  ratio3 <- 3
-  viz1 <- p + coord_fixed(ratio3)
+  ratio5 <- 5
+  viz1 <- p + coord_fixed(ratio5)
   info <- animint2HTML(list(plot = viz1))
   x.axes <- getNodeSet(info$html, "//g[@id='xaxis']")
   y.axes <- getNodeSet(info$html, "//g[@id='yaxis']")
   xdiff <- getTickDiff(x.axes[[1]])
   ydiff <- getTickDiff(y.axes[[1]], axis = "y")
-  diffs <- normDiffs(xdiff, ydiff, ratio3)
+  diffs <- normDiffs(xdiff, ydiff, ratio5)
   expect_equal(diffs[1], diffs[2], tolerance = 1, scale = 1)
 })
 

@@ -11,8 +11,9 @@ system("ps u")
 
 kill_driver <- function() {
   if(interactive()){
-    # stop selenium server
-    remDr$quit()
+    # close Firefox & stop selenium server
+    remDr$closeWindow()
+    remDr$closeServer()
   } else {
     # stop phantomjs
     pJS$stop()

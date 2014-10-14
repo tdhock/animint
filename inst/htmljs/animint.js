@@ -32,17 +32,15 @@ var animint = function (to_select, json_file) {
             ".axis line{fill: none;stroke: black;shape-rendering: crispEdges;}",
             ".axis text {font-family: sans-serif;font-size: 11px;}"];
 
- 
-  var axispaddingx = 60;
-  var axispaddingy = 60;
-  var labelpaddingx = 35;
-  var labelpaddingy = 35;
-  var titlepadding = 30;
+  // 'margins' are fixed across panels and do not
+  // include title/axis/label padding (since these are not
+  // fixed across panels). They do, however, account for 
+  // spacing between panels
   var margin = {
-    left: labelpaddingy + axispaddingy,
-    right: 0,
-    top: titlepadding,
-    bottom: labelpaddingx + axispaddingx
+    left: 0,
+    right: 10,
+    top: 10,
+    bottom: 0
   };
   var plotdim = {
     width: 0,
@@ -111,13 +109,13 @@ var animint = function (to_select, json_file) {
     var ncols = Math.max.apply(null, p_info.layout.COL);
     var panel_names = p_info.layout.PANEL;
     var npanels = Math.max.apply(null, panel_names);
-    plotdim.width = p_info.options.width / ncols;
-    plotdim.height = p_info.options.height / nrows;
 
     // Draw the title
     titlepadding = measureText(p_info.title, 20).height + 10;
+    // why are we giving the title padding if it is undefined?
+    if (p_info.title === undefined)  titlepadding = 0;
     plotdim.title.x = p_info.options.width / 2;
-    plotdim.title.y = plotdim.margin.top / 2;
+    plotdim.title.y = titlepadding / 2;
     svg.append("text")
       .text(p_info.title)
       .attr("id", "plottitle")
@@ -129,52 +127,50 @@ var animint = function (to_select, json_file) {
       .style("text-anchor", "middle");
 
     // Note axis names are "shared" across panels (just like the title)
-    // TODO: add an option to adjust font size?
-    labelpaddingx = 5 + measureText(p_info["xname"], 11).height;
-    labelpaddingy = 5 + measureText(p_info["yname"], 11).height;
+    xtitlepadding = 5 + measureText(p_info["xname"], 11).height;
+    ytitlepadding = 5 + measureText(p_info["yname"], 11).height;
 
-    // grab max text size over axis labels and panels for each axis
+    // grab max text size over axis labels and facet strip labels
+    var axispaddingy = 5;
     if(p_info.hasOwnProperty("ylabs")){
-      axispaddingy = 5 + Math.max.apply(null, p_info.ylabs.map(function(entry){
-	return measureText(entry, 11).width;
+      axispaddingy += Math.max.apply(null, p_info.ylabs.map(function(entry){
+	     return measureText(entry, 11).width;
       }));
     }
+    var axispaddingx = 5;
     if(p_info.hasOwnProperty("xlabs")){
-      axispaddingx = 5 + Math.max.apply(null, p_info.xlabs.map(function(entry){
-	return measureText(entry, 11).height;
+      axispaddingx += Math.max.apply(null, p_info.xlabs.map(function(entry){
+	     return measureText(entry, 11).height;
       }));
       margin.right = 5 + Math.max.apply(null, p_info.xlabs.map(function(entry){
-	return measureText(entry, 11).width;
+	     return measureText(entry, 11).width;
       })); // to ensure the last x-axis label doesn't get cut off.
     }
-    if(p_info.strips.hasOwnProperty("top")){
-      strippaddingy = 5 + Math.max.apply(null, p_info.strips.top.map(function(entry){
-  return measureText(entry, 11).height;
-      })); 
-    } else {
-      strippaddingy = 0;
-    }
-    if(p_info.strips.hasOwnProperty("right")){
-      strippaddingx = 5 + Math.max.apply(null, p_info.strips.right.map(function(entry){
-  return measureText(entry, 11).height;
-      })); 
-    } else {
-      strippaddingx = 0;
-    }
-    
-    // margins should be fixed across panels
-    margin.top = titlepadding + strippaddingy;
-    margin.bottom = labelpaddingx + axispaddingx;
-    margin.left = labelpaddingy + axispaddingy;
-    margin.right = labelpaddingx;
+    var strip_height =  Math.max.apply(null, p_info.strips.top.map(function(entry){
+      return measureText(entry, 11).height;
+    }))
+    var strip_width =  Math.max.apply(null, p_info.strips.right.map(function(entry){
+      return measureText(entry, 11).height;
+    }))
     plotdim.margin = margin;
+    
+    // track the number of x/y axes to account for when calculating 
+    // height/width of graphing region
+    var n_xaxes = 0;
+    var n_yaxes = 0;
+    for (var layout_i = 0; layout_i < npanels; layout_i++) {
+      if (p_info.layout.COL[layout_i] == 1) n_xaxes += p_info.layout.AXIS_X[layout_i];
+      if (p_info.layout.ROW[layout_i] == 1) n_yaxes += p_info.layout.AXIS_Y[layout_i];
+    }
 
-    // the *entire plot* height/width
-    plotdim.width = p_info.options.width;
-    plotdim.height = p_info.options.height;
     // the *entire graph* height/width
-    var graph_width = plotdim.width - ncols * (margin.left + margin.right);
-    var graph_height = plotdim.height - nrows * (margin.top + margin.bottom);
+    var graph_width = p_info.options.width - ncols * (margin.left + margin.right) -
+                      p_info.strips.n.right * strip_width - 
+                      n_yaxes * axispaddingy - ytitlepadding;
+    var graph_height = p_info.options.height - nrows * (margin.top + margin.bottom) -
+                        titlepadding - (p_info.strips.n.top * strip_height) - 
+                        n_xaxes * axispaddingx - xtitlepadding;
+
     // Impose the pixelated aspect ratio of the graph upon the width/height
     // proportions calculated by the compiler. This has to be done on the 
     // rendering side since the precomputed proportions apply to the *graph* 
@@ -190,13 +186,18 @@ var animint = function (to_select, json_file) {
     var hp = p_info.layout.height_proportion.map(function(x){ 
       return x * Math.min(1, 1/aspect); 
     })
-    // add any change in the width/height proportion to x/y displacement
-    var xdisplace = p_info.layout.xdisplace;
-    var ydisplace = p_info.layout.ydisplace;
+
+    // track the number of x/y axes to account for when calculating 
+    // height/width of graph region
+    var graph_height_blank = 1;
+    var graph_width_blank = 1;
     for (var layout_i = 0; layout_i < npanels; layout_i++) {
-      xdisplace[layout_i] = xdisplace[layout_i] + (p_info.layout.width_proportion[layout_i] - wp[layout_i])/2;
-      ydisplace[layout_i] = ydisplace[layout_i] + (p_info.layout.height_proportion[layout_i] - hp[layout_i])/2;
+      if (p_info.layout.COL[layout_i] == 1) graph_height_blank -= hp[layout_i];
+      if (p_info.layout.ROW[layout_i] == 1) graph_width_blank -= wp[layout_i];
     }
+    // cumulative portion of the graph used (on 0-1 scale)
+    var graph_width_cum = (graph_width_blank / 2) * graph_width;
+    var graph_height_cum = (graph_height_blank / 2) * graph_height;
   
     // Bind plot data to this plot's SVG element
     svg.plot = p_info;
@@ -222,6 +223,8 @@ var animint = function (to_select, json_file) {
     // this will hold x/y scales for each panel
     // eventually we inject this into Plots[p_name]
     var scales = {};
+    n_xaxes = 0;
+    n_yaxes = 0;
     // Draw a plot outline for every panel
     for (var layout_i = 0; layout_i < npanels; layout_i++) {
       var panel_i = layout_i + 1;
@@ -267,30 +270,44 @@ var animint = function (to_select, json_file) {
         }
       }    
       
-      axislabs(axis.x, axis.xlab, "x");
-      axislabs(axis.y, axis.ylab, "y");
-
-      var current_row = p_info.layout.ROW[layout_i]; 
-      var current_col = p_info.layout.COL[layout_i]; 
-
-      // calculate panel specific width/height to be used in placing axes, labels, etc.
-      // note that width/height proportion/displacement applies to the graph (not margins)
-      plotdim.graph.width = wp[layout_i] * graph_width;
-      plotdim.graph.height = hp[layout_i] * graph_height;
-      plotdim.xstart = xdisplace[layout_i] * graph_width + 
-                        current_col * plotdim.margin.left +
-                        (current_col - 1) * plotdim.margin.right;
-      plotdim.xend = plotdim.xstart + plotdim.graph.width;
-      plotdim.ystart = ydisplace[layout_i] * graph_height + 
-                        current_row * plotdim.margin.top +
-                        (current_row - 1) * plotdim.margin.bottom;
-      plotdim.yend = plotdim.ystart + plotdim.graph.height;
-      plotdim.xlab.x = plotdim.xstart + plotdim.graph.width / 2;
-      plotdim.xlab.y = axispaddingx + labelpaddingx / 2;
-      plotdim.ylab.x = axispaddingy + labelpaddingy / 2;
-      plotdim.ylab.y = plotdim.yend - plotdim.graph.height / 2;
-
-    // draw the y-axis title when drawing the first panel
+    axislabs(axis.x, axis.xlab, "x");
+    axislabs(axis.y, axis.ylab, "y");
+    
+    // compute the current panel height/width
+    plotdim.graph.height = graph_height * hp[layout_i];
+    plotdim.graph.width = graph_width * wp[layout_i];
+      
+    var current_row = p_info.layout.ROW[layout_i]; 
+    var current_col = p_info.layout.COL[layout_i];
+    var draw_x = p_info.layout.AXIS_X[layout_i];
+    var draw_y = p_info.layout.AXIS_Y[layout_i];
+    // panels are drawn using a "typewriter approach" (left to right & top to bottom)
+    // if the carriage is returned (ie, there is a new row), change some parameters:
+    var new_row = current_col <= p_info.layout.COL[layout_i - 1]
+    if (new_row) {
+      n_yaxes = 0;
+      graph_width_cum = graph_width_blank;
+      graph_height_cum = graph_height_cum + plotdim.graph.height;
+    } 
+    n_xaxes = n_xaxes + draw_x;
+    n_yaxes = n_yaxes + draw_y;
+    
+    // calculate panel specific locations to be used in placing axes, labels, etc.
+    plotdim.xstart =  current_col * plotdim.margin.left + 
+                      (current_col - 1) * plotdim.margin.right +
+                      graph_width_cum + n_yaxes * axispaddingy + ytitlepadding;
+    // room for right strips should be distributed evenly across panels to preserve aspect ratio
+    plotdim.xend = plotdim.xstart + plotdim.graph.width;
+    plotdim.ystart = current_row * plotdim.margin.top +
+                     (current_row - 1) * plotdim.margin.bottom +
+                     graph_height_cum + titlepadding +
+                     Math.min(p_info.strips.n.top, current_row) * strip_height;
+    // room for xaxis title should be distributed evenly across panels to preserve aspect ratio
+    plotdim.yend = plotdim.ystart + plotdim.graph.height;
+    // always add to the width (note it may have been reset earlier)
+    graph_width_cum = graph_width_cum + plotdim.graph.width;
+      
+    // draw the y-axis title (and add padding) when drawing the first panel
     if (layout_i === 0) {
       svg.append("text")
         .text(p_info["ytitle"])
@@ -298,7 +315,7 @@ var animint = function (to_select, json_file) {
         .attr("id", "ytitle")
         .style("text-anchor", "middle")
         .style("font-size", "11px")
-        .attr("transform", "translate(" + (plotdim.xstart - axispaddingy - labelpaddingy / 2)
+        .attr("transform", "translate(" + (plotdim.xstart - axispaddingy - ytitlepadding / 2)
           + "," + (p_info.options.height / 2) + ")rotate(270)");
     }
     // draw the x-axis title when drawing the last panel
@@ -310,57 +327,37 @@ var animint = function (to_select, json_file) {
         .style("text-anchor", "middle")
         .style("font-size", "11px")
         .attr("transform", "translate(" + plotdim.title.x 
-          + "," + (plotdim.yend + axispaddingx + labelpaddingx / 2) + ")");
-    }
-
-      // idea: use the top/right margins to draw the facet title/strips
-      // problem: how do we guarantee strips are readable for an arbitrary
-      // number of strips?
-      if (npanels > 1) {
-        
-        var stripLabels = {'top': [], 'right': []};
-        var strip_location = {};
-        strip_location.top = {
-	       'x': plotdim.xlab.x, 
-	       'y': (plotdim.ystart - plotdim.margin.top/2)
-        };
-        strip_location.right = {
-	       'x': plotdim.xend, 
-	       'y': plotdim.ylab.y
-        };
-
-        draw_strip = function(side) {
-          var x = strip_location[side].x;
-          var y = strip_location[side].y;
-          var stripLabs = stripLabels[side];
-          //create a group
-          svg.select("#" + side + "Strip")
-            .selectAll("." + side + "Strips")
-            .data(stripLabs)
-            .enter()
-              .append("text")
-              .style("text-anchor", "middle")
-              .text(function(d, i) { return d; })
-              // NOTE: there could be multiple strips per panel
-              // TODO: is there a better way to manage spacing?
-              .attr("transform", function(d) { 
-                if (side == "top") {
-                  return "translate(" + x + "," + y + ")rotate(0)";
-                } else if (side == "right") { 
-                  return "translate(" + x + "," + y + ")rotate(90)";
-                }
-              });
-        }
-
-        if (p_info.strips.hasOwnProperty("top")) {
-          stripLabels.top = [p_info.strips.top[layout_i]];
-          draw_strip("top");
+          + "," + (plotdim.yend + axispaddingx + xtitlepadding / 2) + ")");
+    } 
+      
+    draw_strip = function(strip, side) {
+        if (strip == "") {
+          return(null);
         } 
-        if (p_info.strips.hasOwnProperty("right")) {
-          stripLabels.right = [p_info.strips.right[layout_i]];
-          draw_strip("right");
+        // assume right is top until it isn't
+        var x = (plotdim.xstart + plotdim.xend) / 2;
+        var y = plotdim.ystart - strip_height / 2;
+        var rotate = 0;
+        if (side == "right") {
+          x = plotdim.xend + strip_width / 2;
+          y = (plotdim.ystart + plotdim.yend) / 2;
+          rotate = 90;
         }
-      }
+        //create a group
+        svg.select("#" + side + "Strip")
+          .selectAll("." + side + "Strips")
+          .data(strip)
+          .enter()
+            .append("text")
+            .style("text-anchor", "middle")
+            .style("font-size", "11px")
+            .text(function(d) { return d; })
+            // NOTE: there could be multiple strips per panel
+            // TODO: is there a better way to manage spacing?
+            .attr("transform", "translate(" + x + "," + y + ")rotate(" + rotate + ")");
+        }
+      draw_strip([p_info.strips.top[layout_i]], "top");
+      draw_strip([p_info.strips.right[layout_i]], "right");
       
       // for each of the x and y axes, there is a "real" and fake
       // version. The real version will be used for plotting the
@@ -379,7 +376,7 @@ var animint = function (to_select, json_file) {
       scales[panel_i].y_fake = d3.scale.linear()
         .domain([axis.yrange[1], axis.yrange[0]])
         .range([plotdim.ystart, plotdim.yend]);
-      if(p_info.layout.AXIS_X[layout_i]){
+      if(draw_x){
 	     var xaxis = d3.svg.axis()
           .scale(scales[panel_i].x)
           .tickValues(xaxisvals)
@@ -393,7 +390,7 @@ var animint = function (to_select, json_file) {
           .attr("transform", "translate(0," + plotdim.yend + ")")
           .call(xaxis);
       }
-      if(p_info.layout.AXIS_Y[layout_i]){
+      if(draw_y){
 	     var yaxis = d3.svg.axis()
           .scale(scales[panel_i].y)
           .tickValues(yaxisvals)

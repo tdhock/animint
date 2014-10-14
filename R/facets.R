@@ -20,7 +20,9 @@ getStrips.grid <- function(facet, panel, ...) {
     build_strip(panel, col_vars, facet$labeller, side = "top", ...)
   strips <- list(right = strips.right, top = strips.top)
   # the right/top element should exist if there are non-trivial labels
-  strips[sapply(strips, function(x) !identical(x, strips.empty))]
+  # strips <- strips[sapply(strips, function(x) !identical(x, strips.empty))]
+  strips$n <- list(top = 1, right = 1)
+  strips
 }
 
 build_strip <- function(panel, label_df, labeller, side = "right", ...) {
@@ -45,12 +47,39 @@ getStrips.wrap <- function(facet, panel, ...) {
   labels_df[] <- plyr::llply(labels_df, format, justify = "none")
   # facet_wrap labels always go on top
   # we return a list so p_info.strips is always an object (on the JS side)
-  l <- list(top = apply(labels_df, 1, paste, collapse = ", "))
-  l[!identical(l$top, rep("", nrow(panel$layout)))]
+  strips <- list(top = apply(labels_df, 1, paste, collapse = ", "), right = list(""))
+  # strips <- strips[!identical(strips$top, rep("", nrow(panel$layout)))]
+  strips$n <- list(top = max(panel$layout$ROW), right = 0)
+  strips
 }
 
 getStrips.null <- function(facet, panel, ...) {
-  return(list())
+  list(top = list(""), right = list(""), n = list(top = 0, right = 0))
+}
+
+# Attach AXIS_X/AXIS_Y columns to the panel layout if 
+# facet_grids is used.
+# Currently every axis is rendered,
+# but this could be helpful if we decide not to that.
+flag_axis <- function(facet, layout) 
+  UseMethod("flag_axis")
+
+flag_axis.grid <- function(facet, layout) {
+  # 'grid rules' are to draw y-axis on panels with COL == 1
+  # and ROW == max(ROW).
+  layout$AXIS_Y <- layout$COL == 1
+  layout$AXIS_X <- layout$ROW == max(layout$ROW)
+  layout
+}
+
+flag_axis.wrap <- function(facet, layout) {
+  if (sum(grepl("^AXIS_[X-Y]$", names(layout))) != 2)
+    stop("Expected 'AXIS_X' and 'AXIS_Y' to be in panel layout")
+  layout
+}
+
+flag_axis.null <- function(facet, layout) {
+  cbind(layout, AXIS_X = TRUE, AXIS_Y = TRUE)
 }
 
 # TODO: how to 'train_layout' for non-cartesian coordinates?
@@ -100,7 +129,7 @@ train_layout <- function(facet, coord, layout, ranges) {
       names(layout) <- gsub("SPACE_Y", "height_proportion", names(layout), fixed = TRUE)
     }
   }
-  getDisplacement(layout)
+  layout
 }
 
 # fixed cartesian coordinates (on a 0-1 scale)
@@ -111,54 +140,4 @@ fixed_spaces <- function(ranges, ratio = 1) {
   spaces <- list(y = aspect)
   spaces$x <- 1/spaces$y
   lapply(spaces, function(z) min(z, 1))
-}
-
-# compute x/y coordinates of where to start drawing each panel
-getDisplacement <- function(layout) {
-  npanels <- dim(layout)[1]
-  if (npanels == 1) {
-    xdisplace <- (1 - layout$width_proportion)/2
-    ydisplace <- (1 - layout$height_proportion)/2
-    layout <- cbind(layout, xdisplace, ydisplace)
-  } else {
-    xvars <- c("COL", "width_proportion")
-    x <- unique(layout[xvars])
-    xinit <- (1 - sum(x$width_proportion))/2
-    xprop <- x$width_proportion
-    x$xdisplace <- cumsum(c(xinit, xprop[-length(xprop)]))
-    yvars <- c("ROW", "height_proportion")
-    y <- unique(layout[yvars])
-    yinit <- (1 - sum(y$height_proportion))/2
-    yprop <- y$height_proportion
-    y$ydisplace <- cumsum(c(yinit, yprop[-length(yprop)]))
-    layout <- plyr::join(layout, x, by = xvars)
-    layout <- plyr::join(layout, y, by = yvars)
-  }
-  layout
-}
-
-
-# Attach AXIS_X/AXIS_Y columns to the panel layout if 
-# facet_grids is used.
-# Currently every axis is rendered,
-# but this could be helpful if we decide not to that.
-flag_axis <- function(facet, layout) 
-  UseMethod("flag_axis")
-
-flag_axis.grid <- function(facet, layout) {
-  # 'grid rules' are to draw y-axis on panels with COL == 1
-  # and ROW == max(ROW).
-  layout$AXIS_Y <- layout$COL == 1
-  layout$AXIS_X <- layout$ROW == max(layout$ROW)
-  layout
-}
-
-flag_axis.wrap <- function(facet, layout) {
-  if (sum(grepl("^AXIS_[X-Y]$", names(layout))) != 2)
-    stop("Expected 'AXIS_X' and 'AXIS_Y' to be in panel layout")
-  layout
-}
-
-flag_axis.null <- function(facet, layout) {
-  cbind(layout, AXIS_X = TRUE, AXIS_Y = TRUE)
 }
