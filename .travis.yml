@@ -31,6 +31,7 @@ install:
   # Binary install of rmarkdown doesn't work (currently?)
   - ./travis-tool.sh install_github rstudio/rmarkdown
   - ./travis-tool.sh install_github ropensci/RSelenium
+  - ./travis-tool.sh install_github ropensci/gistr
 
 script: ./travis-tool.sh run_tests
 
