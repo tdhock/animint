@@ -29,7 +29,7 @@ install:
   - ./travis-tool.sh r_binary_install XML
   - ./travis-tool.sh r_binary_install shiny
   # Binary install of rmarkdown doesn't work (currently?)
-  - ./travis-tool.sh install_github rmarkdown
+  - ./travis-tool.sh install_github rstudio/rmarkdown
   - ./travis-tool.sh install_github ropensci/RSelenium
 
 script: ./travis-tool.sh run_tests
