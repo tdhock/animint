@@ -172,6 +172,12 @@ Variable', names(dataset))). However I fear that it may end up not
 being very responsive, since the animint would have to be re-compiled
 by the shiny server after every change to the shiny input.
 
+2014.10.13
+
+BUGFIX: Main title will no longer overlap with facet titles -- see
+https://github.com/tdhock/animint/issues/26 
+Also, space management between panels was reduced/improved.
+
 2014.10.10
 
 GGPLOT: geom_widerect is now defined in geoms.R and it is rendered by
