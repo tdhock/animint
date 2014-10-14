@@ -528,24 +528,28 @@ var animint = function (to_select, json_file) {
       g_info.download_status[tsv_name] = "processing";
       response.forEach(function (d) {
         for (var v_name in g_info.types) {
-          var r_type = g_info.types[v_name];
-          if (r_type == "integer") {
-            d[v_name] = parseInt(d[v_name]);
-          } else if (r_type == "numeric") {
-            d[v_name] = parseFloat(d[v_name]);
-          } else if (r_type == "factor") {
-            //keep it as a character.
-          } else if (r_type == "rgb") {
-            //keep it as a character.                
-          } else if (r_type == "linetype") {
-            //keep it as a character. 
-          } else if (r_type == "label") {
-            //keep it as a character
-          } else if (r_type == "character" & v_name == "outliers") {
-            d[v_name] = parseFloat(d[v_name].split(" @ "));
-          } else {
-            throw "unsupported R type " + r_type;
-          }
+	  // clickSelects and showSelected stay as characters, others
+	  // may be converted.
+	  if(v_name != "clickSelects" && v_name != "showSelected"){
+            var r_type = g_info.types[v_name];
+            if (r_type == "integer") {
+              d[v_name] = parseInt(d[v_name]);
+            } else if (r_type == "numeric") {
+              d[v_name] = parseFloat(d[v_name]);
+            } else if (r_type == "factor") {
+              //keep it as a character.
+            } else if (r_type == "rgb") {
+              //keep it as a character.                
+            } else if (r_type == "linetype") {
+              //keep it as a character. 
+            } else if (r_type == "label") {
+              //keep it as a character
+            } else if (r_type == "character" & v_name == "outliers") {
+              d[v_name] = parseFloat(d[v_name].split(" @ "));
+            } else {
+              throw "unsupported R type " + r_type;
+            }
+	  }
         }
       });
       var nest = d3.nest();

@@ -855,9 +855,27 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
     meta$selectors[[meta$time$variable]]$type <- "single"
     anim.values <- lapply(meta$geoms, "[[", "timeValues")
     anim.not.null <- anim.values[!sapply(anim.values, is.null)]
-    meta$time$sequence <- if(all(sapply(anim.not.null, is.numeric))){
+    time.classes <- sapply(anim.not.null, function(x) class(x)[1])
+    time.class <- time.classes[[1]]
+    if(any(time.class != time.classes)){
+      print(time.classes)
+      stop("time variables must all have the same class")
+    }
+    meta$time$sequence <- if(time.class=="numeric"){
       as.character(sort(unique(unlist(anim.not.null))))
-    }else if(all(sapply(anim.not.null, is.factor))){
+    }else if(time.class=="POSIXct"){
+      orderTime <- function(format){
+        values <- unlist(sapply(anim.not.null, strftime, format))
+        sort(unique(as.character(values)))
+      }
+      hms <- orderTime("%H:%M:%S")
+      f <- if(length(hms) == 1){
+        "%Y-%m-%d"
+      }else{
+        "%Y-%m-%d %H:%M:%S"
+      }
+      orderTime(f)
+    }else if(time.class=="factor"){
       levs <- levels(anim.not.null[[1]])
       if(any(sapply(anim.not.null, function(f)levels(f)!=levs))){
         print(sapply(anim.not.null, levels))
