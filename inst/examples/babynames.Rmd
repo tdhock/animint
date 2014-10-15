@@ -1,0 +1,70 @@
+---
+title: "Babynames"
+author: "Carson Sievert"
+date: "June 18, 2014"
+output: html_document
+runtime: shiny
+---
+
+Grab the state babynames data. Here we examine gender difference for babyname $i$ in state $j$ during year $k$ which is defined as (number of _male_ babys named $i$ - number of _female_ babys named $i$)/number of applicants in year j}
+
+Let $m_{ijk}$ be the number of _male_ babys with name $i$ in state $j$ during year $k$.
+Let $f_{ijk}$ be the number of _female_ babys with name $i$ in state $j$ during year $k$.
+Let $n_{k}$ be the number of "applicants" in year $k$.
+
+Define $d_{ijk} = (m_{ijk} - f_{ijk})/n_{k}$. In english, $d_{ijk}$ is a measure of the gender 
+
+```{r dat}
+#devtools::install_github("cpsievert/babynames")
+```
+
+```{r libs, cache=TRUE}
+library(ggplot2)
+library(animint)
+library(dplyr)
+library(magrittr)
+data(namesbystate, package = "babynames")
+```
+
+```{r map, echo=FALSE}
+inputPanel(
+  namesbystate %>% select(name) %>% unique %>% extract(,1) %>%
+    selectizeInput("babyname", label = "Choose a babyname:", choices = ., selected = "Mary"),
+  
+  namesbystate %>% select(year) %>% unique %>% extract(,1) %>% rev %>%
+    selectizeInput("year", label = "Choose a year:", choices = .)
+)
+
+getDat <- reactive({
+  babyname <- input$babyname
+  year <- input$year
+  namesbystate %>% filter(name == babyname) %>% filter(year == year) %>%
+    arrange(region, year, sex) %>% group_by(region, year) %>% 
+    summarise(diff = if (length(prop) == 2) diff(prop) else prop)
+})
+
+renderPlot({
+  map_data("state") %>% 
+    tbl_df() %>% left_join(getDat()) %>%
+  ggplot() + 
+    geom_polygon(aes(x = long, y = lat, group = group, fill = diff), colour = "grey") +
+    scale_fill_gradient2(midpoint = 0) +
+    ggtitle(paste("Gender difference by state for", input$babyname, "in", input$year))
+})
+```
+
+Throw out that don't occur in *both* genders?
+
+```{r, eval=FALSE}
+ggplot() + 
+  geom_polygon(aes(x = long, y = lat, group = group, fill = diff), colour = "grey") +
+  scale_fill_gradient2(midpoint = 0) +
+  ggtitle(paste("Gender difference by state for", input$babyname, "in", input$year))
+
+
+viz <- list(map = map)
+
+gg2animint(viz)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
