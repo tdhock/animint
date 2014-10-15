@@ -1509,6 +1509,17 @@ var animint = function (to_select, json_file) {
 	  }
 	})
       ;
+      Widgets["time"] = element.append("div")
+	.text("Time between animation frames (milliseconds):")
+	.append("input")
+	.attr("type", "text")
+	.on("change", function(){
+	  Animation.pause();
+	  Animation.ms = this.value;
+	  Animation.play();
+	})
+	.attr("value", Animation.ms)
+      ;
       Animation.play();
     }
   });
