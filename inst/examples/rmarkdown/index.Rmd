@@ -22,6 +22,10 @@ library(animint)
 data(WorldBank, package = "animint")
 ```
 
+```{r clean, echo=FALSE}
+WorldBank$region <- gsub("(all income levels)", "", WorldBank$region, fixed = TRUE)
+```
+
 Now, we construct a time-series and scatterplot using ggplot2's grammar with the addition of animint's `clickSelects` and `showSelected` aesthetics to create an interactive link between the plots.
 
 ```{r plots}
@@ -45,6 +49,12 @@ scatter <- ggplot() +
                  data = not.na) +
        scale_size_animint(breaks = 10^(5:9)) +
        make_text(WorldBank, 5, 85, "year")
+```
+
+```{r sizing, echo=FALSE}
+# just to make sure everything fits in one line
+ts <- ts + theme_animint(width = 360, height = 360)
+scatter <- scatter + theme_animint(width = 360, height = 360)
 ```
 
 In this example, the plot aesthetics are fixed, but we could integrate shiny's reactive components into animint's options such as the animation speed. 
