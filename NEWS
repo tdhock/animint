@@ -1,6 +1,8 @@
 TODOs in approximate order of importance (higher is more important).
 
-ASK JS GUYS: grey after mouseout on ff?
+ASK JS GUYS: grey after mouseout on ff? Talked to JS guys,
+maybe has something to do with mouseenter and mouseleave
+http://bl.ocks.org/mbostock/5247027
 
 DSL: customizable alpha/color/size/fill/linetype for selected geoms,
 using selected.alpha, selected.color, etc aesthetics, see
