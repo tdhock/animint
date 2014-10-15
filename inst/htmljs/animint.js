@@ -1229,8 +1229,10 @@ var animint = function (to_select, json_file) {
     //prevent things from flying around from the upper left when they
     //enter the plot.
     eActions(enter);  //DO NOT DELETE!
-    var milliseconds = Selectors[selector_name].duration;
-    elements = elements.transition().duration(milliseconds);
+    if(Selectors.hasOwnProperty(selector_name)){
+      var milliseconds = Selectors[selector_name].duration;
+      elements = elements.transition().duration(milliseconds);
+    }
     if(g_info.aes.hasOwnProperty("id")){
       elements.attr("id", id_fun);
     }
@@ -1439,6 +1441,79 @@ var animint = function (to_select, json_file) {
     for (var g_name in response.geoms) {
       add_geom(g_name, response.geoms[g_name]);
     }
+    // Animation control widgets.
+    var show_message = "Show animation controls";
+    var show_hide_animation_controls = element.append("button")
+      .text(show_message)
+      .on("click", function(){
+	if(this.textContent == show_message){
+	  time_table.style("display", "");
+	  show_hide_animation_controls.text("Hide animation controls");
+	}else{
+	  time_table.style("display", "none");
+	  show_hide_animation_controls.text(show_message);
+	}
+      })
+    ;
+    var time_table = element.append("table")
+      .style("display", "none")
+    ;
+    var first_tr = time_table.append("tr");
+    var first_th = first_tr.append("th");
+    if(response.time){
+      Widgets["play_pause"] = first_th
+	.append("button")
+	.on("click", function(){
+	  if(this.textContent == "Play"){
+	    play();
+	  }else{
+	    pause();
+	  }
+	})
+      ;
+    }
+    first_tr.append("th").text("milliseconds");
+    if(response.time){
+      var second_tr = time_table.append("tr");
+      second_tr.append("td").text("updates");
+      second_tr.append("td")
+	.append("input")
+	.attr("type", "text")
+	.on("change", function(){
+	  Animation.pause();
+	  Animation.ms = this.value;
+	  Animation.play();
+	})
+	.attr("value", Animation.ms)
+      ;
+    }
+    for(s_name in Selectors){
+      s_info = Selectors[s_name];
+      if(!s_info.hasOwnProperty("duration")){
+	s_info.duration = 0;
+      }
+    }
+    selector_array = d3.keys(Selectors);
+    var duration_rows = time_table.selectAll("tr.duration")
+      .data(selector_array)
+      .enter()
+      .append("tr")
+    ;
+    duration_rows
+      .append("td")
+      .text(function(s_name){return s_name;})
+    ;
+    var duration_tds = duration_rows.append("td");
+    var duration_inputs = duration_tds
+      .append("input")
+      .attr("type", "text")
+      .on("change", function(s_name){
+	Selectors[s_name].duration = this.value;
+      })
+      .attr("value", function(s_name){
+	return Selectors[s_name].duration;
+      })
+    ;
     // If this is an animation, then start downloading all the rest of
     // the data, and start the animation.
     if (response.time) {
@@ -1498,63 +1573,6 @@ var animint = function (to_select, json_file) {
 	}
       }
       document.addEventListener("visibilitychange", onchange);
-
-      var show_message = "Show animation controls";
-      var show_hide_animation_controls = element.append("button")
-	.text(show_message)
-	.on("click", function(){
-	  if(this.textContent == show_message){
-	    time_table.style("display", "");
-	    show_hide_animation_controls.text("Hide animation controls");
-	  }else{
-	    time_table.style("display", "none");
-	    show_hide_animation_controls.text(show_message);
-	  }
-	})
-      ;
-      var time_table = element.append("table")
-	.style("display", "none")
-      ;
-      var first_tr = time_table.append("tr");
-      Widgets["play_pause"] = first_tr.append("th")
-	.append("button")
-	.on("click", function(){
-	  if(this.textContent == "Play"){
-	    play();
-	  }else{
-	    pause();
-	  }
-	})
-      ;
-      first_tr.append("th").text("milliseconds");
-      var second_tr = time_table.append("tr");
-      second_tr.append("td").text("updates");
-      second_tr.append("td")
-	.append("input")
-	.attr("type", "text")
-	.on("change", function(){
-	  Animation.pause();
-	  Animation.ms = this.value;
-	  Animation.play();
-	})
-	.attr("value", Animation.ms)
-      ;
-      for(s_name in Selectors){
-	s_info = Selectors[s_name];
-	if(!s_info.hasOwnProperty("duration")){
-	  s_info.duration = 0;
-	}
-	var duration_tr = time_table.append("tr");
-	duration_tr.append("td").text(s_name);
-	duration_tr.append("td")
-	  .append("input")
-	  .attr("type", "text")
-	  .on("change", function(){
-	    s_info.duration = this.value;
-	  })
-	  .attr("value", s_info.duration)
-	;
-      }	
 
       Animation.play();
     }
