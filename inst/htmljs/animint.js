@@ -1500,7 +1500,25 @@ var animint = function (to_select, json_file) {
       }
       document.addEventListener("visibilitychange", onchange);
 
-      Widgets["play_pause"] = element.append("button")
+      var show_message = "Show animation controls";
+      var show_hide_animation_controls = element.append("button")
+	.text(show_message)
+	.on("click", function(){
+	  if(this.textContent == show_message){
+	    time_table.style("display", "");
+	    show_hide_animation_controls.text("Hide animation controls");
+	  }else{
+	    time_table.style("display", "none");
+	    show_hide_animation_controls.text(show_message);
+	  }
+	})
+      ;
+      var time_table = element.append("table")
+	.style("display", "none")
+      ;
+      var first_tr = time_table.append("tr");
+      Widgets["play_pause"] = first_tr.append("th")
+	.append("button")
 	.on("click", function(){
 	  if(this.textContent == "Play"){
 	    play();
@@ -1509,8 +1527,10 @@ var animint = function (to_select, json_file) {
 	  }
 	})
       ;
-      Widgets["time"] = element.append("div")
-	.text("Time between animation frames (milliseconds):")
+      first_tr.append("th").text("milliseconds");
+      var second_tr = time_table.append("tr");
+      second_tr.append("td").text("updates");
+      second_tr.append("td")
 	.append("input")
 	.attr("type", "text")
 	.on("change", function(){
@@ -1520,6 +1540,7 @@ var animint = function (to_select, json_file) {
 	})
 	.attr("value", Animation.ms)
       ;
+
       Animation.play();
     }
   });
