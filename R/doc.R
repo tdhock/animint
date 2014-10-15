@@ -3,8 +3,9 @@
 ##' @return nothing.
 ##' @author Toby Dylan Hocking
 ##' @export
+##' 
 makeDocs <- function(doc.dir){
-  require(knitr)
+  require("knitr")
   viz.path <- Sys.glob(file.path(doc.dir, "*", "viz.R"))
   sub.dirs <- dirname(viz.path)
   Rmd.tmp.file <- file.path(doc.dir, "template.Rmd")

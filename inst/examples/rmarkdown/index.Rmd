@@ -1,0 +1,91 @@
+---
+title: "Animint meets shiny-based interactive documents"
+author: "Carson Sievert"
+date: "June 23, 2014"
+runtime: shiny
+---
+
+[Animint](https://github.com/tdhock/animint) is an R package for creating web-based interactive graphics and animations using ggplot2’s grammar of graphics approach. Now you can embed animint plots inside [shiny apps](http://shiny.rstudio.com/). In the shiny app below, you can change the x/y/color variables and both plots will update.
+
+```{r embedded}
+library(shiny)
+shinyAppDir(
+  system.file("examples/shiny", package = "animint"),
+  options = list(width = "100%", height = 500)
+)
+```
+
+In addition to [embedding a shiny application inline](http://rmarkdown.rstudio.com/authoring_embedded_shiny.html), we can also `renderAnimint` directly inside of an [interactive document](http://rmarkdown.rstudio.com/authoring_shiny.html). To demonstrate, we use the world bank data [made famous by Hans Rosling](http://www.youtube.com/watch?v=hVimVzgtD6w). 
+
+```{r worldBank, message=FALSE}
+library(animint)
+data(WorldBank, package = "animint")
+```
+
+```{r clean, echo=FALSE}
+WorldBank$region <- gsub("(all income levels)", "", WorldBank$region, fixed = TRUE)
+```
+
+Now, we construct a time-series and scatterplot using ggplot2's grammar with the addition of animint's `clickSelects` and `showSelected` aesthetics to create an interactive link between the plots.
+
+```{r plots}
+ts <- ggplot() +
+      make_tallrect(WorldBank, "year") +
+      # plot the lines *on top of rectangles* so lines are clickable
+      geom_line(aes(year, life.expectancy, group = country, colour = region,
+                     clickSelects = country),
+                 data = WorldBank, size = 4, alpha = 3/5) +
+      guides(color = "none")
+
+not.na <- subset(WorldBank, !(is.na(life.expectancy) | is.na(fertility.rate)))
+scatter <- ggplot() +
+       geom_point(aes(fertility.rate, life.expectancy, clickSelects = country,
+                      showSelected = year, colour = region, size = population,
+                      key = country), # key aesthetic for animated transitions!
+                  data = not.na) +
+       geom_text(aes(fertility.rate, life.expectancy, label = country,
+                     showSelected = country, showSelected2 = year,
+                     key = country), #also use key here!
+                 data = not.na) +
+       scale_size_animint(breaks = 10^(5:9)) +
+       make_text(WorldBank, 5, 85, "year")
+```
+
+```{r sizing, echo=FALSE}
+# just to make sure everything fits in one line
+ts <- ts + theme_animint(width = 360, height = 360)
+scatter <- scatter + theme_animint(width = 360, height = 360)
+```
+
+In this example, the plot aesthetics are fixed, but we could integrate shiny's reactive components into animint's options such as the animation speed. 
+
+```{r reactives}
+getPlotList <- reactive({
+  # think of animint objects as a list of ggplots and specially named options
+  list(time = list(variable = "year", ms = input$time),
+       duration = list(year = input$duration),
+       first = list(year = 1975, country = c("United States", "Vietnam")),
+       selector.types = list(country = "multiple"),
+       # the plots we constructed earlier
+       ts = ts,
+       scatter = scatter)
+})
+
+inputPanel(
+  sliderInput("time", "Display time for each frame (in milliseconds)", 
+              min = 10, max = 10000, value = 3000, step = 10),
+  sliderInput("duration", "Time between frames (in milliseconds)", 
+              min = 10, max = 5000, value = 1000, step = 10)
+)
+
+renderAnimint({
+  getPlotList()
+})
+```
+
+
+
+```{r sessionInfo}
+sessionInfo()
+```
+

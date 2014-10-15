@@ -1,6 +1,11 @@
 TODOs in approximate order of importance (higher is more important).
 
-ASK JS GUYS: grey after mouseout on ff?
+ASK JS GUYS: grey after mouseout on ff? Talked to JS guys, maybe has
+something to do with mouseenter and mouseleave
+http://bl.ocks.org/mbostock/5247027 -------------------------------
+maybe has something to do with setInterval which is not executed in
+chrome when the browser window is inactive
+http://stackoverflow.com/questions/5927284
 
 DSL: customizable alpha/color/size/fill/linetype for selected geoms,
 using selected.alpha, selected.color, etc aesthetics, see
@@ -159,18 +164,18 @@ non-animated plots? I have started some work on the loadall branch,
 but the preliminary answer is NO -- the browser freezes and the plot
 does not respond to mouse clicks while the data is loading.
 
-OUTPUT: animint2shiny(ggList) renders the interactive animation as a shiny
-app, e.g.
-https://github.com/tdhock/interactive-tutorial/tree/master/animation/WorldBank
+2014.10.15
 
-OUTPUT: "shiny widgets" -- I guess it should be possible and useful to
-edit things like the variable plotted on the x/y axis, for example in
-the WorldBank data viz, instead of writing
-geom_point(aes(x=life.expectancy)) we could write
-geom_point(aes_string(x=input$xvar)) with selectInput('xvar', 'X
-Variable', names(dataset))). However I fear that it may end up not
-being very responsive, since the animint would have to be re-compiled
-by the shiny server after every change to the shiny input.
+"shiny bindings" are now possible using the renderAnimint() and 
+animintOutput() convenience functions. See here for simple shiny app:
+https://github.com/tdhock/animint/tree/master/inst/examples/shiny
+
+You can also incorporate animint plots into interactive documents:
+https://github.com/tdhock/animint/tree/master/inst/examples/rmarkdown
+
+You can view a live version of these examples here:
+https://cpsievert.shinyapps.io/animintShiny
+https://cpsievert.shinyapps.io/animintRmarkdown
 
 2014.10.13
 
