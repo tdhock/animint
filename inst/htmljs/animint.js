@@ -1474,20 +1474,42 @@ var animint = function (to_select, json_file) {
       }
       all_geom_names = d3.keys(response.geoms);
 
+      var timer;
+      Animation.timer = timer;
+      function play(){
+	// as shown on http://bl.ocks.org/mbostock/3808234
+	timer = setInterval(animateIfLoaded, Animation.ms);
+	Widgets["play_pause"].text("Pause");
+      }
+      Animation.play = play;
+      function pause(){
+	clearInterval(timer);
+	Widgets["play_pause"].text("Play");
+      }
+      Animation.pause = pause;
+
       // This code starts/stops the animation timer when the page is
       // hidden, inspired by
       // http://stackoverflow.com/questions/1060008
       function onchange (evt) {
 	if(document.visibilityState == "hidden"){
-	  clearInterval(timer);
+	  pause();
 	}else{
-	  timer = setInterval(animateIfLoaded, Animation.ms);
+	  play();
 	}
       }
       document.addEventListener("visibilitychange", onchange);
 
-      // as shown on http://bl.ocks.org/mbostock/3808234
-      var timer = setInterval(animateIfLoaded, Animation.ms);
+      Widgets["play_pause"] = element.append("button")
+	.on("click", function(){
+	  if(this.textContent == "Play"){
+	    play();
+	  }else{
+	    pause();
+	  }
+	})
+      ;
+      Animation.play();
     }
   });
 }
