@@ -528,24 +528,28 @@ var animint = function (to_select, json_file) {
       g_info.download_status[tsv_name] = "processing";
       response.forEach(function (d) {
         for (var v_name in g_info.types) {
-          var r_type = g_info.types[v_name];
-          if (r_type == "integer") {
-            d[v_name] = parseInt(d[v_name]);
-          } else if (r_type == "numeric") {
-            d[v_name] = parseFloat(d[v_name]);
-          } else if (r_type == "factor") {
-            //keep it as a character.
-          } else if (r_type == "rgb") {
-            //keep it as a character.                
-          } else if (r_type == "linetype") {
-            //keep it as a character. 
-          } else if (r_type == "label") {
-            //keep it as a character
-          } else if (r_type == "character" & v_name == "outliers") {
-            d[v_name] = parseFloat(d[v_name].split(" @ "));
-          } else {
-            throw "unsupported R type " + r_type;
-          }
+	  // clickSelects and showSelected stay as characters, others
+	  // may be converted.
+	  if(v_name != "clickSelects" && v_name != "showSelected"){
+            var r_type = g_info.types[v_name];
+            if (r_type == "integer") {
+              d[v_name] = parseInt(d[v_name]);
+            } else if (r_type == "numeric") {
+              d[v_name] = parseFloat(d[v_name]);
+            } else if (r_type == "factor") {
+              //keep it as a character.
+            } else if (r_type == "rgb") {
+              //keep it as a character.                
+            } else if (r_type == "linetype") {
+              //keep it as a character. 
+            } else if (r_type == "label") {
+              //keep it as a character
+            } else if (r_type == "character" & v_name == "outliers") {
+              d[v_name] = parseFloat(d[v_name].split(" @ "));
+            } else {
+              throw "unsupported R type " + r_type;
+            }
+	  }
         }
       });
       var nest = d3.nest();
@@ -1469,8 +1473,21 @@ var animint = function (to_select, json_file) {
         Animation.next[prev] = cur;
       }
       all_geom_names = d3.keys(response.geoms);
+
+      // This code starts/stops the animation timer when the page is
+      // hidden, inspired by
+      // http://stackoverflow.com/questions/1060008
+      function onchange (evt) {
+	if(document.visibilityState == "hidden"){
+	  clearInterval(timer);
+	}else{
+	  timer = setInterval(animateIfLoaded, Animation.ms);
+	}
+      }
+      document.addEventListener("visibilitychange", onchange);
+
       // as shown on http://bl.ocks.org/mbostock/3808234
-      setInterval(animateIfLoaded, Animation.ms);
+      var timer = setInterval(animateIfLoaded, Animation.ms);
     }
   });
 }
