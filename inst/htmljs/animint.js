@@ -523,14 +523,23 @@ var animint = function (to_select, json_file) {
     g_info.download_status[tsv_name] = "downloading";
     //prefix tsv file with appropriate path
     var tsv_file = dirs.concat(tsv_name).join("/"); 
+    function is_interactive_aes(v_name){
+      if(v_name == "clickSelects"){
+	return true;
+      }
+      if(v_name.indexOf("showSelected") > -1){
+	return true;
+      }
+      return false;
+    }
     d3.tsv(tsv_file, function (error, response) {
       // First convert to correct types.
       g_info.download_status[tsv_name] = "processing";
       response.forEach(function (d) {
         for (var v_name in g_info.types) {
-	  // clickSelects and showSelected stay as characters, others
-	  // may be converted.
-	  if(v_name != "clickSelects" && v_name != "showSelected"){
+	  // interactive aesthetics (clickSelects, showSelected, etc)
+	  // stay as characters, others may be converted.
+	  if(!is_interactive_aes(v_name)){
             var r_type = g_info.types[v_name];
             if (r_type == "integer") {
               d[v_name] = parseInt(d[v_name]);
@@ -1461,6 +1470,10 @@ var animint = function (to_select, json_file) {
     var first_tr = time_table.append("tr");
     var first_th = first_tr.append("th");
     if(response.time){
+      Animation.next = {};
+      Animation.ms = response.time.ms;
+      Animation.variable = response.time.variable;
+      Animation.sequence = response.time.sequence;
       Widgets["play_pause"] = first_th
 	.append("button")
 	.on("click", function(){
@@ -1479,12 +1492,12 @@ var animint = function (to_select, json_file) {
       second_tr.append("td")
 	.append("input")
 	.attr("type", "text")
+	.attr("value", Animation.ms)
 	.on("change", function(){
 	  Animation.pause();
 	  Animation.ms = this.value;
 	  Animation.play();
 	})
-	.attr("value", Animation.ms)
       ;
     }
     for(s_name in Selectors){
@@ -1517,10 +1530,6 @@ var animint = function (to_select, json_file) {
     // If this is an animation, then start downloading all the rest of
     // the data, and start the animation.
     if (response.time) {
-      Animation.next = {};
-      Animation.ms = response.time.ms;
-      Animation.variable = response.time.variable;
-      Animation.sequence = response.time.sequence;
       var i, prev, cur;
       Selectors[Animation.variable].update.forEach(function(g_name){
 	var g_info = Geoms[g_name];
