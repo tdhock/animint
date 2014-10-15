@@ -26,10 +26,12 @@ Now, we construct a time-series and scatterplot using ggplot2's grammar with the
 
 ```{r plots}
 ts <- ggplot() +
-       geom_line(aes(year, life.expectancy, group = country, colour = region,
+      make_tallrect(WorldBank, "year") +
+      # plot the lines *on top of rectangles* so lines are clickable
+      geom_line(aes(year, life.expectancy, group = country, colour = region,
                      clickSelects = country),
                  data = WorldBank, size = 4, alpha = 3/5) +
-        make_tallrect(WorldBank, "year")
+      guides(color = "none")
 
 not.na <- subset(WorldBank, !(is.na(life.expectancy) | is.na(fertility.rate)))
 scatter <- ggplot() +
@@ -45,7 +47,7 @@ scatter <- ggplot() +
        make_text(WorldBank, 5, 85, "year")
 ```
 
-In this example, the plot aesthetics are fixed, but we could integrate reactive components into animint's options such as the animation speed. 
+In this example, the plot aesthetics are fixed, but we could integrate shiny's reactive components into animint's options such as the animation speed. 
 
 ```{r reactives}
 getPlotList <- reactive({

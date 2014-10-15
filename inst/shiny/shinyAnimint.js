@@ -5,12 +5,10 @@ animintBinding.find = function(scope) {
 };
 
 animintBinding.renderValue = function(el, data) {
-  // remove the old graph
-  var svg = d3.select(el).select("svg");      
-	svg.remove();
-  // make sure it goes blank
-  $(el).html("");
-  // add a dire
+  // remove the old graph 
+  // http://stackoverflow.com/questions/14422198/how-do-i-remove-all-children-elements-from-a-node-and-them-apply-them-again-with
+  var old_plot = d3.select(el).selectAll("*").remove();
+  // add the new plot
   var json_file = "animintAssets/" + data.jsonFile
   var plot = new animint(el, json_file);
   
