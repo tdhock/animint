@@ -159,7 +159,7 @@ non-animated plots? I have started some work on the loadall branch,
 but the preliminary answer is NO -- the browser freezes and the plot
 does not respond to mouse clicks while the data is loading.
 
-2014.10.10
+2014.10.15
 
 "shiny bindings" are now possible using the renderAnimint() and 
 animintOutput() convenience functions. See here for simple shiny app:
@@ -168,6 +168,9 @@ https://github.com/tdhock/animint/tree/master/inst/examples/shiny
 You can also incorporate animint plots into interactive documents:
 https://github.com/tdhock/animint/tree/master/inst/examples/rmarkdown
 
+You can view a live version of these examples here:
+https://cpsievert.shinyapps.io/animintShiny
+https://cpsievert.shinyapps.io/animintRmarkdown
 
 2014.10.13
 
