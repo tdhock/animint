@@ -1229,9 +1229,8 @@ var animint = function (to_select, json_file) {
     //prevent things from flying around from the upper left when they
     //enter the plot.
     eActions(enter);  //DO NOT DELETE!
-    if(g_info.duration && g_info.duration.selector == selector_name) {
-      elements = elements.transition().duration(g_info.duration.ms);
-    }
+    var milliseconds = Selectors[selector_name].duration;
+    elements = elements.transition().duration(milliseconds);
     if(g_info.aes.hasOwnProperty("id")){
       elements.attr("id", id_fun);
     }
@@ -1540,6 +1539,22 @@ var animint = function (to_select, json_file) {
 	})
 	.attr("value", Animation.ms)
       ;
+      for(s_name in Selectors){
+	s_info = Selectors[s_name];
+	if(!s_info.hasOwnProperty("duration")){
+	  s_info.duration = 0;
+	}
+	var duration_tr = time_table.append("tr");
+	duration_tr.append("td").text(s_name);
+	duration_tr.append("td")
+	  .append("input")
+	  .attr("type", "text")
+	  .on("change", function(){
+	    s_info.duration = this.value;
+	  })
+	  .attr("value", s_info.duration)
+	;
+      }	
 
       Animation.play();
     }

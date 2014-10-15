@@ -817,11 +817,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
   
   ## Go through options and add to the list.
   for(v.name in names(meta$duration)){
-    for(g.name in meta$selectors[[v.name]]$update){
-      meta$geoms[[g.name]]$duration <-
-        list(ms=meta$duration[[v.name]],
-             selector=v.name)
-    }
+    meta$selectors[[v.name]]$duration <- meta$duration[[v.name]]
   }
   ## Set plot sizes.
   for(d in c("width","height")){
