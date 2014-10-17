@@ -543,6 +543,12 @@ saveLayer <- function(l, d, meta){
       }
     }
   }
+  # If there is only one PANEL, we don't need it anymore.
+  g$PANEL <- unique(g.data[["PANEL"]])
+  if (length(g$PANEL) == 1) {
+    g.data <- g.data[names(g.data) != "PANEL"]
+  }
+
   ## Split into chunks and save tsv files.
   meta$classed <- g$classed
   meta$chunk.i <- 1L
@@ -566,12 +572,6 @@ saveLayer <- function(l, d, meta){
   names(g$nest_order) <- NULL
   g$subset_order <- g$nest_order
 
-  # If there is only one PANEL, we don't need it anymore.
-  g$PANEL <- unique(g.data[["PANEL"]])
-  if (length(g$PANEL) == 1) {
-    g.data <- g.data[names(g.data) != "PANEL"]
-  }
-
   ## If this plot has more than one PANEL then add it to subset_order
   ## and nest_order.
   if(nrow(meta$built$panel$layout) > 1){
@@ -588,9 +588,6 @@ saveLayer <- function(l, d, meta){
   if(length(time.col)){ # if this layer/geom is animated,
     g$timeValues <- unique(g.data[[time.col]])
   }
-
-  ## TODO: save the download order... if it is an animation then the
-  ## download order should be in the same order.
 
   ## Finally save to the master geom list.
   meta$geoms[[g$classed]] <- g

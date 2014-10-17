@@ -132,13 +132,13 @@ var animint = function (to_select, json_file) {
 
     // grab max text size over axis labels and facet strip labels
     var axispaddingy = 5;
-    if(p_info.hasOwnProperty("ylabs")){
+    if(p_info.hasOwnProperty("ylabs") && p_info.ylabs.length){
       axispaddingy += Math.max.apply(null, p_info.ylabs.map(function(entry){
 	     return measureText(entry, 11).width;
       }));
     }
     var axispaddingx = 5;
-    if(p_info.hasOwnProperty("xlabs")){
+    if(p_info.hasOwnProperty("xlabs") && p_info.xlabs.length){
       axispaddingx += Math.max.apply(null, p_info.xlabs.map(function(entry){
 	     return measureText(entry, 11).height;
       }));
