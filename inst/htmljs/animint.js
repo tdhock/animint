@@ -553,6 +553,8 @@ var animint = function (to_select, json_file) {
               //keep it as a character. 
             } else if (r_type == "label") {
               //keep it as a character
+            } else if (r_type == "character") {
+              //keep it as a character
             } else if (r_type == "character" & v_name == "outliers") {
               d[v_name] = parseFloat(d[v_name].split(" @ "));
             } else {
