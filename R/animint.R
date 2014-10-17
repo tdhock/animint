@@ -107,7 +107,7 @@ parsePlot <- function(meta){
       plot.meta[[axis]][[s("%slab")]] <- if(is.blank(s("axis.text.%s"))){
         NULL
       } else {
-        range[[s("%s.labels")]]
+        as.list(range[[s("%s.labels")]])
       }
       plot.meta[[axis]][[s("%srange")]] <- range[[s("%s.range")]]
       plot.meta[[axis]][[s("%sline")]] <- !is.blank(s("axis.line.%s"))
@@ -116,8 +116,8 @@ parsePlot <- function(meta){
   }
   # grab the unique axis labels (makes rendering simpler)
   axis.info <- plot.meta[grepl("^axis[0-9]+$", names(plot.meta))]
-  plot.meta$xlabs <- unique(unlist(lapply(axis.info, "[", "xlab")))
-  plot.meta$ylabs <- unique(unlist(lapply(axis.info, "[", "ylab")))
+  plot.meta$xlabs <- as.list(unique(unlist(lapply(axis.info, "[", "xlab"))))
+  plot.meta$ylabs <- as.list(unique(unlist(lapply(axis.info, "[", "ylab"))))
   
   plot.meta$legend <- getLegendList(meta$built)
   if(length(plot.meta$legend)>0){
