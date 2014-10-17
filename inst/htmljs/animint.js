@@ -73,7 +73,8 @@ var animint = function (to_select, json_file) {
     // geom. This is a hack and should be removed when we implement
     // the selected.color, selected.size, etc aesthetics.
     if(g_info.aes.hasOwnProperty("fill") && 
-       g_info.geom == "rect"){
+       g_info.geom == "rect" && 
+       g_info.aes.hasOwnProperty("clickSelects")){
       g_info.select_style = "stroke";
     }else{
       g_info.select_style = "opacity";
@@ -1631,6 +1632,7 @@ var linetypesize2dasharray = function (lt, size) {
   } else { //R defined line types
     var o = {
       "blank": size * 0 + "," + size * 10,
+      "none": size * 0 + "," + size * 10,
       "solid": 0,
       "dashed": size * 4 + "," + size * 4,
       "dotted": size + "," + size * 2,
