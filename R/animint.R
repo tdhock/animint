@@ -854,9 +854,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
       print(time.classes)
       stop("time variables must all have the same class")
     }
-    meta$time$sequence <- if(time.class=="numeric"){
-      as.character(sort(unique(unlist(anim.not.null))))
-    }else if(time.class=="POSIXct"){
+    meta$time$sequence <- if(time.class=="POSIXct"){
       orderTime <- function(format){
         values <- unlist(sapply(anim.not.null, strftime, format))
         sort(unique(as.character(values)))
@@ -875,8 +873,8 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
         stop("all time factors must have same levels")
       }
       levs
-    }else{
-      stop("unsupported class for time variable: ", time.class)
+    }else{ #character, numeric, integer, ... what else?
+      as.character(sort(unique(unlist(anim.not.null))))
     }
     meta$selectors[[time.var]]$selected <- meta$time$sequence[[1]]
   }
