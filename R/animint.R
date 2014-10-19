@@ -876,7 +876,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
       }
       levs
     }else{
-      stop("time variables must be all numeric or all factor")
+      stop("unsupported class for time variable: ", time.class)
     }
     meta$selectors[[time.var]]$selected <- meta$time$sequence[[1]]
   }
