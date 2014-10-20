@@ -116,7 +116,7 @@ test_that("play restarts animation", {
   old.html <- getHTML()
   old.year <- getYear(old.html)
   clickID("play_pause")
-  Sys.sleep(1)
+  Sys.sleep(2)
   new.html <- getHTML()
   new.year <- getYear(new.html)
   expect_true(old.year != new.year)
