@@ -49,7 +49,7 @@ wb.facets <-
        geom_text(aes(5, 85, label=paste0("year = ", year),
                      showSelected=year),
                  data=SCATTER(years)),
-       time=list(variable="year",ms=3000),
+       time=list(variable="year", ms=1000),
        bar=ggplot()+
        theme_animint(height=2400)+
        geom_bar(aes(country, life.expectancy, fill=region,
@@ -83,7 +83,7 @@ getYear <- function(html){
 
 test_that("animation updates", {
   old.year <- getYear(info$html)
-  Sys.sleep(3) #wait for one animation frame.
+  Sys.sleep(1) #wait for one animation frame.
   new.html <- XML::htmlParse(remDr$getPageSource(), asText = TRUE)
   new.year <- getYear(new.html)
   expect_true(old.year != new.year)
@@ -106,7 +106,7 @@ test_that("pause stops animation", {
   clickID("play_pause")
   old.html <- getHTML()
   old.year <- getYear(old.html)
-  Sys.sleep(4)
+  Sys.sleep(1)
   new.html <- getHTML()
   new.year <- getYear(new.html)
   expect_true(old.year == new.year)
@@ -116,9 +116,38 @@ test_that("play restarts animation", {
   old.html <- getHTML()
   old.year <- getYear(old.html)
   clickID("play_pause")
-  Sys.sleep(4)
+  Sys.sleep(1)
   new.html <- getHTML()
   new.year <- getYear(new.html)
   expect_true(old.year != new.year)
+})
+
+e <- remDr$findElement("id", "updates_ms")
+e$clickElement()
+e$clearElement()
+e$sendKeysToElement(list("3000", key="enter"))
+
+test_that("pause stops animation (second time)", {
+  clickID("play_pause")
+  old.html <- getHTML()
+  old.year <- getYear(old.html)
+  Sys.sleep(1)
+  new.html <- getHTML()
+  new.year <- getYear(new.html)
+  expect_true(old.year == new.year)
+})
+
+test_that("play restarts animation (slower)", {
+  old.html <- getHTML()
+  old.year <- getYear(old.html)
+  clickID("play_pause")
+  Sys.sleep(1)
+  new.html <- getHTML()
+  new.year <- getYear(new.html)
+  expect_true(old.year == new.year)
+  Sys.sleep(3)
+  newer.html <- getHTML()
+  newer.year <- getYear(newer.html)
+  expect_true(old.year != newer.year)
 })
 
