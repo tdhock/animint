@@ -1455,6 +1455,7 @@ var animint = function (to_select, json_file) {
     var show_message = "Show animation controls";
     var show_hide_animation_controls = element.append("button")
       .text(show_message)
+      .attr("id", "show_hide_animation_controls")
       .on("click", function(){
 	if(this.textContent == show_message){
 	  time_table.style("display", "");
@@ -1477,6 +1478,7 @@ var animint = function (to_select, json_file) {
       Animation.sequence = response.time.sequence;
       Widgets["play_pause"] = first_th
 	.append("button")
+	.attr("id", "play_pause")
 	.on("click", function(){
 	  if(this.textContent == "Play"){
 	    play();

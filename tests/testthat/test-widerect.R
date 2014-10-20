@@ -62,8 +62,9 @@ wb.facets <-
        selector.types=list(country="multiple"),
        title="World Bank data (multiple selection, facets)")
 
+info <- animint2HTML(wb.facets)
+
 test_that("widerect renders a <rect> for every year", {
-  info <- animint2HTML(wb.facets)
   node.set <-
     getNodeSet(info$html,
                '//g[@class="geom6_widerect_ts"]//g[@class="PANEL1"]//rect')
@@ -73,3 +74,51 @@ test_that("widerect renders a <rect> for every year", {
     expect_true(all(sizes > 0))
   }
 })
+
+getYear <- function(html){
+  node.set <- getNodeSet(html, '//g[@class="geom9_text_ts"]//text')
+  expect_equal(length(node.set), 1)
+  xmlValue(node.set[[1]])
+}
+
+test_that("animation updates", {
+  old.year <- getYear(info$html)
+  Sys.sleep(3) #wait for one animation frame.
+  new.html <- XML::htmlParse(remDr$getPageSource(), asText = TRUE)
+  new.year <- getYear(new.html)
+  expect_true(old.year != new.year)
+})
+
+clickID <- function(...){
+  v <- c(...)
+  stopifnot(length(v) == 1)
+  e <- remDr$findElement("id", as.character(v))
+  e$clickElement()
+}
+
+getHTML <- function(){
+  XML::htmlParse(remDr$getPageSource(), asText = TRUE)
+}
+
+clickID("show_hide_animation_controls")
+
+test_that("pause stops animation", {
+  clickID("play_pause")
+  old.html <- getHTML()
+  old.year <- getYear(old.html)
+  Sys.sleep(4)
+  new.html <- getHTML()
+  new.year <- getYear(new.html)
+  expect_true(old.year == new.year)
+})
+
+test_that("play restarts animation", {
+  old.html <- getHTML()
+  old.year <- getYear(old.html)
+  clickID("play_pause")
+  Sys.sleep(4)
+  new.html <- getHTML()
+  new.year <- getYear(new.html)
+  expect_true(old.year != new.year)
+})
+
