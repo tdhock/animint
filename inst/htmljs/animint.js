@@ -1494,6 +1494,7 @@ var animint = function (to_select, json_file) {
       second_tr.append("td").text("updates");
       second_tr.append("td")
 	.append("input")
+	.attr("id", "updates_ms")
 	.attr("type", "text")
 	.attr("value", Animation.ms)
 	.on("change", function(){
