@@ -112,7 +112,7 @@ var animint = function (to_select, json_file) {
     var npanels = Math.max.apply(null, panel_names);
 
     // Draw the title
-    titlepadding = measureText(p_info.title, 20).height + 10;
+    var titlepadding = measureText(p_info.title, 20).height + 10;
     // why are we giving the title padding if it is undefined?
     if (p_info.title === undefined)  titlepadding = 0;
     plotdim.title.x = p_info.options.width / 2;
@@ -128,8 +128,8 @@ var animint = function (to_select, json_file) {
       .style("text-anchor", "middle");
 
     // Note axis names are "shared" across panels (just like the title)
-    xtitlepadding = 5 + measureText(p_info["xname"], 11).height;
-    ytitlepadding = 5 + measureText(p_info["yname"], 11).height;
+    var xtitlepadding = 5 + measureText(p_info["xname"], 11).height;
+    var ytitlepadding = 5 + measureText(p_info["yname"], 11).height;
 
     // grab max text size over axis labels and facet strip labels
     var axispaddingy = 5;
@@ -331,7 +331,7 @@ var animint = function (to_select, json_file) {
           + "," + (plotdim.yend + axispaddingx + xtitlepadding / 2) + ")");
     } 
       
-    draw_strip = function(strip, side) {
+      var draw_strip = function(strip, side) {
         if (strip == "") {
           return(null);
         } 
@@ -516,9 +516,7 @@ var animint = function (to_select, json_file) {
   // download_chunk is called from update_geom and download_sequence.
   var download_chunk = function(g_info, tsv_name, funAfter){
     if(g_info.download_status.hasOwnProperty(tsv_name)){
-      for (var i = 0; i < 6; i++) {
-        funAfter();
-      }
+      funAfter();
       return; // do not download twice.
     }
     g_info.download_status[tsv_name] = "downloading";
@@ -1504,12 +1502,12 @@ var animint = function (to_select, json_file) {
       ;
     }
     for(s_name in Selectors){
-      s_info = Selectors[s_name];
+      var s_info = Selectors[s_name];
       if(!s_info.hasOwnProperty("duration")){
 	s_info.duration = 0;
       }
     }
-    selector_array = d3.keys(Selectors);
+    var selector_array = d3.keys(Selectors);
     var duration_rows = time_table.selectAll("tr.duration")
       .data(selector_array)
       .enter()

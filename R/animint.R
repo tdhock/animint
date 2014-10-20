@@ -103,7 +103,7 @@ parsePlot <- function(meta){
     for (axis in names(axes)) {
       ctr <- ctr + 1
       range <- ranges[[ctr]]
-      plot.meta[[axis]][[xy]] <- range[[s("%s.major")]]
+      plot.meta[[axis]][[xy]] <- as.list(range[[s("%s.major")]])
       plot.meta[[axis]][[s("%slab")]] <- if(is.blank(s("axis.text.%s"))){
         NULL
       } else {
@@ -544,8 +544,10 @@ saveLayer <- function(l, d, meta){
     }
   }
   # If there is only one PANEL, we don't need it anymore.
+  plot.has.panels <- nrow(meta$built$panel$layout) > 1
   g$PANEL <- unique(g.data[["PANEL"]])
-  if (length(g$PANEL) == 1) {
+  geom.has.one.panel <- length(g$PANEL) == 1
+  if(geom.has.one.panel && (!plot.has.panels)) {
     g.data <- g.data[names(g.data) != "PANEL"]
   }
 
@@ -574,7 +576,7 @@ saveLayer <- function(l, d, meta){
 
   ## If this plot has more than one PANEL then add it to subset_order
   ## and nest_order.
-  if(nrow(meta$built$panel$layout) > 1){
+  if(plot.has.panels){
     g$subset_order <- c(g$subset_order, "PANEL")
     g$nest_order <- c(g$nest_order, "PANEL")
   }

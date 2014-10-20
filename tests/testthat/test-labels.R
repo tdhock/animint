@@ -38,7 +38,7 @@ test_that("scale_x_continuous(breaks)+xlab(name) converts", {
   info <- animint2HTML(viz)  
   
   expect_identical(info$plots$scatter$xtitle, "Petal Length")
-  expect_identical(info$plots$scatter$axis$xlab, c("1.5", "6.5"))
+  expect_identical(as.character(info$plots$scatter$axis$xlab), c("1.5", "6.5"))
   
   xlabel <- getNodeSet(info$html, "//text[@id='xtitle']")
   expect_identical(xmlValue(xlabel[[1]]), "Petal Length")
