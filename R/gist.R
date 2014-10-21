@@ -43,7 +43,9 @@ animint2gist <- function
   #  warning("Make sure 'github.username'", 
   #          "and 'github.password' are",
   #          "set in options(...)")
-  if (!requireNamespace("gistr")) message("Please run `devtools::install_github('rOpenSci/gistr')` before using this function")
+  if(!require("gistr")){
+    error("Please run `devtools::install_github('rOpenSci/gistr')` before using this function")
+  }
   # use a flat file structure!
   vendor.path <- file.path(out.dir, "vendor")
   vendor.files <- list.files(vendor.path)
@@ -75,7 +77,7 @@ animint2gist <- function
   if(interactive() && httr::url_success(url_name)) browseURL(url_name)
   ## Try rendering a screenshot using RSelenium.
   has.cmds <- Sys.which(c("pkill", "git")) != ""
-  has.selenium <- requireNamespace("RSelenium")
+  has.selenium <- require("RSelenium")
   if(has.cmds && has.selenium){
     cloned.dir.base <- paste0("gist-", gist.code)
     cloned.dir <- file.path(tempdir(), cloned.dir.base)
