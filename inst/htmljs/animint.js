@@ -1249,7 +1249,7 @@ var animint = function (to_select, json_file) {
     if(g_info.aes.hasOwnProperty("href")){
       // elements are <a>, children are e.g. <circle>
       var linked_geoms = elements.select(eAppend);
-      linked_geoms.data(elements.data(), key_fun);
+      //d3.select(linked_geoms).data(data, key_fun); // WHY did we need this?
       eActions(linked_geoms);
       linkActions(elements);
     }else{
