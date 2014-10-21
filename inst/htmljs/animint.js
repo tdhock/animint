@@ -1523,6 +1523,9 @@ var animint = function (to_select, json_file) {
     var duration_tds = duration_rows.append("td");
     var duration_inputs = duration_tds
       .append("input")
+      .attr("id", function(s_name){
+	return "duration_ms_" + s_name;
+      })
       .attr("type", "text")
       .on("change", function(s_name){
 	Selectors[s_name].duration = this.value;
