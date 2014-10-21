@@ -103,11 +103,11 @@ parsePlot <- function(meta){
     for (axis in names(axes)) {
       ctr <- ctr + 1
       range <- ranges[[ctr]]
-      plot.meta[[axis]][[xy]] <- range[[s("%s.major")]]
+      plot.meta[[axis]][[xy]] <- as.list(range[[s("%s.major")]])
       plot.meta[[axis]][[s("%slab")]] <- if(is.blank(s("axis.text.%s"))){
         NULL
       } else {
-        range[[s("%s.labels")]]
+        as.list(range[[s("%s.labels")]])
       }
       plot.meta[[axis]][[s("%srange")]] <- range[[s("%s.range")]]
       plot.meta[[axis]][[s("%sline")]] <- !is.blank(s("axis.line.%s"))
@@ -116,8 +116,8 @@ parsePlot <- function(meta){
   }
   # grab the unique axis labels (makes rendering simpler)
   axis.info <- plot.meta[grepl("^axis[0-9]+$", names(plot.meta))]
-  plot.meta$xlabs <- unique(unlist(lapply(axis.info, "[", "xlab")))
-  plot.meta$ylabs <- unique(unlist(lapply(axis.info, "[", "ylab")))
+  plot.meta$xlabs <- as.list(unique(unlist(lapply(axis.info, "[", "xlab"))))
+  plot.meta$ylabs <- as.list(unique(unlist(lapply(axis.info, "[", "ylab"))))
   
   plot.meta$legend <- getLegendList(meta$built)
   if(length(plot.meta$legend)>0){
@@ -543,6 +543,14 @@ saveLayer <- function(l, d, meta){
       }
     }
   }
+  # If there is only one PANEL, we don't need it anymore.
+  plot.has.panels <- nrow(meta$built$panel$layout) > 1
+  g$PANEL <- unique(g.data[["PANEL"]])
+  geom.has.one.panel <- length(g$PANEL) == 1
+  if(geom.has.one.panel && (!plot.has.panels)) {
+    g.data <- g.data[names(g.data) != "PANEL"]
+  }
+
   ## Split into chunks and save tsv files.
   meta$classed <- g$classed
   meta$chunk.i <- 1L
@@ -566,15 +574,9 @@ saveLayer <- function(l, d, meta){
   names(g$nest_order) <- NULL
   g$subset_order <- g$nest_order
 
-  # If there is only one PANEL, we don't need it anymore.
-  g$PANEL <- unique(g.data[["PANEL"]])
-  if (length(g$PANEL) == 1) {
-    g.data <- g.data[names(g.data) != "PANEL"]
-  }
-
   ## If this plot has more than one PANEL then add it to subset_order
   ## and nest_order.
-  if(nrow(meta$built$panel$layout) > 1){
+  if(plot.has.panels){
     g$subset_order <- c(g$subset_order, "PANEL")
     g$nest_order <- c(g$nest_order, "PANEL")
   }
@@ -588,9 +590,6 @@ saveLayer <- function(l, d, meta){
   if(length(time.col)){ # if this layer/geom is animated,
     g$timeValues <- unique(g.data[[time.col]])
   }
-
-  ## TODO: save the download order... if it is an animation then the
-  ## download order should be in the same order.
 
   ## Finally save to the master geom list.
   meta$geoms[[g$classed]] <- g
@@ -817,11 +816,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
   
   ## Go through options and add to the list.
   for(v.name in names(meta$duration)){
-    for(g.name in meta$selectors[[v.name]]$update){
-      meta$geoms[[g.name]]$duration <-
-        list(ms=meta$duration[[v.name]],
-             selector=v.name)
-    }
+    meta$selectors[[v.name]]$duration <- meta$duration[[v.name]]
   }
   ## Set plot sizes.
   for(d in c("width","height")){
@@ -855,17 +850,33 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
     meta$selectors[[meta$time$variable]]$type <- "single"
     anim.values <- lapply(meta$geoms, "[[", "timeValues")
     anim.not.null <- anim.values[!sapply(anim.values, is.null)]
-    meta$time$sequence <- if(all(sapply(anim.not.null, is.numeric))){
-      as.character(sort(unique(unlist(anim.not.null))))
-    }else if(all(sapply(anim.not.null, is.factor))){
+    time.classes <- sapply(anim.not.null, function(x) class(x)[1])
+    time.class <- time.classes[[1]]
+    if(any(time.class != time.classes)){
+      print(time.classes)
+      stop("time variables must all have the same class")
+    }
+    meta$time$sequence <- if(time.class=="POSIXct"){
+      orderTime <- function(format){
+        values <- unlist(sapply(anim.not.null, strftime, format))
+        sort(unique(as.character(values)))
+      }
+      hms <- orderTime("%H:%M:%S")
+      f <- if(length(hms) == 1){
+        "%Y-%m-%d"
+      }else{
+        "%Y-%m-%d %H:%M:%S"
+      }
+      orderTime(f)
+    }else if(time.class=="factor"){
       levs <- levels(anim.not.null[[1]])
       if(any(sapply(anim.not.null, function(f)levels(f)!=levs))){
         print(sapply(anim.not.null, levels))
         stop("all time factors must have same levels")
       }
       levs
-    }else{
-      stop("time variables must be all numeric or all factor")
+    }else{ #character, numeric, integer, ... what else?
+      as.character(sort(unique(unlist(anim.not.null))))
     }
     meta$selectors[[time.var]]$selected <- meta$time$sequence[[1]]
   }

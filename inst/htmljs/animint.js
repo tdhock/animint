@@ -73,7 +73,8 @@ var animint = function (to_select, json_file) {
     // geom. This is a hack and should be removed when we implement
     // the selected.color, selected.size, etc aesthetics.
     if(g_info.aes.hasOwnProperty("fill") && 
-       g_info.geom == "rect"){
+       g_info.geom == "rect" && 
+       g_info.aes.hasOwnProperty("clickSelects")){
       g_info.select_style = "stroke";
     }else{
       g_info.select_style = "opacity";
@@ -111,7 +112,7 @@ var animint = function (to_select, json_file) {
     var npanels = Math.max.apply(null, panel_names);
 
     // Draw the title
-    titlepadding = measureText(p_info.title, 20).height + 10;
+    var titlepadding = measureText(p_info.title, 20).height + 10;
     // why are we giving the title padding if it is undefined?
     if (p_info.title === undefined)  titlepadding = 0;
     plotdim.title.x = p_info.options.width / 2;
@@ -127,18 +128,18 @@ var animint = function (to_select, json_file) {
       .style("text-anchor", "middle");
 
     // Note axis names are "shared" across panels (just like the title)
-    xtitlepadding = 5 + measureText(p_info["xname"], 11).height;
-    ytitlepadding = 5 + measureText(p_info["yname"], 11).height;
+    var xtitlepadding = 5 + measureText(p_info["xname"], 11).height;
+    var ytitlepadding = 5 + measureText(p_info["yname"], 11).height;
 
     // grab max text size over axis labels and facet strip labels
     var axispaddingy = 5;
-    if(p_info.hasOwnProperty("ylabs")){
+    if(p_info.hasOwnProperty("ylabs") && p_info.ylabs.length){
       axispaddingy += Math.max.apply(null, p_info.ylabs.map(function(entry){
 	     return measureText(entry, 11).width;
       }));
     }
     var axispaddingx = 5;
-    if(p_info.hasOwnProperty("xlabs")){
+    if(p_info.hasOwnProperty("xlabs") && p_info.xlabs.length){
       axispaddingx += Math.max.apply(null, p_info.xlabs.map(function(entry){
 	     return measureText(entry, 11).height;
       }));
@@ -330,7 +331,7 @@ var animint = function (to_select, json_file) {
           + "," + (plotdim.yend + axispaddingx + xtitlepadding / 2) + ")");
     } 
       
-    draw_strip = function(strip, side) {
+      var draw_strip = function(strip, side) {
         if (strip == "") {
           return(null);
         } 
@@ -515,22 +516,29 @@ var animint = function (to_select, json_file) {
   // download_chunk is called from update_geom and download_sequence.
   var download_chunk = function(g_info, tsv_name, funAfter){
     if(g_info.download_status.hasOwnProperty(tsv_name)){
-      for (var i = 0; i < 6; i++) {
-        funAfter();
-      }
+      funAfter();
       return; // do not download twice.
     }
     g_info.download_status[tsv_name] = "downloading";
     //prefix tsv file with appropriate path
     var tsv_file = dirs.concat(tsv_name).join("/"); 
+    function is_interactive_aes(v_name){
+      if(v_name == "clickSelects"){
+	return true;
+      }
+      if(v_name.indexOf("showSelected") > -1){
+	return true;
+      }
+      return false;
+    }
     d3.tsv(tsv_file, function (error, response) {
       // First convert to correct types.
       g_info.download_status[tsv_name] = "processing";
       response.forEach(function (d) {
         for (var v_name in g_info.types) {
-	  // clickSelects and showSelected stay as characters, others
-	  // may be converted.
-	  if(v_name != "clickSelects" && v_name != "showSelected"){
+	  // interactive aesthetics (clickSelects, showSelected, etc)
+	  // stay as characters, others may be converted.
+	  if(!is_interactive_aes(v_name)){
             var r_type = g_info.types[v_name];
             if (r_type == "integer") {
               d[v_name] = parseInt(d[v_name]);
@@ -543,6 +551,8 @@ var animint = function (to_select, json_file) {
             } else if (r_type == "linetype") {
               //keep it as a character. 
             } else if (r_type == "label") {
+              //keep it as a character
+            } else if (r_type == "character") {
               //keep it as a character
             } else if (r_type == "character" & v_name == "outliers") {
               d[v_name] = parseFloat(d[v_name].split(" @ "));
@@ -1229,8 +1239,9 @@ var animint = function (to_select, json_file) {
     //prevent things from flying around from the upper left when they
     //enter the plot.
     eActions(enter);  //DO NOT DELETE!
-    if(g_info.duration && g_info.duration.selector == selector_name) {
-      elements = elements.transition().duration(g_info.duration.ms);
+    if(Selectors.hasOwnProperty(selector_name)){
+      var milliseconds = Selectors[selector_name].duration;
+      elements = elements.transition().duration(milliseconds);
     }
     if(g_info.aes.hasOwnProperty("id")){
       elements.attr("id", id_fun);
@@ -1440,13 +1451,92 @@ var animint = function (to_select, json_file) {
     for (var g_name in response.geoms) {
       add_geom(g_name, response.geoms[g_name]);
     }
-    // If this is an animation, then start downloading all the rest of
-    // the data, and start the animation.
-    if (response.time) {
+    // Animation control widgets.
+    var show_message = "Show animation controls";
+    var show_hide_animation_controls = element.append("button")
+      .text(show_message)
+      .attr("id", "show_hide_animation_controls")
+      .on("click", function(){
+	if(this.textContent == show_message){
+	  time_table.style("display", "");
+	  show_hide_animation_controls.text("Hide animation controls");
+	}else{
+	  time_table.style("display", "none");
+	  show_hide_animation_controls.text(show_message);
+	}
+      })
+    ;
+    var time_table = element.append("table")
+      .style("display", "none")
+    ;
+    var first_tr = time_table.append("tr");
+    var first_th = first_tr.append("th");
+    if(response.time){
       Animation.next = {};
       Animation.ms = response.time.ms;
       Animation.variable = response.time.variable;
       Animation.sequence = response.time.sequence;
+      Widgets["play_pause"] = first_th
+	.append("button")
+	.attr("id", "play_pause")
+	.on("click", function(){
+	  if(this.textContent == "Play"){
+	    play();
+	  }else{
+	    pause();
+	  }
+	})
+      ;
+    }
+    first_tr.append("th").text("milliseconds");
+    if(response.time){
+      var second_tr = time_table.append("tr");
+      second_tr.append("td").text("updates");
+      second_tr.append("td")
+	.append("input")
+	.attr("id", "updates_ms")
+	.attr("type", "text")
+	.attr("value", Animation.ms)
+	.on("change", function(){
+	  Animation.pause();
+	  Animation.ms = this.value;
+	  Animation.play();
+	})
+      ;
+    }
+    for(s_name in Selectors){
+      var s_info = Selectors[s_name];
+      if(!s_info.hasOwnProperty("duration")){
+	s_info.duration = 0;
+      }
+    }
+    var selector_array = d3.keys(Selectors);
+    var duration_rows = time_table.selectAll("tr.duration")
+      .data(selector_array)
+      .enter()
+      .append("tr")
+    ;
+    duration_rows
+      .append("td")
+      .text(function(s_name){return s_name;})
+    ;
+    var duration_tds = duration_rows.append("td");
+    var duration_inputs = duration_tds
+      .append("input")
+      .attr("id", function(s_name){
+	return "duration_ms_" + s_name;
+      })
+      .attr("type", "text")
+      .on("change", function(s_name){
+	Selectors[s_name].duration = this.value;
+      })
+      .attr("value", function(s_name){
+	return Selectors[s_name].duration;
+      })
+    ;
+    // If this is an animation, then start downloading all the rest of
+    // the data, and start the animation.
+    if (response.time) {
       var i, prev, cur;
       Selectors[Animation.variable].update.forEach(function(g_name){
 	var g_info = Geoms[g_name];
@@ -1500,15 +1590,6 @@ var animint = function (to_select, json_file) {
       }
       document.addEventListener("visibilitychange", onchange);
 
-      Widgets["play_pause"] = element.append("button")
-	.on("click", function(){
-	  if(this.textContent == "Play"){
-	    play();
-	  }else{
-	    pause();
-	  }
-	})
-      ;
       Animation.play();
     }
   });
@@ -1555,6 +1636,7 @@ var linetypesize2dasharray = function (lt, size) {
   } else { //R defined line types
     var o = {
       "blank": size * 0 + "," + size * 10,
+      "none": size * 0 + "," + size * 10,
       "solid": 0,
       "dashed": size * 4 + "," + size * 4,
       "dotted": size + "," + size * 2,
