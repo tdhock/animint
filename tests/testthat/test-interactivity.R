@@ -69,6 +69,7 @@ clickHTML <- function(...){
   stopifnot(length(v) == 1)
   e <- remDr$findElement(names(v), as.character(v))
   e$clickElement()
+  Sys.sleep(1)
   XML::htmlParse(remDr$getPageSource(), asText = TRUE)
 }  
 
