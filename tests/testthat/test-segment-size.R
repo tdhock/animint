@@ -12,7 +12,7 @@ test_that("segment size translates to stroke-width", {
                            data=df, size=1))
   info <- animint2HTML(viz)
   ## Need the ^$ so that we do not match e.g. 210.
-  expect_styles(info, list("stroke-width"="^1[a-z]*$"))
+  expect_styles(info$html, list("stroke-width"="^1[a-z]*$"))
 })
               
 test_that("segment size range translates to stroke-width", {
@@ -21,5 +21,5 @@ test_that("segment size range translates to stroke-width", {
                            data=df)+
               scale_size_identity())
   info <- animint2HTML(viz)
-  expect_styles(info, list("stroke-width"=c("^5[a-z]*$", "^10[a-z]*$")))
+  expect_styles(info$html, list("stroke-width"=c("^5[a-z]*$", "^10[a-z]*$")))
 })
