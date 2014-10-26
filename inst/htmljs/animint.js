@@ -188,15 +188,15 @@ var animint = function (to_select, json_file) {
       return x * Math.min(1, 1/aspect); 
     })
 
-    // track the number of x/y axes to account for when calculating 
-    // height/width of graph region
+    // track the proportion of the graph that should be 'blank' 
+    // this is mainly used to implement coord_fixed()
     var graph_height_blank = 1;
     var graph_width_blank = 1;
     for (var layout_i = 0; layout_i < npanels; layout_i++) {
       if (p_info.layout.COL[layout_i] == 1) graph_height_blank -= hp[layout_i];
       if (p_info.layout.ROW[layout_i] == 1) graph_width_blank -= wp[layout_i];
     }
-    // cumulative portion of the graph used (on 0-1 scale)
+    // cumulative portion of the graph used 
     var graph_width_cum = (graph_width_blank / 2) * graph_width;
     var graph_height_cum = (graph_height_blank / 2) * graph_height;
   
@@ -287,7 +287,7 @@ var animint = function (to_select, json_file) {
     var new_row = current_col <= p_info.layout.COL[layout_i - 1]
     if (new_row) {
       n_yaxes = 0;
-      graph_width_cum = graph_width_blank;
+      graph_width_cum = (graph_width_blank / 2) * graph_width;
       graph_height_cum = graph_height_cum + plotdim.graph.height;
     } 
     n_xaxes = n_xaxes + draw_x;
