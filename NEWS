@@ -163,6 +163,11 @@ non-animated plots? I have started some work on the loadall branch,
 but the preliminary answer is NO -- the browser freezes and the plot
 does not respond to mouse clicks while the data is loading.
 
+2014.10.26
+
+BUGFIX: When using facet_grid() + coord_equal() with multiple rows,
+the rows after the first row were not placed properly.
+
 2014.10.21
 
 User can play/pause the animation, and adjust animation time and
