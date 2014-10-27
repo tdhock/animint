@@ -39,15 +39,15 @@ expect_transform <- function(actual, expected, context = "translate", tolerance 
   expect_equal(nums, expected, tolerance, scale = 1)
 }
 
-expect_links <- function(info, urls){
-  expect_attrs(info, "a", "href", urls)
+expect_links <- function(html, urls){
+  expect_attrs(html, "a", "href", urls)
 }
 
-expect_attrs <- function(info, element.name, attr.name, urls){
+expect_attrs <- function(html, element.name, attr.name, urls){
   stopifnot(is.character(urls))
   xpath <- paste0("//", element.name)
   pattern <- paste0(attr.name, "$")
-  node.set <- getNodeSet(info$html, xpath)
+  node.set <- getNodeSet(html, xpath)
   rendered.urls <- rep(NA, length(node.set))
   for(node.i in seq_along(node.set)){
     node <- node.set[[node.i]]
@@ -62,10 +62,10 @@ expect_attrs <- function(info, element.name, attr.name, urls){
   }
 }
 
-expect_styles <- function(info, styles.expected){
+expect_styles <- function(html, styles.expected){
   stopifnot(is.list(styles.expected))
   stopifnot(!is.null(names(styles.expected)))
-  geom <- getNodeSet(info$html, '//*[@class="geom"]')
+  geom <- getNodeSet(html, '//*[@class="geom"]')
   style.strs <- as.character(sapply(geom, function(x) xmlAttrs(x)["style"]))
   pattern <-
     paste0("(?<name>\\S+?)",

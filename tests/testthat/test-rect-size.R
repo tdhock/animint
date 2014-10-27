@@ -13,7 +13,7 @@ test_that("rect size translates to stroke-width", {
            geom_rect(data = df, size = 5, color = "violet",
                      aes(xmin = xmin, ymin = ymin, xmax = xmax, ymax = ymax)))
   info <- animint2HTML(viz)
-  expect_styles(info, list("stroke-width"="^5[a-z]*$"))
+  expect_styles(info$html, list("stroke-width"="^5[a-z]*$"))
 })
 
 test_that("zero rect size translates to stroke-width", {
@@ -23,7 +23,7 @@ test_that("zero rect size translates to stroke-width", {
                           aes(xmin = xmin, ymin = ymin,
                               xmax = xmax, ymax = ymax)))
   info <- animint2HTML(viz)
-  expect_styles(info, list("stroke-width"="^0.01[a-z]*$")) 
+  expect_styles(info$html, list("stroke-width"="^0.01[a-z]*$")) 
 })
 
 test_that("rect size range translates to stroke-width", {
@@ -32,5 +32,5 @@ test_that("rect size range translates to stroke-width", {
                                               xmax = xmax, ymax = ymax, size = size)) +
                 scale_size_identity())
   info <- suppressWarnings(animint2HTML(viz))
-  expect_styles(info, list("stroke-width"=c("^0.01[a-z]*$", "^5[a-z]*$")))
+  expect_styles(info$html, list("stroke-width"=c("^0.01[a-z]*$", "^5[a-z]*$")))
 })

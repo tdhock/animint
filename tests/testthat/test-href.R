@@ -25,6 +25,7 @@ test_that("aes(href) becomes <a href>", {
   viz <-
     list(universities=ggplot()+
          geom_bar(aes(university, colors,
+                      id=university,
                       clickSelects=university),
                   data=university.df, stat="identity"),
          colors=ggplot()+
@@ -35,10 +36,30 @@ test_that("aes(href) becomes <a href>", {
          scale_color_identity(),
          first=list(university="UC Berkeley"))
   info <- animint2HTML(viz)
-  expect_links(info,
+  expect_links(info$html,
                c("http://en.wikipedia.org/wiki/blue",
                  "http://en.wikipedia.org/wiki/gold"))
 })
 
-## TODO: can we test clicking on the bars to see if they update the
-## circles?
+clickID <- function(...){
+  v <- c(...)
+  stopifnot(length(v) == 1)
+  e <- remDr$findElement("id", as.character(v))
+  e$clickElement()
+  Sys.sleep(1)
+  XML::htmlParse(remDr$getPageSource(), asText = TRUE)
+}
+
+stanford.html <- clickID("Stanford")
+
+test_that("clicking updates href", {
+  expect_links(stanford.html, "http://en.wikipedia.org/wiki/red")
+})
+
+osu.html <- clickID("Oregon State")
+
+test_that("clicking updates href (again)", {
+  expect_links(osu.html,
+               c("http://en.wikipedia.org/wiki/orange",
+                 "http://en.wikipedia.org/wiki/black"))
+})
