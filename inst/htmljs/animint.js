@@ -1140,7 +1140,8 @@ var animint = function (to_select, json_file) {
 	.attr("class", "geom")
       ;
     }
-    if (g_info.aes.hasOwnProperty("clickSelects")) {
+    var has_clickSelects = g_info.aes.hasOwnProperty("clickSelects");
+    if (has_clickSelects) {
       var selected_funs = {
 	"opacity":{
 	  "mouseout":function (d) {
@@ -1216,12 +1217,7 @@ var animint = function (to_select, json_file) {
           var v_name = g_info.aes.clickSelects;
           update_selector(v_name, d.clickSelects);
         })
-        .text("")
-        .append("svg:title")
-        .text(function (d) {
-          var v_name = g_info.aes.clickSelects;
-          return v_name + " " + d.clickSelects;
-        });
+      ;
     } else { //no clickSelects for this geom.
       // Assign opacity. treat lines and ribbons (groups of points)
       // specially.
@@ -1234,6 +1230,21 @@ var animint = function (to_select, json_file) {
       } else {
         enter.style("opacity", get_alpha);
       }
+    }
+    var has_tooltip = g_info.aes.hasOwnProperty("tooltip");
+    if(has_clickSelects || has_tooltip){
+      elements
+        .text("")
+        .append("svg:title")
+        .text(function (d) {
+	  if(has_tooltip){
+	    return d.tooltip;
+	  }else{
+            var v_name = g_info.aes.clickSelects;
+            return v_name + " " + d.clickSelects;
+	  }
+        })
+      ;
     }
     //Set attributes of only the entering elements. This is needed to
     //prevent things from flying around from the upper left when they
