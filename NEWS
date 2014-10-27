@@ -7,6 +7,12 @@ maybe has something to do with setInterval which is not executed in
 chrome when the browser window is inactive
 http://stackoverflow.com/questions/5927284
 
+When testing code on travis, record how much time, disk space, memory
+for compilation and rendering steps, and write those values to a CSV
+file. Then make a time series plot of these data to see if the code is
+getting more or less efficient.
+http://sleepycoders.blogspot.ca/2013/03/sharing-travis-ci-generated-files.html
+
 DSL: customizable alpha/color/size/fill/linetype for selected geoms,
 using selected.alpha, selected.color, etc aesthetics, see
 examples/Climate-selected.R. The first implementation should only
