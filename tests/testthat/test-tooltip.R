@@ -22,6 +22,10 @@ viz <-
                      showSelected=year,
                      tooltip=paste(countries, "not NA in", year)),
                  data=years, color="yellow")+
+       geom_rect(aes(xmin=35, xmax=40,
+                     ymin=2, ymax=2.5,
+                     showSelected=year),
+                 data=years, color="orange")+
        geom_text(aes(55, 9, label=paste("year =", year),
                      showSelected=year),
                  data=years),
@@ -31,7 +35,7 @@ viz <-
        geom_line(aes(year, life.expectancy, group=country, colour=region,
                      clickSelects=country),
                  data=WorldBank, size=4, alpha=3/5),
-       time=list(variable="year",ms=3000),
+
        bar=ggplot()+
        theme_animint(height=2400)+
        geom_bar(aes(country, life.expectancy, fill=region,
@@ -56,22 +60,25 @@ test_that("aes(tooltip, clickSelects) means show tooltip", {
 
 test_that("aes(clickSelects) means show 'variable value'", {
   nodes <-
-    getNodeSet(info$html, '//g[@class="geom5_line_ts"]//path//title')
+    getNodeSet(info$html, '//g[@class="geom7_line_ts"]//path//title')
   tooltips <- sapply(nodes, xmlValue)
   expect_match(tooltips, "country")
 })
 
 test_that("aes(tooltip) means show tooltip", {
   nodes <-
-    getNodeSet(info$html, '//g[@class="geom5_line_ts"]//path//title')
+    getNodeSet(info$html, '//g[@class="geom3_rect_scatter"]//rect//title')
   tooltips <- sapply(nodes, xmlValue)
-  expect_match(tooltips, "country")
+  expect_match(tooltips, "not NA")
 })
 
 test_that("aes() means show no tooltip", {
-  nodes <-
-    getNodeSet(info$html, '//g[@class="geom5_line_ts"]//path//title')
-  tooltips <- sapply(nodes, xmlValue)
-  expect_match(tooltips, "country")
+  rect.xpath <- '//g[@class="geom4_rect_scatter"]//rect'
+  rect.nodes <- getNodeSet(info$html, rect.xpath)
+  expect_equal(length(rect.nodes), 1)
+  
+  title.xpath <- paste0(rect.xpath, '//title')
+  title.nodes <- getNodeSet(info$html, title.xpath)
+  expect_equal(length(title.nodes), 0)
 })
 
