@@ -10,7 +10,7 @@ viz <- list(scatter=ggplot()+
 
 test_that("text size range translates to <text font-size>", {
   info <- animint2HTML(viz)
-  expect_attrs(info, 'text[@class="geom"]', "font-size", c("10", "20"))
+  expect_attrs(info$html, 'text[@class="geom"]', "font-size", c("10", "20"))
 })
               
 test_that("text may contain commas and parentheses", {

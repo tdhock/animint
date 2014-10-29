@@ -45,6 +45,7 @@ good <-
   list(scatter=ggplot()+
        geom_point(aes(life.expectancy, fertility.rate, clickSelects=country,
                       showSelected=year, colour=region, size=population,
+                      tooltip=paste(country, "population", population),
                       key=country), # key aesthetic for animated transitions!
                   data=not.na)+
        geom_text(aes(life.expectancy, fertility.rate, label=country,
@@ -148,7 +149,7 @@ wb.facets <-
                      showSelected=country,
                      clickSelects=country),
                   data=TS(min.years), hjust=1)+
-       
+
        geom_widerect(aes(ymin=year-1/2, ymax=year+1/2,
                          clickSelects=year),
                      data=TS2(years), alpha=1/2)+
@@ -158,7 +159,7 @@ wb.facets <-
        geom_point(aes(fertility.rate, year, color=region, size=population,
                       showSelected=country, clickSelects=country),
                   data=TS2(not.na))+
-       
+
        geom_point(aes(fertility.rate, life.expectancy, clickSelects=country,
                       showSelected=year, colour=region, size=population,
                       key=country), # key aesthetic for animated transitions!

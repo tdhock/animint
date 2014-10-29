@@ -39,11 +39,9 @@ animint2gist <- function
   if(length(description) == 0)description <- ""
   if(length(description) > 1)description <- description[[1]]
   animint2dir(plot.list, out.dir, json.file, open.browser = FALSE)
-  #if (is.null(getOption("github.username")) || is.null(getOption("github.password"))) 
-  #  warning("Make sure 'github.username'", 
-  #          "and 'github.password' are",
-  #          "set in options(...)")
-  if (!requireNamespace("gistr")) message("Please run `devtools::install_github('rOpenSci/gistr')` before using this function")
+  if(!requireNamespace("gistr")){
+    error("Please run `devtools::install_github('rOpenSci/gistr')` before using this function")
+  }
   # use a flat file structure!
   vendor.path <- file.path(out.dir, "vendor")
   vendor.files <- list.files(vendor.path)
@@ -66,7 +64,7 @@ animint2gist <- function
   ## TODO: delete the next line when gist_create can upload PNGs.
   is.ignored <- is.ignored | is.png 
   to.post <- all.files[!is.ignored]
-  gist <- gist_create(to.post,
+  gist <- gistr::gist_create(to.post,
                       description=description,
                       ...)
   elem <- strsplit(gist, split = "/")[[1]]
@@ -83,9 +81,9 @@ animint2gist <- function
                          gist.code, cloned.dir)
     system('pkill -f selenium-server-standalone') #kill the selenium server if it is currently running
     system(clone.cmd)
-    startServer()
+    RSelenium::startServer()
     Sys.sleep(2) # otherwise I get Error in function (type, msg, asError = TRUE)  : couldn't connect to host
-    dr <- remoteDriver$new(browserName = "firefox", port = 4444)
+    dr <- RSelenium::remoteDriver$new(browserName = "firefox", port = 4444)
     dr$open()
     if (isTRUE(dr$value$takesScreenshot)){
       dr$navigate(url_name)
