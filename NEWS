@@ -131,9 +131,6 @@ methods should we use to define hoverSelects interactivity?
 
 GGPLOT: theme(legend.position)
 
-DSL: aes(tooltip=text) for specifying the text to show when you hover
-the mouse over something, e.g. issue #1.
-
 DSL: option list(layout=matrix of plot names) means render plots in an
 html table instead of in a line.
 
@@ -168,6 +165,11 @@ RENDER: Should we download all data in the background, even for
 non-animated plots? I have started some work on the loadall branch,
 but the preliminary answer is NO -- the browser freezes and the plot
 does not respond to mouse clicks while the data is loading.
+
+2014.10.29
+
+DSL: aes(tooltip=text) for specifying the text to show when you hover
+the mouse over something, e.g. issue #1.
 
 2014.10.26
 
