@@ -166,6 +166,10 @@ non-animated plots? I have started some work on the loadall branch,
 but the preliminary answer is NO -- the browser freezes and the plot
 does not respond to mouse clicks while the data is loading.
 
+2014.11.11
+
+BUGFIX: Account for facet strip labels when placing multiple rows of panels.
+
 2014.10.29
 
 DSL: aes(tooltip=text) for specifying the text to show when you hover

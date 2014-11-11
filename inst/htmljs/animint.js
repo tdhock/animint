@@ -299,7 +299,7 @@ var animint = function (to_select, json_file) {
                       graph_width_cum + n_yaxes * axispaddingy + ytitlepadding;
     // room for right strips should be distributed evenly across panels to preserve aspect ratio
     plotdim.xend = plotdim.xstart + plotdim.graph.width;
-    plotdim.ystart = current_row * plotdim.margin.top +
+    plotdim.ystart = current_row * (plotdim.margin.top + strip_height) +
                      (current_row - 1) * plotdim.margin.bottom +
                      graph_height_cum + titlepadding +
                      Math.min(p_info.strips.n.top, current_row) * strip_height;
