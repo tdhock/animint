@@ -29,6 +29,11 @@ selected.color="black" and color="transparent" for
 e.g. geom_rect(aes(fill=numeric, clickSelects=id)) and otherwise,
 selected.alpha=1 and alpha=1/2.
 
+RENDER: Have you thought adding the ability about saving the
+visualization state? I know we have ability to change the default
+selection, but it would also be nice to save the state as a url
+fragment -- http://en.wikipedia.org/wiki/Fragment_identifier
+
 OPTIMIZATION: Why does it take so much memory to compile large data?
 e.g. My computer has 12GB RAM but starts swapping when I try to
 compile examples/vervet.R.
