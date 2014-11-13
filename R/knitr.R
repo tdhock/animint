@@ -28,9 +28,9 @@ knit_print.animint <- function(x, options, ...) {
   # http://stackoverflow.com/questions/8959243/r-remove-non-alphanumeric-symbols-from-a-string
   dir <- gsub("[^[:alnum:]]", "", options$label)
   # modify the directory name until we find a unique one
-  while (file.exists(dir)) {
-    dir <- paste0(dir, "2")
-  }
+#   while (file.exists(dir)) {
+#     dir <- paste0(dir, "2")
+#   }
   animint2dir(x, out.dir = dir, json.file = 'plot.json', open.browser = FALSE)
   res <- new_animint(list(id = dir), json.file = file.path(dir, 'plot.json'))
   # if this is the first plot, place scripts just before the plot
