@@ -13,6 +13,11 @@ file. Then make a time series plot of these data to see if the code is
 getting more or less efficient.
 http://sleepycoders.blogspot.ca/2013/03/sharing-travis-ci-generated-files.html
 
+DSL: allow for example
+geom_tile(aes(clickSelects1=var1, clickSelects2=var2))
+which means that clicking a tile changes
+the selected values of BOTH selectors.
+
 DSL: allow specifying newlines in the option list: 
 list(timeSeries=ggplot(), 
      newline=list(),
