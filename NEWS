@@ -13,6 +13,13 @@ file. Then make a time series plot of these data to see if the code is
 getting more or less efficient.
 http://sleepycoders.blogspot.ca/2013/03/sharing-travis-ci-generated-files.html
 
+DSL: allow specifying newlines in the option list: 
+list(timeSeries=ggplot(), 
+     newline=list(),
+     scatter=ggplot())
+means that we should layout the plots in a <table> with
+2 rows and 1 column.
+
 DSL: customizable alpha/color/size/fill/linetype for selected geoms,
 using selected.alpha, selected.color, etc aesthetics, see
 examples/Climate-selected.R. The first implementation should only
