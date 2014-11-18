@@ -178,6 +178,10 @@ non-animated plots? I have started some work on the loadall branch,
 but the preliminary answer is NO -- the browser freezes and the plot
 does not respond to mouse clicks while the data is loading.
 
+2014.11.13
+
+knit_print.animint will now overwrite existing directories. This more closely mimics the default behavoir of knitr (everytime you re-knit, new figures/output files replace old ones).
+
 2014.11.11
 
 BUGFIX: Account for facet strip labels when placing multiple rows of panels.
