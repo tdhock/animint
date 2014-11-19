@@ -581,7 +581,6 @@ saveLayer <- function(l, d, meta){
   ## select_order, and nest_order.
   if(plot.has.panels){
     g$subset_order <- c(g$subset_order, "PANEL")
-    g$select_order <- c(g$select_order, "PANEL")
     g$nest_order <- c(g$nest_order, "PANEL")
   }
 
