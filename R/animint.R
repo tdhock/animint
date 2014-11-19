@@ -212,7 +212,7 @@ saveLayer <- function(l, d, meta){
   show.vars <- g$aes[is.ss]
   g$subset_order <- as.list(names(show.vars))
 
-  is.cs <- names(g$aes) == "clickSelects"
+  is.cs <- is.clickSelects(names(g$aes))
   update.vars <- g$aes[is.ss | is.cs]
 
   ## Construct the selector.
@@ -639,6 +639,17 @@ is.showSelected <- function(x){
   grepl("showSelected", x)
 }
 
+##' Test if aesthetics are clickSelects.
+##' @param x character vector.
+##' @return logical vector
+##' @export
+##' @author Susan VanderPlas
+is.clickSelects <- function(x){
+  if(length(x) == 0)return(logical())
+  stopifnot(is.character(x))
+  grepl("clickSelects", x)
+}
+
 ##' Deprecated alias for animint2dir.
 ##' @title animint2dir
 ##' @param ... passed to animint2dir
@@ -791,7 +802,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
         ## mapping and data. TODO: Do we need to copy any global
         ## values to this layer?
         is.ss <- is.showSelected(names(L$mapping))
-        is.cs <- names(L$mapping) == "clickSelects"
+        is.cs <- is.clickSelects(names(L$mapping))
         update.vars <- L$mapping[is.ss | is.cs]
         has.var <- update.vars %in% names(L$data)
         if(!all(has.var)){

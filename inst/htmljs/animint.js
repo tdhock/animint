@@ -523,7 +523,7 @@ var animint = function (to_select, json_file) {
     //prefix tsv file with appropriate path
     var tsv_file = dirs.concat(tsv_name).join("/"); 
     function is_interactive_aes(v_name){
-      if(v_name == "clickSelects"){
+      if(v_name.indexOf("clickSelects") > -1){
 	return true;
       }
       if(v_name.indexOf("showSelected") > -1){
