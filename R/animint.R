@@ -212,7 +212,7 @@ saveLayer <- function(l, d, meta){
   show.vars <- g$aes[is.ss]
   g$subset_order <- as.list(names(show.vars))
 
-  is.cs <- names(g$aes) == "clickSelects"
+  is.cs <- is.clickSelects(names(g$aes))
   update.vars <- g$aes[is.ss | is.cs]
 
   ## Construct the selector.
@@ -639,6 +639,17 @@ is.showSelected <- function(x){
   grepl("showSelected", x)
 }
 
+##' Test if aesthetics are clickSelects.
+##' @param x character vector.
+##' @return logical vector
+##' @export
+##' @author Susan VanderPlas
+is.clickSelects <- function(x){
+  if(length(x) == 0)return(logical())
+  stopifnot(is.character(x))
+  grepl("clickSelects", x)
+}
+
 ##' Deprecated alias for animint2dir.
 ##' @title animint2dir
 ##' @param ... passed to animint2dir
@@ -726,12 +737,14 @@ gg2animint <- function(...){
 #' @param out.dir directory to store html/js/csv files.
 #' @param json.file character string that names the JSON file with metadata associated with the plot.
 #' @param open.browser Should R open a browser? If yes, be sure to configure your browser to allow access to local files, as some browsers block this by default (e.g. chrome).
+#' @param css.file character string for non-empty css file to include. Provided file will be copied to the output directory as styles.css
 #' @return invisible list of ggplots in list format.
 #' @export 
 #' @seealso \code{\link{ggplot2}}
 #' @example inst/examples/animint.R
 animint2dir <- function(plot.list, out.dir = tempfile(), 
-                        json.file = "plot.json", open.browser = interactive()) {
+                        json.file = "plot.json", open.browser = interactive(),
+                        css.file = "") {
   ## Check that plot.list is a list and every element is named.
   if (!is.list(plot.list)) 
     stop("plot.list must be a list of ggplots")
@@ -791,7 +804,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
         ## mapping and data. TODO: Do we need to copy any global
         ## values to this layer?
         is.ss <- is.showSelected(names(L$mapping))
-        is.cs <- names(L$mapping) == "clickSelects"
+        is.cs <- is.clickSelects(names(L$mapping))
         update.vars <- L$mapping[is.ss | is.cs]
         has.var <- update.vars %in% names(L$data)
         if(!all(has.var)){
@@ -893,8 +906,17 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
   ## Finally, copy html/js/json files to out.dir.
   src.dir <- system.file("htmljs",package="animint")
   to.copy <- Sys.glob(file.path(src.dir, "*"))
-  if(file.exists(paste0(out.dir, "styles.css"))){
+  if(file.exists(paste0(out.dir, "styles.css")) | css.file != "default.file"){
     to.copy <- to.copy[!grepl("styles.css", to.copy, fixed=TRUE)]
+  }
+  if(css.file!=""){
+    # if css filename is provided, copy that file to the out directory as "styles.css"
+    to.copy <- to.copy[!grepl("styles.css", to.copy, fixed=TRUE)]
+    if(!file.exists(css.file)){
+      stop(paste("css.file", css.file, "does not exist. Please check that the file name and path are specified correctly."))
+    } else {
+      file.copy(css.file, file.path(out.dir, "styles.css"), overwrite=TRUE)
+    }
   }
   file.copy(to.copy, out.dir, overwrite=TRUE, recursive=TRUE)
   export.names <-
