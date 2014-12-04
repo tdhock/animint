@@ -30,7 +30,7 @@
 #' animint2gist(viz, description = "My animint plot")
 #' }
 animint2gist <- function
-(plot.list, out.dir = tempfile(), json.file = "plot.json", 
+(plot.list, out.dir = tempfile(), json.file = "plot.json", css.file="",
  url_prefix = sprintf("http://bl.ocks.org/%s/raw",
    getOption("github.username")),
  description=plot.list$title,
@@ -38,7 +38,7 @@ animint2gist <- function
   if(!is.character(description))description <- ""
   if(length(description) == 0)description <- ""
   if(length(description) > 1)description <- description[[1]]
-  animint2dir(plot.list, out.dir, json.file, open.browser = FALSE)
+  animint2dir(plot.list, out.dir, json.file, css.file, open.browser = FALSE)
   if(!requireNamespace("gistr")){
     error("Please run `devtools::install_github('rOpenSci/gistr')` before using this function")
   }

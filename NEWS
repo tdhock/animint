@@ -18,8 +18,8 @@ geom_tile(aes(clickSelects1=var1, clickSelects2=var2))
 which means that clicking a tile changes
 the selected values of BOTH selectors.
 
-DSL: allow specifying newlines in the option list: 
-list(timeSeries=ggplot(), 
+DSL: allow specifying newlines in the option list:
+list(timeSeries=ggplot(),
      newline=list(),
      scatter=ggplot())
 means that we should layout the plots in a <table> with
@@ -75,7 +75,7 @@ thocking@silene:~/projects/chip-seq-paper(master*)$ curl --compress -# --head ht
 Content-Encoding: gzip
 thocking@silene:~/projects/chip-seq-paper(master*)$ curl -# --head https://gist.githubusercontent.com/tdhock/914ab9c19038cae238a4/raw/plot.json |grep Content-Encoding
 
-thocking@silene:~/projects/chip-seq-paper(master*)$ 
+thocking@silene:~/projects/chip-seq-paper(master*)$
 
 DSL: Allow other variable names for the same selection variable,
 e.g. insert and insert.show are 2 different columns in
@@ -99,6 +99,9 @@ background, as in plotly. Then double-click to zoom back out.
 
 RENDER: It would be nice to be able to resize plots interactively,
 like we can do in shiny+ggvis.
+
+RENDER/DSL: Multiple selection via rectangular brush and/or lasso
+https://github.com/skokenes/D3-Lasso-Plugin
 
 RENDER: Legends can be interactive: clicking a legend entry
 shows/hides that subset of data. For example, when we say
@@ -133,7 +136,7 @@ http://kbroman.github.io/qtlcharts/assets/chartexamples/iplotMScanone_example.ht
 we could write geom_tile(aes(hoverSelects=var)) which means that the
 selected value of var should be changed when the user hovers the mouse
 over any tile. Raise an error if hoverSelects is used with multiple
-selection. For the viz below 
+selection. For the viz below
 http://cpsievert.github.io/LDAvis/newsgroup/newsgroup.html
 we could write geom_point(aes(hoverSelects=var, clickSelects=var))
 There are thus two kinds of hoverSelects: when you hover away from a
@@ -189,6 +192,10 @@ BUGFIX: do not stop when viz$timeSeries is a ggplot and viz$time is
 undefined. More informative error when viz$time does not contain the
 required elements named ms and variable.
 
+2014.11.24
+
+Added css.file argument to animint2dir
+
 2014.11.13
 
 knit_print.animint will now overwrite existing directories. This more closely mimics the default behavoir of knitr (everytime you re-knit, new figures/output files replace old ones).
@@ -214,7 +221,7 @@ transition durations.
 
 2014.10.15
 
-"shiny bindings" are now possible using the renderAnimint() and 
+"shiny bindings" are now possible using the renderAnimint() and
 animintOutput() convenience functions. See here for simple shiny app:
 https://github.com/tdhock/animint/tree/master/inst/examples/shiny
 
@@ -228,7 +235,7 @@ https://cpsievert.shinyapps.io/animintRmarkdown
 2014.10.13
 
 BUGFIX: Main title will no longer overlap with facet titles -- see
-https://github.com/tdhock/animint/issues/26 
+https://github.com/tdhock/animint/issues/26
 Also, space management between panels was reduced/improved.
 
 2014.10.10
@@ -284,8 +291,8 @@ All tests are now working.
 The animist2gist function posts relevant files as a gist and allows
 one to automatically view/share plots via http://bl.ocks.org
 
-Moved a number of packages from DEPENDS to IMPORTS 
-(except for ggplot2 and proto). Also added gistr to SUGGESTS 
+Moved a number of packages from DEPENDS to IMPORTS
+(except for ggplot2 and proto). Also added gistr to SUGGESTS
 as it is needed for animist2gist.
 
 2014.5.17
@@ -506,7 +513,7 @@ Updated documentation to include warnings about using google chrome with animint
 
 
 2013.7.29
-Fix for significant digits issue with clickSelects - fixed by exporting 
+Fix for significant digits issue with clickSelects - fixed by exporting
 as character into JSON file, then importing and converting to numerals.
 
 Axes can now be removed for maps
