@@ -186,6 +186,12 @@ non-animated plots? I have started some work on the loadall branch,
 but the preliminary answer is NO -- the browser freezes and the plot
 does not respond to mouse clicks while the data is loading.
 
+2014.12.4
+
+BUGFIX: do not stop when viz$timeSeries is a ggplot and viz$time is
+undefined. More informative error when viz$time does not contain the
+required elements named ms and variable.
+
 2014.11.24
 
 Added css.file argument to animint2dir
