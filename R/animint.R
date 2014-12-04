@@ -754,7 +754,10 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
   ## Save the animation variable so we can treat it specially when we
   ## process each geom.
   # CPS (7-22-14): What if the user doesn't specify milliseconds? Could we provide a reasonable default?
-  if(is.list(plot.list$time)){
+  if(is.list(plot.list[["time"]])){
+    if(!all(c("ms", "variable") %in% names(plot.list$time))){
+      stop("time option list needs ms, variable")
+    }
     meta$time <- plot.list$time
     ms <- meta$time$ms
     stopifnot(is.numeric(ms))
