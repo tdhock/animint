@@ -93,9 +93,8 @@ sig.facets <- mmir.plot$sig+
 print(sig.facets)
 animint2dir(mmir.plot, "intreg-nofacets")
 
-## TODO: mmir.plot is way too complicated, since facets are not yet
-## implemented in animint. The easier facetted version would look
-## like this:
+## The mmir.plot above is way too complicated, since it does not use
+## facets. The simpler facetted version looks like this:
 mmir.facet <- 
   list(signal=mmir.plot$signal,
        penalty=ggplot()+
@@ -124,7 +123,7 @@ mmir.facet <-
                     data=data.frame(intreg$selection, what="segments"))+
        xlab("penalty value $L=f(x)$")+ # TODO: mathjax.
        facet_grid(what~.,scales="free"))
-animint2dir(mmir.facet, "intreg-facets") # doesn't work yet.
+animint2dir(mmir.facet, "intreg-facets") 
 ## This plot has an additional facet for signal, which would not be
 ## present in the interactive plot, but is useful here to see all
 ## the data in regular ggplot2.
@@ -133,3 +132,45 @@ too.many.facets <- mmir.facet$penalty+
   theme_bw()+
   theme(panel.margin=grid::unit(0, "cm"))
 print(too.many.facets)
+
+## No annotated regions!
+mmir.segs <- 
+  list(signal=ggplot()+
+       theme_animint(height=300, width=800)+       
+       scale_x_continuous("position on chromosome (mega base pairs)",
+                          breaks=c(100,200))+
+       scale_fill_manual(values=breakpoint.colors,guide="none")+
+       geom_blank(aes(first.base/1e6, logratio+2/8), data=intreg$ann)+
+       ggtitle("Copy number profile and maximum likelihood segmentation")+
+       ylab("logratio")+
+       geom_point(aes(base/1e6, logratio,
+                      showSelected=signal),
+                  data=intreg$sig)+
+       geom_segment(aes(first.base/1e6, mean, xend=last.base/1e6, yend=mean,
+                        showSelected=signal,
+                        showSelected2=segments),
+                    data=intreg$seg, colour=signal.colors[["estimate"]])+
+       geom_vline(aes(xintercept=base/1e6,
+                      showSelected=signal,
+                      showSelected2=segments),
+                  colour=signal.colors[["estimate"]],
+                  linetype="dashed",
+                  data=intreg$breaks),
+       
+       segments=ggplot()+
+       theme_animint(height=300, width=800)+
+       xlab("log(penalty)")+
+       ylab("optimal number of segments")+
+       ggtitle("Select profile and number of segments")+
+       geom_tallrect(aes(xmin=min.L, xmax=max.L,
+                         showSelected=signal,
+                         clickSelects=segments),
+                     data=intreg$selection,
+                     alpha=1/2)+
+       geom_segment(aes(min.L, segments, xend=max.L, yend=segments,
+                        clickSelects=signal),
+                    data=intreg$selection, alpha=0.6, size=5))
+animint2dir(mmir.segs, "intreg-segs")
+
+## TODO: plot reconstruction error vs model complexity! (instead of
+## penalty)
