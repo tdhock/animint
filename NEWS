@@ -133,6 +133,7 @@ widgets=list(var1="onscreen", var2="all", var3="both").
 DSL: To accomplish interactivity like in this plot
 http://timelyportfolio.blogspot.ca/2014/05/pdf-chart-inkscape-svg-d3-interactive.html
 http://kbroman.github.io/qtlcharts/assets/chartexamples/iplotMScanone_example.html
+https://www.biostat.wisc.edu/~kbroman/D3/car_crashes/
 we could write geom_tile(aes(hoverSelects=var)) which means that the
 selected value of var should be changed when the user hovers the mouse
 over any tile. Raise an error if hoverSelects is used with multiple
