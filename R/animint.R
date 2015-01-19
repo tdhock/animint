@@ -213,6 +213,9 @@ saveLayer <- function(l, d, meta){
   g$subset_order <- as.list(names(show.vars))
 
   is.cs <- is.clickSelects(names(g$aes))
+  select.vars <- g$aes[is.cs]
+  g$select_order <- as.list(names(select.vars))
+  
   update.vars <- g$aes[is.ss | is.cs]
 
   ## Construct the selector.
@@ -575,7 +578,7 @@ saveLayer <- function(l, d, meta){
   g$subset_order <- g$nest_order
 
   ## If this plot has more than one PANEL then add it to subset_order
-  ## and nest_order.
+  ## select_order, and nest_order.
   if(plot.has.panels){
     g$subset_order <- c(g$subset_order, "PANEL")
     g$nest_order <- c(g$nest_order, "PANEL")
