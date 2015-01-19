@@ -378,18 +378,33 @@ var animint = function (to_select, json_file) {
         .domain([axis.yrange[1], axis.yrange[0]])
         .range([plotdim.ystart, plotdim.yend]);
       if(draw_x){
-	     var xaxis = d3.svg.axis()
+	var xaxis = d3.svg.axis()
           .scale(scales[panel_i].x)
           .tickValues(xaxisvals)
           .tickFormat(function (d) {
             return xaxislabs[xaxisvals.indexOf(d)].toString();
           })
           .orient("bottom");
-	     svg.append("g")
+	var xaxis_g = svg.append("g")
           .attr("class", "axis")
           .attr("id", "xaxis")
           .attr("transform", "translate(0," + plotdim.yend + ")")
           .call(xaxis);
+	var xanchor, xangle;
+	if(axis.hasOwnProperty("xanchor")){
+	  xanchor = axis.xanchor;
+	}else{
+	  xanchor = "middle";
+	}
+	if(axis.hasOwnProperty("xangle")){
+	  xangle = axis.xangle;
+	}else{
+	  xangle = "0";
+	}
+	xaxis_g.selectAll("text")
+	  .style("text-anchor", xanchor)
+	  .attr("transform", "rotate(" + xangle + " 0 9)")
+	;
       }
       if(draw_y){
 	     var yaxis = d3.svg.axis()
