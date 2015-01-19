@@ -11,49 +11,68 @@ sg <- ggplot() +
   stat_summary(data=ss, aes(Year, Year, clickSelects=Year),
                fun.y=length, geom="bar")
 
+getTicks <- function(html, p.name){
+  xp <- sprintf('//svg[@id="%s"]//g[@id="xaxis"]//text', p.name)
+  nodes <- getNodeSet(html, xp)
+  stopifnot(length(nodes) > 0)
+  sapply(nodes, xmlAttrs)
+}
+
+expect_rotate_anchor <- function(info, rotate, anchor){
+  not <- getTicks(info$html, 'not')
+  expect_match(not["style", ], "text-anchor: middle", fixed=TRUE)
+  expect_match(not["transform", ], "rotate(0", fixed=TRUE)
+  rotated <- getTicks(info$html, 'rotated')
+  expect_match(rotated["style", ], paste("text-anchor:", anchor), fixed=TRUE)
+  expect_match(rotated["transform", ], paste0("rotate(", rotate), fixed=TRUE)
+}
+
+test_that('no axis rotation is fine', {
+  map <-
+    list(rotated=fg,
+         not=sg)
+  info <- animint2HTML(map)
+  expect_rotate_anchor(info, "0", "middle")
+})
+
 test_that('axis.text.x=element_text(angle=90) means transform="rotate(-90)"', {
   map <-
-    list(fg=fg+theme(axis.text.x=element_text(angle=90)),
-         sg=sg)
+    list(rotated=fg+theme(axis.text.x=element_text(angle=90)),
+         not=sg)
   info <- animint2HTML(map)
-  expect_rotate(info, "-90")
-  expect_anchor(info, "middle")
+  expect_rotate_anchor(info, "-90", "middle")
 })
 
 test_that('axis.text.x=element_text(angle=70) means transform="rotate(-70)"', {
   map <-
-    list(fg=fg+theme(axis.text.x=element_text(angle=70)),
-         sg=sg)
+    list(rotated=fg+theme(axis.text.x=element_text(angle=70)),
+         not=sg)
   info <- animint2HTML(map)
-  expect_rotate(info, "-70")
-  expect_anchor(info, "middle")
+  expect_rotate_anchor(info, "-70", "middle")
 })
 
 test_that('and hjust=1 means style="text-anchor: end;"', {
   map <-
-    list(fg=fg+theme(axis.text.x=element_text(angle=70, hjust=1)),
-         sg=sg)
+    list(rotated=fg+theme(axis.text.x=element_text(angle=70, hjust=1)),
+         not=sg)
   info <- animint2HTML(map)
-  expect_rotate(info, "-70")
-  expect_anchor(info, "end")
+  expect_rotate_anchor(info, "-70", "end")
 })
 
 test_that('and hjust=0 means style="text-anchor: start;"', {
   map <-
-    list(fg=fg+theme(axis.text.x=element_text(angle=70, hjust=0)),
-         sg=sg)
+    list(rotated=fg+theme(axis.text.x=element_text(angle=70, hjust=0)),
+         not=sg)
   info <- animint2HTML(map)
-  expect_rotate(info, "-70")
-  expect_anchor(info, "start")
+  expect_rotate_anchor(info, "-70", "start")
 })
 
 test_that('and hjust=0.5 means style="text-anchor: middle;"', {
   map <-
-    list(fg=fg+theme(axis.text.x=element_text(angle=70, hjust=0.5)),
-         sg=sg)
+    list(rotated=fg+theme(axis.text.x=element_text(angle=70, hjust=0.5)),
+         not=sg)
   info <- animint2HTML(map)
-  expect_rotate(info, "-70")
-  expect_anchor(info, "middle")
+  expect_rotate_anchor(info, "-70", "middle")
 })
 
 ## TODO: also test for y axis rotation.
