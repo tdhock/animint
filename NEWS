@@ -56,9 +56,6 @@ https://github.com/tdhock/animint-examples/blob/master/examples/scaffolds.R
 took 15 minutes to compile on my computer.
 
 OPTIMIZATION: to save disk space, we can compress the TSV file
-database to .tsv.gz files. But for this to work with
-d3.tsv("path/to/file.tsv.gz"), we need a web server that serves .gz
-files with the Content-Encoding: gzip header -- is this possible with
 standard web servers? With servers like gist.github.com, all .json
 files are served with Content-Encoding: gzip, so they use
 http://en.wikipedia.org/wiki/HTTP_compression over the network. In
@@ -186,6 +183,11 @@ RENDER: Should we download all data in the background, even for
 non-animated plots? I have started some work on the loadall branch,
 but the preliminary answer is NO -- the browser freezes and the plot
 does not respond to mouse clicks while the data is loading.
+
+2015.01.19
+
+BUGFIX: no longer need to load knitr in a knitr document to print
+an animint plot.
 
 2014.12.4
 
