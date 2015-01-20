@@ -40,7 +40,7 @@ test_that('axis.text.x=element_text(angle=90) means transform="rotate(-90)"', {
     list(rotated=fg+theme(axis.text.x=element_text(angle=90)),
          not=sg)
   info <- animint2HTML(map)
-  expect_rotate_anchor(info, "-90", "middle")
+  expect_rotate_anchor(info, "-90", "end")
 })
 
 test_that('axis.text.x=element_text(angle=70) means transform="rotate(-70)"', {
@@ -48,7 +48,7 @@ test_that('axis.text.x=element_text(angle=70) means transform="rotate(-70)"', {
     list(rotated=fg+theme(axis.text.x=element_text(angle=70)),
          not=sg)
   info <- animint2HTML(map)
-  expect_rotate_anchor(info, "-70", "middle")
+  expect_rotate_anchor(info, "-70", "end")
 })
 
 test_that('and hjust=1 means style="text-anchor: end;"', {
@@ -73,6 +73,15 @@ test_that('and hjust=0.5 means style="text-anchor: middle;"', {
          not=sg)
   info <- animint2HTML(map)
   expect_rotate_anchor(info, "-70", "middle")
+})
+
+test_that('hjust=0.75 is an error', {
+  map <-
+    list(rotated=fg+theme(axis.text.x=element_text(hjust=0.75)),
+         not=sg)
+  expect_error({
+    info <- animint2HTML(map)
+  }, "animint only supports hjust values 0, 0.5, 1")
 })
 
 ## TODO: also test for y axis rotation.

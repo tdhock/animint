@@ -110,6 +110,24 @@ parsePlot <- function(meta){
         as.list(range[[s("%s.labels")]])
       }
       plot.meta[[axis]][[s("%srange")]] <- range[[s("%s.range")]]
+      axis.text <- theme.pars[[s("axis.text.%s")]]
+      ## TODO: also look at axis.text! (and text?)
+      anchor <- hjust2anchor(axis.text$hjust)
+      angle <- if(is.numeric(axis.text$angle)){
+        -axis.text$angle
+      }
+      if(is.null(angle)){
+        angle <- 0
+      }
+      if(is.null(anchor)){
+        anchor <- if(angle == 0){
+          "middle"
+        }else{
+          "end"
+        }
+      }
+      plot.meta[[axis]][[s("%sanchor")]] <- as.character(anchor)
+      plot.meta[[axis]][[s("%sangle")]] <- as.numeric(angle)
       plot.meta[[axis]][[s("%sline")]] <- !is.blank(s("axis.line.%s"))
       plot.meta[[axis]][[s("%sticks")]] <- !is.blank(s("axis.ticks.%s"))
     }
@@ -150,6 +168,22 @@ parsePlot <- function(meta){
   }
 
   meta$plots[[meta$plot.name]] <- plot.meta
+}
+
+hjust2anchor <- function(hjust){
+  if(is.null(hjust))return(NULL)
+  trans <-
+    c("0"="start",
+      "0.5"="middle",
+      "1"="end")
+  hjust.str <- as.character(hjust)
+  is.valid <- hjust.str %in% names(trans)
+  if(all(is.valid)){
+    trans[hjust.str]
+  }else{
+    print(hjust[!is.valid])
+    stop("animint only supports hjust values 0, 0.5, 1")
+  }
 }
 
 #' Save a layer to disk, save and return meta-data.
