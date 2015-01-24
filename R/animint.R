@@ -98,6 +98,25 @@ parsePlot <- function(meta){
         lab.or.null
       }
     }
+    # theme settings are shared across panels
+    axis.text <- theme.pars[[s("axis.text.%s")]]
+    ## TODO: also look at axis.text! (and text?)
+    anchor <- hjust2anchor(axis.text$hjust)
+    angle <- if(is.numeric(axis.text$angle)){
+      -axis.text$angle
+    }
+    if(is.null(angle)){
+      angle <- 0
+    }
+    if(is.null(anchor)){
+      anchor <- if(angle == 0){
+        "middle"
+      }else{
+        "end"
+      }
+    }
+    plot.meta[[s("%sanchor")]] <- as.character(anchor)
+    plot.meta[[s("%sangle")]] <- as.numeric(angle)
     # translate panel specific axis info
     ctr <- 0
     for (axis in names(axes)) {
@@ -110,24 +129,6 @@ parsePlot <- function(meta){
         as.list(range[[s("%s.labels")]])
       }
       plot.meta[[axis]][[s("%srange")]] <- range[[s("%s.range")]]
-      axis.text <- theme.pars[[s("axis.text.%s")]]
-      ## TODO: also look at axis.text! (and text?)
-      anchor <- hjust2anchor(axis.text$hjust)
-      angle <- if(is.numeric(axis.text$angle)){
-        -axis.text$angle
-      }
-      if(is.null(angle)){
-        angle <- 0
-      }
-      if(is.null(anchor)){
-        anchor <- if(angle == 0){
-          "middle"
-        }else{
-          "end"
-        }
-      }
-      plot.meta[[axis]][[s("%sanchor")]] <- as.character(anchor)
-      plot.meta[[axis]][[s("%sangle")]] <- as.numeric(angle)
       plot.meta[[axis]][[s("%sline")]] <- !is.blank(s("axis.line.%s"))
       plot.meta[[axis]][[s("%sticks")]] <- !is.blank(s("axis.ticks.%s"))
     }
