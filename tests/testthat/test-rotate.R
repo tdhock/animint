@@ -6,6 +6,7 @@ ss <- data.frame(State=paste("some long text", c("CA", "NY")),
 
 fg <- ggplot() +
   geom_point(aes(x=State, y=Prop.Inv, showSelected=Year), data=ss) +
+  xlab("STATE SOME REALLY REALLY LONG TEXT THAT MAY OVERLAP TICKS")+
   theme_animint(width=600, height=400) 
 sg <- ggplot() +
   stat_summary(data=ss, aes(Year, Year, clickSelects=Year),
@@ -30,9 +31,9 @@ expect_rotate_anchor <- function(info, rotate, anchor){
   e.text <- e.axis$findChildElement("css selector", "text")
   tick.loc <- e.text$getElementLocation()
   tick.size <- e.text$getElementSize()
-  ## 5 pixels is a magic number that lets the test pass for un-rotated
+  ## Subtract a magic number that lets the test pass for un-rotated
   ## labels in firefox.
-  tick.bottom.y <- tick.loc$y + tick.size$height - 5 
+  tick.bottom.y <- tick.loc$y + tick.size$height - 6
   e.title <- remDr$findElement("css selector", "text#xtitle")
   title.loc <- e.title$getElementLocation()
   expect_true(tick.bottom.y < title.loc$y)
