@@ -25,16 +25,16 @@ var animint = function (to_select, json_file) {
   this.Animation = Animation;
   var all_geom_names = {};
   this.all_geom_names = all_geom_names;
-  
+
   var css = document.createElement('style');
   css.type = 'text/css';
-  var styles = [".axis path{fill: none;stroke: black;shape-rendering: crispEdges;}", 
+  var styles = [".axis path{fill: none;stroke: black;shape-rendering: crispEdges;}",
             ".axis line{fill: none;stroke: black;shape-rendering: crispEdges;}",
             ".axis text {font-family: sans-serif;font-size: 11px;}"];
 
   // 'margins' are fixed across panels and do not
   // include title/axis/label padding (since these are not
-  // fixed across panels). They do, however, account for 
+  // fixed across panels). They do, however, account for
   // spacing between panels
   var margin = {
     left: 0,
@@ -72,8 +72,8 @@ var animint = function (to_select, json_file) {
     // Determine what style to use to show the selection for this
     // geom. This is a hack and should be removed when we implement
     // the selected.color, selected.size, etc aesthetics.
-    if(g_info.aes.hasOwnProperty("fill") && 
-       g_info.geom == "rect" && 
+    if(g_info.aes.hasOwnProperty("fill") &&
+       g_info.geom == "rect" &&
        g_info.aes.hasOwnProperty("clickSelects")){
       g_info.select_style = "stroke";
     }else{
@@ -128,8 +128,8 @@ var animint = function (to_select, json_file) {
       .style("text-anchor", "middle");
 
     // Note axis names are "shared" across panels (just like the title)
-    var xtitlepadding = 5 + measureText(p_info["xname"], 11).height;
-    var ytitlepadding = 5 + measureText(p_info["yname"], 11).height;
+    var xtitlepadding = 5 + measureText(p_info["xtitle"], 11).height;
+    var ytitlepadding = 5 + measureText(p_info["ytitle"], 11).height;
 
     // grab max text size over axis labels and facet strip labels
     var axispaddingy = 5;
@@ -138,14 +138,14 @@ var animint = function (to_select, json_file) {
 	     return measureText(entry, 11).width;
       }));
     }
-    var axispaddingx = 5;
+    var axispaddingx = 5 + 9;
     if(p_info.hasOwnProperty("xlabs") && p_info.xlabs.length){
+      // TODO: throw warning if text height is large portion of plot height?
       axispaddingx += Math.max.apply(null, p_info.xlabs.map(function(entry){
-	     return measureText(entry, 11).height;
+	     return measureText(entry, 11, p_info.xangle).height;
       }));
-      margin.right = 5 + Math.max.apply(null, p_info.xlabs.map(function(entry){
-	     return measureText(entry, 11).width;
-      })); // to ensure the last x-axis label doesn't get cut off.
+      // TODO: carefully calculating this gets complicated with rotating xlabs
+      margin.right += 5;
     }
     var strip_height =  Math.max.apply(null, p_info.strips.top.map(function(entry){
       return measureText(entry, 11).height;
@@ -154,8 +154,8 @@ var animint = function (to_select, json_file) {
       return measureText(entry, 11).height;
     }))
     plotdim.margin = margin;
-    
-    // track the number of x/y axes to account for when calculating 
+
+    // track the number of x/y axes to account for when calculating
     // height/width of graphing region
     var n_xaxes = 0;
     var n_yaxes = 0;
@@ -166,29 +166,29 @@ var animint = function (to_select, json_file) {
 
     // the *entire graph* height/width
     var graph_width = p_info.options.width - ncols * (margin.left + margin.right) -
-                      p_info.strips.n.right * strip_width - 
+                      p_info.strips.n.right * strip_width -
                       n_yaxes * axispaddingy - ytitlepadding;
     var graph_height = p_info.options.height - nrows * (margin.top + margin.bottom) -
-                        titlepadding - (p_info.strips.n.top * strip_height) - 
+                        titlepadding - (p_info.strips.n.top * strip_height) -
                         n_xaxes * axispaddingx - xtitlepadding;
 
     // Impose the pixelated aspect ratio of the graph upon the width/height
-    // proportions calculated by the compiler. This has to be done on the 
-    // rendering side since the precomputed proportions apply to the *graph* 
+    // proportions calculated by the compiler. This has to be done on the
+    // rendering side since the precomputed proportions apply to the *graph*
     // and the graph size depends upon results of measureText()
     if (p_info.layout.coord_fixed[0]) {
       var aspect = (graph_height / nrows) / (graph_width / ncols);
     } else {
       var aspect = 1;
     }
-    var wp = p_info.layout.width_proportion.map(function(x){ 
-      return x * Math.min(1, aspect); 
+    var wp = p_info.layout.width_proportion.map(function(x){
+      return x * Math.min(1, aspect);
     })
-    var hp = p_info.layout.height_proportion.map(function(x){ 
-      return x * Math.min(1, 1/aspect); 
+    var hp = p_info.layout.height_proportion.map(function(x){
+      return x * Math.min(1, 1/aspect);
     })
 
-    // track the proportion of the graph that should be 'blank' 
+    // track the proportion of the graph that should be 'blank'
     // this is mainly used to implement coord_fixed()
     var graph_height_blank = 1;
     var graph_width_blank = 1;
@@ -196,10 +196,10 @@ var animint = function (to_select, json_file) {
       if (p_info.layout.COL[layout_i] == 1) graph_height_blank -= hp[layout_i];
       if (p_info.layout.ROW[layout_i] == 1) graph_width_blank -= wp[layout_i];
     }
-    // cumulative portion of the graph used 
+    // cumulative portion of the graph used
     var graph_width_cum = (graph_width_blank / 2) * graph_width;
     var graph_height_cum = (graph_height_blank / 2) * graph_height;
-  
+
     // Bind plot data to this plot's SVG element
     svg.plot = p_info;
     Plots[p_name] = p_info;
@@ -210,8 +210,8 @@ var animint = function (to_select, json_file) {
       });
       SVGs[g_name] = svg;
     });
-    
-    // If we are to draw more than one panel, 
+
+    // If we are to draw more than one panel,
     // create a grouping for strip labels
     if (npanels > 1) {
       svg.append("g")
@@ -237,7 +237,7 @@ var animint = function (to_select, json_file) {
       var yaxisvals = [];
       var yaxislabs = [];
       var outbreaks, outlabs;
-      
+
       //function to write labels and breaks to their respective arrays
       var axislabs = function(breaks, labs, axis){
         if(axis=="x"){
@@ -264,21 +264,21 @@ var animint = function (to_select, json_file) {
           });
         } else {
           outbreaks.forEach(function (d) {
-            outlabs.push(""); 
-            // push a blank string to the array for each axis tick 
+            outlabs.push("");
+            // push a blank string to the array for each axis tick
             // if the specified label is null
           });
         }
-      }    
-      
+      }
+
     axislabs(axis.x, axis.xlab, "x");
     axislabs(axis.y, axis.ylab, "y");
-    
+
     // compute the current panel height/width
     plotdim.graph.height = graph_height * hp[layout_i];
     plotdim.graph.width = graph_width * wp[layout_i];
-      
-    var current_row = p_info.layout.ROW[layout_i]; 
+
+    var current_row = p_info.layout.ROW[layout_i];
     var current_col = p_info.layout.COL[layout_i];
     var draw_x = p_info.layout.AXIS_X[layout_i];
     var draw_y = p_info.layout.AXIS_Y[layout_i];
@@ -289,12 +289,12 @@ var animint = function (to_select, json_file) {
       n_yaxes = 0;
       graph_width_cum = (graph_width_blank / 2) * graph_width;
       graph_height_cum = graph_height_cum + plotdim.graph.height;
-    } 
+    }
     n_xaxes = n_xaxes + draw_x;
     n_yaxes = n_yaxes + draw_y;
-    
+
     // calculate panel specific locations to be used in placing axes, labels, etc.
-    plotdim.xstart =  current_col * plotdim.margin.left + 
+    plotdim.xstart =  current_col * plotdim.margin.left +
                       (current_col - 1) * plotdim.margin.right +
                       graph_width_cum + n_yaxes * axispaddingy + ytitlepadding;
     // room for right strips should be distributed evenly across panels to preserve aspect ratio
@@ -307,7 +307,7 @@ var animint = function (to_select, json_file) {
     plotdim.yend = plotdim.ystart + plotdim.graph.height;
     // always add to the width (note it may have been reset earlier)
     graph_width_cum = graph_width_cum + plotdim.graph.width;
-      
+
     // draw the y-axis title (and add padding) when drawing the first panel
     if (layout_i === 0) {
       svg.append("text")
@@ -327,14 +327,14 @@ var animint = function (to_select, json_file) {
         .attr("id", "xtitle")
         .style("text-anchor", "middle")
         .style("font-size", "11px")
-        .attr("transform", "translate(" + plotdim.title.x 
-          + "," + (plotdim.yend + axispaddingx + xtitlepadding / 2) + ")");
-    } 
-      
+        .attr("transform", "translate(" + plotdim.title.x
+          + "," + (plotdim.yend + axispaddingx) + ")");
+    }
+
       var draw_strip = function(strip, side) {
         if (strip == "") {
           return(null);
-        } 
+        }
         // assume right is top until it isn't
         var x = (plotdim.xstart + plotdim.xend) / 2;
         var y = plotdim.ystart - strip_height / 2;
@@ -359,7 +359,7 @@ var animint = function (to_select, json_file) {
         }
       draw_strip([p_info.strips.top[layout_i]], "top");
       draw_strip([p_info.strips.right[layout_i]], "right");
-      
+
       // for each of the x and y axes, there is a "real" and fake
       // version. The real version will be used for plotting the
       // data, and the fake version is just for the display of the
@@ -390,21 +390,9 @@ var animint = function (to_select, json_file) {
           .attr("id", "xaxis")
           .attr("transform", "translate(0," + plotdim.yend + ")")
           .call(xaxis);
-	var xanchor, xangle;
-	if(axis.hasOwnProperty("xanchor")){
-	  xanchor = axis.xanchor;
-	}else{
-	  xanchor = "middle";
-	}
-	if(axis.hasOwnProperty("xangle")){
-	  xangle = axis.xangle;
-	}else{
-	  xangle = "0";
-	}
 	xaxis_g.selectAll("text")
-	  .style("text-anchor", xanchor)
-	  .attr("transform", "rotate(" + xangle + " 0 9)")
-	;
+	  .style("text-anchor", p_info.xanchor)
+	  .attr("transform", "rotate(" + p_info.xangle + " 0 9)");
       }
       if(draw_y){
 	     var yaxis = d3.svg.axis()
@@ -420,7 +408,7 @@ var animint = function (to_select, json_file) {
           .attr("transform", "translate(" + (plotdim.xstart) + ",0)")
           .call(yaxis);
       }
-	
+
     	if(!axis.xline) {
     	  styles.push("#"+p_name+" #xaxis"+" path{stroke:none;}");
     	}
@@ -434,7 +422,7 @@ var animint = function (to_select, json_file) {
     	  styles.push("#"+p_name+" #yaxis .tick"+" line{stroke:none;}");
     	}
 
-    } //end of for loop 
+    } //end of for loop
 
     Plots[p_name].scales = scales;
 
@@ -449,7 +437,7 @@ var animint = function (to_select, json_file) {
     }
   }
   var get_tsv = function(g_info, chunk_id){
-    return g_info.classed + "_chunk" + chunk_id + ".tsv";  
+    return g_info.classed + "_chunk" + chunk_id + ".tsv";
   }
   // update_geom is called from add_geom and update_selector. It
   // downloads data if necessary, and then calls draw_geom.
@@ -536,7 +524,7 @@ var animint = function (to_select, json_file) {
     }
     g_info.download_status[tsv_name] = "downloading";
     //prefix tsv file with appropriate path
-    var tsv_file = dirs.concat(tsv_name).join("/"); 
+    var tsv_file = dirs.concat(tsv_name).join("/");
     function is_interactive_aes(v_name){
       if(v_name.indexOf("clickSelects") > -1){
 	return true;
@@ -562,9 +550,9 @@ var animint = function (to_select, json_file) {
             } else if (r_type == "factor") {
               //keep it as a character.
             } else if (r_type == "rgb") {
-              //keep it as a character.                
+              //keep it as a character.
             } else if (r_type == "linetype") {
-              //keep it as a character. 
+              //keep it as a character.
             } else if (r_type == "label") {
               //keep it as a character
             } else if (r_type == "character") {
@@ -736,11 +724,11 @@ var animint = function (to_select, json_file) {
 
     var eActions, eAppend;
     var key_fun = null;
-    var id_fun = function(d){ 
+    var id_fun = function(d){
       return d.id;
     };
     if(g_info.aes.hasOwnProperty("key")){
-      key_fun = function(d){ 
+      key_fun = function(d){
         return d.key;
       };
     }
@@ -774,7 +762,7 @@ var animint = function (to_select, json_file) {
       // Inside update_geom the variables take the following values
       // (pseudo-Javascript code)
 
-      // var kv = [{"key":"0","value":"133","bases.per.probe":"133"}, 
+      // var kv = [{"key":"0","value":"133","bases.per.probe":"133"},
       //           {"key":"1","value":"2667","bases.per.probe":"2667"}];
       // var data = {"133":[array of 20 points used to draw the line for group 133],
       //             "2667":[array of 20 points used to draw the line for group 2667]};
@@ -821,13 +809,13 @@ var animint = function (to_select, json_file) {
 
           // Need to store the clickSelects value that will
           // be passed to the selector when we click on this
-          // item. 
+          // item.
           d.clickSelects = data[d.value][0].clickSelects;
           return d;
         });
       }
 
-      // line, path, and polygon use d3.svg.line(), 
+      // line, path, and polygon use d3.svg.line(),
       // ribbon uses d3.svg.area()
       // we have to define lineThing accordingly.
       if (g_info.geom == "ribbon") {
@@ -857,7 +845,7 @@ var animint = function (to_select, json_file) {
 	//take key from first value in the group.
 	return one_row.id;
       };
-      elements = elements.data(kv, key_fun); 
+      elements = elements.data(kv, key_fun);
       eActions = function (e) {
         e.attr("d", function (d) {
           var one_group = data[d.value];
@@ -900,7 +888,7 @@ var animint = function (to_select, json_file) {
           })
           .style("stroke-width", function (group_info) {
             var one_group = data[group_info.value];
-            var one_row = one_group[0]; 
+            var one_row = one_group[0];
 	    // take line size for first value in the group
             return get_size(one_row);
           });
@@ -1160,7 +1148,7 @@ var animint = function (to_select, json_file) {
       var selected_funs = {
 	"opacity":{
 	  "mouseout":function (d) {
-            return ifSelectedElse(d, g_info.aes.clickSelects, 
+            return ifSelectedElse(d, g_info.aes.clickSelects,
 				  get_alpha(d), get_alpha(d) - 1/2);
 	  },
 	  "mouseover":function (d) {
@@ -1169,7 +1157,7 @@ var animint = function (to_select, json_file) {
 	},
 	"stroke":{
 	  "mouseout":function(d){
-	    return ifSelectedElse(d, g_info.aes.clickSelects, 
+	    return ifSelectedElse(d, g_info.aes.clickSelects,
 				  "black", "transparent");
 	  },
 	  "mouseover":function(d){
@@ -1236,7 +1224,7 @@ var animint = function (to_select, json_file) {
     } else { //no clickSelects for this geom.
       // Assign opacity. treat lines and ribbons (groups of points)
       // specially.
-      if (g_info.geom == "line" || g_info.geom == "ribbon") { 
+      if (g_info.geom == "line" || g_info.geom == "ribbon") {
         enter.style("opacity", function (group_info) {
           var one_group = data[group_info.value];
           var one_row = one_group[0]; // take aesthetic for first value in the group
@@ -1292,7 +1280,7 @@ var animint = function (to_select, json_file) {
     }else{
       // value should be added or removed from the selection.
       var i_value = s_info.selected.indexOf(value);
-      if(i_value == -1){ 
+      if(i_value == -1){
 	// not found, add to selection.
 	s_info.selected.push(value);
       }else{
@@ -1331,7 +1319,7 @@ var animint = function (to_select, json_file) {
     if(all_geom_names.every(geomLoaded)){
       update_selector(v_name, next);
     }
-  } 
+  }
 
   //The main idea of how legends work:
 
@@ -1370,7 +1358,7 @@ var animint = function (to_select, json_file) {
       var linescale = d3.scale.linear().domain([0,6]).range([1,4]);
       // scale lines so they are visible in the legend. (does not
       // affect plot scaling)
-      if(legendgeoms.indexOf("polygon")>-1){ 
+      if(legendgeoms.indexOf("polygon")>-1){
         // aesthetics that would draw a rect
         legend_svgs.append("rect")
 	  .attr("x", 2)
@@ -1379,14 +1367,14 @@ var animint = function (to_select, json_file) {
 	  .attr("height", 10)
           .style("stroke-width", function(d){return d["polygonsize"]||1;})
           .style("stroke-dasharray", function(d){
-	    return linetypesize2dasharray(d["polygonlinetype"]||"solid", 
+	    return linetypesize2dasharray(d["polygonlinetype"]||"solid",
 					  d["size"]||2);
 	  })
           .style("stroke", function(d){return d["polygoncolour"] || "#000000";})
           .style("fill", function(d){return d["polygonfill"] || "#FFFFFF";})
           .style("opacity", function(d){return d["polygonalpha"]||1;});
       }
-      if(legendgeoms.indexOf("text")>-1){ 
+      if(legendgeoms.indexOf("text")>-1){
         // aesthetics that would draw a rect
         legend_svgs.append("text")
 	  .attr("x", 10)
@@ -1405,7 +1393,7 @@ var animint = function (to_select, json_file) {
 	    return linescale(d["pathsize"])||2;
 	  })
           .style("stroke-dasharray", function(d){
-	    return linetypesize2dasharray(d["pathlinetype"]||"solid", 
+	    return linetypesize2dasharray(d["pathlinetype"]||"solid",
 					  d["pathsize"] || 2);
 	  })
           .style("stroke", function(d){return d["pathcolour"] || "#000000";})
@@ -1429,7 +1417,7 @@ var animint = function (to_select, json_file) {
       ;
     }
   }
-  
+
   // Download the main description of the interactive plot.
   d3.json(json_file, function (error, response) {
     if(response.hasOwnProperty("title")){
@@ -1441,7 +1429,7 @@ var animint = function (to_select, json_file) {
       add_legend(p_name, response.plots[p_name]);
       // Append style sheet to document head.
       css.appendChild(document.createTextNode(styles.join(" ")));
-      document.head.appendChild(css);   
+      document.head.appendChild(css);
     }
     // Then add selectors and start downloading the first data subset.
     for (var s_name in response.selectors) {
@@ -1621,34 +1609,32 @@ var animint = function (to_select, json_file) {
   });
 }
 
-var measureText = function (pText, pFontSize, pStyle) {
-  var lDiv = document.createElement('lDiv');
+// create a dummy element, apply the appropriate classes,
+// and then measure the element
+// Inspired from http://jsfiddle.net/uzddx/2/
+var measureText = function(pText, pFontSize, pAngle, pStyle) {
+    if (!pText || pText.length === 0) return {height: 0, width: 0};
+    if (pAngle === null || isNaN(pAngle)) pAngle = 0;
 
-  document.body.appendChild(lDiv);
+    var container = d3.select('body').append('svg')
+      // do we need to set the class so that styling is applied?
+      //.attr('class', classname);
 
-  if (pStyle != null) {
-    lDiv.style = pStyle;
-  }
-  lDiv.style.fontSize = "" + pFontSize + "px";
-  lDiv.style.position = "absolute";
-  lDiv.style.left = -1000;
-  lDiv.style.top = -1000;
+    container.append('text')
+      .attr({x: -1000, y: -1000})
+      .attr("transform", "rotate(" + pAngle + ")")
+      .attr("style", pStyle)
+      .attr("font-size", pFontSize)
+      .text(pText);
 
-  lDiv.innerHTML = pText;
+    var bbox = container.node().getBBox();
+    container.remove();
 
-  var lResult = {
-    width: lDiv.clientWidth,
-    height: lDiv.clientHeight
-  };
-
-  document.body.removeChild(lDiv);
-  lDiv = null;
-
-  return lResult;
+    return {height: bbox.height, width: bbox.width};
 }
 
 var linetypesize2dasharray = function (lt, size) {
-  var isInt = function(n) { return typeof n === 'number' && parseFloat(n) == parseInt(n, 10) && !isNaN(n); } 
+  var isInt = function(n) { return typeof n === 'number' && parseFloat(n) == parseInt(n, 10) && !isNaN(n); }
   if(isInt(lt)){ // R integer line types.
     var o = {
       0: size * 0 + "," + size * 10,
