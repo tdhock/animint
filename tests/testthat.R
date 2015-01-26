@@ -10,10 +10,24 @@ source(file.path(getwd(), "testthat", "functions.R"))
 ## To get the process long names look at (helps to debug)
 system("ps u")
 
-kill_all <- function() {
-  # kill the local file server
-  system('pkill -f "servr::httd\\(port=4848"')
-  # quit the remote driver
+start_servr <- function(port = 4848) {
+  # Thanks to Winston for making this process cleaner
+  # https://github.com/wch/webshot/blob/master/R/appshot.R
+  pidfile <- tempfile("pid")
+  on.exit(unlink(pidfile))
+  cmd <- sprintf(
+    "'cat(Sys.getpid(), file=\"%s\"); servr::httd(port=%d, dir=file.path(getwd(), \"testthat\"), launch.browser=FALSE)'",
+    pidfile,
+    port
+  )
+  # Run app in background
+  system2("R", args = c("--slave", "-e", cmd), wait = FALSE)
+  # Return process id
+  as.numeric(readLines(pidfile, warn = FALSE))
+}
+
+# Kill the selenium driver
+kill_dr <- function() {
   remDr$quit()
   if (interactive()) {
     # close Firefox & stop selenium server
@@ -26,17 +40,12 @@ kill_all <- function() {
 }
 
 run_test <- function() {
-  # In case of potential errors in running the test, we make sure to kill 
-  # all the background processes upon exiting this function.
-  on.exit(kill_all(), add = TRUE)
-  
   # Run local file server in a separate R session
-  # IDEA: If we can access the process ID (with Sys.getpid()) from this child session
-  # we could kill the file server with tools::pskill(). This would help testing be 
-  # platform independent -- I just don't know how to transfer objects between sessions
-  cmd <- "R -e \'servr::httd(port=4848, dir=file.path(getwd(), \"testthat\"), launch.browser=FALSE)\'"
-  system(cmd, wait = FALSE)
-  
+  pid <- start_servr()
+  # In case of potential errors in running the test, we make sure to kill
+  # all the background processes upon exit
+  on.exit(tools::pskill(pid), add = TRUE)
+  on.exit(kill_dr(), add = TRUE)
   if (interactive()) {
     checkForServer(dir=system.file("bin", package="RSelenium"))
     startServer()
