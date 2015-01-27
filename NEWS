@@ -184,6 +184,14 @@ non-animated plots? I have started some work on the loadall branch,
 but the preliminary answer is NO -- the browser freezes and the plot
 does not respond to mouse clicks while the data is loading.
 
+2015.01.27
+
+Translate R/ggplot
+theme(axis.text.x=element_text(angle=70, hjust=1)) 
+to HTML/SVG
+<text style="text-anchor: end;" transform="rotate(-70)">
+Thanks for the bug report @mswastik
+
 2015.01.19
 
 BUGFIX: no longer need to load knitr in a knitr document to print
