@@ -7,7 +7,7 @@ ss <- data.frame(State=paste("some long text", c("CA", "NY")),
 fg <- ggplot() +
   geom_point(aes(x=State, y=Prop.Inv, showSelected=Year), data=ss) +
   xlab("STATE SOME REALLY REALLY LONG TEXT THAT MAY OVERLAP TICKS")+
-  theme_animint(width=600, height=400) 
+  theme_animint(width=600, height=400)
 sg <- ggplot() +
   stat_summary(data=ss, aes(Year, Year, clickSelects=Year),
                fun.y=length, geom="bar")

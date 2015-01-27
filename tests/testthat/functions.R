@@ -1,8 +1,8 @@
 #### helper functions to be reused in testing #####
 
 #' Apply `animint2dir` to a list ggplots and extract the (rendered) page source via RSelenium
-#' 
-#' @details This function assumes an object named 'context' exists -- this should be a 
+#'
+#' @details This function assumes an object named 'context' exists -- this should be a
 #' character string as it will be used specify a directory which is bound to a testing context.
 #' @author Carson Sievert
 #' @param plotList A named list of ggplot2 objects
@@ -14,17 +14,9 @@ animint2HTML <- function(plotList) {
   ## inside of the tests, it will write the viz to
   ## animint/tests/testthat/htmltest, so we also need to start the
   ## servr in animint/tests/testthat.
-
-  ##on.exit(unlink("htmltest", recursive=TRUE))
+  #on.exit(unlink("htmltest", recursive=TRUE))
   res <- animint2dir(plotList, out.dir="htmltest", open.browser = FALSE)
-  address <- "http://localhost:4848/htmltest/"
-  remDr$navigate(address)
-  ## find/get methods are kinda slow in RSelenium (here is an example)
-  ## remDr$navigate(attr(info, "address"))
-  ## t <- remDr$findElement(using = 'class name', value = 'title')
-  ## t$getElementText()[[1]]
-
-  ## I think parsing using XML::htmlParse() and XML::getNodeSet() is faster/easier
+  remDr$navigate("http://localhost:4848/htmltest")
   res$html <- XML::htmlParse(remDr$getPageSource(), asText = TRUE)
   res
 }
@@ -161,5 +153,3 @@ normDiffs <- function(xdiff, ydiff, ratio = 1) {
   if (is.null(xlab) || is.null(ylab)) warning("label-diff attribute is missing")
   c(ratio * xdiff / xlab, ydiff / ylab)
 }
-
-
