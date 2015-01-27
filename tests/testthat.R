@@ -82,3 +82,6 @@ kill_dr <- function(b) {
   if (b == "phantomjs") pJS$stop()
   remDr$quit()
 }
+
+# this will make travisCI run tests with phantomJS
+run_tests()
