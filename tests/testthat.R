@@ -4,6 +4,7 @@ library(RSelenium)
 library(XML)
 library(shiny)
 library(servr)
+library(testthat)
 
 #' @param browserName Name of the browser to use for testing.
 #' See ?RSelenium::remoteDriver for details.
@@ -25,14 +26,16 @@ library(servr)
 
 run_tests <- function(browserName = "phantomjs", ..., port = 4848,
                       filter = NULL, show.ps = FALSE) {
-  library("testthat") #gotta be a better way!
+
   ## To get the process long names look at (helps to debug)
   if (show.ps) system("ps u")
-  if (basename(getwd()) != "animint")
-    warning("The basename of the working directory should be 'animint'.")
   old <- getwd()
   on.exit(setwd(old))
-  setwd("tests")
+  if (basename(old) == "animint") {
+    setwd("tests")
+  } else if (basename(old) != "tests") {
+    warning("Make sure your working directory is set to animint's source path")
+  }
   source("testthat/functions.R")
   # start a daemonized local file server
   server <- try({
