@@ -1,7 +1,7 @@
 #' Convert a list of ggplots to an interactive animation and post files as a gist
-#' 
+#'
 #' Before using this function set your appropriate 'github.username' and 'github.password' \link{options}
-#' 
+#'
 #' @param plot.list a named list of ggplots and option lists.
 #' @param out.dir local directory to store html/js/csv files.
 #' @param json.file character string that names the JSON file with metadata associated with the plot.
@@ -14,10 +14,10 @@
 #' and it becomes the plot title on the bl.ocks/username page.
 #' @param ... options passed onto \link{gistr::gist}
 #' @export
-#' 
+#'
 #' @examples
 #' \dontrun{
-#' devtools::install_github("rOpenSci/gistr") 
+#' devtools::install_github("rOpenSci/gistr")
 #' options(github.username = "foo", github.password = "bar")
 #' library(animint)
 #' iris$id <- 1:nrow(iris)
@@ -30,9 +30,9 @@
 #' animint2gist(viz, description = "My animint plot")
 #' }
 animint2gist <- function
-(plot.list, out.dir = tempfile(), json.file = "plot.json", css.file="",
- url_prefix = sprintf("http://bl.ocks.org/%s/raw",
-   getOption("github.username")),
+(plot.list, out.dir = tempfile(), json.file = "plot.json", css.file = "",
+ open.browser = interactive(),
+ url_prefix = "http://bl.ocks.org/%s/raw",
  description=plot.list$title,
  ...){
   if(!is.character(description))description <- ""
@@ -62,15 +62,11 @@ animint2gist <- function
   is.png <- grepl("[.]png$", all.files)
   is.ignored <- all.file.info$isdir | is.empty | is.tilde
   ## TODO: delete the next line when gist_create can upload PNGs.
-  is.ignored <- is.ignored | is.png 
+  is.ignored <- is.ignored | is.png
   to.post <- all.files[!is.ignored]
-  gist <- gistr::gist_create(to.post,
-                      description=description,
-                      ...)
-  elem <- strsplit(gist, split = "/")[[1]]
-  gist.code <- elem[length(elem)]
-  url_name <- file.path(url_prefix, gist.code)
-  if(interactive() && httr::url_success(url_name)) browseURL(url_name)
+  gist <- gistr::gist_create(to.post, description=description, browse=FALSE, ...)
+  if (interactive()) print(gist)
+  if (open.browser) browseURL(sprintf(url_prefix, gist$id))
   ## Try rendering a screenshot using RSelenium.
   has.cmds <- Sys.which(c("pkill", "git")) != ""
   has.selenium <- requireNamespace("RSelenium")
@@ -115,4 +111,4 @@ animint2gist <- function
   }
 }
 
-  
+

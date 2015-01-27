@@ -1,4 +1,4 @@
-#' Convert a ggplot to a list. 
+#' Convert a ggplot to a list.
 #' @param meta environment with previously calculated plot data, and a new plot to parse, already stored in plot and plot.name.
 #' @return nothing, info is stored in meta.
 #' @export
@@ -23,22 +23,22 @@ parsePlot <- function(meta){
   }
   for(layer.i in seq_along(meta$plot$layers)){
     ##cat(sprintf("%4d / %4d layers\n", layer.i, length(meta$plot$layers)))
-    
+
     ## This is the layer from the original ggplot object.
     L <- meta$plot$layers[[layer.i]]
-    
+
     ## for each layer, there is a correpsonding data.frame which
     ## evaluates the aesthetic mapping.
     df <- meta$built$data[[layer.i]]
-    
+
     ## This extracts essential info for this geom/layer.
     g <- saveLayer(L, df, meta)
-    
+
     ## 'strips' are really titles for the different facet panels
     plot.meta$strips <- with(meta$built, getStrips(plot$facet, panel))
     ## the layout tells us how to subset and where to plot on the JS side
     plot.meta$layout <- with(meta$built, flag_axis(plot$facet, panel$layout))
-    plot.meta$layout <- with(meta$built, train_layout(plot$facet, plot$coordinates, plot.meta$layout, 
+    plot.meta$layout <- with(meta$built, train_layout(plot$facet, plot$coordinates, plot.meta$layout,
                                                      panel$ranges))
     plot.meta$geoms <- c(plot.meta$geoms, list(g$classed))
   }
@@ -51,14 +51,14 @@ parsePlot <- function(meta){
       meta$geoms[[geom.prev]]$nextgeom <- meta$geoms[[geom.next]]$classed
     }
   }
-                                        
+
   ## Export axis specification as a combination of breaks and
   ## labels, on the relevant axis scale (i.e. so that it can
-  ## be passed into d3 on the x axis scale instead of on the 
-  ## grid 0-1 scale). This allows transformations to be used 
-  ## out of the box, with no additional d3 coding. 
-  theme.pars <- ggplot2:::plot_theme(meta$plot)  
-  
+  ## be passed into d3 on the x axis scale instead of on the
+  ## grid 0-1 scale). This allows transformations to be used
+  ## out of the box, with no additional d3 coding.
+  theme.pars <- ggplot2:::plot_theme(meta$plot)
+
   ## Flip labels if coords are flipped - transform does not take care
   ## of this. Do this BEFORE checking if it is blank or not, so that
   ## individual axes can be hidden appropriately, e.g. #1.
@@ -72,12 +72,12 @@ parsePlot <- function(meta){
     "element_blank"%in%attr(x,"class")
   }
 
-  # Instead of an "axis" JSON object for each plot, 
-  # allow for "axis1", "axis2", etc. where 
+  # Instead of an "axis" JSON object for each plot,
+  # allow for "axis1", "axis2", etc. where
   # "axis1" corresponds to the 1st PANEL
   ranges <- meta$built$panel$ranges
   n.axis <- length(ranges)
-  axes <- setNames(vector("list", n.axis), 
+  axes <- setNames(vector("list", n.axis),
                    paste0("axis", seq_len(n.axis)))
   plot.meta <- c(plot.meta, axes)
 
@@ -98,6 +98,25 @@ parsePlot <- function(meta){
         lab.or.null
       }
     }
+    # theme settings are shared across panels
+    axis.text <- theme.pars[[s("axis.text.%s")]]
+    ## TODO: also look at axis.text! (and text?)
+    anchor <- hjust2anchor(axis.text$hjust)
+    angle <- if(is.numeric(axis.text$angle)){
+      -axis.text$angle
+    }
+    if(is.null(angle)){
+      angle <- 0
+    }
+    if(is.null(anchor)){
+      anchor <- if(angle == 0){
+        "middle"
+      }else{
+        "end"
+      }
+    }
+    plot.meta[[s("%sanchor")]] <- as.character(anchor)
+    plot.meta[[s("%sangle")]] <- as.numeric(angle)
     # translate panel specific axis info
     ctr <- 0
     for (axis in names(axes)) {
@@ -118,7 +137,7 @@ parsePlot <- function(meta){
   axis.info <- plot.meta[grepl("^axis[0-9]+$", names(plot.meta))]
   plot.meta$xlabs <- as.list(unique(unlist(lapply(axis.info, "[", "xlab"))))
   plot.meta$ylabs <- as.list(unique(unlist(lapply(axis.info, "[", "ylab"))))
-  
+
   plot.meta$legend <- getLegendList(meta$built)
   if(length(plot.meta$legend)>0){
     plot.meta$legend <-
@@ -126,10 +145,10 @@ parsePlot <- function(meta){
         length(i)>0
       }))]
   }  # only pass out legends that have guide = "legend" or guide="colorbar"
-  
+
   # Remove legend if theme has no legend position
   if(theme.pars$legend.position=="none") plot.meta$legend <- NULL
-  
+
   if("element_blank"%in%attr(theme.pars$plot.title, "class")){
     plot.meta$title <- ""
   } else {
@@ -152,6 +171,22 @@ parsePlot <- function(meta){
   meta$plots[[meta$plot.name]] <- plot.meta
 }
 
+hjust2anchor <- function(hjust){
+  if(is.null(hjust))return(NULL)
+  trans <-
+    c("0"="start",
+      "0.5"="middle",
+      "1"="end")
+  hjust.str <- as.character(hjust)
+  is.valid <- hjust.str %in% names(trans)
+  if(all(is.valid)){
+    trans[hjust.str]
+  }else{
+    print(hjust[!is.valid])
+    stop("animint only supports hjust values 0, 0.5, 1")
+  }
+}
+
 #' Save a layer to disk, save and return meta-data.
 #' @param l one layer of the ggplot object.
 #' @param d one layer of calculated data from ggplot2::ggplot_build(p).
@@ -167,7 +202,7 @@ saveLayer <- function(l, d, meta){
             meta$geom.count, g$geom, meta$plot.name)
   meta$geom.count <- meta$geom.count + 1
   ## needed for when group, etc. is an expression:
-  g$aes <- sapply(l$mapping, function(k) as.character(as.expression(k))) 
+  g$aes <- sapply(l$mapping, function(k) as.character(as.expression(k)))
 
   ## use un-named parameters so that they will not be exported
   ## to JSON as a named object, since that causes problems with
@@ -191,7 +226,7 @@ saveLayer <- function(l, d, meta){
 
   ## "subset_order": [
   ##  "showSelected",
-  ## "showSelected2" 
+  ## "showSelected2"
   ## ],
 
   ## This information is used to parse the recursive array data structure
@@ -233,7 +268,7 @@ saveLayer <- function(l, d, meta){
     meta$selectors[[v.name]]$update <-
       c(meta$selectors[[v.name]]$update, as.list(g$classed))
   }
-  
+
   ## Warn if stat_bin is used with animint aes. geom_bar + stat_bin
   ## doesn't make sense with clickSelects/showSelected, since two
   ## clickSelects/showSelected values may show up in the same bin.
@@ -250,7 +285,7 @@ saveLayer <- function(l, d, meta){
   }
 
   ##print("before pre-processing")
-  
+
   ## Pre-process some complex geoms so that they are treated as
   ## special cases of basic geoms. In ggplot2, this processing is done
   ## in the draw method of the geoms.
@@ -261,18 +296,18 @@ saveLayer <- function(l, d, meta){
     g.data[,"y"] <- g.data$slope*ranges$x.range[1]+g.data$intercept
     g.data[,"yend"] <-  g.data$slope*ranges$x.range[2]+g.data$intercept
     g.data <- as.data.frame(g.data)
-    if(g$aes[["group"]]=="1"){ 
+    if(g$aes[["group"]]=="1"){
       # ggplot2 defaults to adding a group attribute
-      # which misleads for situations where there are 
-      # multiple lines with the same group. 
-      # if the group attribute conveys no additional 
+      # which misleads for situations where there are
+      # multiple lines with the same group.
+      # if the group attribute conveys no additional
       # information, remove it.
       ## TODO: Figure out a better way to handle this...
       g$aes <- g$aes[-which(names(g$aes)=="group")]
-    } 
+    }
     g$geom <- "segment"
   } else if(g$geom=="point"){
-    # Fill set to match ggplot2 default of filled in circle. 
+    # Fill set to match ggplot2 default of filled in circle.
     if(!"fill"%in%names(g.data) & "colour"%in%names(g.data)){
       g.data[["fill"]] <- g.data[["colour"]]
     }
@@ -299,7 +334,7 @@ saveLayer <- function(l, d, meta){
     if(!"colour"%in%names(g.data) & "fill"%in%names(g.data)){
       g.data[["colour"]] <- g.data[["fill"]]
       # Make outer border of 0 size if size isn't already specified.
-      if(!"size"%in%names(g.data)) g.data[["size"]] <- 0 
+      if(!"size"%in%names(g.data)) g.data[["size"]] <- 0
     }
     g$geom <- "rect"
   } else if(g$geom=="bar"){
@@ -313,8 +348,8 @@ saveLayer <- function(l, d, meta){
     ## that using our current JS code. There is a straightforward
     ## workaround: combine working geoms (rects, lines, and points).
 
-    g.data$outliers <- sapply(g.data$outliers, FUN=paste, collapse=" @ ") 
-    # outliers are specified as a list... change so that they are specified 
+    g.data$outliers <- sapply(g.data$outliers, FUN=paste, collapse=" @ ")
+    # outliers are specified as a list... change so that they are specified
     # as a single string which can then be parsed in JavaScript.
     # there has got to be a better way to do this!!
   } else if(g$geom=="violin"){
@@ -354,12 +389,12 @@ saveLayer <- function(l, d, meta){
     hex <- as.data.frame(hexcoords(dx, dy))[,1:2]
     hex <- rbind(hex, hex[1,]) # to join hexagon back to first point
     g.data$group <- as.numeric(interaction(g.data$group, 1:nrow(g.data)))
-    ## this has the potential to be a bad assumption - 
-    ##   by default, group is identically 1, if the user 
+    ## this has the potential to be a bad assumption -
+    ##   by default, group is identically 1, if the user
     ##   specifies group, polygons aren't possible to plot
     ##   using d3, because group will have a different meaning
     ##   than "one single polygon".
-    # CPS (07-24-14) what about this? -- 
+    # CPS (07-24-14) what about this? --
     # http://tdhock.github.io/animint/geoms/polygon/index.html
     newdata <- ddply(g.data, .(group), function(df){
       df$xcenter <- df$x
@@ -371,36 +406,36 @@ saveLayer <- function(l, d, meta){
     if(!"colour"%in%names(g.data) & "fill"%in%names(g.data)){
       g.data[["colour"]] <- g.data[["fill"]]
       # Make outer border of 0 size if size isn't already specified.
-      if(!"size"%in%names(g.data)) g.data[["size"]] <- 0 
+      if(!"size"%in%names(g.data)) g.data[["size"]] <- 0
     }
-  } else { 
+  } else {
     ## all other geoms are basic, and keep the same name.
     g$geom
   }
 
   ##print("after pre-processing")
-  
-  ## idea: if geom is calculated, group is not meaningful - 
-  ## it has already been used in the calculation stage, and 
+
+  ## idea: if geom is calculated, group is not meaningful -
+  ## it has already been used in the calculation stage, and
   ## will only confuse the issue later.
   geom.aes.vars = g$aes[which(names(g$aes)%in%c("x", "y", "fill", "colour", "alpha", "size"))]
   grpidx <- which(names(g$aes)=="group")
   if(length(grpidx) > 0){
-    if(length(geom.aes.vars)>0 & nrow(g.data)!=nrow(l$data) & 
+    if(length(geom.aes.vars)>0 & nrow(g.data)!=nrow(l$data) &
          !g$geom%in%c("ribbon","polygon","line", "path")){
       ## need to exclude geom_ribbon and geom_violin, since they are
       ## coded to allow group aesthetics because they use the d3 path
       ## setup.
       if(g$aes[grpidx]%in%geom.aes.vars){
-        ## if the group aesthetic is also mapped to another visual aesthetic, 
+        ## if the group aesthetic is also mapped to another visual aesthetic,
         ## then remove the group aesthetic
         g$aes <- g$aes[-which(names(g$aes)=="group")]
       }
     }
   }
-  
+
   ##print("after group block")
-  
+
   ## Check g.data for color/fill - convert to hexadecimal so JS can parse correctly.
   for(color.var in c("colour", "color", "fill")){
     if(color.var %in% names(g.data)){
@@ -411,14 +446,14 @@ saveLayer <- function(l, d, meta){
   if(any(g.data$size == 0, na.rm=TRUE)){
     warning(sprintf("geom_%s with size=0 will be invisible",g$geom))
   }
-  
+
   ## Idea: use the ggplot2:::coord_transform(coords, data, scales)
   ## function to handle cases like coord_flip. scales is a list of
   ## 12, coords is a list(limits=list(x=NULL,y=NULL)) with class
   ## e.g. c("cartesian","coord"). The result is a transformed data
   ## frame where all the data values are between 0 and 1.
-  
-  ## TODO: coord_transform maybe won't work for 
+
+  ## TODO: coord_transform maybe won't work for
   ## geom_dotplot|rect|segment and polar/log transformations, which
   ## could result in something nonlinear. For the time being it is
   ## best to just ignore this, but you can look at the source of
@@ -426,15 +461,15 @@ saveLayer <- function(l, d, meta){
   ## doing a piecewise linear interpolation of the shape.
 
   # Apply coord_transform seperately to each panel
-  # Note the plotly implementation does not use 
+  # Note the plotly implementation does not use
   # coord_transform...do they take care of the transformation
   # at a different point in time?
-  g.data <- do.call("rbind", mapply(function(x, y) { 
+  g.data <- do.call("rbind", mapply(function(x, y) {
     ggplot2:::coord_transform(meta$plot$coord, x, y)
   }, split(g.data, g.data[["PANEL"]]), ranges, SIMPLIFY = FALSE))
-  
+
   ## Output types
-  ## Check to see if character type is d3's rgb type. 
+  ## Check to see if character type is d3's rgb type.
   is.linetype <- function(x){
     x <- tolower(x)
     namedlinetype <-
@@ -459,7 +494,7 @@ saveLayer <- function(l, d, meta){
       type
     }
   })
-  
+
   ## convert ordered factors to unordered factors so javascript
   ## doesn't flip out.
   ordfactidx <- which(g$types=="ordered-factor")
@@ -478,7 +513,7 @@ saveLayer <- function(l, d, meta){
   if(length(time.col)){
     g$subset_order <- g$subset_order[order(g$subset_order != time.col)]
   }
-  
+
   ## Determine which showSelected values to use for breaking the data
   ## into chunks. This is a list of variables which have the same
   ## names as the selectors. E.g. if chunk_order=list("year") then
@@ -585,7 +620,7 @@ saveLayer <- function(l, d, meta){
   if("group" %in% names(g$aes)){
     g$nest_order <- c(g$nest_order, "group")
   }
-  
+
   ## Get unique values of time variable.
   if(length(time.col)){ # if this layer/geom is animated,
     g$timeValues <- unique(g.data[[time.col]])
@@ -664,9 +699,9 @@ gg2animint <- function(...){
 #' Compile and render an animint in a local directory
 #'
 #' An animint is a list of ggplots and options that defines
-#' an interactive animation and can be viewed in a web browser. 
+#' an interactive animation and can be viewed in a web browser.
 #' Several new aesthetics control interactivity.
-#' The most important two are 
+#' The most important two are
 #' \itemize{
 #' \item \code{aes(showSelected=variable)} means that
 #'   only the subset of the data that corresponds to
@@ -675,10 +710,10 @@ gg2animint <- function(...){
 #'   this geom will change the currently selected value of variable.
 #' }
 #' The others are described on https://github.com/tdhock/animint/wiki/Advanced-features-present-animint-but-not-in-ggplot2
-#' 
-#' Supported ggplot2 geoms: 
+#'
+#' Supported ggplot2 geoms:
 #' \itemize{
-#' \item point 
+#' \item point
 #' \item jitter
 #' \item line
 #' \item rect
@@ -705,7 +740,7 @@ gg2animint <- function(...){
 #' \item freqpoly
 #' \item hex
 #' }
-#' Unsupported geoms: 
+#' Unsupported geoms:
 #' \itemize{
 #' \item rug
 #' \item dotplot
@@ -717,21 +752,21 @@ gg2animint <- function(...){
 #' \item bin2d - bin using ddply() and then use geom_tile()
 #' \item map - can be created using geom_polygon or geom_path
 #'}
-#' Supported scales: 
+#' Supported scales:
 #' \itemize{
-#' \item alpha, 
+#' \item alpha,
 #' \item fill/colour (brewer, gradient, identity, manual)
 #' \item linetype
 #' \item x and y axis scales, manual break specification, label formatting
 #' \item x and y axis theme elements: axis.line, axis.ticks, axis.text, axis.title can be set to element_blank(); other theme modifications not supported at this time, but would be possible with custom css files.
-#' \item area 
+#' \item area
 #' \item size
 #' }
-#' Unsupported scales: 
+#' Unsupported scales:
 #' \itemize{
 #' \item shape. Open and closed circles can be represented by manipulating fill and colour scales and using default (circle) points, but d3 does not support many R shape types, so mapping between the two is difficult.
 #' }
-#' 
+#'
 #' @aliases animint
 #' @param plot.list a named list of ggplots and option lists.
 #' @param out.dir directory to store html/js/csv files.
@@ -739,20 +774,20 @@ gg2animint <- function(...){
 #' @param open.browser Should R open a browser? If yes, be sure to configure your browser to allow access to local files, as some browsers block this by default (e.g. chrome).
 #' @param css.file character string for non-empty css file to include. Provided file will be copied to the output directory as styles.css
 #' @return invisible list of ggplots in list format.
-#' @export 
+#' @export
 #' @seealso \code{\link{ggplot2}}
 #' @example inst/examples/animint.R
-animint2dir <- function(plot.list, out.dir = tempfile(), 
+animint2dir <- function(plot.list, out.dir = tempfile(),
                         json.file = "plot.json", open.browser = interactive(),
                         css.file = "") {
   ## Check that plot.list is a list and every element is named.
-  if (!is.list(plot.list)) 
+  if (!is.list(plot.list))
     stop("plot.list must be a list of ggplots")
-  if (is.null(names(plot.list))) 
+  if (is.null(names(plot.list)))
     stop("plot.list must be a named list")
-  if (any(names(plot.list)=="")) 
+  if (any(names(plot.list)==""))
     stop("plot.list must have names with non-empty strings")
-  
+
   ## Store meta-data in this environment, so we can alter state in the
   ## lower-level functions.
   meta <- new.env()
@@ -829,7 +864,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
       stop("list items must be ggplots or option lists, problem: ", list.name)
     }
   }
-  
+
   ## Go through options and add to the list.
   for(v.name in names(meta$duration)){
     meta$selectors[[v.name]]$duration <- meta$duration[[v.name]]
@@ -896,7 +931,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
     }
     meta$selectors[[time.var]]$selected <- meta$time$sequence[[1]]
   }
-  
+
   ## The first selection:
   for(selector.name in names(meta$first)){
     first <- as.character(meta$first[[selector.name]])
@@ -920,6 +955,9 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
     } else {
       file.copy(css.file, file.path(out.dir, "styles.css"), overwrite=TRUE)
     }
+  } else {
+    style.file <- system.file("htmljs", "styles.css", package = "animint")
+    file.copy(style.file, file.path(out.dir, "styles.css"), overwrite=TRUE)
   }
   file.copy(to.copy, out.dir, overwrite=TRUE, recursive=TRUE)
   export.names <-
@@ -945,9 +983,9 @@ servr::httd("', normalizePath( out.dir,winslash="/" ), '")')
 
 
 #' Check if character is an RGB hexadecimal color value
-#' @param x character 
+#' @param x character
 #' @return True/False value
-#' @export 
+#' @export
 is.rgb <- function(x){
   grepl("NULL", x) | (grepl("#", x) & nchar(x)==7)
 }
@@ -958,7 +996,7 @@ is.rgb <- function(x){
 #' @export
 toRGB <- function(x){
   sapply(x, function(i) if(!is.na(i)) rgb(t(col2rgb(as.character(i))), maxColorValue=255) else "none")
-} 
+}
 
 #' Function to get legend information from ggplot
 #' @param plistextra output from ggplot2::ggplot_build(p)
@@ -973,7 +1011,7 @@ getLegendList <- function(plistextra){
   position <- theme$legend.position
   # by default, guide boxes are vertically aligned
   theme$legend.box <- if(is.null(theme$legend.box)) "vertical" else theme$legend.box
-  
+
   # size of key (also used for bar in colorbar guide)
   theme$legend.key.width <- if(is.null(theme$legend.key.width)) theme$legend.key.size
   theme$legend.key.height <- if(is.null(theme$legend.key.height)) theme$legend.key.size
@@ -991,8 +1029,8 @@ getLegendList <- function(plistextra){
         switch(position, bottom =, top = c("center", "top"), left =, right = c("left", "top"))
       else
         c("center", "center")
-    } 
-  
+    }
+
   position <- theme$legend.position
   # locate guide argument in scale_*, and use that for a default.
   # Note, however, that guides(colour = ...) has precendence! See https://gist.github.com/cpsievert/ece28830a6c992b29ab6
@@ -1025,7 +1063,7 @@ getLegendList <- function(plistextra){
 getLegend <- function(mb){
   guidetype <- mb$name
   ## The main idea of legends:
-  
+
   ## 1. Here in getLegend I export the legend entries as a list of
   ## rows that can be used in a data() bind in D3.
 
@@ -1039,7 +1077,7 @@ getLegend <- function(mb){
     if (nd == 0) return(data.frame()); # if no rows, return an empty df.
     if ("guide" %in% names(params)) {
       if (params[["guide"]] == "none") return(data.frame()); # if no guide, return an empty df
-    } 
+    }
     if (nd != nk) warning("key and data have different number of rows")
     if (!".label" %in% names(key)) return(data.frame()); # if there are no labels, return an empty df.
     data$`.label` <- key$`.label`
@@ -1060,9 +1098,9 @@ getLegend <- function(mb){
   if(guidetype=="none"){
     NULL
   } else{
-    list(guide = guidetype, 
-         geoms = geoms, 
-         title = mb$title, 
+    list(guide = guidetype,
+         geoms = geoms,
+         title = mb$title,
          entries = data)
   }
 }
@@ -1071,7 +1109,7 @@ getLegend <- function(mb){
 #' @param dfs list of data frames
 #' @param ... other arguments to merge
 #' @return data frame of merged lists
-merge_recurse = function (dfs, ...) 
+merge_recurse = function (dfs, ...)
 {
   if (length(dfs) == 1) {
     dfs[[1]]
@@ -1080,7 +1118,7 @@ merge_recurse = function (dfs, ...)
     merge(dfs[[1]], dfs[[2]], all.x = TRUE, sort = FALSE, ...)
   }
   else {
-    merge(dfs[[1]], Recall(dfs[-1]), all.x = TRUE, sort = FALSE, 
+    merge(dfs[[1]], Recall(dfs[-1]), all.x = TRUE, sort = FALSE,
           ...)
   }
 }
