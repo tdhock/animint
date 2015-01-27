@@ -138,7 +138,7 @@ var animint = function (to_select, json_file) {
 	     return measureText(entry, 11).width;
       }));
     }
-    var axispaddingx = 5 + 9;
+    var axispaddingx = 10 + 9;
     if(p_info.hasOwnProperty("xlabs") && p_info.xlabs.length){
       // TODO: throw warning if text height is large portion of plot height?
       axispaddingx += Math.max.apply(null, p_info.xlabs.map(function(entry){
