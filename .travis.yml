@@ -16,7 +16,7 @@ install:
   - ./travis-tool.sh install_github tdhock/ggplot2
   # Dependencies for shiny/rmarkdown integration
   # Thanks RStudio! https://github.com/rstudio/rmarkdown/blob/master/.travis.yml
-  # Install binary pandoc from Rstudio 
+  # Install binary pandoc from Rstudio
   - mkdir -p $HOME/opt/pandoc
   - curl -O https://s3.amazonaws.com/rstudio-buildtools/pandoc-1.12.3.zip
   - unzip -j pandoc-1.12.3.zip pandoc-1.12.3/linux/debian/x86_64/pandoc
@@ -28,10 +28,11 @@ install:
   - ./travis-tool.sh r_binary_install servr
   - ./travis-tool.sh r_binary_install XML
   - ./travis-tool.sh r_binary_install shiny
+  - ./travis-tool.sh r_binary_install RSelenium
+  - ./travis-tool.sh r_binary_install gistr
   # Binary install of rmarkdown doesn't work (currently?)
   - ./travis-tool.sh install_github rstudio/rmarkdown
-  - ./travis-tool.sh install_github ropensci/RSelenium
-  - ./travis-tool.sh install_github ropensci/gistr
+  - ./travis-tool.sh install_github yihui/servr
 
 script: ./travis-tool.sh run_tests
 
