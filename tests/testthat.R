@@ -24,6 +24,8 @@ library(testthat)
 #' run_tests("chrome")
 #'
 
+source("tests/testthat/functions.R")
+
 run_tests <- function(browserName = "phantomjs", ..., port = 4848,
                       filter = NULL, show.ps = FALSE) {
 
@@ -36,7 +38,7 @@ run_tests <- function(browserName = "phantomjs", ..., port = 4848,
   } else if (basename(old) != "tests") {
     warning("Make sure your working directory is set to animint's source path")
   }
-  source("testthat/functions.R")
+
   # start a daemonized local file server
   server <- try({
     servr::httd(dir = file.path(getwd(), "testthat"),
@@ -62,6 +64,7 @@ run_tests <- function(browserName = "phantomjs", ..., port = 4848,
     selenium <- try(RSelenium::startServer(), silent = TRUE)
   }
   Sys.sleep(5) # give the binary a moment
+  browser()
   remDr <<- RSelenium::remoteDriver(browserName = browserName)
   remDr$open(silent = TRUE)
   # run the tests
@@ -87,4 +90,4 @@ kill_dr <- function(b) {
 }
 
 # this will make travisCI run tests with phantomJS
-run_tests()
+run_tests("firefox", filter = "rotate")
