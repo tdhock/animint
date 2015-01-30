@@ -31,7 +31,7 @@ install:
   - ./travis-tool.sh install_github rstudio/rmarkdown
   - ./travis-tool.sh install_github ropensci/RSelenium
   - ./travis-tool.sh install_github ropensci/gistr
-  - ./travis-tool.sh install_github servr
+  - ./travis-tool.sh install_github yihui/servr
 
 script: ./travis-tool.sh run_tests
 
