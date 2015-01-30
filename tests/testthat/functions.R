@@ -14,9 +14,10 @@ animint2HTML <- function(plotList) {
   ## inside of the tests, it will write the viz to
   ## animint/tests/testthat/htmltest, so we also need to start the
   ## servr in animint/tests/testthat.
-  #on.exit(unlink("htmltest", recursive=TRUE))
+  on.exit(unlink("htmltest", recursive=TRUE))
   res <- animint2dir(plotList, out.dir="htmltest", open.browser = FALSE)
-  remDr$navigate("http://localhost:4848/htmltest")
+  address <- "http://localhost:4848/htmltest/"
+  remDr$navigate(address)
   res$html <- XML::htmlParse(remDr$getPageSource(), asText = TRUE)
   res
 }

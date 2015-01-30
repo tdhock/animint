@@ -24,14 +24,14 @@ viz <-
        duration=list(year=1000))
 
 test_that("plot named timeSeries is OK without time option list", {
-  animint2dir(viz)
+  animint2dir(viz, open.browser = FALSE)
 })
 
 viz.time <- viz
 viz.time$time <- list(ms=2000, variable="year")
 
 test_that("plot named timeSeries is OK with time option list", {
-  animint2dir(viz.time)
+  animint2dir(viz.time, open.browser = FALSE)
 })
 
 bad <-
@@ -55,7 +55,7 @@ bad <-
 
 test_that("plot named time is NOT OK", {
   expect_error({
-    animint2dir(bad)
+    animint2dir(bad, open.browser = FALSE)
   }, "time option list needs ms, variable")
 })
 

@@ -24,9 +24,9 @@ library(testthat)
 #' run_tests("chrome")
 #'
 
-source("tests/testthat/functions.R")
+source("testthat/functions.R")
 
-run_tests <- function(browserName = "phantomjs", ..., port = 4848,
+run_tests <- function(browserName = "phantomjs", ...,
                       filter = NULL, show.ps = FALSE) {
 
   ## To get the process long names look at (helps to debug)
@@ -38,19 +38,14 @@ run_tests <- function(browserName = "phantomjs", ..., port = 4848,
   } else if (basename(old) != "tests") {
     warning("Make sure your working directory is set to animint's source path")
   }
-
-  # start a daemonized local file server
-  server <- try({
-    servr::httd(dir = file.path(getwd(), "testthat"),
-                port = port, daemon = TRUE, browser = FALSE)
-  }, silent = TRUE)
-  # if error, we won't know the right server ID,
-  # so it's best to kill by the port number?
-  if (inherits(server, "try-error")) {
-    on.exit(kill_port(port), add = TRUE)
-  } else {
-    on.exit(servr::daemon_stop(server), add = TRUE)
-  }
+  # start a non-blocking local file server
+  cmd <- "R -e \'cat(Sys.getpid(), file=\"pid-4848.txt\"); servr::httd(dir=\"testthat\", port=4848, browser=FALSE)\'"
+  system(cmd, wait = FALSE)
+  # kill the file server on exit
+  on.exit({
+    tools::pskill(readLines("pid-4848.txt", warn = F))
+    file.remove("pid-4848.txt")
+  }, add = TRUE)
   # quit selenium on exit
   on.exit(kill_dr(browserName), add = TRUE)
   # selenium runs on port 4444
@@ -64,7 +59,6 @@ run_tests <- function(browserName = "phantomjs", ..., port = 4848,
     selenium <- try(RSelenium::startServer(), silent = TRUE)
   }
   Sys.sleep(5) # give the binary a moment
-  browser()
   remDr <<- RSelenium::remoteDriver(browserName = browserName)
   remDr$open(silent = TRUE)
   # run the tests
@@ -85,9 +79,13 @@ kill_port <- function(port) {
 
 # Kill the selenium driver
 kill_dr <- function(b) {
-  if (b == "phantomjs") pJS$stop()
-  remDr$quit()
+  if (b == "phantomjs") {
+    pJS$stop()
+  } else {
+    remDr$quit()
+  }
+  return(invisible())
 }
 
 # this will make travisCI run tests with phantomJS
-run_tests("firefox", filter = "rotate")
+run_tests()
