@@ -26,17 +26,14 @@ kill_all <- function() {
 }
 
 run_test <- function() {
-  # In case of potential errors in running the test, we make sure to kill 
+  # In case of potential errors in running the test, we make sure to kill
   # all the background processes upon exiting this function.
   on.exit(kill_all(), add = TRUE)
-  
-  # Run local file server in a separate R session
-  # IDEA: If we can access the process ID (with Sys.getpid()) from this child session
-  # we could kill the file server with tools::pskill(). This would help testing be 
-  # platform independent -- I just don't know how to transfer objects between sessions
-  cmd <- "R -e \'servr::httd(port=4848, dir=file.path(getwd(), \"testthat\"), launch.browser=FALSE)\'"
-  system(cmd, wait = FALSE)
-  
+
+  res <- servr::httd(dir = file.path(getwd(), "testthat"),
+              port = 4848, daemon = TRUE, browser = FALSE)
+  on.exit(servr::daemon_stop(res), add = TRUE)
+
   if (interactive()) {
     checkForServer(dir=system.file("bin", package="RSelenium"))
     startServer()
