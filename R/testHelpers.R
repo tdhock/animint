@@ -59,15 +59,9 @@ run_tests <- function(browserName = "phantomjs", dir = ".", ...,
     file.remove("pid-4848.txt")
   }, add = TRUE)
   # quit selenium on exit
-  on.exit(kill_dr(browserName), add = TRUE)
-  if (browserName == "phantomjs") {
-    ## phantomjs doesn't need a selenium server (and is lightning fast!)
-    ## Idea is from -- vignette("RSelenium-headless", package = "RSelenium")
-    animintEnv$pJS <- RSelenium::phantom()
-  } else {
-    RSelenium::checkForServer(dir = system.file("bin", package="RSelenium"))
-    selenium <- try(RSelenium::startServer(), silent = TRUE)
-  }
+  on.exit(kill_dr(), add = TRUE)
+  RSelenium::checkForServer(dir = system.file("bin", package="RSelenium"))
+  selenium <- try(RSelenium::startServer(), silent = TRUE)
   Sys.sleep(5) # give the binary a moment
   animintEnv$remDr <- RSelenium::remoteDriver(browserName = browserName)
   animintEnv$remDr$open(silent = TRUE)
@@ -89,12 +83,8 @@ kill_port <- function(port) {
 }
 
 # Kill the selenium driver
-kill_dr <- function(b) {
-  if (b == "phantomjs") {
-    animintEnv$pJS$stop()
-  } else {
-    animintEnv$remDr$quit()
-    system('pkill -f selenium-server-standalone')
-  }
+kill_dr <- function() {
+  animintEnv$remDr$quit()
+  system('pkill -f selenium-server-standalone')
   return(invisible())
 }
