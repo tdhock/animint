@@ -2,6 +2,7 @@
 
 export(animint2dir)
 export(animint2gist)
+export(animintEnv)
 export(animintOutput)
 export(geom_tallrect)
 export(geom_widerect)

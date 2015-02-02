@@ -1,3 +1,4 @@
+#' @export
 animintEnv <- new.env(parent = emptyenv())
 
 #' Run animint tests
@@ -93,6 +94,7 @@ kill_dr <- function(b) {
     animintEnv$pJS$stop()
   } else {
     animintEnv$remDr$quit()
+    system('pkill -f selenium-server-standalone')
   }
   return(invisible())
 }
