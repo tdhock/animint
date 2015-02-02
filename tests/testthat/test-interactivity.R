@@ -6,7 +6,7 @@ only.error <- subset(breakpoints$error,type=="E")
 only.segments <- subset(only.error, samples==samples[1])
 signal.colors <- c(estimate="#0adb0a",
                    latent="#0098ef")
-breakpointError <- 
+breakpointError <-
   list(signal=ggplot()+
        geom_point(aes(position, signal, showSelected=samples),
                   data=breakpoints$signals)+
@@ -67,11 +67,11 @@ test_that("default is 4 <line> segments", {
 clickHTML <- function(...){
   v <- c(...)
   stopifnot(length(v) == 1)
-  e <- remDr$findElement(names(v), as.character(v))
+  e <- animintEnv$remDr$findElement(names(v), as.character(v))
   e$clickElement()
   Sys.sleep(1)
-  XML::htmlParse(remDr$getPageSource(), asText = TRUE)
-}  
+  XML::htmlParse(animintEnv$remDr$getPageSource(), asText = TRUE)
+}
 
 test_that("clickSelects 300 makes 300 <circle> elements", {
     # randomly fails

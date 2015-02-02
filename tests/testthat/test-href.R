@@ -44,10 +44,10 @@ test_that("aes(href) becomes <a href>", {
 clickID <- function(...){
   v <- c(...)
   stopifnot(length(v) == 1)
-  e <- remDr$findElement("id", as.character(v))
+  e <- animintEnv$remDr$findElement("id", as.character(v))
   e$clickElement()
   Sys.sleep(1)
-  XML::htmlParse(remDr$getPageSource(), asText = TRUE)
+  XML::htmlParse(animintEnv$remDr$getPageSource(), asText = TRUE)
 }
 
 stanford.html <- clickID("Stanford")

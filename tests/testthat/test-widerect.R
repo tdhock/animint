@@ -24,7 +24,7 @@ wb.facets <-
        geom_point(aes(year, life.expectancy, color=region, size=population,
                       showSelected=country, clickSelects=country),
                   data=TS(not.na))+
-       
+
        geom_line(aes(fertility.rate, year, group=country, colour=region,
                      clickSelects=country),
                  data=TS2(not.na), size=4, alpha=3/5)+
@@ -35,7 +35,7 @@ wb.facets <-
                          clickSelects=year,
                          id=paste0("year", year)),
                      data=TS2(years), alpha=1/2)+
-       
+
        geom_point(aes(fertility.rate, life.expectancy, clickSelects=country,
                       showSelected=year, colour=region, size=population,
                       key=country), # key aesthetic for animated transitions!
@@ -50,7 +50,7 @@ wb.facets <-
        geom_text(aes(5, 85, label=paste0("year = ", year),
                      showSelected=year),
                  data=SCATTER(years)),
-       
+
        bar=ggplot()+
        theme_animint(height=2400)+
        geom_bar(aes(country, life.expectancy, fill=region,
@@ -58,7 +58,7 @@ wb.facets <-
                     key=country, id=country),
                 data=not.na, stat="identity", position="identity")+
        coord_flip(),
-       
+
        time=list(variable="year", ms=1000),
        duration=list(year=1000),
        first=list(year=1975, country=c("United States", "Vietnam")),
@@ -87,7 +87,7 @@ getYear <- function(html){
 test_that("animation updates", {
   old.year <- getYear(info$html)
   Sys.sleep(1) #wait for one animation frame.
-  new.html <- XML::htmlParse(remDr$getPageSource(), asText = TRUE)
+  new.html <- XML::htmlParse(animintEnv$remDr$getPageSource(), asText = TRUE)
   new.year <- getYear(new.html)
   expect_true(old.year != new.year)
 })
@@ -95,12 +95,12 @@ test_that("animation updates", {
 clickID <- function(...){
   v <- c(...)
   stopifnot(length(v) == 1)
-  e <- remDr$findElement("id", as.character(v))
+  e <- animintEnv$remDr$findElement("id", as.character(v))
   e$clickElement()
 }
 
 getHTML <- function(){
-  XML::htmlParse(remDr$getPageSource(), asText = TRUE)
+  XML::htmlParse(animintEnv$remDr$getPageSource(), asText = TRUE)
 }
 
 clickID("show_hide_animation_controls")
@@ -125,7 +125,7 @@ test_that("play restarts animation", {
   expect_true(old.year != new.year)
 })
 
-e <- remDr$findElement("id", "updates_ms")
+e <- animintEnv$remDr$findElement("id", "updates_ms")
 e$clickElement()
 e$clearElement()
 e$sendKeysToElement(list("3000", key="enter"))
@@ -187,7 +187,7 @@ test_that("middle of transition != after when duration=1000", {
   expect_true(during.width != after.width)
 })
 
-e <- remDr$findElement("id", "duration_ms_year")
+e <- animintEnv$remDr$findElement("id", "duration_ms_year")
 e$clickElement()
 e$clearElement()
 e$sendKeysToElement(list("0", key="enter"))

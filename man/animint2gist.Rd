@@ -36,8 +36,6 @@ Before using this function set your appropriate
 }
 \examples{
 \dontrun{
-devtools::install_github("rOpenSci/gistr")
-options(github.username = "foo", github.password = "bar")
 library(animint)
 iris$id <- 1:nrow(iris)
 viz <- list(petal=ggplot()+

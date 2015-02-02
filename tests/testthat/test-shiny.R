@@ -7,9 +7,9 @@ system(cmd, wait = FALSE)
 
 test_that("animint plot renders in a shiny app", {
   Sys.sleep(5) # give shiny a second to do it's thing
-  remDr$navigate("http://localhost:6012/")
+  animintEnv$remDr$navigate("http://localhost:6012/")
   Sys.sleep(10)
-  html <- XML::htmlParse(remDr$getPageSource(), asText = TRUE)
+  html <- XML::htmlParse(animintEnv$remDr$getPageSource(), asText = TRUE)
   tools::pskill(readLines("pid-6012.txt", warn = F))
   file.remove("pid-6012.txt")
   circles <- getNodeSet(html, "//div[@id='animint']//circle")
@@ -21,9 +21,9 @@ system(rmd, wait = FALSE)
 
 test_that("animint plot renders in an interactive document", {
   Sys.sleep(10) # give shiny a second to do it's thing
-  remDr$navigate("http://localhost:6014/")
+  animintEnv$remDr$navigate("http://localhost:6014/")
   Sys.sleep(10)
-  html <- XML::htmlParse(remDr$getPageSource(), asText = TRUE)
+  html <- XML::htmlParse(animintEnv$remDr$getPageSource(), asText = TRUE)
   tools::pskill(readLines("pid-6014.txt", warn = F))
   file.remove("pid-6014.txt")
   circles <- getNodeSet(html, "//svg//circle")

@@ -1,4 +1,3 @@
-#### helper functions to be reused in testing #####
 
 #' Apply `animint2dir` to a list ggplots and extract the (rendered) page source via RSelenium
 #'
@@ -17,8 +16,8 @@ animint2HTML <- function(plotList) {
   on.exit(unlink("htmltest", recursive=TRUE))
   res <- animint2dir(plotList, out.dir="htmltest", open.browser = FALSE)
   address <- "http://localhost:4848/htmltest/"
-  remDr$navigate(address)
-  res$html <- XML::htmlParse(remDr$getPageSource(), asText = TRUE)
+  animintEnv$remDr$navigate(address)
+  res$html <- XML::htmlParse(animintEnv$remDr$getPageSource(), asText = TRUE)
   res
 }
 
