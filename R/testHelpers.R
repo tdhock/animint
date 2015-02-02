@@ -71,6 +71,7 @@ run_tests <- function(browserName = "phantomjs", dir = ".", ...,
   animintEnv$remDr <- RSelenium::remoteDriver(browserName = browserName)
   animintEnv$remDr$open(silent = TRUE)
   # run the tests
+  source("functions.R")
   test_dir(".", filter = filter)
 }
 
