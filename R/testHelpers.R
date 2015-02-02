@@ -16,6 +16,7 @@ animintEnv <- new.env(parent = emptyenv())
 #' @export
 #' @examples
 #'
+#' \dontrun{
 #' # testing requires that you load testthat first.
 #' library("testthat")
 #' # run all tests with phantomjs
@@ -23,6 +24,7 @@ animintEnv <- new.env(parent = emptyenv())
 #' # run tests in test-rotate.R with Firefox
 #' run_tests("firefox", filter = "rotate")
 #' run_tests("chrome")
+#' }
 #'
 
 run_tests <- function(browserName = "phantomjs", dir = ".", ...,
@@ -39,7 +41,6 @@ run_tests <- function(browserName = "phantomjs", dir = ".", ...,
   on.exit(setwd(old))
   dir <- normalizePath(dir, mustWork = TRUE)
   if (!grepl("animint", dir)) stop("animint must be in the directory")
-  cat(dir)
   base_name <- basename(dir)
   if (base_name == 'animint') {
     setwd("tests/testthat")

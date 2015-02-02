@@ -29,6 +29,7 @@ run_tests(browserName = "phantomjs", dir = ".", ..., filter = NULL,
 Convenience function for running animint tests.
 }
 \examples{
+\dontrun{
 # testing requires that you load testthat first.
 library("testthat")
 # run all tests with phantomjs
@@ -36,5 +37,6 @@ run_tests()
 # run tests in test-rotate.R with Firefox
 run_tests("firefox", filter = "rotate")
 run_tests("chrome")
+}
 }
 
