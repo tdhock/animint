@@ -4,11 +4,15 @@
 \alias{run_tests}
 \title{Run animint tests}
 \usage{
-run_tests(browserName = "phantomjs", ..., filter = NULL, show.ps = FALSE)
+run_tests(browserName = "phantomjs", dir = ".", ..., filter = NULL,
+  show.ps = FALSE)
 }
 \arguments{
   \item{browserName}{Name of the browser to use for
   testing. See ?RSelenium::remoteDriver for details.}
+
+  \item{dir}{character string with the path to animint's
+  source code.}
 
   \item{...}{passed onto RSelenium::remoteDriver}
 

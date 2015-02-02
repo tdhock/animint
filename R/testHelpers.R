@@ -6,6 +6,7 @@ animintEnv <- new.env(parent = emptyenv())
 #'
 #' @param browserName Name of the browser to use for testing.
 #' See ?RSelenium::remoteDriver for details.
+#' @param dir character string with the path to animint's source code.
 #' @param ... passed onto RSelenium::remoteDriver
 #' @param port port number used for local file server
 #' @param show.ps show user invoked processes
@@ -24,7 +25,7 @@ animintEnv <- new.env(parent = emptyenv())
 #' run_tests("chrome")
 #'
 
-run_tests <- function(browserName = "phantomjs", ...,
+run_tests <- function(browserName = "phantomjs", dir = ".", ...,
                       filter = NULL, show.ps = FALSE) {
   # packages required to run the tests
   pkgs <- lapply(c("RSelenium", "servr", "shiny", "rmarkdown", "XML"),
@@ -36,11 +37,10 @@ run_tests <- function(browserName = "phantomjs", ...,
   if (show.ps) system("ps u")
   old <- getwd()
   on.exit(setwd(old))
-  if (basename(old) == "animint") {
-    setwd("tests")
-  } else if (basename(old) != "tests") {
-    warning("Make sure your working directory is set to animint's source path")
-  }
+  dir <- normalizePath(dir, mustWork = TRUE)
+  if (basename(dir) != 'animint')
+    stop("basename(dir) != 'animint'")
+  setwd("tests")
   # start a non-blocking local file server
   cmd <- "R -e \'cat(Sys.getpid(), file=\"pid-4848.txt\"); servr::httd(dir=\"testthat\", port=4848, browser=FALSE)\'"
   system(cmd, wait = FALSE)
