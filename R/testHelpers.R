@@ -38,9 +38,11 @@ run_tests <- function(browserName = "phantomjs", dir = ".", ...,
   old <- getwd()
   on.exit(setwd(old))
   dir <- normalizePath(dir, mustWork = TRUE)
-  if (basename(dir) != 'animint')
-    stop("basename(dir) != 'animint'")
-  setwd("tests")
+  if (basename(dir) == 'animint') {
+    setwd("tests")
+  } else if (basename(dir) != "tests") {
+    stop("dir must point to animint's source (or its tests folder)")
+  }
   # start a non-blocking local file server
   cmd <- "R -e \'cat(Sys.getpid(), file=\"pid-4848.txt\"); servr::httd(dir=\"testthat\", port=4848, browser=FALSE)\'"
   system(cmd, wait = FALSE)
