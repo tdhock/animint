@@ -38,13 +38,17 @@ run_tests <- function(browserName = "phantomjs", dir = ".", ...,
   old <- getwd()
   on.exit(setwd(old))
   dir <- normalizePath(dir, mustWork = TRUE)
-  if (basename(dir) == 'animint') {
-    setwd("tests")
-  } else if (basename(dir) != "tests") {
-    stop("dir must point to animint's source (or its tests folder)")
+  if (!grepl("animint", dir)) stop("animint must be in the directory")
+  base_name <- basename(dir)
+  if (base_name == 'animint') {
+    setwd("tests/testthat")
+  } else if (base_name == "tests") {
+    setwd("testthat")
+  } else if (base_name != "testthat") {
+    stop("dir must point to either animint's source, its tests folder, or its tests/testthat folder.")
   }
   # start a non-blocking local file server
-  cmd <- "R -e \'cat(Sys.getpid(), file=\"pid-4848.txt\"); servr::httd(dir=\"testthat\", port=4848, browser=FALSE)\'"
+  cmd <- "R -e \'cat(Sys.getpid(), file=\"pid-4848.txt\"); servr::httd(dir=\".\", port=4848, browser=FALSE)\'"
   system(cmd, wait = FALSE)
   # kill the file server on exit
   on.exit({
@@ -65,7 +69,7 @@ run_tests <- function(browserName = "phantomjs", dir = ".", ...,
   animintEnv$remDr <- RSelenium::remoteDriver(browserName = browserName)
   animintEnv$remDr$open(silent = TRUE)
   # run the tests
-  test_dir("testthat", filter = filter)
+  test_dir(".", filter = filter)
 }
 
 # http://stackoverflow.com/questions/5043808/how-to-find-processes-based-on-port-and-kill-them-all
