@@ -4,7 +4,7 @@
 \alias{knit_print.animint}
 \title{Insert an interactive animation into an R markdown document using a customized print method.}
 \usage{
-\method{knit_print}{animint}(x, options, ...)
+knit_print.animint(x, options, ...)
 }
 \arguments{
   \item{x}{named list of ggplots and option lists to pass
