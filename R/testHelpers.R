@@ -39,6 +39,7 @@ run_tests <- function(browserName = "phantomjs", dir = ".", ...,
   on.exit(setwd(old))
   dir <- normalizePath(dir, mustWork = TRUE)
   if (!grepl("animint", dir)) stop("animint must be in the directory")
+  cat(dir)
   base_name <- basename(dir)
   if (base_name == 'animint') {
     setwd("tests/testthat")
