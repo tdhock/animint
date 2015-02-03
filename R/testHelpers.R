@@ -110,7 +110,7 @@ try_servr <- function(port, pidfile) {
   t <- suppressWarnings(system2("R", c("-e", cmd),
                                 stdout = output, stderr = output, wait = FALSE))
   # give it a second to write output (maybe addTaskCallback would be better?)
-  Sys.sleep(2)
+  Sys.sleep(4)
   on.exit(unlink(output))
   # returns true if success
   !any(grepl("Error", readLines(output)))
