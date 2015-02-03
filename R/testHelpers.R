@@ -30,16 +30,23 @@ animintEnv <- new.env(parent = emptyenv())
 
 run_tests <- function(browserName = "phantomjs", dir = ".", ...,
                       filter = NULL, show.ps = FALSE) {
+  # necessary evil?
+  library("testthat")
+  library("XML")
+  library("animint")
+  library("shiny")
+  library("rmarkdown")
+  library("RSelenium")
+
   # packages required to run the tests
-  pkgs <- lapply(c("RSelenium", "servr", "shiny", "rmarkdown", "XML"),
-                 requireNamespace)
+  #pkgs <- lapply(c("RSelenium", "servr", "shiny", "rmarkdown", "XML"),
+  #               requireNamespace)
   # make sure testthat is loaded
-  if (!"package:testthat" %in% search())
-    stop("Testing requires the testthat package. Please library('testthat') and try again.")
+  #if (!"package:testthat" %in% search())
+  #  stop("Testing requires the testthat package. Please library('testthat') and try again.")
   ## To get the process long names look at (helps to debug)
   if (show.ps) system("ps u")
   old <- getwd()
-  on.exit(setwd(old))
   dir <- normalizePath(dir, mustWork = TRUE)
   if (!grepl("animint", dir)) stop("animint must be in the directory")
   base_name <- basename(dir)
@@ -51,40 +58,71 @@ run_tests <- function(browserName = "phantomjs", dir = ".", ...,
     stop("dir must point to either animint's source, its tests folder, or its tests/testthat folder.")
   }
   # start a non-blocking local file server
-  cmd <- "R -e \'cat(Sys.getpid(), file=\"pid-4848.txt\"); servr::httd(dir=\".\", port=4848, browser=FALSE)\'"
-  system(cmd, wait = FALSE)
+  pid.file <- run_servr()
+  port <- names(pid.file)
   # kill the file server on exit
   on.exit({
-    tools::pskill(readLines("pid-4848.txt", warn = F))
-    file.remove("pid-4848.txt")
+    tools::pskill(readLines(pid.file, warn = F))
+    file.remove(pid.file)
   }, add = TRUE)
   # quit selenium on exit
-  on.exit(kill_dr(), add = TRUE)
-  RSelenium::checkForServer(dir = system.file("bin", package="RSelenium"))
-  selenium <- try(RSelenium::startServer(), silent = TRUE)
-  Sys.sleep(5) # give the binary a moment
+  on.exit(kill_dr(browserName), add = TRUE)
+  if (browserName == "phantomjs") {
+    animintEnv$pJS <- RSelenium::phantom()
+  } else {
+    RSelenium::checkForServer(dir = system.file("bin", package="RSelenium"))
+    selenium <- try(RSelenium::startServer(), silent = TRUE)
+  }
+  Sys.sleep(5) # give the backend a moment
   animintEnv$remDr <- RSelenium::remoteDriver(browserName = browserName)
   animintEnv$remDr$open(silent = TRUE)
+  animintEnv$.address <- sprintf("http://localhost:%s", port)
   # run the tests
   source("functions.R")
+  # return to original directory on exit
+  on.exit(setwd(old), add = TRUE)
   test_dir(".", filter = filter)
 }
 
-# http://stackoverflow.com/questions/5043808/how-to-find-processes-based-on-port-and-kill-them-all
-kill_port <- function(port) {
-  if (.Platform$OS.type == "windows") {
-    # might get some ideas here https://github.com/ropensci/RSelenium/issues/25
-    warning("Testing on Windows not yet fully supported")
-  } else {
-    pid.tab <- system(paste0("lsof -i tcp:", port), intern = TRUE)
-    pid <- read.table(text = pid.tab)[,1]
+# keep trying to start a server until success
+run_servr <- function(port = 4848) {
+  pid.file <- tempfile("pid")
+  success <- try_servr(port = port, pidfile = pid.file)
+  while (!success) {
+    # kill the process ID
+    tools::pskill(readLines(pid.file, warn = F))
+    file.remove(pid.file)
+    # randomly alter port number
+    port <- port + seq.int(-10, 10)[sample.int(n = 21, size = 1)]
+    pid.file <- tempfile("pid")
+    success <- try_servr(port = port, pid.file)
   }
-  tools::pskill(pid)
+  setNames(pid.file, port)
+}
+
+# try to start a server on a specific port
+try_servr <- function(port, pidfile) {
+  cmd <- sprintf(
+    "'cat(Sys.getpid(), file=\"%s\"); servr::httd(dir=\".\", port=%d, browser=FALSE)'",
+    pidfile, port
+  )
+  output <- tempfile(fileext = "txt")
+  t <- suppressWarnings(system2("R", c("-e", cmd),
+                                stdout = output, stderr = output, wait = FALSE))
+  # give it a second to write output (maybe addTaskCallback would be better?)
+  Sys.sleep(2)
+  on.exit(unlink(output))
+  # returns true if success
+  !any(grepl("Error", readLines(output)))
 }
 
 # Kill the selenium driver
-kill_dr <- function() {
-  animintEnv$remDr$quit()
-  system('pkill -f selenium-server-standalone')
+kill_dr <- function(b) {
+  if (b == "phantomjs") {
+    animintEnv$pJS$stop()
+  } else {
+    animintEnv$remDr$quit()
+    system('pkill -f selenium-server-standalone')
+  }
   return(invisible())
 }
