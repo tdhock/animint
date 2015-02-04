@@ -12,6 +12,7 @@ for compilation and rendering steps, and write those values to a CSV
 file. Then make a time series plot of these data to see if the code is
 getting more or less efficient.
 http://sleepycoders.blogspot.ca/2013/03/sharing-travis-ci-generated-files.html
+http://rmflight.github.io/posts/2014/11/travis_ci_gh_pages.html
 
 DSL: allow for example
 geom_tile(aes(clickSelects1=var1, clickSelects2=var2))
@@ -183,14 +184,6 @@ RENDER: Should we download all data in the background, even for
 non-animated plots? I have started some work on the loadall branch,
 but the preliminary answer is NO -- the browser freezes and the plot
 does not respond to mouse clicks while the data is loading.
-
-2015.01.27
-
-Translate R/ggplot
-theme(axis.text.x=element_text(angle=70, hjust=1)) 
-to HTML/SVG
-<text style="text-anchor: end;" transform="rotate(-70)">
-Thanks for the bug report @mswastik
 
 2015.01.19
 
