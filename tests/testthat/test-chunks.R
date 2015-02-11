@@ -1,6 +1,6 @@
 context("chunks")
 
-test_that("produce as many chunk files as specified", {
+testthatQuantity("produce as many chunk files as specified", {
   viz <- list(iris=ggplot()+
     geom_point(aes(Petal.Width, Sepal.Length, showSelected=Species),
                data=iris, chunk_vars="Species"))
@@ -24,7 +24,7 @@ test_that("produce as many chunk files as specified", {
   expect_equal(length(tsv.files), 1)
 })
 
-test_that("produce informative errors for bad chunk_vars", {
+testthatQuantity("produce informative errors for bad chunk_vars", {
   viz <- list(iris=ggplot()+
     geom_point(aes(Petal.Width, Sepal.Length, showSelected=Species),
                data=iris, chunk_vars="species"))

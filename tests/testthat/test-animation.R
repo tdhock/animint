@@ -26,7 +26,7 @@ tornado.anim <-
                  data=UStornadoCounts, alpha=3/5, size=4),
        time=list(variable="year",ms=2000))
 
-test_that("tornado animation frames correct", {
+testthatQuantity("tornado animation frames correct", {
   info <- animint2dir(tornado.anim, open.browser=FALSE)
   expect_identical(info$time$sequence, as.character(1950:2012))
 })
@@ -48,7 +48,7 @@ motion <-
        time=list(variable="year",ms=3000),
        duration=list(year=1000))
 
-test_that("WorldBank animation frames correct", {
+testthatQuantity("WorldBank animation frames correct", {
   info <- animint2dir(motion, open.browser=FALSE)
   expect_identical(info$time$sequence, as.character(1960:2012))
 })
@@ -89,7 +89,7 @@ evolution <-
        duration=list(generation=1000),
        time=list(variable="generation",ms=2000))
 
-test_that("tornado animation frames correct", {
+testthatQuantity("tornado animation frames correct", {
   info <- animint2dir(evolution, open.browser=FALSE)
   expect_identical(info$time$sequence, as.character(1:100))
 })
