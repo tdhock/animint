@@ -100,13 +100,13 @@ run_servr <- function(port = 4848, ...) {
 
 # try to run a blocking command (for example a file server or shiny app)
 # on a specific port. If it fails, kill the R process according to it's process ID.
-try_servr <- function(port, pidfile = tempfile("pid"),
+try_servr <- function(port, pidfile = "pid.txt",
                       command = "servr::httd(dir=\".\", port=%d, browser=FALSE)") {
   cmd <- sprintf(
     paste0("'library(methods); cat(Sys.getpid(), file=\"%s\"); ", command, "'"),
     pidfile, port
   )
-  output <- tempfile(fileext = "txt")
+  output <- "output.txt"
   on.exit(unlink(pidfile), add = TRUE)
   on.exit(unlink(output), add = TRUE)
   t <- suppressWarnings(system2("Rscript", c("-e", cmd),
@@ -127,6 +127,10 @@ kill_dr <- function(b) {
     animintEnv$pJS$stop()
   } else {
     animintEnv$remDr$quit()
+    if (nchar(Sys.which("pkill")) == 0)
+      warning("Did not find the UNIX command `pkill` which kills \n",
+              "the selenium server used in animint testing. \n",
+              "You may have to kill this process manually.")
     system('pkill -f selenium-server-standalone')
   }
   return(invisible())
