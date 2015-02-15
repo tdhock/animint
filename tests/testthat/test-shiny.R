@@ -1,7 +1,5 @@
 context("shiny")
 
-Sys.setenv("R_TESTS" = "") # As suggested by hadley -- https://github.com/hadley/testthat/issues/144
-
 shiny_cmd <- "shiny::runApp(appDir=system.file(\"examples/shiny\", package = \"animint\"), port=%d, launch.browser=FALSE)"
 res <- run_servr(command = shiny_cmd)
 address <- sprintf("http://localhost:%s/", res$port)

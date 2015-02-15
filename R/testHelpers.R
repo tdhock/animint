@@ -40,6 +40,10 @@ run_tests <- function(browserName = "phantomjs", dir = ".", ...,
   library("rmarkdown")
   library("RSelenium")
 
+  # avoid weird errors if this function is called via testhat::check()
+  # https://github.com/hadley/testthat/issues/144
+  Sys.setenv("R_TESTS" = "")
+
   # packages required to run the tests
   #pkgs <- lapply(c("RSelenium", "servr", "shiny", "rmarkdown", "XML"),
   #               requireNamespace)
@@ -116,8 +120,8 @@ try_servr <- function(port, pidfile = tempfile("pid"),
   pid <- readLines(pidfile, warn = FALSE)
   # if not, kill the process
   if (!success) tools::pskill(pid)
-  unlink(pidfile)
-  unlink(output)
+  file.remove(pidfile)
+  file.remove(output)
   list(pid = pid, port = port, success = success)
 }
 
