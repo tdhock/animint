@@ -13,13 +13,23 @@ animint2HTML <- function(plotList) {
   ## inside of the tests, it will write the viz to
   ## animint/tests/testthat/htmltest, so we also need to start the
   ## servr in animint/tests/testthat.
-  out_dir <- "htmltest"
-  ##on.exit(unlink(out_dir, recursive=TRUE))
-  res <- animint2dir(plotList, out.dir = out_dir, open.browser = FALSE)
-  address <- file.path(animintEnv$.address, out_dir)
-  animintEnv$remDr$navigate(address)
-  res$html <- XML::htmlParse(animintEnv$remDr$getPageSource(), asText = TRUE)
+  res <- animint2dir(plotList, out.dir = animintEnv$.outDir,
+                     open.browser = FALSE)
+  # to avoid weird redirecting done in some browsers,
+  # we first navtigate to "http://localhost:port/", then *click*
+  # on the appropriate testing directory
+  animintEnv$remDr$navigate(animintEnv$.address)
+  res$html <- clickHTML("xpath"="//a[@href='htmltest/']")
   res
+}
+
+clickHTML <- function(...){
+  v <- c(...)
+  stopifnot(length(v) == 1)
+  e <- animintEnv$remDr$findElement(names(v), as.character(v))
+  e$clickElement()
+  Sys.sleep(1)
+  XML::htmlParse(animintEnv$remDr$getPageSource(), asText = TRUE)
 }
 
 expect_transform <- function(actual, expected, context = "translate", tolerance = 5) {

@@ -2,29 +2,29 @@ context("shiny")
 
 Sys.setenv("R_TESTS" = "") # As suggested by hadley -- https://github.com/hadley/testthat/issues/144
 
-pid.file <- animint:::run_servr(port = 6012)
+shiny_cmd <- "shiny::runApp(appDir=system.file(\"examples/shiny\", package = \"animint\"), port=%d, launch.browser=FALSE)"
+res <- run_servr(command = shiny_cmd)
+address <- sprintf("http://localhost:%s/", res$port)
 
 test_that("animint plot renders in a shiny app", {
   Sys.sleep(5) # give shiny a second to do it's thing
-  animintEnv$remDr$navigate("http://localhost:6012/")
+  animintEnv$remDr$navigate(address)
   Sys.sleep(10)
   html <- XML::htmlParse(animintEnv$remDr$getPageSource(), asText = TRUE)
-  tools::pskill(readLines(pid.file, warn = F))
-  file.remove(pid.file)
+  tools::pskill(res$pid)
   circles <- getNodeSet(html, "//div[@id='animint']//circle")
   expect_true(length(circles) >= 1)
 })
 
-pid.file <- animint:::run_servr(port = 6014)
+res <- run_servr(command = shiny_cmd)
+address <- sprintf("http://localhost:%s/", res$port)
 
 test_that("animint plot renders in an interactive document", {
   Sys.sleep(10) # give shiny a second to do it's thing
-  animintEnv$remDr$navigate("http://localhost:6014/")
+  animintEnv$remDr$navigate(address)
   Sys.sleep(10)
   html <- XML::htmlParse(animintEnv$remDr$getPageSource(), asText = TRUE)
-  tools::pskill(readLines(pid.file, warn = F))
-  file.remove(pid.file)
+  tools::pskill(res$pid)
   circles <- getNodeSet(html, "//svg//circle")
   expect_true(length(circles) >= 1)
 })
-

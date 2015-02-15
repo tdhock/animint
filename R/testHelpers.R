@@ -30,7 +30,9 @@ animintEnv <- new.env(parent = emptyenv())
 
 run_tests <- function(browserName = "phantomjs", dir = ".", ...,
                       filter = NULL, show.ps = FALSE) {
-  # necessary evil?
+  # necessary evil? I think so, unless we want to put `::` everywhere
+  # one hack for CRAN would be to *not* export this function and run
+  # tests with animint:::run_tests()
   library("testthat")
   library("XML")
   library("animint")
@@ -57,26 +59,27 @@ run_tests <- function(browserName = "phantomjs", dir = ".", ...,
   } else if (base_name != "testthat") {
     stop("dir must point to either animint's source, its tests folder, or its tests/testthat folder.")
   }
-  # start a non-blocking local file server
-  pid.file <- run_servr()
-  port <- names(pid.file)
-  # kill the file server on exit
-  on.exit({
-    tools::pskill(readLines(pid.file, warn = F))
-    file.remove(pid.file)
-  }, add = TRUE)
-  # quit selenium on exit
+  # start a non-blocking local file server and remember the address
+  res <- run_servr()
+  animintEnv$.address <- sprintf("http://localhost:%s", res$port)
+  animintEnv$.outDir <- "htmltest"
+  on.exit(unlink(animintEnv$.outDir, recursive = TRUE), add = TRUE)
+  # stop file server and selenium on exit
+  on.exit(tools::pskill(res$pid), add = TRUE)
   on.exit(kill_dr(browserName), add = TRUE)
   if (browserName == "phantomjs") {
     animintEnv$pJS <- RSelenium::phantom()
   } else {
+    # make sure Firefox doesn't try to redirect requests to localhost
+    # https://cdivilly.wordpress.com/2013/08/15/disable-firefox-redirecting-to-localhost-com/
+    # prof <- RSelenium::makeFirefoxProfile(list(browser.fixup.alternate.enabled = FALSE))
     RSelenium::checkForServer(dir = system.file("bin", package="RSelenium"))
     selenium <- try(RSelenium::startServer(), silent = TRUE)
   }
-  Sys.sleep(5) # give the backend a moment
+  # give the backend a moment to start-up
+  Sys.sleep(5)
   animintEnv$remDr <- RSelenium::remoteDriver(browserName = browserName)
   animintEnv$remDr$open(silent = TRUE)
-  animintEnv$.address <- sprintf("http://localhost:%s", port)
   # run the tests
   source("functions.R")
   # return to original directory on exit
@@ -85,35 +88,37 @@ run_tests <- function(browserName = "phantomjs", dir = ".", ...,
 }
 
 # keep trying to start a server until success
-run_servr <- function(port = 4848) {
-  pid.file <- tempfile("pid")
-  success <- try_servr(port = port, pidfile = pid.file)
-  while (!success) {
-    # kill the process ID
-    tools::pskill(readLines(pid.file, warn = F))
-    file.remove(pid.file)
+run_servr <- function(port = 4848, ...) {
+  res <- try_servr(port = port, ...)
+  while (!res$success) {
     # randomly alter port number
-    port <- port + seq.int(-10, 10)[sample.int(n = 21, size = 1)]
-    pid.file <- tempfile("pid")
-    success <- try_servr(port = port, pid.file)
+    new_port <- res$port + seq.int(-10, 10)[sample.int(n = 21, size = 1)]
+    res <- try_servr(port = new_port, ...)
   }
-  setNames(pid.file, port)
+  list(pid = res$pid, port = res$port)
 }
 
-# try to start a server on a specific port
-try_servr <- function(port, pidfile) {
+# try to run a blocking command (for example a file server or shiny app)
+# on a specific port. If it fails, kill the R process according to it's process ID.
+try_servr <- function(port, pidfile = tempfile("pid"),
+                      command = "servr::httd(dir=\".\", port=%d, browser=FALSE)") {
   cmd <- sprintf(
-    "'cat(Sys.getpid(), file=\"%s\"); servr::httd(dir=\".\", port=%d, browser=FALSE)'",
+    paste0("'library(methods); cat(Sys.getpid(), file=\"%s\"); ", command, "'"),
     pidfile, port
   )
   output <- tempfile(fileext = "txt")
-  t <- suppressWarnings(system2("R", c("-e", cmd),
+  on.exit(unlink(pidfile), add = TRUE)
+  on.exit(unlink(output), add = TRUE)
+  t <- suppressWarnings(system2("Rscript", c("-e", cmd),
                                 stdout = output, stderr = output, wait = FALSE))
   # give it a second to write output (maybe addTaskCallback would be better?)
-  Sys.sleep(10)
-  on.exit(unlink(output))
-  # returns true if success
-  !any(grepl("Error", readLines(output)))
+  Sys.sleep(2)
+  # was the command successful?
+  success <- !any(grepl("Error", readLines(output, warn = FALSE)))
+  pid <- readLines(pidfile, warn = FALSE)
+  # if not, kill the process
+  if (!success) tools::pskill(pid)
+  list(pid = pid, port = port, success = success)
 }
 
 # Kill the selenium driver
