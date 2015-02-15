@@ -100,15 +100,13 @@ run_servr <- function(port = 4848, ...) {
 
 # try to run a blocking command (for example a file server or shiny app)
 # on a specific port. If it fails, kill the R process according to it's process ID.
-try_servr <- function(port, pidfile = "pid.txt",
+try_servr <- function(port, pidfile = tempfile("pid"),
                       command = "servr::httd(dir=\".\", port=%d, browser=FALSE)") {
   cmd <- sprintf(
     paste0("'library(methods); cat(Sys.getpid(), file=\"%s\"); ", command, "'"),
     pidfile, port
   )
-  output <- "output.txt"
-  on.exit(unlink(pidfile), add = TRUE)
-  on.exit(unlink(output), add = TRUE)
+  output <- tempfile(fileext = "txt")
   t <- suppressWarnings(system2("Rscript", c("-e", cmd),
                                 stdout = output, stderr = output, wait = FALSE))
   # give it a second to write output (maybe addTaskCallback would be better?)
@@ -118,6 +116,8 @@ try_servr <- function(port, pidfile = "pid.txt",
   pid <- readLines(pidfile, warn = FALSE)
   # if not, kill the process
   if (!success) tools::pskill(pid)
+  unlink(pidfile)
+  unlink(output)
   list(pid = pid, port = port, success = success)
 }
 
