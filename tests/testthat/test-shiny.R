@@ -1,7 +1,7 @@
 context("shiny")
 
 shiny_cmd <- "shiny::runApp(appDir=system.file(\"examples/shiny\", package = \"animint\"), port=%d, launch.browser=FALSE)"
-res <- run_servr(command = shiny_cmd)
+res <- animint:::run_servr(command = shiny_cmd)
 address <- sprintf("http://localhost:%s/", res$port)
 
 test_that("animint plot renders in a shiny app", {
@@ -14,7 +14,7 @@ test_that("animint plot renders in a shiny app", {
   expect_true(length(circles) >= 1)
 })
 
-res <- run_servr(command = shiny_cmd)
+res <- animint:::run_servr(command = shiny_cmd)
 address <- sprintf("http://localhost:%s/", res$port)
 
 test_that("animint plot renders in an interactive document", {
