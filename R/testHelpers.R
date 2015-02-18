@@ -70,19 +70,20 @@ run_tests <- function(browserName = "phantomjs", dir = ".", ...,
   on.exit(unlink(animintEnv$.outDir, recursive = TRUE), add = TRUE)
   # stop file server and selenium on exit
   on.exit(tools::pskill(res$pid), add = TRUE)
-  on.exit(kill_dr(browserName), add = TRUE)
   if (browserName == "phantomjs") {
+    on.exit(animintEnv$pJS$stop(), add = TRUE)
     animintEnv$pJS <- RSelenium::phantom()
   } else {
-    # make sure Firefox doesn't try to redirect requests to localhost
-    # https://cdivilly.wordpress.com/2013/08/15/disable-firefox-redirecting-to-localhost-com/
-    # prof <- RSelenium::makeFirefoxProfile(list(browser.fixup.alternate.enabled = FALSE))
+    on.exit({
+      animintEnv$remDr$closeWindow()
+      animintEnv$remDr$closeServer()
+    }, add = TRUE)
     RSelenium::checkForServer(dir = system.file("bin", package="RSelenium"))
-    selenium <- try(RSelenium::startServer(), silent = TRUE)
+    selenium <- RSelenium::startServer()
   }
+  animintEnv$remDr <- RSelenium::remoteDriver(browserName = browserName, ...)
   # give the backend a moment to start-up
   Sys.sleep(5)
-  animintEnv$remDr <- RSelenium::remoteDriver(browserName = browserName)
   animintEnv$remDr$open(silent = TRUE)
   # run the tests
   source("functions.R")
@@ -123,19 +124,4 @@ try_servr <- function(port, pidfile = tempfile("pid"),
   file.remove(pidfile)
   file.remove(output)
   list(pid = pid, port = port, success = success)
-}
-
-# Kill the selenium driver
-kill_dr <- function(b) {
-  if (b == "phantomjs") {
-    animintEnv$pJS$stop()
-  } else {
-    animintEnv$remDr$quit()
-    if (nchar(Sys.which("pkill")) == 0)
-      warning("Did not find the UNIX command `pkill` which kills \n",
-              "the selenium server used in animint testing. \n",
-              "You may have to kill this process manually.")
-    system('pkill -f selenium-server-standalone')
-  }
-  return(invisible())
 }
