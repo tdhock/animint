@@ -117,7 +117,9 @@ try_servr <- function(port, pidfile = tempfile("pid"),
   # give it a second to write output (maybe addTaskCallback would be better?)
   Sys.sleep(2)
   # was the command successful?
-  success <- !any(grepl("Error", readLines(output, warn = FALSE)))
+  outlines <- readLines(output, warn = FALSE)
+  ##print(outlines)
+  success <- !any(grepl("Error", outlines))
   pid <- readLines(pidfile, warn = FALSE)
   # if not, kill the process
   if (!success) tools::pskill(pid)
