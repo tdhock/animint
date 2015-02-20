@@ -40,6 +40,13 @@ run_tests <- function(browserName = "phantomjs", dir = ".", ...,
   library("rmarkdown")
   library("RSelenium")
 
+  # try to shut down selenium/phantomjs in case tests exited improperly previously
+  e <- try({
+    animintEnv$remDr$closeWindow()
+    animintEnv$remDr$closeServer()
+    animintEnv$pJS$stop()
+  }, silent = TRUE)
+
   # avoid weird errors if this function is called via testhat::check()
   # https://github.com/hadley/testthat/issues/144
   Sys.setenv("R_TESTS" = "")
