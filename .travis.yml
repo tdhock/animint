@@ -34,7 +34,6 @@ install:
   - ./travis-tool.sh r_binary_install gistr
   # Binary install of rmarkdown doesn't work (currently?)
   - ./travis-tool.sh install_github rstudio/rmarkdown
-  - ./travis-tool.sh install_github yihui/servr
 
 script: ./travis-tool.sh run_tests
 
