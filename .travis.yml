@@ -27,13 +27,13 @@ install:
   - rm pandoc-1.12.3.zip
   - $HOME/opt/pandoc/pandoc --version
   # Dependencies for running animint tests
-  - ./travis-tool.sh r_binary_install servr
   - ./travis-tool.sh r_binary_install XML
   - ./travis-tool.sh r_binary_install shiny
   - ./travis-tool.sh r_binary_install RSelenium
   - ./travis-tool.sh r_binary_install gistr
   # Binary install of rmarkdown doesn't work (currently?)
   - ./travis-tool.sh install_github rstudio/rmarkdown
+  - ./travis-tool.sh install_github yihui/servr@456059b89116cc7acf3851c42fe5917b2d2ba98e
 
 script: ./travis-tool.sh run_tests
 
