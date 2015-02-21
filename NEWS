@@ -188,6 +188,14 @@ does not respond to mouse clicks while the data is loading.
 DSL: Implement shape aesthetic with d3.svg.symbol()
 https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol_type
 
+2015.01.27
+
+Translate R/ggplot
+theme(axis.text.x=element_text(angle=70, hjust=1))
+to HTML/SVG
+<text style="text-anchor: end;" transform="rotate(-70)">
+Thanks for the bug report @mswastik
+
 2015.01.19
 
 BUGFIX: no longer need to load knitr in a knitr document to print
