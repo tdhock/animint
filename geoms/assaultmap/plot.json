@@ -1,0 +1,143 @@
+{
+ "geoms": {
+ "geom1_polygon_g17": {
+ "geom": "polygon",
+"data": "geom1_polygon_g17.csv",
+"aes": {
+ "x": "long",
+"y": "lat",
+"group": "group",
+"fill": "value",
+"colour": "value" 
+},
+"params": [],
+"update": "",
+"subord": [
+ "group" 
+],
+"subvars": {
+ "group": "group" 
+},
+"classed": "geom1_polygon_g17",
+"types": {
+ "fill": "rgb",
+"colour": "rgb",
+"y": "numeric",
+"x": "numeric",
+"group": "integer",
+"PANEL": "integer" 
+},
+"nextgeom": "geom2_blank_g17" 
+},
+"geom2_blank_g17": {
+ "geom": "blank",
+"data": "geom2_blank_g17.csv",
+"aes": {
+ "x": "x",
+"y": "y" 
+},
+"params": [],
+"update": "",
+"subord": [],
+"subvars": [],
+"classed": "geom2_blank_g17",
+"types": {
+ "y": "numeric",
+"x": "numeric",
+"PANEL": "integer",
+"group": "integer" 
+},
+"nextgeom": "geom3_text_g17" 
+},
+"geom3_text_g17": {
+ "geom": "text",
+"data": "geom3_text_g17.csv",
+"aes": {
+ "x": "x",
+"y": "y",
+"label": "label" 
+},
+"params": {
+ "parse": false,
+"hjust":    0.5 
+},
+"update": "",
+"subord": [],
+"subvars": [],
+"classed": "geom3_text_g17",
+"types": {
+ "y": "numeric",
+"x": "numeric",
+"label": "factor",
+"PANEL": "integer",
+"group": "integer" 
+} 
+} 
+},
+"selectors": [],
+"plots": {
+ "g17": {
+ "geoms": [
+ "geom1_polygon_g17",
+"geom2_blank_g17",
+"geom3_text_g17" 
+],
+"scales": {
+ "fill": [ "grey50", "#1E4161", "#346E9D", "#4C9EDE" ],
+"colour": [ "grey50", "#1E4161", "#346E9D", "#4C9EDE" ] 
+},
+"options": {
+ "width":    400,
+"height":    400 
+},
+"axis": {
+ "x": [ 0.11924, 0.4345, 0.74975 ],
+"xlab": [ "-120", "-100", "-80" ],
+"xrange": [ -127.57, -64.124 ],
+"xname": "long",
+"xline": true,
+"xticks": true,
+"y": [ 0.0098039, 0.18806, 0.36631, 0.54456, 0.72282, 0.90107 ],
+"ylab": [ "10", "20", "30", "40", "50", "60" ],
+"yrange": [   9.45,  65.55 ],
+"yname": "lat",
+"yline": true,
+"yticks": true 
+},
+"title": "geom_polygon map",
+"legend": {
+ "value": {
+ "guide": "legend",
+"geoms": "polygon",
+"title": "value",
+"entries": [
+ {
+ "polygonfill": "#4C9EDE",
+"polygoncolour": "#4C9EDE",
+"polygonsize":    0.5,
+"polygonlinetype":      1,
+"polygonorder": 3,
+"label": [ "300" ] 
+},
+{
+ "polygonfill": "#346E9D",
+"polygoncolour": "#346E9D",
+"polygonsize":    0.5,
+"polygonlinetype":      1,
+"polygonorder": 2,
+"label": [ "200" ] 
+},
+{
+ "polygonfill": "#1E4161",
+"polygoncolour": "#1E4161",
+"polygonsize":    0.5,
+"polygonlinetype":      1,
+"polygonorder": 1,
+"label": [ "100" ] 
+} 
+] 
+} 
+} 
+} 
+} 
+}

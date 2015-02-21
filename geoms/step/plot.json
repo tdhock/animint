@@ -1,0 +1,92 @@
+{
+ "geoms": {
+ "geom1_path_g9": {
+ "geom": "path",
+"data": "geom1_path_g9.csv",
+"aes": {
+ "x": "x",
+"y": "y",
+"colour": "factor(group)",
+"group": "group" 
+},
+"params": {
+ "direction": "hv" 
+},
+"update": "",
+"subord": [
+ "group" 
+],
+"subvars": {
+ "group": "group" 
+},
+"classed": "geom1_path_g9",
+"types": {
+ "x": "numeric",
+"y": "numeric",
+"colour": "rgb",
+"group": "integer",
+"PANEL": "integer" 
+} 
+} 
+},
+"selectors": [],
+"plots": {
+ "g9": {
+ "geoms": [
+ "geom1_path_g9" 
+],
+"scales": {
+ "colour": [ "#F8766D", "#00BA38", "#619CFF" ] 
+},
+"options": {
+ "width":    400,
+"height":    400 
+},
+"axis": {
+ "x": [ 0.026902, 0.21243, 0.39796, 0.58349, 0.76902, 0.95455 ],
+"xlab": [ "0", "10", "20", "30", "40", "50" ],
+"xrange": [  -1.45,  52.45 ],
+"xname": "x",
+"xline": true,
+"xticks": true,
+"y": [ 0.15418, 0.42012, 0.68606, 0.95199 ],
+"ylab": [ "0", "5", "10", "15" ],
+"yrange": [ -2.8988, 15.903 ],
+"yname": "y",
+"yline": true,
+"yticks": true 
+},
+"title": "geom_step",
+"legend": {
+ "Distribution": {
+ "guide": "legend",
+"geoms": "path",
+"title": "Distribution",
+"entries": [
+ {
+ "pathcolour": "#619CFF",
+"pathsize":    0.5,
+"pathlinetype":      1,
+"pathorder": 3,
+"label": [ "Gamma(2,1/3)" ] 
+},
+{
+ "pathcolour": "#00BA38",
+"pathsize":    0.5,
+"pathlinetype":      1,
+"pathorder": 2,
+"label": [ "N(0,1)" ] 
+},
+{
+ "pathcolour": "#F8766D",
+"pathsize":    0.5,
+"pathlinetype":      1,
+"pathorder": 1,
+"label": [ "N(3,1)" ] 
+} 
+] 
+} 
+} 
+} 
+} 
+}

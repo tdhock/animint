@@ -1,0 +1,110 @@
+{
+ "geoms": {
+ "geom1_point_g16": {
+ "geom": "point",
+"data": "geom1_point_g16.csv",
+"aes": {
+ "x": "carat",
+"y": "price",
+"alpha": "..density.." 
+},
+"params": {
+ "na.rm":     10,
+"size": [      1 ] 
+},
+"update": "",
+"subord": [],
+"subvars": [],
+"classed": "geom1_point_g16",
+"types": {
+ "alpha": "numeric",
+"x": "numeric",
+"y": "numeric",
+"density": "numeric",
+"group": "integer",
+"level": "numeric",
+"piece": "numeric",
+"PANEL": "integer" 
+} 
+} 
+},
+"selectors": [],
+"plots": {
+ "g16": {
+ "geoms": [
+ "geom1_point_g16" 
+],
+"scales": {
+ "alpha": [    0.1, 0.10047 ] 
+},
+"options": {
+ "width":    400,
+"height":    400 
+},
+"axis": {
+ "x": [ 0.15753, 0.36509, 0.57264, 0.7802, 0.98775 ],
+"xlab": [ "0.5", "1.0", "1.5", "2.0", "2.5" ],
+"xrange": [ 0.1205, 2.5295 ],
+"xname": "carat",
+"xline": true,
+"xticks": true,
+"y": [ 0.028081, 0.27556, 0.52304, 0.77052 ],
+"ylab": [ "0", "5000", "10000", "15000" ],
+"yrange": [ -567.35,  19636 ],
+"yname": "price",
+"yline": true,
+"yticks": true 
+},
+"title": "geom_density2d points",
+"legend": {
+ "Density": {
+ "guide": "legend",
+"geoms": "point",
+"title": "Density",
+"entries": [
+ {
+ "pointalpha": 0.9694,
+"pointshape":     16,
+"pointcolour": "#000000",
+"pointsize":      1,
+"pointorder": 5,
+"label": [ "5e-04" ] 
+},
+{
+ "pointalpha": 0.7948,
+"pointshape":     16,
+"pointcolour": "#000000",
+"pointsize":      1,
+"pointorder": 4,
+"label": [ "4e-04" ] 
+},
+{
+ "pointalpha":  0.622,
+"pointshape":     16,
+"pointcolour": "#000000",
+"pointsize":      1,
+"pointorder": 3,
+"label": [ "3e-04" ] 
+},
+{
+ "pointalpha": 0.4474,
+"pointshape":     16,
+"pointcolour": "#000000",
+"pointsize":      1,
+"pointorder": 2,
+"label": [ "2e-04" ] 
+},
+{
+ "pointalpha": 0.2746,
+"pointshape":     16,
+"pointcolour": "#000000",
+"pointsize":      1,
+"pointorder": 1,
+"label": [ "1e-04" ] 
+} 
+] 
+} 
+} 
+} 
+} 
+}

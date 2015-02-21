@@ -1,0 +1,87 @@
+{
+ "geoms": {
+ "geom1_rect_g18": {
+ "geom": "rect",
+"data": "geom1_rect_g18.csv",
+"aes": {
+ "x": "factor(cyl)",
+"fill": "factor(vs)" 
+},
+"params": [],
+"update": "",
+"subord": [],
+"subvars": [],
+"classed": "geom1_rect_g18",
+"types": {
+ "fill": "rgb",
+"y": "numeric",
+"count": "numeric",
+"x": "numeric",
+"ndensity": "numeric",
+"ncount": "numeric",
+"density": "numeric",
+"PANEL": "integer",
+"group": "integer",
+"ymin": "numeric",
+"ymax": "numeric",
+"xmin": "numeric",
+"xmax": "numeric" 
+} 
+} 
+},
+"selectors": [],
+"plots": {
+ "g18": {
+ "geoms": [
+ "geom1_rect_g18" 
+],
+"scales": {
+ "fill": [ "#F8766D", "#00BFC4" ] 
+},
+"options": {
+ "width":    400,
+"height":    400 
+},
+"axis": {
+ "x": [ 0.1875,    0.5, 0.8125 ],
+"xlab": [ "4", "6", "8" ],
+"xrange": [    0.4,    3.6 ],
+"xname": "factor(cyl)",
+"xline": true,
+"xticks": true,
+"y": [ 0.045455, 0.37013, 0.69481 ],
+"ylab": [ "0", "5", "10" ],
+"yrange": [   -0.7,   14.7 ],
+"yname": "count",
+"yline": true,
+"yticks": true 
+},
+"title": "geom_bar stacked",
+"legend": {
+ "factor(vs)": {
+ "guide": "legend",
+"geoms": "polygon",
+"title": "factor(vs)",
+"entries": [
+ {
+ "polygonfill": "#00BFC4",
+"polygonsize":    0.5,
+"polygonlinetype":      1,
+"polygonweight":      1,
+"polygonorder": 2,
+"label": [ "1" ] 
+},
+{
+ "polygonfill": "#F8766D",
+"polygonsize":    0.5,
+"polygonlinetype":      1,
+"polygonweight":      1,
+"polygonorder": 1,
+"label": [ "0" ] 
+} 
+] 
+} 
+} 
+} 
+} 
+}

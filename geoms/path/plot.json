@@ -1,0 +1,82 @@
+{
+ "geoms": {
+ "geom1_path_g4": {
+ "geom": "path",
+"data": "geom1_path_g4.csv",
+"aes": {
+ "x": "x",
+"y": "y" 
+},
+"params": {
+ "lineend": "butt",
+"linejoin": "round",
+"linemitre":      1,
+"na.rm": false,
+"alpha":    0.5 
+},
+"update": "",
+"subord": [],
+"subvars": [],
+"classed": "geom1_path_g4",
+"types": {
+ "x": "numeric",
+"y": "numeric",
+"PANEL": "integer",
+"group": "integer" 
+},
+"nextgeom": "geom2_text_g4" 
+},
+"geom2_text_g4": {
+ "geom": "text",
+"data": "geom2_text_g4.csv",
+"aes": {
+ "x": "x",
+"y": "y",
+"label": "z" 
+},
+"params": {
+ "parse": false 
+},
+"update": "",
+"subord": [],
+"subvars": [],
+"classed": "geom2_text_g4",
+"types": {
+ "x": "numeric",
+"y": "numeric",
+"label": "integer",
+"PANEL": "integer",
+"group": "integer" 
+} 
+} 
+},
+"selectors": [],
+"plots": {
+ "g4": {
+ "geoms": [
+ "geom1_path_g4",
+"geom2_text_g4" 
+],
+"options": {
+ "width":    400,
+"height":    400 
+},
+"axis": {
+ "x": [ 0.21519, 0.44253, 0.66987, 0.89721 ],
+"xlab": [ "-0.5", "0.0", "0.5", "1.0" ],
+"xrange": [ -0.97328, 1.2261 ],
+"xname": "x",
+"xline": true,
+"xticks": true,
+"y": [ 0.065175, 0.29887, 0.53257, 0.76626, 0.99996 ],
+"ylab": [ "-1.0", "-0.5", "0.0", "0.5", "1.0" ],
+"yrange": [ -1.1394, 1.0001 ],
+"yname": "y",
+"yline": true,
+"yticks": true 
+},
+"title": "geom_path",
+"legend": {} 
+} 
+} 
+}

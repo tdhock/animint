@@ -1,0 +1,106 @@
+{
+ "geoms": {
+ "geom1_ribbon_plot1": {
+ "geom": "ribbon",
+"data": "geom1_ribbon_plot1.csv",
+"aes": {
+ "x": "y",
+"group": "group",
+"fill": "group" 
+},
+"params": {
+ "na.rm": false,
+"alpha":    0.5 
+},
+"update": "",
+"subord": [
+ "group" 
+],
+"subvars": {
+ "group": "group" 
+},
+"classed": "geom1_ribbon_plot1",
+"types": {
+ "fill": "rgb",
+"y": "numeric",
+"x": "numeric",
+"density": "numeric",
+"scaled": "numeric",
+"count": "numeric",
+"group": "integer",
+"PANEL": "integer",
+"ymin": "numeric",
+"ymax": "numeric" 
+} 
+} 
+},
+"selectors": [],
+"plots": {
+ "plot1": {
+ "geoms": [
+ "geom1_ribbon_plot1" 
+],
+"scales": {
+ "fill": [ "#F8766D", "#00BA38", "#619CFF" ] 
+},
+"options": {
+ "width":    400,
+"height":    400 
+},
+"axis": {
+ "x": [ 0.11479, 0.43326, 0.75174 ],
+"xlab": [ "0", "10", "20" ],
+"xrange": [ -3.6042, 27.795 ],
+"xname": "x",
+"xline": true,
+"xticks": true,
+"y": [ 0.045455, 0.37708, 0.7087 ],
+"ylab": [ "0.0", "0.2", "0.4" ],
+"yrange": [ -0.027413, 0.57568 ],
+"yname": "density",
+"yline": true,
+"yticks": true 
+},
+"title": "geom_density",
+"legend": {
+ "Distribution": {
+ "guide": "legend",
+"geoms": "polygon",
+"title": "Distribution",
+"entries": [
+ {
+ "polygonfill": "#619CFF",
+"polygonweight":      1,
+"polygoncolour": "#000000",
+"polygonalpha":    0.5,
+"polygonsize":    0.5,
+"polygonlinetype":      1,
+"polygonorder": 3,
+"label": [ "Gamma(2,1/3)" ] 
+},
+{
+ "polygonfill": "#00BA38",
+"polygonweight":      1,
+"polygoncolour": "#000000",
+"polygonalpha":    0.5,
+"polygonsize":    0.5,
+"polygonlinetype":      1,
+"polygonorder": 2,
+"label": [ "N(0,1)" ] 
+},
+{
+ "polygonfill": "#F8766D",
+"polygonweight":      1,
+"polygoncolour": "#000000",
+"polygonalpha":    0.5,
+"polygonsize":    0.5,
+"polygonlinetype":      1,
+"polygonorder": 1,
+"label": [ "N(3,1)" ] 
+} 
+] 
+} 
+} 
+} 
+} 
+}

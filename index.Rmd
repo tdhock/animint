@@ -1,0 +1,66 @@
+Animint Tutorial
+========================================================
+
+This tutorial is designed to demonstrate animint, a package that converts ggplot2 plots into d3 javascript graphics. Animint allows you to make interactive web-based graphics using familiar R methods. In addition, animint allows graphics to be animated and respond to user clicks.
+```{r setup,echo=FALSE, tidy=FALSE, message=FALSE, warning=FALSE}
+opts_chunk$set(fig.width=6, fig.height=4,cache=TRUE, message=FALSE, warning=FALSE)
+library(ggplot2)
+library(animint)
+library(plyr)
+```
+
+Contents
+---------------------------------------------------------
+* [Installation](#install)
+* [Introduction](#intro)
+* [Tornado Example](tornadoes.html#tornadoes) - see what animint can do, including explanations of clickSelects, showSelected, and animations. 
+* [Climate Example](climate.html) - another demonstration of using animint with multiple linked plots and animation.
+* [Examples of Geoms](geoms.html) - explanations of how to use statistics and certain geoms in animint, demonstrations of most geoms that animint supports. 
+
+<a name="install"/>
+Installation instructions
+---------------------------------------------------------
+The animint package is available on [github](https://github.com/tdhock/animint). 
+```{r install}
+library(devtools) # devtools package, allows you to install from github repositories
+install_github("animint", "tdhock") 
+```
+You can also download a zip file of the package and install it normally using install_packages() if you do not want to install the devtools package.
+
+### A Note about using Google Chrome
+
+Google Chrome blocks local file access by default. To get around this, you must close all chrome instances and then restart chrome using the flag --allow-file-access-from-files. In Windows, you do this using cmd, the command prompt. Alternately, Firefox will work by default.
+
+<a name="intro"/>
+Introduction 
+---------------------------------------------------------
+Let's start with a reasonably common comparison of distributions: two normal distributions with different centers, and a gamma distribution. 
+
+```{r density}
+library(ggplot2)
+library(animint)
+library(plyr)
+set.seed(33)
+
+boxplotdata <- rbind(data.frame(x=1:50, y=sort(rnorm(50, 3, 1)), group="N(3,1)"),
+                     data.frame(x=1:50, y=sort(rnorm(50, 0, 1)), group="N(0,1)"), 
+                     data.frame(x=1:50, y=sort(rgamma(50, 2, 1/3)), group="Gamma(2,1/3)"))
+boxplotdata <- ddply(boxplotdata, .(group), transform, ymax=max(y), ymin=min(y), med=median(y))
+
+g1 <- ggplot() + geom_density(data=boxplotdata, aes(x=y, group=group, fill=group), alpha=.5) +
+  scale_fill_discrete("Distribution") + xlab("x") + 
+  ggtitle("geom_density")
+g1
+gg2animint(list(plot1 = g1), out.dir="./g1")
+```
+
+You can see the resulting d3 plot [here](g1/index.html).
+
+Animint requires a list of named plots - each plot must be a ggplot2 object and must have a name, such as "plot1" in the example above. You can also specify the output directory - this allows you to control where the generated webpage is stored. If the output directory is not specified, then typically R will create a temporary directory on your computer to store the generated webpage. 
+
+
+[Next, we'll look at a specific dataset and demonstrate the functions and aesthetics animint adds to ggplot2.](tornadoes.html)
+
+
+
+<sub>Tutorial created by Susan VanderPlas on 8/29/2013 using animint version 0.1.0 and ggplot2 0.9.3.1</sub>

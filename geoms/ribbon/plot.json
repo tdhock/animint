@@ -1,0 +1,91 @@
+{
+ "geoms": {
+ "geom1_ribbon_g2": {
+ "geom": "ribbon",
+"data": "geom1_ribbon_g2.csv",
+"aes": {
+ "x": "x",
+"ymin": "ymin",
+"ymax": "ymax",
+"group": "group",
+"fill": "group" 
+},
+"params": {
+ "na.rm": false,
+"alpha":    0.5 
+},
+"update": "",
+"subord": [
+ "group" 
+],
+"subvars": {
+ "group": "group" 
+},
+"classed": "geom1_ribbon_g2",
+"types": {
+ "fill": "rgb",
+"x": "numeric",
+"ymin": "numeric",
+"ymax": "numeric",
+"group": "integer",
+"PANEL": "integer",
+"colour": "rgb" 
+} 
+} 
+},
+"selectors": [],
+"plots": {
+ "g2": {
+ "geoms": [
+ "geom1_ribbon_g2" 
+],
+"scales": {
+ "fill": [ "#F8766D", "#00BFC4" ] 
+},
+"options": {
+ "width":    400,
+"height":    400 
+},
+"axis": {
+ "x": [ 0.045455, 0.27273,    0.5, 0.72727, 0.95455 ],
+"xlab": [ "0.00", "0.25", "0.50", "0.75", "1.00" ],
+"xrange": [  -0.05,   1.05 ],
+"xname": "x",
+"xline": true,
+"xticks": true,
+"y": [ 0.33161, 0.69575 ],
+"ylab": [ "1", "2" ],
+"yrange": [ 0.089353, 2.8355 ],
+"yname": null,
+"yline": true,
+"yticks": true 
+},
+"title": "geom_ribbon",
+"legend": {
+ "group": {
+ "guide": "legend",
+"geoms": "polygon",
+"title": "group",
+"entries": [
+ {
+ "polygonfill": "#00BFC4",
+"polygonsize":    0.5,
+"polygonlinetype":      1,
+"polygonalpha":    0.5,
+"polygonorder": 2,
+"label": [ "high" ] 
+},
+{
+ "polygonfill": "#F8766D",
+"polygonsize":    0.5,
+"polygonlinetype":      1,
+"polygonalpha":    0.5,
+"polygonorder": 1,
+"label": [ "low" ] 
+} 
+] 
+} 
+} 
+} 
+} 
+}

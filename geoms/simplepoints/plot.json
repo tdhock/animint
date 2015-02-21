@@ -1,0 +1,362 @@
+{
+ "geoms": {
+ "geom1_point_s1": {
+ "geom": "point",
+"data": "geom1_point_s1.csv",
+"aes": {
+ "x": "x",
+"y": "y" 
+},
+"params": {
+ "na.rm": false 
+},
+"update": "",
+"subord": [],
+"subvars": [],
+"classed": "geom1_point_s1",
+"types": {
+ "x": "numeric",
+"y": "numeric",
+"PANEL": "integer",
+"group": "integer" 
+},
+"nextgeom": "geom2_point_s2" 
+},
+"geom2_point_s2": {
+ "geom": "point",
+"data": "geom2_point_s2.csv",
+"aes": {
+ "x": "xnew",
+"y": "y" 
+},
+"params": {
+ "na.rm": false,
+"colour": "blue" 
+},
+"update": "",
+"subord": [],
+"subvars": [],
+"classed": "geom2_point_s2",
+"types": {
+ "x": "numeric",
+"y": "numeric",
+"PANEL": "integer",
+"group": "integer" 
+},
+"nextgeom": "geom3_point_s3" 
+},
+"geom3_point_s3": {
+ "geom": "point",
+"data": "geom3_point_s3.csv",
+"aes": {
+ "x": "xnew",
+"y": "y",
+"colour": "class",
+"fill": "class" 
+},
+"params": {
+ "na.rm": false 
+},
+"update": "",
+"subord": [],
+"subvars": [],
+"classed": "geom3_point_s3",
+"types": {
+ "colour": "rgb",
+"fill": "rgb",
+"x": "numeric",
+"y": "numeric",
+"PANEL": "integer",
+"group": "integer" 
+},
+"nextgeom": "geom4_point_s4" 
+},
+"geom4_point_s4": {
+ "geom": "point",
+"data": "geom4_point_s4.csv",
+"aes": {
+ "x": "xnew",
+"y": "y",
+"colour": "xnew",
+"fill": "xnew" 
+},
+"params": {
+ "na.rm": false 
+},
+"update": "",
+"subord": [],
+"subvars": [],
+"classed": "geom4_point_s4",
+"types": {
+ "colour": "rgb",
+"fill": "rgb",
+"x": "numeric",
+"y": "numeric",
+"PANEL": "integer",
+"group": "integer" 
+},
+"nextgeom": "geom5_point_s6" 
+},
+"geom5_point_s6": {
+ "geom": "point",
+"data": "geom5_point_s6.csv",
+"aes": {
+ "x": "x",
+"y": "y",
+"colour": "x * y",
+"fill": "x * y" 
+},
+"params": {
+ "na.rm": false 
+},
+"update": "",
+"subord": [],
+"subvars": [],
+"classed": "geom5_point_s6",
+"types": {
+ "colour": "rgb",
+"fill": "rgb",
+"x": "numeric",
+"y": "numeric",
+"PANEL": "integer",
+"group": "integer" 
+} 
+} 
+},
+"selectors": [],
+"plots": {
+ "s1": {
+ "geoms": [
+ "geom1_point_s1" 
+],
+"options": {
+ "width":    400,
+"height":    400 
+},
+"axis": {
+ "x": [ 0.042135, 0.33215, 0.62216, 0.91217 ],
+"xlab": [ "20", "40", "60", "80" ],
+"xrange": [ 17.094, 86.057 ],
+"xname": "very long x axis label",
+"xline": true,
+"xticks": true,
+"y": [ 0.21305, 0.47388, 0.7347, 0.99553 ],
+"ylab": [ "30", "50", "70", "90" ],
+"yrange": [ 13.664, 90.343 ],
+"yname": "very long y axis label",
+"yline": true,
+"yticks": true 
+},
+"title": "Titles are awesome",
+"legend": {} 
+},
+"s2": {
+ "geoms": [
+ "geom2_point_s2" 
+],
+"options": {
+ "width":    400,
+"height":    400 
+},
+"axis": {
+ "x": [ 0.14286, 0.38095, 0.61905, 0.85714 ],
+"xlab": [ "20", "40", "60", "80" ],
+"xrange": [    0.4,    4.6 ],
+"xname": "xnew",
+"xline": true,
+"xticks": true,
+"y": [ 0.21305, 0.47388, 0.7347, 0.99553 ],
+"ylab": [ "30", "50", "70", "90" ],
+"yrange": [ 13.664, 90.343 ],
+"yname": "y",
+"yline": true,
+"yticks": true 
+},
+"title": "Colours are cool",
+"legend": {} 
+},
+"s3": {
+ "geoms": [
+ "geom3_point_s3" 
+],
+"scales": {
+ "colour": [ "#FF0000", "#0000FF" ],
+"fill": [ "#FF0000", "#0000FF" ] 
+},
+"options": {
+ "width":    400,
+"height":    400 
+},
+"axis": {
+ "x": [ 0.14286, 0.38095, 0.61905, 0.85714 ],
+"xlab": [ "20", "40", "60", "80" ],
+"xrange": [    0.4,    4.6 ],
+"xname": "xnew",
+"xline": true,
+"xticks": true,
+"y": [ 0.21305, 0.47388, 0.7347, 0.99553 ],
+"ylab": [ "30", "50", "70", "90" ],
+"yrange": [ 13.664, 90.343 ],
+"yname": "y",
+"yline": true,
+"yticks": true 
+},
+"title": "Manual colour/fill scales",
+"legend": {
+ "class": {
+ "guide": "legend",
+"geoms": "point",
+"title": "class",
+"entries": [
+ {
+ "pointcolour": "#0000FF",
+"pointfill": "#0000FF",
+"pointshape":     16,
+"pointsize":      2,
+"pointorder": 2,
+"label": [ "low" ] 
+},
+{
+ "pointcolour": "#FF0000",
+"pointfill": "#FF0000",
+"pointshape":     16,
+"pointsize":      2,
+"pointorder": 1,
+"label": [ "high" ] 
+} 
+] 
+} 
+} 
+},
+"s4": {
+ "geoms": [
+ "geom4_point_s4" 
+],
+"scales": {
+ "colour": [ "#F8766D", "#7CAE00", "#00BFC4", "#C77CFF" ],
+"fill": [ "#F8766D", "#7CAE00", "#00BFC4", "#C77CFF" ] 
+},
+"options": {
+ "width":    400,
+"height":    400 
+},
+"axis": {
+ "x": [ 0.14286, 0.38095, 0.61905, 0.85714 ],
+"xlab": [ "20", "40", "60", "80" ],
+"xrange": [    0.4,    4.6 ],
+"xname": "xnew",
+"xline": true,
+"xticks": true,
+"y": [ 0.21305, 0.47388, 0.7347, 0.99553 ],
+"ylab": [ "30", "50", "70", "90" ],
+"yrange": [ 13.664, 90.343 ],
+"yname": "y",
+"yline": true,
+"yticks": true 
+},
+"title": "Categorical colour/fill scales",
+"legend": {
+ "xnew": {
+ "guide": "legend",
+"geoms": "point",
+"title": "xnew",
+"entries": [
+ {
+ "pointcolour": "#C77CFF",
+"pointfill": "#C77CFF",
+"pointshape":     16,
+"pointsize":      2,
+"pointorder": 4,
+"label": [ "80" ] 
+},
+{
+ "pointcolour": "#00BFC4",
+"pointfill": "#00BFC4",
+"pointshape":     16,
+"pointsize":      2,
+"pointorder": 3,
+"label": [ "60" ] 
+},
+{
+ "pointcolour": "#7CAE00",
+"pointfill": "#7CAE00",
+"pointshape":     16,
+"pointsize":      2,
+"pointorder": 2,
+"label": [ "40" ] 
+},
+{
+ "pointcolour": "#F8766D",
+"pointfill": "#F8766D",
+"pointshape":     16,
+"pointsize":      2,
+"pointorder": 1,
+"label": [ "20" ] 
+} 
+] 
+} 
+} 
+},
+"s6": {
+ "geoms": [
+ "geom5_point_s6" 
+],
+"scales": {
+ "colour": [ "grey50", "#21486A", "#346E9D", "#4997D4", "grey50" ],
+"fill": [ "grey50", "#21486A", "#346E9D", "#4997D4", "grey50" ] 
+},
+"options": {
+ "width":    400,
+"height":    400 
+},
+"axis": {
+ "x": [ 0.042135, 0.33215, 0.62216, 0.91217 ],
+"xlab": [ "20", "40", "60", "80" ],
+"xrange": [ 17.094, 86.057 ],
+"xname": "x",
+"xline": true,
+"xticks": true,
+"y": [ 0.21305, 0.47388, 0.7347, 0.99553 ],
+"ylab": [ "30", "50", "70", "90" ],
+"yrange": [ 13.664, 90.343 ],
+"yname": "y",
+"yline": true,
+"yticks": true 
+},
+"title": "Continuous color scales",
+"legend": {
+ "x * y": {
+ "guide": "legend",
+"geoms": "point",
+"title": "x * y",
+"entries": [
+ {
+ "pointcolour": "#4997D4",
+"pointfill": "#4997D4",
+"pointshape":     16,
+"pointsize":      2,
+"pointorder": 3,
+"label": [ "6000" ] 
+},
+{
+ "pointcolour": "#346E9D",
+"pointfill": "#346E9D",
+"pointshape":     16,
+"pointsize":      2,
+"pointorder": 2,
+"label": [ "4000" ] 
+},
+{
+ "pointcolour": "#21486A",
+"pointfill": "#21486A",
+"pointshape":     16,
+"pointsize":      2,
+"pointorder": 1,
+"label": [ "2000" ] 
+} 
+] 
+} 
+} 
+} 
+} 
+}

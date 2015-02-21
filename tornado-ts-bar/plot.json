@@ -1,0 +1,242 @@
+{
+ "geoms": {
+ "geom1_text_map": {
+ "geom": "text",
+"data": "geom1_text_map.csv",
+"aes": {
+ "x": "x",
+"y": "y",
+"label": "label",
+"showSelected": "year" 
+},
+"params": {
+ "parse": false 
+},
+"update": {
+ "showSelected": "year" 
+},
+"subord": [
+ "showSelected" 
+],
+"subvars": {
+ "showSelected": "year" 
+},
+"classed": "geom1_text_map",
+"types": {
+ "x": "numeric",
+"y": "numeric",
+"label": "factor",
+"showSelected": "integer",
+"PANEL": "integer",
+"group": "integer" 
+},
+"nextgeom": "geom2_polygon_map" 
+},
+"geom2_polygon_map": {
+ "geom": "polygon",
+"data": "geom2_polygon_map.csv",
+"aes": {
+ "x": "long",
+"y": "lat",
+"group": "group",
+"clickSelects": "state" 
+},
+"params": {
+ "colour": "grey",
+"fill": "black" 
+},
+"update": {
+ "clickSelects": "state" 
+},
+"subord": [
+ "group" 
+],
+"subvars": {
+ "group": "group" 
+},
+"classed": "geom2_polygon_map",
+"types": {
+ "x": "numeric",
+"y": "numeric",
+"group": "integer",
+"clickSelects": "factor",
+"PANEL": "integer" 
+},
+"nextgeom": "geom3_segment_map" 
+},
+"geom3_segment_map": {
+ "geom": "segment",
+"data": "geom3_segment_map.csv",
+"aes": {
+ "x": "startLong",
+"y": "startLat",
+"xend": "endLong",
+"yend": "endLat",
+"showSelected": "year" 
+},
+"params": {
+ "lineend": "butt",
+"na.rm": false,
+"colour": "#55B1F7" 
+},
+"update": {
+ "showSelected": "year" 
+},
+"subord": [
+ "showSelected" 
+],
+"subvars": {
+ "showSelected": "year" 
+},
+"classed": "geom3_segment_map",
+"types": {
+ "x": "numeric",
+"xend": "numeric",
+"y": "numeric",
+"yend": "numeric",
+"showSelected": "integer",
+"PANEL": "integer",
+"group": "integer" 
+},
+"nextgeom": "geom4_text_ts" 
+},
+"geom4_text_ts": {
+ "geom": "text",
+"data": "geom4_text_ts.csv",
+"aes": {
+ "x": "x",
+"y": "y",
+"label": "label",
+"showSelected": "state" 
+},
+"params": {
+ "parse": false 
+},
+"update": {
+ "showSelected": "state" 
+},
+"subord": [
+ "showSelected" 
+],
+"subvars": {
+ "showSelected": "state" 
+},
+"classed": "geom4_text_ts",
+"types": {
+ "x": "numeric",
+"y": "numeric",
+"label": "factor",
+"showSelected": "factor",
+"PANEL": "integer",
+"group": "integer" 
+},
+"nextgeom": "geom5_rect_ts" 
+},
+"geom5_rect_ts": {
+ "geom": "rect",
+"data": "geom5_rect_ts.csv",
+"aes": {
+ "x": "year",
+"y": "count",
+"clickSelects": "year",
+"showSelected": "state" 
+},
+"params": [],
+"update": {
+ "showSelected": "state",
+"clickSelects": "year" 
+},
+"subord": [
+ "showSelected" 
+],
+"subvars": {
+ "showSelected": "state" 
+},
+"classed": "geom5_rect_ts",
+"types": {
+ "x": "numeric",
+"y": "numeric",
+"clickSelects": "integer",
+"showSelected": "factor",
+"PANEL": "integer",
+"group": "integer",
+"ymin": "numeric",
+"ymax": "numeric",
+"xmin": "numeric",
+"xmax": "numeric" 
+} 
+} 
+},
+"selectors": {
+ "year": {
+ "selected": 1950,
+"subset": [
+ "geom1_text_map",
+"geom3_segment_map",
+"geom5_rect_ts" 
+] 
+},
+"state": {
+ "selected": "AL",
+"subset": [
+ "geom2_polygon_map",
+"geom4_text_ts",
+"geom5_rect_ts" 
+] 
+} 
+},
+"plots": {
+ "map": {
+ "geoms": [
+ "geom1_text_map",
+"geom2_polygon_map",
+"geom3_segment_map" 
+],
+"options": {
+ "width":    970,
+"height":    500 
+},
+"axis": {
+ "x": [ 0.11924, 0.4345, 0.74975 ],
+"xlab": null,
+"xrange": [ -127.57, -64.124 ],
+"xname": "",
+"xline": false,
+"xticks": false,
+"y": [ 0.040705, 0.22347, 0.40624, 0.58901, 0.77178, 0.95455 ],
+"ylab": null,
+"yrange": [ 23.886, 51.244 ],
+"yname": "",
+"yline": false,
+"yticks": false 
+},
+"title": "",
+"legend": {} 
+},
+"ts": {
+ "geoms": [
+ "geom4_text_ts",
+"geom5_rect_ts" 
+],
+"options": {
+ "width":    500,
+"height":    500 
+},
+"axis": {
+ "x": [ 0.19649, 0.48555, 0.77461 ],
+"xlab": [ "1960", "1980", "2000" ],
+"xrange": [ 1946.4, 2015.6 ],
+"xname": "Year",
+"xline": true,
+"xticks": true,
+"y": [ 0.045455, 0.27273,    0.5, 0.72727, 0.95455 ],
+"ylab": [ "0", "50", "100", "150", "200" ],
+"yrange": [    -10,    210 ],
+"yname": "Number of Tornadoes",
+"yline": true,
+"yticks": true 
+},
+"legend": {} 
+} 
+} 
+}

@@ -1,0 +1,159 @@
+{
+ "geoms": {
+ "geom1_polygon_map": {
+ "geom": "polygon",
+"data": "geom1_polygon_map.csv",
+"aes": {
+ "x": "long",
+"y": "lat",
+"group": "group" 
+},
+"params": {
+ "colour": "grey",
+"fill": "black" 
+},
+"update": "",
+"subord": [
+ "group" 
+],
+"subvars": {
+ "group": "group" 
+},
+"classed": "geom1_polygon_map",
+"types": {
+ "x": "numeric",
+"y": "numeric",
+"group": "integer",
+"PANEL": "integer" 
+},
+"nextgeom": "geom2_segment_map" 
+},
+"geom2_segment_map": {
+ "geom": "segment",
+"data": "geom2_segment_map.csv",
+"aes": {
+ "x": "startLong",
+"y": "startLat",
+"xend": "endLong",
+"yend": "endLat",
+"showSelected": "year" 
+},
+"params": {
+ "lineend": "butt",
+"na.rm": false,
+"colour": "#55B1F7" 
+},
+"update": {
+ "showSelected": "year" 
+},
+"subord": [
+ "showSelected" 
+],
+"subvars": {
+ "showSelected": "year" 
+},
+"classed": "geom2_segment_map",
+"types": {
+ "x": "numeric",
+"xend": "numeric",
+"y": "numeric",
+"yend": "numeric",
+"showSelected": "integer",
+"PANEL": "integer",
+"group": "integer" 
+},
+"nextgeom": "geom3_rect_ts" 
+},
+"geom3_rect_ts": {
+ "geom": "rect",
+"data": "geom3_rect_ts.csv",
+"aes": {
+ "x": "year",
+"y": "year",
+"clickSelects": "year" 
+},
+"params": {
+ "alpha":      1 
+},
+"update": {
+ "clickSelects": "year" 
+},
+"subord": [],
+"subvars": [],
+"classed": "geom3_rect_ts",
+"types": {
+ "x": "numeric",
+"group": "integer",
+"y": "numeric",
+"clickSelects": "integer",
+"PANEL": "integer",
+"ymin": "numeric",
+"ymax": "numeric",
+"xmin": "numeric",
+"xmax": "numeric" 
+} 
+} 
+},
+"selectors": {
+ "year": {
+ "selected": 2006,
+"subset": [
+ "geom2_segment_map",
+"geom3_rect_ts" 
+] 
+} 
+},
+"plots": {
+ "map": {
+ "geoms": [
+ "geom1_polygon_map",
+"geom2_segment_map" 
+],
+"options": {
+ "width":    970,
+"height":    500 
+},
+"axis": {
+ "x": [ 0.11924, 0.4345, 0.74975 ],
+"xlab": [ "-120", "-100", "-80" ],
+"xrange": [ -127.57, -64.124 ],
+"xname": "long",
+"xline": true,
+"xticks": true,
+"y": [ 0.040584,  0.228, 0.41542, 0.60283, 0.79025, 0.97766 ],
+"ylab": [ "25", "30", "35", "40", "45", "50" ],
+"yrange": [ 23.917, 50.596 ],
+"yname": "lat",
+"yline": true,
+"yticks": true 
+},
+"title": "Tornadoes in the US",
+"legend": {} 
+},
+"ts": {
+ "geoms": [
+ "geom3_rect_ts" 
+],
+"options": {
+ "width":    500,
+"height":    500 
+},
+"axis": {
+ "x": [ 0.19649, 0.48555, 0.77461 ],
+"xlab": [ "1960", "1980", "2000" ],
+"xrange": [ 1946.4, 2015.6 ],
+"xname": "Year",
+"xline": true,
+"xticks": true,
+"y": [ 0.045455, 0.29316, 0.54087, 0.78858 ],
+"ylab": [ "0", "500", "1000", "1500" ],
+"yrange": [ -91.75, 1926.8 ],
+"yname": "Number of Tornadoes",
+"yline": true,
+"yticks": true 
+},
+"title": "Number of Recorded Tornadoes, 1950-2006",
+"legend": {} 
+} 
+} 
+}
