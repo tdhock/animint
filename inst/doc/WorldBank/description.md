@@ -1,2 +1,0 @@
-- Click on the background of the time series plot on the left to select a year.
-- Click on a line on the time series plot or a point on the scatterplot to select a country.

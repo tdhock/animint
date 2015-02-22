@@ -1,2 +1,0 @@
-- Click a circle on a scatterplot to select a data set.
-- Click the background of the lineplots to select sample size or class prior.

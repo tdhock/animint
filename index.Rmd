@@ -1,66 +1,420 @@
-Animint Tutorial
-========================================================
+---
+title: "animint tutorial"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    theme: readable
+---
 
-This tutorial is designed to demonstrate animint, a package that converts ggplot2 plots into d3 javascript graphics. Animint allows you to make interactive web-based graphics using familiar R methods. In addition, animint allows graphics to be animated and respond to user clicks.
 ```{r setup,echo=FALSE, tidy=FALSE, message=FALSE, warning=FALSE}
-opts_chunk$set(fig.width=6, fig.height=4,cache=TRUE, message=FALSE, warning=FALSE)
-library(ggplot2)
-library(animint)
-library(plyr)
+library("animint")
+knitr::opts_chunk$set(fig.width = 6, fig.height = 4, fig.align = "center", message = FALSE, warning = FALSE, tidy = FALSE)
 ```
 
-Contents
----------------------------------------------------------
-* [Installation](#install)
-* [Introduction](#intro)
-* [Tornado Example](tornadoes.html#tornadoes) - see what animint can do, including explanations of clickSelects, showSelected, and animations. 
-* [Climate Example](climate.html) - another demonstration of using animint with multiple linked plots and animation.
-* [Examples of Geoms](geoms.html) - explanations of how to use statistics and certain geoms in animint, demonstrations of most geoms that animint supports. 
+## Introduction 
 
-<a name="install"/>
-Installation instructions
----------------------------------------------------------
-The animint package is available on [github](https://github.com/tdhock/animint). 
-```{r install}
-library(devtools) # devtools package, allows you to install from github repositories
-install_github("animint", "tdhock") 
-```
-You can also download a zip file of the package and install it normally using install_packages() if you do not want to install the devtools package.
+This tutorial demonstrates [**animint**](https://github.com/tdhock/animint) -- an `R` package for converting [**ggplot2**](http://cran.r-project.org/web/packages/ggplot2/index.html) plots into web-based interactive visualizations.
 
-### A Note about using Google Chrome
+## Viewing, sharing & embedding animint plots
 
-Google Chrome blocks local file access by default. To get around this, you must close all chrome instances and then restart chrome using the flag --allow-file-access-from-files. In Windows, you do this using cmd, the command prompt. Alternately, Firefox will work by default.
-
-<a name="intro"/>
-Introduction 
----------------------------------------------------------
-Let's start with a reasonably common comparison of distributions: two normal distributions with different centers, and a gamma distribution. 
+Suppose we have a basic **ggplot2** plot:
 
 ```{r density}
-library(ggplot2)
-library(animint)
-library(plyr)
-set.seed(33)
-
-boxplotdata <- rbind(data.frame(x=1:50, y=sort(rnorm(50, 3, 1)), group="N(3,1)"),
-                     data.frame(x=1:50, y=sort(rnorm(50, 0, 1)), group="N(0,1)"), 
-                     data.frame(x=1:50, y=sort(rgamma(50, 2, 1/3)), group="Gamma(2,1/3)"))
-boxplotdata <- ddply(boxplotdata, .(group), transform, ymax=max(y), ymin=min(y), med=median(y))
-
-g1 <- ggplot() + geom_density(data=boxplotdata, aes(x=y, group=group, fill=group), alpha=.5) +
-  scale_fill_discrete("Distribution") + xlab("x") + 
-  ggtitle("geom_density")
-g1
-gg2animint(list(plot1 = g1), out.dir="./g1")
+library("ggplot2")
+mtcars$cyl <- as.factor(mtcars$cyl)
+p <- ggplot() + geom_point(data = mtcars,
+    aes(x = mpg, y = wt, colour = cyl))
+p
 ```
 
-You can see the resulting d3 plot [here](g1/index.html).
+### Local viewing
 
-Animint requires a list of named plots - each plot must be a ggplot2 object and must have a name, such as "plot1" in the example above. You can also specify the output directory - this allows you to control where the generated webpage is stored. If the output directory is not specified, then typically R will create a temporary directory on your computer to store the generated webpage. 
+The `animint2dir()` function is most useful for local development and quickly iterating your **animint** plots. This function compiles a list of ggplot objects (and a [list of other options](TODO-make-list)), [compiles them](https://github.com/tdhock/animint/wiki/Compiler-details), and write a set of files to a directory. Here we write those files to the "simple" directory.
+
+```{r, eval = FALSE}
+library("animint")
+animint2dir(list(plot = p), out.dir = "simple", open.browser = FALSE)
+```
+
+To view the result, you'll probably want to start a local [file server](http://en.wikipedia.org/wiki/File_server) in the "simple" directory. This can be done easily from the `R` console with the [**servr**](http://cran.r-project.org/web/packages/servr/index.html) package:
+
+```{r, eval = FALSE}
+servr::httd("simple") # press ESC to stop the server & resume R session
+```
+
+### Embedding animint plots in knitr/rmarkdown
+
+You can simply add a class of "animint" to a list ggplot objects in a .Rmd file to embed an animint plot in your document (of course, this will only work if the output file is HTML).
+
+```{r simple}
+structure(list(plot = p), class = "animint")
+```
+
+### Share plots via bl.ocks.org
+
+If you want to quickly share your plot with others and have a [GitHub](https://github.com/) account, `animint2gist()` will compile your ggplot's and upload the resulting files as a [gist](https://gist.github.com/) which can then be viewed via  <http://bl.ocks.org/>
+
+```{r, eval = FALSE}
+animint2dir(list(plot = p))
+```
+
+## The grammar of graphics in a nutshell
+
+**ggplot2** is an implementation of the [grammar of graphics](http://www.amazon.com/The-Grammar-Graphics-Statistics-Computing/dp/0387245448) which adds the ability to create [layered graphics](http://vita.had.co.nz/papers/layered-grammar.html). A layer consists of five components: Data, Aesthetics, Statistics, Geometry, and Positional Adjustment. The figure below shows how the components fit together to make up a layer. To keep the illustration simple, the graphic in this example is composed of just one layer, but **ggplot2** (and **animint**) allows for multiple layers on a single plot.
+
+<div align = "center">
+  <img src="gg.png" width = "700px" height = "300px">
+</div>
+
+## Adding interactivity with clickSelects & showSelected aesthetics
+
+**animint** understands two aesthetics in addition to the usual ggplot2 aesthetics: `clickSelects` and `showSelected`:
+
+<div align = "center">
+  <img src="clickSelects.png" width = "700px" height = "300px">
+  <img src="showSelected.png" width = "700px" height = "300px">
+</div>
+
+This allows animint to show/hide subsets of data (`showSelected`) according to the current selection (`clickSelects`). For (an overly simplified) example, let's continue with the `mtcars` example:
+
+```{r}
+p1 <- ggplot() + theme(legend.position = "none") +
+  geom_point(data = mtcars,
+    aes(x = mpg, y = wt, colour = cyl, clickSelects = cyl))
+p2 <- ggplot() + 
+  geom_point(data = mtcars,
+    aes(x = mpg, y = wt, colour = cyl, showSelected = cyl))
+p_list <- list(plot1 = p1, plot2 = p2)
+structure(p_list, class = "animint")
+```
+
+This example is not practically useful since we are linking plots to the same data, but it should help demonstrate the idea behind `clickSelects` and `showSelected`. The next section shows how we can leverage `clickSelects`, `showSelected`, and [other animint options]() to make linked interactive animations.
+
+## Tornado example
+
+Animint includes a dataset from the US National Oceanic and Atmospheric Administration, listing all recorded tornadoes in the US from 1950 - 2006 with GIS information. The data can be found [here](http://www.spc.noaa.gov/wcm/#data) or loaded into R using the command `data(UStornadoes, package = "animint")`. 
+
+```{r tornadobar, message=FALSE, warning=FALSE}
+library("plyr")
+library("maps")
+data(UStornadoes, package = "animint")
+
+USpolygons <- map_data("state")
+USpolygons$state = state.abb[match(USpolygons$region, tolower(state.name))]
+
+map <- ggplot() + 
+  geom_polygon(aes(x = long, y = lat, group = group), 
+               data = USpolygons, fill = "black", colour = "grey") +
+  geom_segment(aes(x = startLong, y = startLat, xend = endLong, yend = endLat, showSelected = year), 
+               colour = "#55B1F7", data = UStornadoes) +
+  ggtitle("Tornadoes in the US")
+
+ts <- ggplot() + 
+  stat_summary(aes(year, year, clickSelects = year), 
+               data = UStornadoes, fun.y = length, geom = "bar") + 
+  ggtitle("Number of Recorded Tornadoes, 1950-2006") + 
+  ylab("Number of Tornadoes") + 
+  xlab("Year")
+
+# specify map width to be 970px
+# theme_animint() requires Toby's fork of ggplot2
+# devtools::install_github("tdhock/ggplot2")
+# (we're hopeful this fork will be merged with ggplot2 master)
+map <- map + theme_animint(height = 970)
+
+tornado.bar <- list(map = map, ts = ts) 
+
+animint2dir(tornado.bar, "tornado-bar")
+```
+
+The [resulting plot](tornado-bar/index.html) is better in another tab/window.
+
+Clicking on a specific bar causes the subset of data corresponding to that year to be "selected" and plotted on the US map. We specified this by including `showSelected=year` in the `aes()` statement for map, and `clickSelects=year` in the `aes()` statement for `ts`. The graph dynamically updates based on the user's clicks. 
+
+The syntax for this example is slightly tricky, because the standard specification of `geom_bar(aes(x=year, clickSelects=year), data=UStornadoes, stat="bin")` does not work with **animint** at this time. This is because `clickSelects` is not a **ggplot2** aesthetic, and so the binning algorithm does not behave properly when `clickSelects` is specified. Using `stat_summary()` allows us to avoid this behavior. 
+
+### Simpler bar plots
+
+In order to make bar plots with `stat_bin()` somewhat easier, **animint** includes a `make_bar()` function, which helps facilitate bar charts with `clickSelects` aesthetics. 
+
+```{r tornadobar2, message=FALSE, warning=FALSE}
+ts <- ggplot() + make_bar(UStornadoes, "year") + 
+  ggtitle("Number of Recorded Tornadoes, 1950-2006") + 
+  ylab("Number of Tornadoes") + 
+  xlab("Year")
+
+tornado.bar <- list(map = map, ts = ts, width=list(map = 970, ts = 500),  height=list(500)) 
+
+animint2dir(tornado.bar, "tornado-bar2")
+```
+
+This code produces the [same plot](tornado-bar2/index.html), but with a much more intuitive syntax. 
+
+### Plot Themes
+
+We typically do not want plot axes and labels displayed on a map, because it's obvious what the x and y axes are. While animint does not support all of **ggplot2**'s `theme()` options, it does support removing the axes, labels, and axis titles. 
+
+To fully remove all evidence of the axes, we must separately remove axis lines, ticks, text (axis break labels), and titles. 
+
+```{r tornadotheme, message=FALSE, warning=FALSE}
+map <- ggplot() + 
+  geom_polygon(aes(x = long, y = lat, group = group), 
+               data = USpolygons, fill = "black", colour = "grey") +
+  geom_segment(aes(x = startLong, y = startLat, xend = endLong, yend = endLat, showSelected = year), 
+               colour = "#55B1F7", data = UStornadoes) +
+  ggtitle("Tornadoes in the US") + 
+  theme(axis.line = element_blank(), axis.text = element_blank(), 
+        axis.ticks = element_blank(), axis.title = element_blank()) +
+  theme_animint(width = 970)
+
+tornado.bar <- list(map = map, ts = ts) 
+animint2dir(tornado.bar, "tornado-bar3")
+```
+
+You can see the resulting plot [here](tornado-bar3/index.html). Notice that the axes have been removed from the map, leaving only the data displayed on that plot. 
+
+We may want to allow users to select a state as well as a year, so that the bar chart shows the number of tornadoes over time for a specific state, and the map shows the tornadoes that occurred during the selected year. To do this, we will need to create a summarized dataset. We'll create a data frame that contains the number of tornadoes occurring in each state for each year in the dataset. 
+
+```{r tornadocounts,message=FALSE, warning=FALSE}
+UStornadoCounts <-
+  ddply(UStornadoes, .(state, year), summarize, count=length(state))
+```
+
+### Text that responds to clickSelects
+
+The `make_text()` function included in **animint** makes it easy to create text describing what has been selected. In this case, we would like to display the year on the US map, and we would like to show the state on the bar chart. This interactivity does not work with `ggtitle()` at this time, but we can create a "title" element on the plot itself instead using make_text.  
+
+Syntax is  `make_text(data, x, y, label.var, format=NULL)` where `format` can be specified using a string containing `%d`, `%f`, etc. to represent the variable value.
+
+```{r tornadotsbar, message=FALSE, warning=FALSE, cache=TRUE}
+map <- ggplot() + 
+  make_text(UStornadoCounts, -100, 50, "year", "Tornadoes in %d") +
+  geom_polygon(aes(x = long, y = lat, group = group, clickSelects = state),
+               data = USpolygons, fill = "black", colour = "grey") +
+  geom_segment(aes(x = startLong, y = startLat, xend = endLong, yend = endLat,
+                   showSelected = year),
+               colour = "#55B1F7", data = UStornadoes) + 
+  theme(axis.line = element_blank(), axis.text = element_blank(), 
+        axis.ticks = element_blank(), axis.title = element_blank()) +
+  theme_animint(width = 970)
+
+ts <- ggplot() + 
+  make_text(UStornadoes, 1980, 200, "state") +
+  geom_bar(aes(year, count, clickSelects = year, showSelected = state),
+           data = UStornadoCounts, stat = "identity", position = "identity") + 
+  ylab("Number of Tornadoes") + 
+  xlab("Year")
+
+tornado.ts.bar <- list(map = map, ts = ts) 
+animint2dir(tornado.ts.bar, "tornado-ts-bar")
+```
+
+[Here](tornado-ts-bar/index.html) is the resulting plot.
+
+### Animation
+
+Animint also allows you to automatically change the selection or data shown so that the plot is animated. An element named `time` in the list provided to `animint2dir()` allows you to set the following arguments: 
+
+* the __variable__ that will advance over time
+* __ms__, the length of time in milliseconds between transitions
+* __duration__, the time used to switch between values (in milliseconds).
+
+### `make_tallrect()`
+
+This example also demonstrates the `make_tallrect()` function, which populates a graph with bars spanning the entire y range located at each value of the variable passed in, with clickSelects element to match. Syntax is  
+`make_tallrect(data, x.name, alpha=1/2)`
+
+```{r tornadoanimation, warning=FALSE, message=FALSE}
+map <- ggplot()+
+  geom_polygon(aes(x = long, y = lat, group = group, clickSelects = state),
+               data = USpolygons, fill = "black", colour = "grey") +
+  geom_segment(aes(x = startLong, y = startLat, xend = endLong, yend = endLat,
+                   showSelected = year),
+               colour = "#55B1F7", data = UStornadoes) + 
+  make_text(UStornadoCounts, -100, 50, "year", "Tornadoes in %d") +
+  theme(axis.line = element_blank(), axis.text = element_blank(), 
+        axis.ticks = element_blank(), axis.title = element_blank()) +
+  theme_animint(width = 970)
+
+ts <- ggplot()+
+  make_tallrect(UStornadoCounts, "year")+
+  make_text(UStornadoes, 1980, 200, "state") +
+  geom_line(aes(year, count, clickSelects = state, group = state),
+            data = UStornadoCounts, alpha = 3/5, size = 4) + 
+  ylab("Number of Tornadoes") + 
+  xlab("Year")
 
 
-[Next, we'll look at a specific dataset and demonstrate the functions and aesthetics animint adds to ggplot2.](tornadoes.html)
+
+tornado.anim <- list(map = map, ts = ts)
+
+# append the time object in as another object in the main list.
+tornado.anim$time <- list(variable = "year", ms = 2000) 
+ 
+
+animint2dir(tornado.anim, "tornado-anim")
+```
+
+[Here](tornado-anim/index.html) is the resulting plot with animation.
+
+## Climate Example
+
+Dataset: 2006 Data Expo data, from NASA Goddard Institute for Space Studies. 
+Data is a subset of the monthly climatology of the International Satellite Cloud Climatology Project (ISCCP). 
+Dataset contains monthly observations of atmospheric variables 1995-2000, for a 24x24 grid of locations over North, South, and Central America between 113.75ºW-56.25ºW, 21.25ºS-36.25ºN with 2.5º grid
+spacing. Dataset contains information such as cloud cover at low, med, and high altitudes, temperature, surface temperature, pressure, and ozone concentration. Temperatures given are in Celsius.
+
+Dataset description adapted from [one of the submitted posters](http://had.co.nz/dataexpo/isu-dataexpo.pdf)
+
+```{r setup2}
+library("animint")
+library("maps")
+library("lubridate")
+library("plyr")
+
+data(climate, package = "animint")
+climate$time2 <- decimal_date(ymd(as.character(climate$date)))
+
+countries <- map_data("world")
+# Map coordinate limits chosen so that the polygons displayed are at least reasonably complete. 
+countries <- subset(countries, (lat < 38) & (lat > -24))
+countries <- subset(countries, ((-long) > 54) & ((-long) < 118))
+
+# Create variable showing temp-avg.monthly.temp at that location
+climate <- ddply(climate, .(id, month), transform, 
+                 tempdev = temperature - mean(temperature), 
+                 surfdev = surftemp - mean(surftemp))
+climate <- climate[order(climate$date, climate$id), ]
+
+# data frame with formatted labels
+dates <- ddply(climate, .(date), summarise, month = month[1], 
+               year = year[1], time2 = time2[1], 
+               textdate = paste(month.name[month], year))
+dates <- dates[order(dates$date),]
+```
+
+As data consists of both time-sequence and spatial data, we might want to link some sort of time-series plot to maps displaying the spatial data. We might also want to be able to click on a portion of the map and see the relevant time series. This suggests that we will need at least two selectors: `id`, which identifies the spatial location, and `time2`, which is a continuous numerical representation of the time sequence, starting at 1995.000. 
+
+```{r timeseries}
+tempseq <- ggplot() + 
+  make_tallrect(data = climate, "time2") + 
+  geom_line(data = climate, aes(x = time2, y = temperature, group = id, showSelected = id)) +
+  geom_text(data = dates, aes(x = 1998, y = -5, label = textdate, showSelected = time2))
+```
+
+This code chunk defines a plot that shows the temperature over time for a selected spatial location, and contains many `tallrect()`'s (rectangles spanning the y range that break up the x axis) that select a specific point in time. If we view this plot in R, **showSelected** is not a recognized aesthetic, and so ggplot displays all of the lines at once, and all of the tallrects are also displayed in the background. It's a pretty messy plot!
+
+```{r timeseries-display}
+tempseq
+```
+In order to be able to select an ID, we must have at least one other plot in our animint plot list. Let's start with a plot that shows how each location compares to its average monthly temperature. Note that this quantity was computed in the code chunk at the beginning of this section. 
+
+```{r tempmap}
+# we will re-use this set of elements, so let's define a function to add them to a plot p with tiles.
+# we can't define the base plot first because the path must be drawn on top of the tiles.
+plainmap <- function(p){
+  p + geom_path(data = countries, aes(x = long, y = lat, group = group)) + 
+  geom_text(data = dates, 
+            aes(x = -86, y = 39, label = textdate, showSelected = time2))+ 
+  theme(axis.line = element_blank(), axis.text = element_blank(), 
+        axis.ticks = element_blank(), axis.title = element_blank())
+}
+
+# tiles with temperature data to serve as the background for the plot.
+temptiles <- ggplot() + 
+  geom_tile(data = climate, 
+            aes(x = long, y = lat, fill = tempdev, 
+                clickSelects = id, showSelected = time2)) + 
+  scale_fill_gradient2("deg. C", low = "blue", mid = "white", 
+                       high = "red", limits = c(-20, 20), 
+                       midpoint = 0) + 
+  ggtitle("Temperature Deviation from Monthly Norm")
+
+airtemp <- plainmap(temptiles)
+```
+
+The `theme()` statement removes the axis, axis labels, and axis title from the plot, since maps are fairly self-explanatory and longitude and latitude values don't provide much additional information. The `geom_text()` statement is used where one would typically use a `make_text()` statement, but in this case, we want a format that is not easily derived from the `showSelected` variable. 
+
+Now that we have both plot types that we need for the selectors we've chosen, we can add animation and output to animint:
+
+```{r animint1}
+animint2dir(list(timeseriestemp = tempseq, 
+                airtemp = airtemp,
+                time = list(variable = "time2", ms = 3000),
+                selector.types = list(id = "multiple"),
+                width = list(450),
+                height = list(450)
+                ), out.dir = "climate/onemap")
+```
+
+The `time` variable defines which selector will change sequentially, in this case, `time2`. In addition, the plot will change every 3000 milliseconds, or every 3 seconds. We will cover the entire time period in 216 seconds, or about 3.5 minutes. 
+
+Here is the [animint-generated webpage](climate/onemap/index.html). Click on the islands off the coast of South America, and see if you can determine in what year El Nino (warming of the Pacific Ocean off the coast of South America) occurred. How much of the plot seems to be effected by this event?
+
+We can also add additional maps. The dataset contains ozone data, surface temperature data, and cloud cover data. 
+
+```{r surftempmap}
+surftemp <- plainmap(p = ggplot() + 
+  geom_tile(data = climate, 
+            aes(x = long, y = lat, fill = surftemp, 
+                clickSelects = id, showSelected = time2)) + 
+  scale_fill_gradient2("deg. C", low = "blue", mid = "white", 
+                       high = "red", limits = c(-10, 45), 
+                       midpoint = 0) + 
+  ggtitle("Surface Temperature"))
+
+ozone <- plainmap(p = ggplot() + 
+  geom_tile(data = climate, 
+            aes(x = long, y = lat, fill = ozone, 
+                clickSelects = id, showSelected = time2))+ 
+  scale_fill_gradient("Concentration", low = "white", high = "brown") + 
+  ggtitle("Ozone Concentration"))
+
+cloudshigh <- plainmap(p = ggplot() + 
+  geom_tile(data = climate, 
+            aes(x = long, y = lat, fill = cloudhigh, 
+                clickSelects = id, showSelected = time2)) + 
+  scale_fill_gradient("Coverage", low = "skyblue", high = "white", 
+                      limits = c(0, 75)) + 
+  ggtitle("High Altitute Cloud Cover"))
+
+cloudsmid <- plainmap(p = ggplot() + 
+  geom_tile(data = climate, colour = "grey",
+            aes(x = long, y = lat, fill = cloudmid, 
+                clickSelects = id, showSelected = time2))+ 
+  scale_fill_gradient("Coverage", low = "skyblue", high = "white", 
+                      limits = c(0, 75)) + 
+  ggtitle("Mid Altitute Cloud Cover"))
+
+cloudslow <- plainmap(p = ggplot() + 
+  geom_tile(data = climate, colour = "grey",
+            aes(x = long, y = lat, fill = cloudlow, 
+                clickSelects = id, showSelected = time2)) +
+  scale_fill_gradient("Coverage", low = "skyblue", high = "white", 
+                      limits = c(0, 75)) + 
+  ggtitle("Low Altitute Cloud Cover"))
+
+animint2dir(list(timeseriestemp = tempseq,
+                airtemp = airtemp,
+                surftemp = surftemp,
+                cloudslow = cloudslow, 
+                cloudsmid = cloudsmid, 
+                cloudshigh = cloudshigh, 
+                ozone = ozone,
+                time = list(variable="time2", ms=3000),
+                selector.types = list(id = "multiple"),
+                width = list(timeseriestemp=900, 
+                             airtemp=450, surftemp=450, ozone=450, 
+                             cloudslow=450, cloudsmid=450, cloudshigh=450),
+                height = list(450)
+                ), out.dir = "climate/lotsofmaps")
+```
+
+Here is the [animint-generated webpage](climate/lotsofmaps/index.html). This page may take longer to load due to the increased amount of data d3 must process.
 
 
 
-<sub>Tutorial created by Susan VanderPlas on 8/29/2013 using animint version 0.1.0 and ggplot2 0.9.3.1</sub>
+```{r}
+sessionInfo()
+```
