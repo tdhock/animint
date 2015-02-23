@@ -1,23 +1,19 @@
 {
  "geoms": {
- "geom1_polygon_g8": {
+ "geom1_violin_g8": {
  "geom": "polygon",
-"data": "geom1_polygon_g8.csv",
+"classed": "geom1_violin_g8",
 "aes": {
  "x": "group",
 "y": "y",
 "fill": "group",
 "group": "group" 
 },
-"params": {},
-"update": "",
-"subord": [
- "group" 
-],
-"subvars": {
- "group": "group" 
+"params": {
+ "trim": true,
+"scale": "area" 
 },
-"classed": "geom1_polygon_g8",
+"subset_order": [],
 "types": {
  "fill": "rgb",
 "y": "numeric",
@@ -36,37 +32,99 @@
 "xmax": "numeric",
 "xminv": "numeric",
 "xmaxv": "numeric" 
-} 
+},
+"PANEL": 1,
+"chunks": 1,
+"total": 1,
+"chunk_order": [],
+"nest_order": [
+ "group" 
+] 
 } 
 },
 "selectors": [],
 "plots": {
  "g8": {
- "geoms": [
- "geom1_polygon_g8" 
+ "strips": {
+ "top": [
+ "" 
 ],
-"scales": {
- "fill": [ "#F8766D", "#00BA38", "#619CFF" ] 
+"right": [
+ "" 
+],
+"n": {
+ "top":      0,
+"right":      0 
+} 
 },
-"options": {
- "width":    400,
-"height":    400 
+"layout": {
+ "PANEL": [ 1 ],
+"ROW": [ 1 ],
+"COL": [ 1 ],
+"SCALE_X": [ 1 ],
+"SCALE_Y": [ 1 ],
+"AXIS_X": [ true ],
+"AXIS_Y": [ true ],
+"coord_fixed": [ false ],
+"width_proportion": [      1 ],
+"height_proportion": [      1 ] 
 },
-"axis": {
- "x": [ 0.1875,    0.5, 0.8125 ],
-"xlab": [ "N(3,1)", "N(0,1)", "Gamma(2,1/3)" ],
+"geoms": [
+ "geom1_violin_g8" 
+],
+"axis1": {
+ "x": [
+ 0.1875,
+   0.5,
+0.8125 
+],
+"xlab": [
+ "N(3,1)",
+"N(0,1)",
+"Gamma(2,1/3)" 
+],
 "xrange": [    0.4,    3.6 ],
-"xname": "Distribution",
 "xline": true,
 "xticks": true,
-"y": [ 0.15342, 0.42018, 0.68694, 0.9537 ],
-"ylab": [ "0", "5", "10", "15" ],
-"yrange": [ -2.8756, 15.868 ],
-"yname": "y",
+"y": [
+ 0.1002,
+0.27727,
+0.45435,
+0.63142,
+0.80849,
+0.98556 
+],
+"ylab": [
+ "0",
+"5",
+"10",
+"15",
+"20",
+"25" 
+],
+"yrange": [ -2.8295, 25.408 ],
 "yline": true,
 "yticks": true 
 },
-"title": "geom_violin",
+"xtitle": "Distribution",
+"xanchor": "middle",
+"xangle":      0,
+"ytitle": "y",
+"yanchor": "end",
+"yangle":      0,
+"xlabs": [
+ "N(3,1)",
+"N(0,1)",
+"Gamma(2,1/3)" 
+],
+"ylabs": [
+ "0",
+"5",
+"10",
+"15",
+"20",
+"25" 
+],
 "legend": {
  "Distribution": {
  "guide": "legend",
@@ -79,7 +137,6 @@
 "polygoncolour": "#333333",
 "polygonsize":    0.5,
 "polygonlinetype": "solid",
-"polygonorder": 3,
 "label": [ "Gamma(2,1/3)" ] 
 },
 {
@@ -88,7 +145,6 @@
 "polygoncolour": "#333333",
 "polygonsize":    0.5,
 "polygonlinetype": "solid",
-"polygonorder": 2,
 "label": [ "N(0,1)" ] 
 },
 {
@@ -97,11 +153,15 @@
 "polygoncolour": "#333333",
 "polygonsize":    0.5,
 "polygonlinetype": "solid",
-"polygonorder": 1,
 "label": [ "N(3,1)" ] 
 } 
 ] 
 } 
+},
+"title": "geom_violin",
+"options": {
+ "width":    400,
+"height":    400 
 } 
 } 
 } 

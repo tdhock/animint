@@ -9,7 +9,7 @@
 <meta name="generator" content="pandoc" />
 
 
-<meta name="date" content="2015-02-22" />
+<meta name="date" content="2015-02-23" />
 
 <title>animint tutorial</title>
 
@@ -64,7 +64,7 @@ img {
 
 <div id="header">
 <h1 class="title">animint tutorial</h1>
-<h4 class="date"><em>2015-02-22</em></h4>
+<h4 class="date"><em>2015-02-23</em></h4>
 </div>
 
 <div id="TOC">
@@ -192,7 +192,7 @@ structure(plots, class = &quot;animint&quot;)</code></pre>
 
 </div>
 <script>var plot = new animint("#unnamedchunk5", "unnamedchunk5/plot.json");</script>
-<p>On the left hand panel, we can click the different colours to change the current selection and view the differences in the relationship between bill amount and tips. Notice how bill amount and tip have lower correlation amongst smokers (especially male smokers). The next section shows how we can leverage <code>clickSelects</code>, <code>showSelected</code>, and <a href="">other animint options</a> to make more complex interactive animations.</p>
+<p>On the left hand panel, we can click the different colours to change the current selection and view the differences in the relationship between bill amount and tips. Notice how bill amount and tip have lower correlation amongst smokers (especially male smokers). The next section shows how we can leverage <code>clickSelects</code>, <code>showSelected</code>, and <a href="https://github.com/tdhock/animint/wiki/Advanced-features-present-animint-but-not-in-ggplot2">other animint options</a> to make more complex interactive animations.</p>
 </div>
 </div>
 <div id="tornado-example" class="section level2">
@@ -489,14 +489,9 @@ lines_simple</code></pre>
 <pre><code>## $p1</code></pre>
 <pre><code>## 
 ## $p2</code></pre>
-<pre class="r"><code>structure(lines_simple, class = &quot;animint&quot;)</code></pre>
-<p>
-</p>
-<div id="linesimple">
-
-</div>
-<script>var plot = new animint("#linesimple", "linesimple/plot.json");</script>
+<pre class="r"><code>animint2dir(lines_simple, &quot;geoms/line-simple&quot;)</code></pre>
 <p><img src="index_files/figure-html/line-simple-1.png" title="" alt="" width="576" style="display: block; margin: auto;" /><img src="index_files/figure-html/line-simple-2.png" title="" alt="" width="576" style="display: block; margin: auto;" /></p>
+<p><a href="geoms/line-simple">Click here</a> to see the resulting animint plot(s).</p>
 </div>
 <div id="linetypes" class="section level4">
 <h4>Linetypes</h4>
@@ -547,13 +542,8 @@ p7 &lt;- ggplot() +
   ggtitle(&quot;Named linetypes&quot;)
 
 line_types &lt;- list(p3 = p3, p4 = p4, p5 = p5, p6 = p6, p7 = p7)
-structure(line_types, class = &quot;animint&quot;)</code></pre>
-<p>
-</p>
-<div id="linetypes">
-
-</div>
-<script>var plot = new animint("#linetypes", "linetypes/plot.json");</script>
+animint2dir(line_types, &quot;geoms/line-types&quot;)</code></pre>
+<p><a href="geoms/line-types">Click here</a> to see the resulting animint plot(s).</p>
 </div>
 <div id="alpha-scales-and-lines" class="section level4">
 <h4>Alpha scales and lines</h4>
@@ -603,13 +593,8 @@ p12 &lt;- ggplot() +
   ggtitle(&quot;Continuous Alpha and Colour&quot;)
 
 alphas &lt;- list(p8 = p8, p9 = p9, p10 = p10, p11 = p11, p12 = p12)
-structure(alphas, class = &quot;animint&quot;)</code></pre>
-<p>
-</p>
-<div id="alphalines">
-
-</div>
-<script>var plot = new animint("#alphalines", "alphalines/plot.json");</script>
+animint2dir(alphas, &quot;geoms/alphalines&quot;)</code></pre>
+<p><a href="geoms/alphalines">Click here</a> to see the resulting animint plot(s).</p>
 </div>
 </div>
 <div id="points" class="section level3">
@@ -677,13 +662,8 @@ points_simple</code></pre>
 <pre><code>## 
 ## $s6</code></pre>
 <p><img src="index_files/figure-html/pointssimple-5.png" title="" alt="" width="576" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>structure(points_simple, class = &quot;animint&quot;)</code></pre>
-<p>
-</p>
-<div id="pointssimple">
-
-</div>
-<script>var plot = new animint("#pointssimple", "pointssimple/plot.json");</script>
+<pre class="r"><code>animint2dir(points_simple, &quot;geoms/point-simple&quot;)</code></pre>
+<p><a href="geoms/point-simple">Click here</a> to see the resulting animint plot(s).</p>
 </div>
 <div id="geom_jitter" class="section level4">
 <h4><code>geom_jitter()</code></h4>
@@ -693,13 +673,8 @@ points_simple</code></pre>
   ggtitle(&quot;geom_jitter&quot;)
 s5</code></pre>
 <p><img src="index_files/figure-html/jitterplots-1.png" title="" alt="" width="576" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>structure(list(s5 = s5), class = &quot;animint&quot;)</code></pre>
-<p>
-</p>
-<div id="jitterplots">
-
-</div>
-<script>var plot = new animint("#jitterplots", "jitterplots/plot.json");</script>
+<pre class="r"><code>animint2dir(list(s5 = s5), &quot;geoms/jitterplots&quot;)</code></pre>
+<p><a href="geoms/jitterplots">Click here</a> to see the resulting animint plot(s).</p>
 </div>
 </div>
 <div id="interactive-plots-and-scale_size" class="section level3">
@@ -803,13 +778,8 @@ pts</code></pre>
 <pre><code>## 
 ## $s12</code></pre>
 <p><img src="index_files/figure-html/sizepoints-7.png" title="" alt="" width="576" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>structure(pts, class = &quot;animint&quot;)</code></pre>
-<p>
-</p>
-<div id="sizepoints">
-
-</div>
-<script>var plot = new animint("#sizepoints", "sizepoints/plot.json");</script>
+<pre class="r"><code>animint2dir(pts, &quot;geoms/sizepoints&quot;)</code></pre>
+<p><a href="geoms/sizepoints">Click here</a> to see the resulting animint plot(s).</p>
 </div>
 <div id="geom_abline" class="section level3">
 <h3><code>geom_abline()</code></h3>
@@ -822,13 +792,8 @@ g1 &lt;- ggplot() +
   ggtitle(&quot;geom_abline&quot;)
 g1</code></pre>
 <p><img src="index_files/figure-html/abline-1.png" title="" alt="" width="576" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>structure(list(g1 = g1), class = &quot;animint&quot;)</code></pre>
-<p>
-</p>
-<div id="abline">
-
-</div>
-<script>var plot = new animint("#abline", "abline/plot.json");</script>
+<pre class="r"><code>animint2dir(list(g1 = g1), &quot;geoms/abline&quot;)</code></pre>
+<p><a href="geoms/abline">Click here</a> to see the resulting animint plot(s).</p>
 </div>
 <div id="geom_ribbon" class="section level3">
 <h3><code>geom_ribbon()</code></h3>
@@ -845,13 +810,8 @@ g2 &lt;- ggplot() +
   ggtitle(&quot;geom_ribbon&quot;)
 g2</code></pre>
 <p><img src="index_files/figure-html/ribbon-1.png" title="" alt="" width="576" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>structure(list(g2 = g2), class = &quot;animint&quot;)</code></pre>
-<p>
-</p>
-<div id="ribbon">
-
-</div>
-<script>var plot = new animint("#ribbon", "ribbon/plot.json");</script>
+<pre class="r"><code>animint2dir(list(g2 = g2), &quot;geoms/ribbon&quot;)</code></pre>
+<p><a href="geoms/ribbon">Click here</a> to see the resulting animint plot(s).</p>
 </div>
 <div id="geom_tile" class="section level3">
 <h3><code>geom_tile()</code></h3>
@@ -868,13 +828,8 @@ g3 &lt;- ggplot() +
   xlab(&quot;x&quot;) + ylab(&quot;y&quot;) + ggtitle(&quot;geom_tile&quot;)
 g3</code></pre>
 <p><img src="index_files/figure-html/tile-1.png" title="" alt="" width="576" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>structure(list(g3 = g3), class = &quot;animint&quot;)</code></pre>
-<p>
-</p>
-<div id="tile">
-
-</div>
-<script>var plot = new animint("#tile", "tile/plot.json");</script>
+<pre class="r"><code>animint2dir(list(g3 = g3), &quot;geoms/tile&quot;)</code></pre>
+<p><a href="geoms/tile">Click here</a> to see the resulting animint plot(s).</p>
 </div>
 <div id="geom_path" class="section level3">
 <h3><code>geom_path()</code></h3>
@@ -887,13 +842,8 @@ g4 &lt;- ggplot() +
   ggtitle(&quot;geom_path&quot;)
 g4</code></pre>
 <p><img src="index_files/figure-html/path-1.png" title="" alt="" width="576" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>structure(list(g4 = g4), class = &quot;animint&quot;)</code></pre>
-<p>
-</p>
-<div id="path">
-
-</div>
-<script>var plot = new animint("#path", "path/plot.json");</script>
+<pre class="r"><code>animint2dir(list(g4 = g4), &quot;geoms/path&quot;)</code></pre>
+<p><a href="geoms/path">Click here</a> to see the resulting animint plot(s).</p>
 </div>
 <div id="geom_polygon" class="section level3">
 <h3><code>geom_polygon()</code></h3>
@@ -911,13 +861,8 @@ g5 &lt;- ggplot() +
   ggtitle(&quot;geom_polygon&quot;)
 g5</code></pre>
 <p><img src="index_files/figure-html/polygons-1.png" title="" alt="" width="576" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>structure(list(g5 = g5), class = &quot;animint&quot;)</code></pre>
-<p>
-</p>
-<div id="polygons">
-
-</div>
-<script>var plot = new animint("#polygons", "polygons/plot.json");</script>
+<pre class="r"><code>animint2dir(list(g5 = g5), &quot;geoms/polygons&quot;)</code></pre>
+<p><a href="geoms/polygons">Click here</a> to see the resulting animint plot(s).</p>
 </div>
 <div id="geom_linerange" class="section level3">
 <h3><code>geom_linerange()</code></h3>
@@ -935,13 +880,8 @@ g6 &lt;- ggplot() +
   scale_colour_discrete(&quot;Distribution&quot;)
 g6</code></pre>
 <p><img src="index_files/figure-html/linerange-1.png" title="" alt="" width="576" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>structure(list(g6 = g6), class = &quot;animint&quot;)</code></pre>
-<p>
-</p>
-<div id="linerange">
-
-</div>
-<script>var plot = new animint("#linerange", "linerange/plot.json");</script>
+<pre class="r"><code>animint2dir(list(g6 = g6), &quot;geoms/linerange&quot;)</code></pre>
+<p><a href="geoms/linerange">Click here</a> to see the resulting animint plot(s).</p>
 </div>
 <div id="geom_histogram" class="section level3">
 <h3><code>geom_histogram()</code></h3>
@@ -951,13 +891,8 @@ g6</code></pre>
   ggtitle(&quot;geom_histogram&quot;)
 g7</code></pre>
 <p><img src="index_files/figure-html/histogram-1.png" title="" alt="" width="576" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>structure(list(g7 = g7), class = &quot;animint&quot;)</code></pre>
-<p>
-</p>
-<div id="histogram">
-
-</div>
-<script>var plot = new animint("#histogram", "histogram/plot.json");</script>
+<pre class="r"><code>animint2dir(list(g7 = g7), &quot;geoms/histogram&quot;)</code></pre>
+<p><a href="geoms/histogram">Click here</a> to see the resulting animint plot(s).</p>
 </div>
 <div id="geom_violin" class="section level3">
 <h3><code>geom_violin()</code></h3>
@@ -968,13 +903,8 @@ g7</code></pre>
   xlab(&quot;Distribution&quot;)
 g8</code></pre>
 <p><img src="index_files/figure-html/violin-1.png" title="" alt="" width="576" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>structure(list(g8 = g8), class = &quot;animint&quot;)</code></pre>
-<p>
-</p>
-<div id="violin">
-
-</div>
-<script>var plot = new animint("#violin", "violin/plot.json");</script>
+<pre class="r"><code>animint2dir(list(g8 = g8), &quot;geoms/violin&quot;)</code></pre>
+<p><a href="geoms/violin">Click here</a> to see the resulting animint plot(s).</p>
 </div>
 <div id="geom_step" class="section level3">
 <h3><code>geom_step()</code></h3>
@@ -985,13 +915,8 @@ g8</code></pre>
   ggtitle(&quot;geom_step&quot;)
 g9</code></pre>
 <p><img src="index_files/figure-html/step-1.png" title="" alt="" width="576" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>structure(list(g9 = g9), class = &quot;animint&quot;)</code></pre>
-<p>
-</p>
-<div id="step">
-
-</div>
-<script>var plot = new animint("#step", "step/plot.json");</script>
+<pre class="r"><code>animint2dir(list(g9 = g9), &quot;geoms/step&quot;)</code></pre>
+<p><a href="geoms/step">Click here</a> to see the resulting animint plot(s).</p>
 </div>
 <div id="geom_contour" class="section level3">
 <h3><code>geom_contour()</code></h3>
@@ -1027,8 +952,8 @@ contours</code></pre>
 <pre><code>## 
 ## $g12</code></pre>
 <p><img src="index_files/figure-html/contour-2.png" title="" alt="" width="576" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>animint2dir(contours, &quot;contours&quot;)</code></pre>
-<p>Since can take a few seconds to load all of the tiles, the contours are <a href="contours">here</a></p>
+<pre class="r"><code>animint2dir(contours, &quot;geoms/contours&quot;)</code></pre>
+<p><a href="geoms/contours">Click here</a> to see the resulting animint plot(s).</p>
 </div>
 <div id="scale_y_log10-and-geom_contour-with-stat_density2d" class="section level3">
 <h3><code>scale_y_log10()</code> and <code>geom_contour()</code> with <code>stat_density2d()</code></h3>
@@ -1045,13 +970,8 @@ g13 &lt;- ggplot() +
   ggtitle(&quot;geom_contour 2d density&quot;)
 g13</code></pre>
 <p><img src="index_files/figure-html/scaleycontour-1.png" title="" alt="" width="576" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>structure(list(g13 = g13), class = &quot;animint&quot;)</code></pre>
-<p>
-</p>
-<div id="scaleycontour">
-
-</div>
-<script>var plot = new animint("#scaleycontour", "scaleycontour/plot.json");</script>
+<pre class="r"><code>animint2dir(list(g13 = g13), &quot;geoms/scaleycontour&quot;)</code></pre>
+<p><a href="geoms/scaleycontour">Click here</a> to see the resulting animint plot(s).</p>
 </div>
 <div id="geom_polygon-with-stat-density2d-contours" class="section level3">
 <h3><code>geom_polygon</code> with <code>stat = 'density2d'</code> contours</h3>
@@ -1067,16 +987,10 @@ g13</code></pre>
   scale_y_continuous(limits = c(40,110), trans = &quot;log10&quot;) +
   scale_x_continuous(limits = c(.5, 6)) +
   ggtitle(&quot;geom_density2d polygon&quot;)
-
 g14</code></pre>
 <p><img src="index_files/figure-html/densitypolygon-1.png" title="" alt="" width="576" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>structure(list(g14 = g14), class = &quot;animint&quot;)</code></pre>
-<p>
-</p>
-<div id="densitypolygon">
-
-</div>
-<script>var plot = new animint("#densitypolygon", "densitypolygon/plot.json");</script>
+<pre class="r"><code>animint2dir(list(g14 = g14), &quot;geoms/densitypolygon&quot;)</code></pre>
+<p><a href="geoms/densitypolygon">Click here</a> to see the resulting animint plot(s).</p>
 </div>
 <div id="tile-plot-filled-by-density" class="section level3">
 <h3>Tile plot filled by density</h3>
@@ -1090,13 +1004,8 @@ g15 &lt;- ggplot() +
   ggtitle(&quot;geom_density2d tile&quot;) + ylim(c(0, 19000))
 g15</code></pre>
 <p><img src="index_files/figure-html/tiledensity-1.png" title="" alt="" width="576" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>structure(list(g15 = g15), class = &quot;animint&quot;)</code></pre>
-<p>
-</p>
-<div id="tiledensity">
-
-</div>
-<script>var plot = new animint("#tiledensity", "tiledensity/plot.json");</script>
+<pre class="r"><code>animint2dir(list(g15 = g15), &quot;geoms/tiledensity&quot;)</code></pre>
+<p><a href="geoms/tiledensity">Click here</a> to see the resulting animint plot(s).</p>
 </div>
 <div id="density-mapped-to-point-size" class="section level3">
 <h3>Density mapped to point size</h3>
@@ -1107,13 +1016,8 @@ g15</code></pre>
   ggtitle(&quot;geom_density2d points&quot;)
 g16</code></pre>
 <p><img src="index_files/figure-html/pointdensity-1.png" title="" alt="" width="576" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>structure(list(g16 = g16), class = &quot;animint&quot;)</code></pre>
-<p>
-</p>
-<div id="pointdensity">
-
-</div>
-<script>var plot = new animint("#pointdensity", "pointdensity/plot.json");</script>
+<pre class="r"><code>animint2dir(list(g16 = g16), &quot;geoms/pointdensity&quot;)</code></pre>
+<p><a href="geoms/pointdensity">Click here</a> to see the resulting animint plot(s).</p>
 </div>
 <div id="creating-maps-with-animint" class="section level3">
 <h3>Creating maps with animint</h3>
@@ -1147,13 +1051,8 @@ g17 &lt;- ggplot() +
             hjust = .5, aes(x = x, y = y, label = label))
 g17  </code></pre>
 <p><img src="index_files/figure-html/maptutorial-1.png" title="" alt="" width="576" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>structure(list(g17 = g17), class = &quot;animint&quot;)</code></pre>
-<p>
-</p>
-<div id="maptutorial">
-
-</div>
-<script>var plot = new animint("#maptutorial", "maptutorial/plot.json");</script>
+<pre class="r"><code>animint2dir(list(g17 = g17), &quot;geoms/maptutorial&quot;)</code></pre>
+<p><a href="geoms/maptutorial">Click here</a> to see the resulting animint plot(s).</p>
 </div>
 <div id="stacked-bar-chart" class="section level3">
 <h3>Stacked bar chart</h3>
@@ -1164,13 +1063,8 @@ g17  </code></pre>
   ggtitle(&quot;geom_bar stacked&quot;)
 g18</code></pre>
 <p><img src="index_files/figure-html/stackedbar-1.png" title="" alt="" width="576" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>structure(list(g18 = g18), class = &quot;animint&quot;)</code></pre>
-<p>
-</p>
-<div id="stackedbar">
-
-</div>
-<script>var plot = new animint("#stackedbar", "stackedbar/plot.json");</script>
+<pre class="r"><code>animint2dir(list(g18 = g18), &quot;geoms/stackedbar&quot;)</code></pre>
+<p><a href="geoms/stackedbar">Click here</a> to see the resulting animint plot(s).</p>
 </div>
 <div id="geom_area-with-stat_density" class="section level3">
 <h3><code>geom_area()</code> with <code>stat_density()</code></h3>
@@ -1181,13 +1075,8 @@ g19 &lt;- ggplot() +
 
 g19</code></pre>
 <p><img src="index_files/figure-html/areadensity-1.png" title="" alt="" width="576" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>structure(list(g19 = g19), class = &quot;animint&quot;)</code></pre>
-<p>
-</p>
-<div id="areadensity">
-
-</div>
-<script>var plot = new animint("#areadensity", "areadensity/plot.json");</script>
+<pre class="r"><code>animint2dir(list(g19 = g19), &quot;geoms/areadensity&quot;)</code></pre>
+<p><a href="geoms/areadensity">Click here</a> to see the resulting animint plot(s).</p>
 </div>
 <div id="geom_freqpoly" class="section level3">
 <h3><code>geom_freqpoly()</code></h3>
@@ -1197,13 +1086,8 @@ g19</code></pre>
   ggtitle(&quot;geom_freqpoly&quot;)
 g20</code></pre>
 <p><img src="index_files/figure-html/freqpoly-1.png" title="" alt="" width="576" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>structure(list(g20 = g20), class = &quot;animint&quot;)</code></pre>
-<p>
-</p>
-<div id="freqpoly">
-
-</div>
-<script>var plot = new animint("#freqpoly", "freqpoly/plot.json");</script>
+<pre class="r"><code>animint2dir(list(g20 = g20), &quot;geoms/freqpoly&quot;)</code></pre>
+<p><a href="geoms/freqpoly">Click here</a> to see the resulting animint plot(s).</p>
 </div>
 <div id="geom_hex" class="section level3">
 <h3><code>geom_hex()</code></h3>
@@ -1213,13 +1097,8 @@ g20</code></pre>
   xlab(&quot;x&quot;) + ylab(&quot;y&quot;) + ggtitle(&quot;geom_hex&quot;)
 g21</code></pre>
 <p><img src="index_files/figure-html/hex-1.png" title="" alt="" width="576" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>structure(list(g21 = g21), class = &quot;animint&quot;)</code></pre>
-<p>
-</p>
-<div id="hex">
-
-</div>
-<script>var plot = new animint("#hex", "hex/plot.json");</script>
+<pre class="r"><code>animint2dir(list(g21 = g21), &quot;geoms/hex&quot;)</code></pre>
+<p><a href="geoms/hex">Click here</a> to see the resulting animint plot(s).</p>
 </div>
 </div>
 <div id="session-info" class="section level2">

@@ -12,6 +12,7 @@ output:
 library("animint")
 knitr::opts_chunk$set(fig.width = 6, fig.height = 4, fig.align = "center", message = FALSE, warning = FALSE, tidy = FALSE)
 if (!file_test("-d", "climate")) dir.create("climate")
+if (!file_test("-d", "geoms")) dir.create("geoms")
 ```
 
 ## Introduction 
@@ -110,7 +111,7 @@ plots <- list(plot1 = p1, plot2 = p2)
 structure(plots, class = "animint")
 ```
 
-On the left hand panel, we can click the different colours to change the current selection and view the differences in the relationship between bill amount and tips. Notice how bill amount and tip have lower correlation amongst smokers (especially male smokers). The next section shows how we can leverage `clickSelects`, `showSelected`, and [other animint options]() to make more complex interactive animations.
+On the left hand panel, we can click the different colours to change the current selection and view the differences in the relationship between bill amount and tips. Notice how bill amount and tip have lower correlation amongst smokers (especially male smokers). The next section shows how we can leverage `clickSelects`, `showSelected`, and [other animint options](https://github.com/tdhock/animint/wiki/Advanced-features-present-animint-but-not-in-ggplot2) to make more complex interactive animations.
 
 ## Tornado example
 
@@ -464,8 +465,10 @@ p2 <- ggplot() +
 
 lines_simple <- list(p1 = p1, p2 = p2)
 lines_simple
-structure(lines_simple, class = "animint")
+animint2dir(lines_simple, "geoms/line-simple")
 ```
+
+[Click here](geoms/line-simple) to see the resulting animint plot(s).
 
 #### Linetypes
 
@@ -518,8 +521,10 @@ p7 <- ggplot() +
   ggtitle("Named linetypes")
 
 line_types <- list(p3 = p3, p4 = p4, p5 = p5, p6 = p6, p7 = p7)
-structure(line_types, class = "animint")
+animint2dir(line_types, "geoms/line-types")
 ```
+
+[Click here](geoms/line-types) to see the resulting animint plot(s).
 
 #### Alpha scales and lines
 
@@ -570,8 +575,10 @@ p12 <- ggplot() +
   ggtitle("Continuous Alpha and Colour")
 
 alphas <- list(p8 = p8, p9 = p9, p10 = p10, p11 = p11, p12 = p12)
-structure(alphas, class = "animint")
+animint2dir(alphas, "geoms/alphalines")
 ```
+
+[Click here](geoms/alphalines) to see the resulting animint plot(s).
 
 ### Points
 
@@ -630,8 +637,10 @@ s6 <- ggplot() +
 
 points_simple <- list(s1 = s1, s2 = s2, s3 = s3, s4 = s4, s6 = s6)
 points_simple
-structure(points_simple, class = "animint")
+animint2dir(points_simple, "geoms/point-simple")
 ```
+
+[Click here](geoms/point-simple) to see the resulting animint plot(s).
 
 #### `geom_jitter()`
 
@@ -641,9 +650,10 @@ s5 <- ggplot() +
               aes(x = xnew, y = y, colour = class4, fill = class4)) +
   ggtitle("geom_jitter")
 s5
-structure(list(s5 = s5), class = "animint")
+animint2dir(list(s5 = s5), "geoms/jitterplots")
 ```
 
+[Click here](geoms/jitterplots) to see the resulting animint plot(s).
 
 ### Interactive plots and `scale_size()`
 
@@ -731,8 +741,10 @@ s12 <- ggplot() +
 
 pts <- list(s7 = s7, s8 = s8, s9 = s9, s10 = s10, s11 = s11, s12 = s12)
 pts
-structure(pts, class = "animint")
+animint2dir(pts, "geoms/sizepoints")
 ```
+
+[Click here](geoms/sizepoints) to see the resulting animint plot(s).
 
 
 ### `geom_abline()`
@@ -746,8 +758,10 @@ g1 <- ggplot() +
               aes(intercept = intercept, slope = slope)) +
   ggtitle("geom_abline")
 g1
-structure(list(g1 = g1), class = "animint")
+animint2dir(list(g1 = g1), "geoms/abline")
 ```
+
+[Click here](geoms/abline) to see the resulting animint plot(s).
 
 ### `geom_ribbon()`
 
@@ -764,8 +778,10 @@ g2 <- ggplot() +
                   group = group, fill = group)) + 
   ggtitle("geom_ribbon")
 g2
-structure(list(g2 = g2), class = "animint")
+animint2dir(list(g2 = g2), "geoms/ribbon")
 ```
+
+[Click here](geoms/ribbon) to see the resulting animint plot(s).
 
 ### `geom_tile()`
 
@@ -782,8 +798,10 @@ g3 <- ggplot() +
   scale_fill_gradient(low = "#56B1F7", high = "#132B43") + 
   xlab("x") + ylab("y") + ggtitle("geom_tile")
 g3
-structure(list(g3 = g3), class = "animint")
+animint2dir(list(g3 = g3), "geoms/tile")
 ```
+
+[Click here](geoms/tile) to see the resulting animint plot(s).
 
 ### `geom_path()`
 
@@ -796,8 +814,10 @@ g4 <- ggplot() +
             aes(x = x, y = y, label = z)) + 
   ggtitle("geom_path")
 g4
-structure(list(g4 = g4), class = "animint")
+animint2dir(list(g4 = g4), "geoms/path")
 ```
+
+[Click here](geoms/path) to see the resulting animint plot(s).
 
 ### `geom_polygon()`
 
@@ -815,8 +835,10 @@ g5 <- ggplot() +
   geom_text(data = polydata, aes(x = xc, y = yc, label = group)) +
   ggtitle("geom_polygon")
 g5
-structure(list(g5 = g5), class = "animint")
+animint2dir(list(g5 = g5), "geoms/polygons")
 ```
+
+[Click here](geoms/polygons) to see the resulting animint plot(s).
 
 ### `geom_linerange()`
 
@@ -834,8 +856,10 @@ g6 <- ggplot() +
   ggtitle("geom_linerange") + xlab("Distribution") +
   scale_colour_discrete("Distribution")
 g6
-structure(list(g6 = g6), class = "animint")
+animint2dir(list(g6 = g6), "geoms/linerange")
 ```
+
+[Click here](geoms/linerange) to see the resulting animint plot(s).
 
 ### `geom_histogram()`
 
@@ -845,8 +869,10 @@ g7 <- ggplot() +
                  aes(x = y, fill = ..count..), binwidth = 1) + 
   ggtitle("geom_histogram")
 g7
-structure(list(g7 = g7), class = "animint")
+animint2dir(list(g7 = g7), "geoms/histogram")
 ```
+
+[Click here](geoms/histogram) to see the resulting animint plot(s).
 
 ### `geom_violin()`
 
@@ -857,8 +883,10 @@ g8 <- ggplot() +
   ggtitle("geom_violin") + scale_fill_discrete("Distribution") +
   xlab("Distribution")
 g8
-structure(list(g8 = g8), class = "animint")
+animint2dir(list(g8 = g8), "geoms/violin")
 ```
+
+[Click here](geoms/violin) to see the resulting animint plot(s).
 
 ### `geom_step()`
 
@@ -869,8 +897,10 @@ g9 <- ggplot() +
   scale_colour_discrete("Distribution") +
   ggtitle("geom_step")
 g9
-structure(list(g9 = g9), class = "animint")
+animint2dir(list(g9 = g9), "geoms/step")
 ```
+
+[Click here](geoms/step) to see the resulting animint plot(s).
 
 ### `geom_contour()`
 
@@ -902,10 +932,10 @@ g12 <- ggplot() +
 
 contours <- list(g11 = g11, g12 = g12)
 contours
-animint2dir(contours, "contours")
+animint2dir(contours, "geoms/contours")
 ```
 
-Since can take a few seconds to load all of the tiles, the contours are [here](contours)
+[Click here](geoms/contours) to see the resulting animint plot(s).
 
 ### `scale_y_log10()` and `geom_contour()` with `stat_density2d()`
 
@@ -923,9 +953,10 @@ g13 <- ggplot() +
   xlim(0.5, 6) + scale_y_log10(limits = c(40,110)) +
   ggtitle("geom_contour 2d density")
 g13
-
-structure(list(g13 = g13), class = "animint")
+animint2dir(list(g13 = g13), "geoms/scaleycontour")
 ```
+
+[Click here](geoms/scaleycontour) to see the resulting animint plot(s).
 
 ### `geom_polygon` with `stat = 'density2d'` contours
 
@@ -942,10 +973,11 @@ g14 <- ggplot() +
   scale_y_continuous(limits = c(40,110), trans = "log10") +
   scale_x_continuous(limits = c(.5, 6)) +
   ggtitle("geom_density2d polygon")
-
 g14
-structure(list(g14 = g14), class = "animint")
+animint2dir(list(g14 = g14), "geoms/densitypolygon")
 ```
+
+[Click here](geoms/densitypolygon) to see the resulting animint plot(s).
 
 ### Tile plot filled by density 
 
@@ -959,8 +991,10 @@ g15 <- ggplot() +
   scale_colour_gradient(limits = c(1e-5,8e-4), na.value = "white") +
   ggtitle("geom_density2d tile") + ylim(c(0, 19000))
 g15
-structure(list(g15 = g15), class = "animint")
+animint2dir(list(g15 = g15), "geoms/tiledensity")
 ```
+
+[Click here](geoms/tiledensity) to see the resulting animint plot(s).
 
 ### Density mapped to point size
 
@@ -971,8 +1005,10 @@ g16 <- ggplot() +
   scale_alpha_continuous("Density") +
   ggtitle("geom_density2d points")
 g16
-structure(list(g16 = g16), class = "animint")
+animint2dir(list(g16 = g16), "geoms/pointdensity")
 ```
+
+[Click here](geoms/pointdensity) to see the resulting animint plot(s).
 
 ### Creating maps with animint
 
@@ -1007,8 +1043,10 @@ g17 <- ggplot() +
   geom_text(data = data.frame(x = -95.84, y = 55, label = "Arrests for Assault"),
             hjust = .5, aes(x = x, y = y, label = label))
 g17  
-structure(list(g17 = g17), class = "animint")
+animint2dir(list(g17 = g17), "geoms/maptutorial")
 ```
+
+[Click here](geoms/maptutorial) to see the resulting animint plot(s).
 
 ### Stacked bar chart
 
@@ -1020,9 +1058,10 @@ g18 <- ggplot() +
            aes(x = factor(cyl), fill = factor(vs))) + 
   ggtitle("geom_bar stacked")
 g18
-
-structure(list(g18 = g18), class = "animint")
+animint2dir(list(g18 = g18), "geoms/stackedbar")
 ```
+
+[Click here](geoms/stackedbar) to see the resulting animint plot(s).
 
 ### `geom_area()` with `stat_density()`
 
@@ -1033,8 +1072,10 @@ g19 <- ggplot() +
   ggtitle("geom_area")
 
 g19
-structure(list(g19 = g19), class = "animint")
+animint2dir(list(g19 = g19), "geoms/areadensity")
 ```
+
+[Click here](geoms/areadensity) to see the resulting animint plot(s).
 
 ### `geom_freqpoly()`
 
@@ -1044,8 +1085,10 @@ g20 <- ggplot() +
                 aes(x = clarity, group = cut, colour = cut)) +
   ggtitle("geom_freqpoly")
 g20
-structure(list(g20 = g20), class = "animint")
+animint2dir(list(g20 = g20), "geoms/freqpoly")
 ```
+
+[Click here](geoms/freqpoly) to see the resulting animint plot(s).
 
 ### `geom_hex()`
 
@@ -1055,8 +1098,10 @@ g21 <- ggplot() +
   scale_fill_gradient(low = "#56B1F7", high = "#132B43") + 
   xlab("x") + ylab("y") + ggtitle("geom_hex")
 g21
-structure(list(g21 = g21), class = "animint")
+animint2dir(list(g21 = g21), "geoms/hex")
 ```
+
+[Click here](geoms/hex) to see the resulting animint plot(s).
 
 ## Session Info
 

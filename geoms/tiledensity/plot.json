@@ -1,19 +1,19 @@
 {
  "geoms": {
- "geom1_rect_g15": {
+ "geom1_tile_g15": {
  "geom": "rect",
-"data": "geom1_rect_g15.csv",
+"classed": "geom1_tile_g15",
 "aes": {
  "x": "carat",
 "y": "price",
 "fill": "..density..",
 "colour": "..density.." 
 },
-"params": {},
-"update": "",
-"subord": [],
-"subvars": [],
-"classed": "geom1_rect_g15",
+"params": {
+ "contour": false,
+"n":     30 
+},
+"subset_order": [],
 "types": {
  "fill": "rgb",
 "colour": "rgb",
@@ -28,38 +28,91 @@
 "xmax": "numeric",
 "ymin": "numeric",
 "ymax": "numeric" 
-} 
+},
+"PANEL": 1,
+"chunks": 1,
+"total": 1,
+"chunk_order": [],
+"nest_order": [] 
 } 
 },
 "selectors": [],
 "plots": {
  "g15": {
- "geoms": [
- "geom1_rect_g15" 
+ "strips": {
+ "top": [
+ "" 
 ],
-"scales": {
- "fill": [ "white", "#21486A", "#326996", "#438CC5", "#55B1F7" ],
-"colour": [ "white", "#21486A", "#326996", "#438CC5", "#55B1F7" ] 
+"right": [
+ "" 
+],
+"n": {
+ "top":      0,
+"right":      0 
+} 
 },
-"options": {
- "width":    400,
-"height":    400 
+"layout": {
+ "PANEL": [ 1 ],
+"ROW": [ 1 ],
+"COL": [ 1 ],
+"SCALE_X": [ 1 ],
+"SCALE_Y": [ 1 ],
+"AXIS_X": [ true ],
+"AXIS_Y": [ true ],
+"coord_fixed": [ false ],
+"width_proportion": [      1 ],
+"height_proportion": [      1 ] 
 },
-"axis": {
- "x": [ 0.16895, 0.36959, 0.57022, 0.77086, 0.9715 ],
-"xlab": [ "0.5", "1.0", "1.5", "2.0", "2.5" ],
-"xrange": [ 0.078966,  2.571 ],
-"xname": "carat",
+"geoms": [
+ "geom1_tile_g15" 
+],
+"axis1": {
+ "x": [
+ 0.30141,
+0.61415,
+0.92688 
+],
+"xlab": [
+ "1",
+"2",
+"3" 
+],
+"xrange": [ 0.036207, 3.2338 ],
 "xline": true,
 "xticks": true,
-"y": [ 0.045455, 0.28469, 0.52392, 0.76316 ],
-"ylab": [ "0", "5000", "10000", "15000" ],
+"y": [
+ 0.045455,
+0.28469,
+0.52392,
+0.76316 
+],
+"ylab": [
+ "0",
+"5000",
+"10000",
+"15000" 
+],
 "yrange": [   -950,  19950 ],
-"yname": "price",
 "yline": true,
 "yticks": true 
 },
-"title": "geom_density2d tile",
+"xtitle": "carat",
+"xanchor": "middle",
+"xangle":      0,
+"ytitle": "price",
+"yanchor": "end",
+"yangle":      0,
+"xlabs": [
+ "1",
+"2",
+"3" 
+],
+"ylabs": [
+ "0",
+"5000",
+"10000",
+"15000" 
+],
 "legend": {
  "density": {
  "guide": "legend",
@@ -71,7 +124,6 @@
 "polygoncolour": "#55B1F7",
 "polygonsize":    0.1,
 "polygonlinetype":      1,
-"polygonorder": 4,
 "label": [ "8e-04" ] 
 },
 {
@@ -79,7 +131,6 @@
 "polygoncolour": "#438CC5",
 "polygonsize":    0.1,
 "polygonlinetype":      1,
-"polygonorder": 3,
 "label": [ "6e-04" ] 
 },
 {
@@ -87,7 +138,6 @@
 "polygoncolour": "#326996",
 "polygonsize":    0.1,
 "polygonlinetype":      1,
-"polygonorder": 2,
 "label": [ "4e-04" ] 
 },
 {
@@ -95,11 +145,15 @@
 "polygoncolour": "#21486A",
 "polygonsize":    0.1,
 "polygonlinetype":      1,
-"polygonorder": 1,
 "label": [ "2e-04" ] 
 } 
 ] 
 } 
+},
+"title": "geom_density2d tile",
+"options": {
+ "width":    400,
+"height":    400 
 } 
 } 
 } 

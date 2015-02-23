@@ -1,17 +1,16 @@
 {
  "geoms": {
- "geom1_rect_g7": {
+ "geom1_histogram_g7": {
  "geom": "rect",
-"data": "geom1_rect_g7.csv",
+"classed": "geom1_histogram_g7",
 "aes": {
  "x": "y",
 "fill": "..count.." 
 },
-"params": {},
-"update": "",
-"subord": [],
-"subvars": [],
-"classed": "geom1_rect_g7",
+"params": {
+ "binwidth":      1 
+},
+"subset_order": [],
 "types": {
  "fill": "rgb",
 "y": "numeric",
@@ -28,37 +27,97 @@
 "xmax": "numeric",
 "colour": "rgb",
 "size": "numeric" 
-} 
+},
+"PANEL": 1,
+"chunks": 1,
+"total": 1,
+"chunk_order": [],
+"nest_order": [] 
 } 
 },
 "selectors": [],
 "plots": {
  "g7": {
- "geoms": [
- "geom1_rect_g7" 
+ "strips": {
+ "top": [
+ "" 
 ],
-"scales": {
- "fill": [ "#132B43", "#244D72", "#3773A5", "#4B9CDB", "grey50" ] 
+"right": [
+ "" 
+],
+"n": {
+ "top":      0,
+"right":      0 
+} 
 },
-"options": {
- "width":    400,
-"height":    400 
+"layout": {
+ "PANEL": [ 1 ],
+"ROW": [ 1 ],
+"COL": [ 1 ],
+"SCALE_X": [ 1 ],
+"SCALE_Y": [ 1 ],
+"AXIS_X": [ true ],
+"AXIS_Y": [ true ],
+"coord_fixed": [ false ],
+"width_proportion": [      1 ],
+"height_proportion": [      1 ] 
 },
-"axis": {
- "x": [ 0.09596, 0.34848, 0.60101, 0.85354 ],
-"xlab": [ "0", "5", "10", "15" ],
-"xrange": [   -1.9,   17.9 ],
-"xname": "y",
+"geoms": [
+ "geom1_histogram_g7" 
+],
+"axis1": {
+ "x": [
+ 0.079125,
+0.41582,
+0.75253 
+],
+"xlab": [
+ "0",
+"10",
+"20" 
+],
+"xrange": [  -2.35,  27.35 ],
 "xline": true,
 "xticks": true,
-"y": [ 0.045455, 0.30519, 0.56494, 0.82468 ],
-"ylab": [ "0", "2", "4", "6" ],
-"yrange": [  -0.35,   7.35 ],
-"yname": "count",
+"y": [
+ 0.045455,
+0.23485,
+0.42424,
+0.61364,
+0.80303,
+0.99242 
+],
+"ylab": [
+ "0.0",
+"2.5",
+"5.0",
+"7.5",
+"10.0",
+"12.5" 
+],
+"yrange": [   -0.6,   12.6 ],
 "yline": true,
 "yticks": true 
 },
-"title": "geom_histogram",
+"xtitle": "y",
+"xanchor": "middle",
+"xangle":      0,
+"ytitle": "count",
+"yanchor": "end",
+"yangle":      0,
+"xlabs": [
+ "0",
+"10",
+"20" 
+],
+"ylabs": [
+ "0.0",
+"2.5",
+"5.0",
+"7.5",
+"10.0",
+"12.5" 
+],
 "legend": {
  "count": {
  "guide": "legend",
@@ -66,39 +125,47 @@
 "title": "count",
 "entries": [
  {
- "polygonfill": "#4B9CDB",
+ "polygonfill": "#55B1F7",
 "polygonsize":    0.5,
 "polygonlinetype":      1,
 "polygonweight":      1,
-"polygonorder": 4,
+"label": [ "12" ] 
+},
+{
+ "polygonfill": "#448CC6",
+"polygonsize":    0.5,
+"polygonlinetype":      1,
+"polygonweight":      1,
+"label": [ "9" ] 
+},
+{
+ "polygonfill": "#326A97",
+"polygonsize":    0.5,
+"polygonlinetype":      1,
+"polygonweight":      1,
 "label": [ "6" ] 
 },
 {
- "polygonfill": "#3773A5",
+ "polygonfill": "#22496B",
 "polygonsize":    0.5,
 "polygonlinetype":      1,
 "polygonweight":      1,
-"polygonorder": 3,
-"label": [ "4" ] 
-},
-{
- "polygonfill": "#244D72",
-"polygonsize":    0.5,
-"polygonlinetype":      1,
-"polygonweight":      1,
-"polygonorder": 2,
-"label": [ "2" ] 
+"label": [ "3" ] 
 },
 {
  "polygonfill": "#132B43",
 "polygonsize":    0.5,
 "polygonlinetype":      1,
 "polygonweight":      1,
-"polygonorder": 1,
 "label": [ "0" ] 
 } 
 ] 
 } 
+},
+"title": "geom_histogram",
+"options": {
+ "width":    400,
+"height":    400 
 } 
 } 
 } 

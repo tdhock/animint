@@ -2,7 +2,7 @@
  "geoms": {
  "geom1_path_g4": {
  "geom": "path",
-"data": "geom1_path_g4.csv",
+"classed": "geom1_path_g4",
 "aes": {
  "x": "x",
 "y": "y" 
@@ -14,21 +14,23 @@
 "na.rm": false,
 "alpha":    0.5 
 },
-"update": "",
-"subord": [],
-"subvars": [],
-"classed": "geom1_path_g4",
+"subset_order": [],
 "types": {
  "x": "numeric",
 "y": "numeric",
 "PANEL": "integer",
 "group": "integer" 
 },
+"PANEL": 1,
+"chunks": 1,
+"total": 1,
+"chunk_order": [],
+"nest_order": [],
 "nextgeom": "geom2_text_g4" 
 },
 "geom2_text_g4": {
  "geom": "text",
-"data": "geom2_text_g4.csv",
+"classed": "geom2_text_g4",
 "aes": {
  "x": "x",
 "y": "y",
@@ -37,46 +39,107 @@
 "params": {
  "parse": false 
 },
-"update": "",
-"subord": [],
-"subvars": [],
-"classed": "geom2_text_g4",
+"subset_order": [],
 "types": {
  "x": "numeric",
 "y": "numeric",
 "label": "integer",
-"PANEL": "integer",
-"group": "integer" 
-} 
+"PANEL": "integer" 
+},
+"PANEL": 1,
+"chunks": 1,
+"total": 1,
+"chunk_order": [],
+"nest_order": [] 
 } 
 },
 "selectors": [],
 "plots": {
  "g4": {
- "geoms": [
+ "strips": {
+ "top": [
+ "" 
+],
+"right": [
+ "" 
+],
+"n": {
+ "top":      0,
+"right":      0 
+} 
+},
+"layout": {
+ "PANEL": [ 1 ],
+"ROW": [ 1 ],
+"COL": [ 1 ],
+"SCALE_X": [ 1 ],
+"SCALE_Y": [ 1 ],
+"AXIS_X": [ true ],
+"AXIS_Y": [ true ],
+"coord_fixed": [ false ],
+"width_proportion": [      1 ],
+"height_proportion": [      1 ] 
+},
+"geoms": [
  "geom1_path_g4",
 "geom2_text_g4" 
 ],
-"options": {
- "width":    400,
-"height":    400 
-},
-"axis": {
- "x": [ 0.21519, 0.44253, 0.66987, 0.89721 ],
-"xlab": [ "-0.5", "0.0", "0.5", "1.0" ],
-"xrange": [ -0.97328, 1.2261 ],
-"xname": "x",
+"axis1": {
+ "x": [
+ 0.024247,
+0.2931,
+0.56195,
+0.8308 
+],
+"xlab": [
+ "-0.8",
+"-0.4",
+"0.0",
+"0.4" 
+],
+"xrange": [ -0.83607, 0.65174 ],
 "xline": true,
 "xticks": true,
-"y": [ 0.065175, 0.29887, 0.53257, 0.76626, 0.99996 ],
-"ylab": [ "-1.0", "-0.5", "0.0", "0.5", "1.0" ],
-"yrange": [ -1.1394, 1.0001 ],
-"yname": "y",
+"y": [
+ 0.18798,
+0.43875,
+0.68952,
+0.94028 
+],
+"ylab": [
+ "-0.4",
+"0.0",
+"0.4",
+"0.8" 
+],
+"yrange": [ -0.69986, 0.89525 ],
 "yline": true,
 "yticks": true 
 },
+"xtitle": "x",
+"xanchor": "middle",
+"xangle":      0,
+"ytitle": "y",
+"yanchor": "end",
+"yangle":      0,
+"xlabs": [
+ "-0.8",
+"-0.4",
+"0.0",
+"0.4" 
+],
+"ylabs": [
+ "-0.4",
+"0.0",
+"0.4",
+"0.8" 
+],
+"legend": {},
 "title": "geom_path",
-"legend": {} 
+"options": {
+ "width":    400,
+"height":    400 
+} 
 } 
 } 
 }

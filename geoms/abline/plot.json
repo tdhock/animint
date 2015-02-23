@@ -2,7 +2,7 @@
  "geoms": {
  "geom1_point_g1": {
  "geom": "point",
-"data": "geom1_point_g1.csv",
+"classed": "geom1_point_g1",
 "aes": {
  "x": "x",
 "y": "y" 
@@ -10,69 +10,133 @@
 "params": {
  "na.rm": false 
 },
-"update": "",
-"subord": [],
-"subvars": [],
-"classed": "geom1_point_g1",
+"subset_order": [],
 "types": {
  "x": "numeric",
 "y": "numeric",
-"PANEL": "integer",
-"group": "integer" 
+"PANEL": "integer" 
 },
-"nextgeom": "geom2_segment_g1" 
+"PANEL": 1,
+"chunks": 1,
+"total": 1,
+"chunk_order": [],
+"nest_order": [],
+"nextgeom": "geom2_abline_g1" 
 },
-"geom2_segment_g1": {
+"geom2_abline_g1": {
  "geom": "segment",
-"data": "geom2_segment_g1.csv",
+"classed": "geom2_abline_g1",
 "aes": {
  "intercept": "intercept",
 "slope": "slope" 
 },
 "params": [],
-"update": "",
-"subord": [],
-"subvars": [],
-"classed": "geom2_segment_g1",
+"subset_order": [],
 "types": {
  "intercept": "numeric",
 "slope": "numeric",
 "group": "integer",
 "PANEL": "integer",
-"x": "numeric",
-"xend": "numeric",
 "y": "numeric",
 "yend": "numeric" 
-} 
+},
+"PANEL": 1,
+"chunks": 1,
+"total": 1,
+"chunk_order": [],
+"nest_order": [] 
 } 
 },
 "selectors": [],
 "plots": {
  "g1": {
- "geoms": [
- "geom1_point_g1",
-"geom2_segment_g1" 
+ "strips": {
+ "top": [
+ "" 
 ],
-"options": {
- "width":    400,
-"height":    400 
+"right": [
+ "" 
+],
+"n": {
+ "top":      0,
+"right":      0 
+} 
 },
-"axis": {
- "x": [ 0.038147, 0.2717, 0.50526, 0.73881, 0.97236 ],
-"xlab": [ "0.0", "2.5", "5.0", "7.5", "10.0" ],
-"xrange": [ -0.40833, 10.296 ],
-"xname": "x",
+"layout": {
+ "PANEL": [ 1 ],
+"ROW": [ 1 ],
+"COL": [ 1 ],
+"SCALE_X": [ 1 ],
+"SCALE_Y": [ 1 ],
+"AXIS_X": [ true ],
+"AXIS_Y": [ true ],
+"coord_fixed": [ false ],
+"width_proportion": [      1 ],
+"height_proportion": [      1 ] 
+},
+"geoms": [
+ "geom1_point_g1",
+"geom2_abline_g1" 
+],
+"axis1": {
+ "x": [
+ 0.042486,
+ 0.274,
+0.50552,
+0.73703,
+0.96855 
+],
+"xlab": [
+ "0.0",
+"2.5",
+"5.0",
+"7.5",
+"10.0" 
+],
+"xrange": [ -0.45878,  10.34 ],
 "xline": true,
 "xticks": true,
-"y": [ 0.18345, 0.39974, 0.61603, 0.83231 ],
-"ylab": [ "5", "10", "15", "20" ],
-"yrange": [ 0.75915, 23.876 ],
-"yname": "y",
+"y": [
+ 0.20687,
+0.42325,
+0.63962,
+ 0.856 
+],
+"ylab": [
+ "5",
+"10",
+"15",
+"20" 
+],
+"yrange": [ 0.21958, 23.328 ],
 "yline": true,
 "yticks": true 
 },
+"xtitle": "x",
+"xanchor": "middle",
+"xangle":      0,
+"ytitle": "y",
+"yanchor": "end",
+"yangle":      0,
+"xlabs": [
+ "0.0",
+"2.5",
+"5.0",
+"7.5",
+"10.0" 
+],
+"ylabs": [
+ "5",
+"10",
+"15",
+"20" 
+],
+"legend": {},
 "title": "geom_abline",
-"legend": {} 
+"options": {
+ "width":    400,
+"height":    400 
+} 
 } 
 } 
 }

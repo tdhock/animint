@@ -9,7 +9,6 @@ GSoC application.txt
 .Rbuildignore
 *.log
 *.synctex.gz
-*.Rproj
 .gitignore
 .RData
 .Rbuildignore
