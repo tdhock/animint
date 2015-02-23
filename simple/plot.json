@@ -4,9 +4,9 @@
  "geom": "point",
 "classed": "geom1_point_plot",
 "aes": {
- "x": "mpg",
-"y": "wt",
-"colour": "cyl" 
+ "x": "total_bill",
+"y": "tip",
+"colour": "sex_smoker" 
 },
 "params": {
  "na.rm": false 
@@ -58,83 +58,86 @@
 ],
 "axis1": {
  "x": [
- 0.029981,
-0.2234,
-0.41683,
-0.61025,
-0.80368,
-0.9971 
+ 0.17742,
+0.36784,
+0.55827,
+0.7487,
+0.93912 
 ],
 "xlab": [
  "10",
-"15",
 "20",
-"25",
 "30",
-"35" 
+"40",
+"50" 
 ],
-"xrange": [  9.225, 35.075 ],
+"xrange": [  0.683, 53.197 ],
 "xline": true,
 "xticks": true,
 "y": [
- 0.15866,
-0.3911,
-0.62354,
-0.85599 
+ 0.19697,
+0.44949,
+0.70202,
+0.95455 
 ],
 "ylab": [
- "2",
-"3",
-"4",
-"5" 
+ "2.5",
+"5.0",
+"7.5",
+"10.0" 
 ],
-"yrange": [ 1.3174, 5.6196 ],
+"yrange": [   0.55,  10.45 ],
 "yline": true,
 "yticks": true 
 },
-"xtitle": "mpg",
+"xtitle": "total_bill",
 "xanchor": "middle",
 "xangle":      0,
-"ytitle": "wt",
+"ytitle": "tip",
 "yanchor": "end",
 "yangle":      0,
 "xlabs": [
  "10",
-"15",
 "20",
-"25",
 "30",
-"35" 
+"40",
+"50" 
 ],
 "ylabs": [
- "2",
-"3",
-"4",
-"5" 
+ "2.5",
+"5.0",
+"7.5",
+"10.0" 
 ],
 "legend": {
- "cyl": {
+ "sex_smoker": {
  "guide": "legend",
 "geoms": "point",
-"title": "cyl",
+"title": "sex_smoker",
 "entries": [
  {
- "pointcolour": "#619CFF",
+ "pointcolour": "#C77CFF",
 "pointshape":     16,
 "pointsize":      2,
-"label": [ "8" ] 
+"label": [ "Male.Yes" ] 
 },
 {
- "pointcolour": "#00BA38",
+ "pointcolour": "#00BFC4",
 "pointshape":     16,
 "pointsize":      2,
-"label": [ "6" ] 
+"label": [ "Female.Yes" ] 
+},
+{
+ "pointcolour": "#7CAE00",
+"pointshape":     16,
+"pointsize":      2,
+"label": [ "Male.No" ] 
 },
 {
  "pointcolour": "#F8766D",
 "pointshape":     16,
 "pointsize":      2,
-"label": [ "4" ] 
+"label": [ "Female.No" ] 
 } 
 ] 
 } 

@@ -1,0 +1,137 @@
+{
+ "geoms": {
+ "geom1_point_g13": {
+ "geom": "point",
+"classed": "geom1_point_g13",
+"aes": {
+ "x": "duration",
+"y": "waiting" 
+},
+"params": {
+ "na.rm": false 
+},
+"subset_order": [],
+"types": {
+ "x": "numeric",
+"y": "numeric",
+"PANEL": "integer" 
+},
+"PANEL": 1,
+"chunks": 1,
+"total": 1,
+"chunk_order": [],
+"nest_order": [],
+"nextgeom": "geom2_contour_g13" 
+},
+"geom2_contour_g13": {
+ "geom": "path",
+"classed": "geom2_contour_g13",
+"aes": {
+ "x": "duration",
+"y": "waiting",
+"group": "piece" 
+},
+"params": {
+ "lineend": "butt",
+"linejoin": "round",
+"linemitre":      1,
+"na.rm": false,
+"colour": "blue",
+"size":    0.5 
+},
+"subset_order": [],
+"types": {
+ "level": "numeric",
+"x": "numeric",
+"y": "numeric",
+"piece": "integer",
+"group": "factor",
+"PANEL": "integer" 
+},
+"PANEL": 1,
+"chunks": 1,
+"total": 1,
+"chunk_order": [],
+"nest_order": [
+ "group" 
+] 
+} 
+},
+"selectors": [],
+"plots": {
+ "g13": {
+ "strips": {
+ "top": [
+ "" 
+],
+"right": [
+ "" 
+],
+"n": {
+ "top":      0,
+"right":      0 
+} 
+},
+"layout": {
+ "PANEL": [ 1 ],
+"ROW": [ 1 ],
+"COL": [ 1 ],
+"SCALE_X": [ 1 ],
+"SCALE_Y": [ 1 ],
+"AXIS_X": [ true ],
+"AXIS_Y": [ true ],
+"coord_fixed": [ false ],
+"width_proportion": [      1 ],
+"height_proportion": [      1 ] 
+},
+"geoms": [
+ "geom1_point_g13",
+"geom2_contour_g13" 
+],
+"axis1": {
+ "x": [
+ 0.29339,
+0.62397,
+0.95455 
+],
+"xlab": [
+ "2",
+"4",
+"6" 
+],
+"xrange": [  0.225,  6.275 ],
+"xline": true,
+"xticks": true,
+"y": [
+ 0.86889 
+],
+"ylab": [
+ "100" 
+],
+"yrange": [ 1.5801, 2.0634 ],
+"yline": true,
+"yticks": true 
+},
+"xtitle": "duration",
+"xanchor": "middle",
+"xangle":      0,
+"ytitle": "waiting",
+"yanchor": "end",
+"yangle":      0,
+"xlabs": [
+ "2",
+"4",
+"6" 
+],
+"ylabs": [
+ "100" 
+],
+"legend": {},
+"title": "geom_contour 2d density",
+"options": {
+ "width":    400,
+"height":    400 
+} 
+} 
+} 
+}

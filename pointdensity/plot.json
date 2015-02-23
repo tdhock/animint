@@ -1,0 +1,167 @@
+{
+ "geoms": {
+ "geom1_point_g16": {
+ "geom": "point",
+"classed": "geom1_point_g16",
+"aes": {
+ "x": "carat",
+"y": "price",
+"alpha": "..density.." 
+},
+"params": {
+ "na.rm":     10,
+"size": [      1 ],
+"contour": false 
+},
+"subset_order": [],
+"types": {
+ "alpha": "numeric",
+"x": "numeric",
+"y": "numeric",
+"density": "numeric",
+"level": "numeric",
+"piece": "numeric",
+"PANEL": "integer" 
+},
+"PANEL": 1,
+"chunks": 1,
+"total": 1,
+"chunk_order": [],
+"nest_order": [] 
+} 
+},
+"selectors": [],
+"plots": {
+ "g16": {
+ "strips": {
+ "top": [
+ "" 
+],
+"right": [
+ "" 
+],
+"n": {
+ "top":      0,
+"right":      0 
+} 
+},
+"layout": {
+ "PANEL": [ 1 ],
+"ROW": [ 1 ],
+"COL": [ 1 ],
+"SCALE_X": [ 1 ],
+"SCALE_Y": [ 1 ],
+"AXIS_X": [ true ],
+"AXIS_Y": [ true ],
+"coord_fixed": [ false ],
+"width_proportion": [      1 ],
+"height_proportion": [      1 ] 
+},
+"geoms": [
+ "geom1_point_g16" 
+],
+"axis1": {
+ "x": [
+ 0.16942,
+0.37603,
+0.58264,
+0.78926,
+0.99587 
+],
+"xlab": [
+ "0.5",
+"1.0",
+"1.5",
+"2.0",
+"2.5" 
+],
+"xrange": [   0.09,   2.51 ],
+"xline": true,
+"xticks": true,
+"y": [
+ 0.027204,
+0.27585,
+0.52449,
+0.77314 
+],
+"ylab": [
+ "0",
+"5000",
+"10000",
+"15000" 
+],
+"yrange": [ -547.05,  19562 ],
+"yline": true,
+"yticks": true 
+},
+"xtitle": "carat",
+"xanchor": "middle",
+"xangle":      0,
+"ytitle": "price",
+"yanchor": "end",
+"yangle":      0,
+"xlabs": [
+ "0.5",
+"1.0",
+"1.5",
+"2.0",
+"2.5" 
+],
+"ylabs": [
+ "0",
+"5000",
+"10000",
+"15000" 
+],
+"legend": {
+ "Density": {
+ "guide": "legend",
+"geoms": "point",
+"title": "Density",
+"entries": [
+ {
+ "pointalpha": 0.9874,
+"pointshape":     16,
+"pointcolour": "#000000",
+"pointsize":      1,
+"label": [ "5e-04" ] 
+},
+{
+ "pointalpha": 0.8092,
+"pointshape":     16,
+"pointcolour": "#000000",
+"pointsize":      1,
+"label": [ "4e-04" ] 
+},
+{
+ "pointalpha": 0.6328,
+"pointshape":     16,
+"pointcolour": "#000000",
+"pointsize":      1,
+"label": [ "3e-04" ] 
+},
+{
+ "pointalpha": 0.4546,
+"pointshape":     16,
+"pointcolour": "#000000",
+"pointsize":      1,
+"label": [ "2e-04" ] 
+},
+{
+ "pointalpha": 0.2782,
+"pointshape":     16,
+"pointcolour": "#000000",
+"pointsize":      1,
+"label": [ "1e-04" ] 
+} 
+] 
+} 
+},
+"title": "geom_density2d points",
+"options": {
+ "width":    400,
+"height":    400 
+} 
+} 
+} 
+}

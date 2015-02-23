@@ -1,0 +1,138 @@
+{
+ "geoms": {
+ "geom1_bar_g18": {
+ "geom": "rect",
+"classed": "geom1_bar_g18",
+"aes": {
+ "x": "factor(cyl)",
+"fill": "factor(vs)" 
+},
+"params": [],
+"subset_order": [],
+"types": {
+ "fill": "rgb",
+"y": "numeric",
+"count": "numeric",
+"x": "numeric",
+"ndensity": "numeric",
+"ncount": "numeric",
+"density": "numeric",
+"PANEL": "integer",
+"group": "integer",
+"ymin": "numeric",
+"ymax": "numeric",
+"xmin": "numeric",
+"xmax": "numeric" 
+},
+"PANEL": 1,
+"chunks": 1,
+"total": 1,
+"chunk_order": [],
+"nest_order": [] 
+} 
+},
+"selectors": [],
+"plots": {
+ "g18": {
+ "strips": {
+ "top": [
+ "" 
+],
+"right": [
+ "" 
+],
+"n": {
+ "top":      0,
+"right":      0 
+} 
+},
+"layout": {
+ "PANEL": [ 1 ],
+"ROW": [ 1 ],
+"COL": [ 1 ],
+"SCALE_X": [ 1 ],
+"SCALE_Y": [ 1 ],
+"AXIS_X": [ true ],
+"AXIS_Y": [ true ],
+"coord_fixed": [ false ],
+"width_proportion": [      1 ],
+"height_proportion": [      1 ] 
+},
+"geoms": [
+ "geom1_bar_g18" 
+],
+"axis1": {
+ "x": [
+ 0.1875,
+   0.5,
+0.8125 
+],
+"xlab": [
+ "4",
+"6",
+"8" 
+],
+"xrange": [    0.4,    3.6 ],
+"xline": true,
+"xticks": true,
+"y": [
+ 0.045455,
+0.37013,
+0.69481 
+],
+"ylab": [
+ "0",
+"5",
+"10" 
+],
+"yrange": [   -0.7,   14.7 ],
+"yline": true,
+"yticks": true 
+},
+"xtitle": "factor(cyl)",
+"xanchor": "middle",
+"xangle":      0,
+"ytitle": "count",
+"yanchor": "end",
+"yangle":      0,
+"xlabs": [
+ "4",
+"6",
+"8" 
+],
+"ylabs": [
+ "0",
+"5",
+"10" 
+],
+"legend": {
+ "factor(vs)": {
+ "guide": "legend",
+"geoms": "polygon",
+"title": "factor(vs)",
+"entries": [
+ {
+ "polygonfill": "#00BFC4",
+"polygonsize":    0.5,
+"polygonlinetype":      1,
+"polygonweight":      1,
+"label": [ "1" ] 
+},
+{
+ "polygonfill": "#F8766D",
+"polygonsize":    0.5,
+"polygonlinetype":      1,
+"polygonweight":      1,
+"label": [ "0" ] 
+} 
+] 
+} 
+},
+"title": "geom_bar stacked",
+"options": {
+ "width":    400,
+"height":    400 
+} 
+} 
+} 
+}

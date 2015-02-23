@@ -1,0 +1,162 @@
+{
+ "geoms": {
+ "geom1_violin_g8": {
+ "geom": "polygon",
+"classed": "geom1_violin_g8",
+"aes": {
+ "x": "group",
+"y": "y",
+"fill": "group",
+"group": "group" 
+},
+"params": {
+ "trim": true,
+"scale": "area" 
+},
+"subset_order": [],
+"types": {
+ "fill": "rgb",
+"y": "numeric",
+"density": "numeric",
+"scaled": "numeric",
+"count": "numeric",
+"n": "integer",
+"x": "numeric",
+"group": "integer",
+"PANEL": "integer",
+"violinwidth": "numeric",
+"width": "numeric",
+"ymin": "numeric",
+"ymax": "numeric",
+"xmin": "numeric",
+"xmax": "numeric",
+"xminv": "numeric",
+"xmaxv": "numeric" 
+},
+"PANEL": 1,
+"chunks": 1,
+"total": 1,
+"chunk_order": [],
+"nest_order": [
+ "group" 
+] 
+} 
+},
+"selectors": [],
+"plots": {
+ "g8": {
+ "strips": {
+ "top": [
+ "" 
+],
+"right": [
+ "" 
+],
+"n": {
+ "top":      0,
+"right":      0 
+} 
+},
+"layout": {
+ "PANEL": [ 1 ],
+"ROW": [ 1 ],
+"COL": [ 1 ],
+"SCALE_X": [ 1 ],
+"SCALE_Y": [ 1 ],
+"AXIS_X": [ true ],
+"AXIS_Y": [ true ],
+"coord_fixed": [ false ],
+"width_proportion": [      1 ],
+"height_proportion": [      1 ] 
+},
+"geoms": [
+ "geom1_violin_g8" 
+],
+"axis1": {
+ "x": [
+ 0.1875,
+   0.5,
+0.8125 
+],
+"xlab": [
+ "N(3,1)",
+"N(0,1)",
+"Gamma(2,1/3)" 
+],
+"xrange": [    0.4,    3.6 ],
+"xline": true,
+"xticks": true,
+"y": [
+ 0.15247,
+0.40068,
+0.64889,
+0.89709 
+],
+"ylab": [
+ "0",
+"5",
+"10",
+"15" 
+],
+"yrange": [ -3.0715, 17.073 ],
+"yline": true,
+"yticks": true 
+},
+"xtitle": "Distribution",
+"xanchor": "middle",
+"xangle":      0,
+"ytitle": "y",
+"yanchor": "end",
+"yangle":      0,
+"xlabs": [
+ "N(3,1)",
+"N(0,1)",
+"Gamma(2,1/3)" 
+],
+"ylabs": [
+ "0",
+"5",
+"10",
+"15" 
+],
+"legend": {
+ "Distribution": {
+ "guide": "legend",
+"geoms": "polygon",
+"title": "Distribution",
+"entries": [
+ {
+ "polygonfill": "#619CFF",
+"polygonweight":      1,
+"polygoncolour": "#333333",
+"polygonsize":    0.5,
+"polygonlinetype": "solid",
+"label": [ "Gamma(2,1/3)" ] 
+},
+{
+ "polygonfill": "#00BA38",
+"polygonweight":      1,
+"polygoncolour": "#333333",
+"polygonsize":    0.5,
+"polygonlinetype": "solid",
+"label": [ "N(0,1)" ] 
+},
+{
+ "polygonfill": "#F8766D",
+"polygonweight":      1,
+"polygoncolour": "#333333",
+"polygonsize":    0.5,
+"polygonlinetype": "solid",
+"label": [ "N(3,1)" ] 
+} 
+] 
+} 
+},
+"title": "geom_violin",
+"options": {
+ "width":    400,
+"height":    400 
+} 
+} 
+} 
+}

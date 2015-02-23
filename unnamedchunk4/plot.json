@@ -1,0 +1,268 @@
+{
+ "geoms": {
+ "geom1_point_plot1": {
+ "geom": "point",
+"classed": "geom1_point_plot1",
+"aes": {
+ "x": "sex",
+"y": "smoker",
+"clickSelects": "sex_smoker",
+"colour": "sex_smoker" 
+},
+"params": {
+ "na.rm": false 
+},
+"subset_order": [],
+"types": {
+ "colour": "rgb",
+"x": "numeric",
+"y": "numeric",
+"clickSelects": "factor",
+"PANEL": "integer",
+"fill": "rgb" 
+},
+"PANEL": 1,
+"chunks": 1,
+"total": 1,
+"chunk_order": [],
+"nest_order": [] 
+},
+"geom2_point_plot2": {
+ "geom": "point",
+"classed": "geom2_point_plot2",
+"aes": {
+ "x": "total_bill",
+"y": "tip",
+"showSelected": "sex_smoker",
+"colour": "sex_smoker" 
+},
+"params": {
+ "na.rm": false 
+},
+"subset_order": [],
+"types": {
+ "colour": "rgb",
+"x": "numeric",
+"y": "numeric",
+"showSelected": "factor",
+"PANEL": "integer",
+"fill": "rgb" 
+},
+"PANEL": 1,
+"chunks": {
+ "Female.No": 1,
+"Male.No": 2,
+"Female.Yes": 3,
+"Male.Yes": 4 
+},
+"total": 4,
+"chunk_order": [
+ "sex_smoker" 
+],
+"nest_order": [] 
+} 
+},
+"selectors": {
+ "sex_smoker": {
+ "selected": "Female.No",
+"type": "single",
+"update": [
+ "geom1_point_plot1",
+"geom2_point_plot2" 
+],
+"chunks": "sex_smoker" 
+} 
+},
+"plots": {
+ "plot1": {
+ "strips": {
+ "top": [
+ "" 
+],
+"right": [
+ "" 
+],
+"n": {
+ "top":      0,
+"right":      0 
+} 
+},
+"layout": {
+ "PANEL": [ 1 ],
+"ROW": [ 1 ],
+"COL": [ 1 ],
+"SCALE_X": [ 1 ],
+"SCALE_Y": [ 1 ],
+"AXIS_X": [ true ],
+"AXIS_Y": [ true ],
+"coord_fixed": [ false ],
+"width_proportion": [      1 ],
+"height_proportion": [      1 ] 
+},
+"geoms": [
+ "geom1_point_plot1" 
+],
+"axis1": {
+ "x": [
+ 0.27273,
+0.72727 
+],
+"xlab": [
+ "Female",
+"Male" 
+],
+"xrange": [    0.4,    2.6 ],
+"xline": true,
+"xticks": true,
+"y": [
+ 0.27273,
+0.72727 
+],
+"ylab": [
+ "No",
+"Yes" 
+],
+"yrange": [    0.4,    2.6 ],
+"yline": true,
+"yticks": true 
+},
+"xtitle": "sex",
+"xanchor": "middle",
+"xangle":      0,
+"ytitle": "smoker",
+"yanchor": "end",
+"yangle":      0,
+"xlabs": [
+ "Female",
+"Male" 
+],
+"ylabs": [
+ "No",
+"Yes" 
+],
+"options": {
+ "width":    400,
+"height":    400 
+} 
+},
+"plot2": {
+ "strips": {
+ "top": [
+ "" 
+],
+"right": [
+ "" 
+],
+"n": {
+ "top":      0,
+"right":      0 
+} 
+},
+"layout": {
+ "PANEL": [ 1 ],
+"ROW": [ 1 ],
+"COL": [ 1 ],
+"SCALE_X": [ 1 ],
+"SCALE_Y": [ 1 ],
+"AXIS_X": [ true ],
+"AXIS_Y": [ true ],
+"coord_fixed": [ false ],
+"width_proportion": [      1 ],
+"height_proportion": [      1 ] 
+},
+"geoms": [
+ "geom2_point_plot2" 
+],
+"axis1": {
+ "x": [
+ 0.17742,
+0.36784,
+0.55827,
+0.7487,
+0.93912 
+],
+"xlab": [
+ "10",
+"20",
+"30",
+"40",
+"50" 
+],
+"xrange": [  0.683, 53.197 ],
+"xline": true,
+"xticks": true,
+"y": [
+ 0.19697,
+0.44949,
+0.70202,
+0.95455 
+],
+"ylab": [
+ "2.5",
+"5.0",
+"7.5",
+"10.0" 
+],
+"yrange": [   0.55,  10.45 ],
+"yline": true,
+"yticks": true 
+},
+"xtitle": "total_bill",
+"xanchor": "middle",
+"xangle":      0,
+"ytitle": "tip",
+"yanchor": "end",
+"yangle":      0,
+"xlabs": [
+ "10",
+"20",
+"30",
+"40",
+"50" 
+],
+"ylabs": [
+ "2.5",
+"5.0",
+"7.5",
+"10.0" 
+],
+"legend": {
+ "sex_smoker": {
+ "guide": "legend",
+"geoms": "point",
+"title": "sex_smoker",
+"entries": [
+ {
+ "pointcolour": "#C77CFF",
+"pointshape":     16,
+"pointsize":      2,
+"label": [ "Male.Yes" ] 
+},
+{
+ "pointcolour": "#00BFC4",
+"pointshape":     16,
+"pointsize":      2,
+"label": [ "Female.Yes" ] 
+},
+{
+ "pointcolour": "#7CAE00",
+"pointshape":     16,
+"pointsize":      2,
+"label": [ "Male.No" ] 
+},
+{
+ "pointcolour": "#F8766D",
+"pointshape":     16,
+"pointsize":      2,
+"label": [ "Female.No" ] 
+} 
+] 
+} 
+},
+"options": {
+ "width":    400,
+"height":    400 
+} 
+} 
+} 
+}

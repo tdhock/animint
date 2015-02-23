@@ -1,0 +1,152 @@
+{
+ "geoms": {
+ "geom1_jitter_s5": {
+ "geom": "jitter",
+"classed": "geom1_jitter_s5",
+"aes": {
+ "x": "xnew",
+"y": "y",
+"colour": "class4",
+"fill": "class4" 
+},
+"params": {
+ "na.rm": false 
+},
+"subset_order": [],
+"types": {
+ "colour": "rgb",
+"fill": "rgb",
+"x": "numeric",
+"y": "numeric",
+"PANEL": "integer",
+"group": "integer" 
+},
+"PANEL": 1,
+"chunks": 1,
+"total": 1,
+"chunk_order": [],
+"nest_order": [] 
+} 
+},
+"selectors": [],
+"plots": {
+ "s5": {
+ "strips": {
+ "top": [
+ "" 
+],
+"right": [
+ "" 
+],
+"n": {
+ "top":      0,
+"right":      0 
+} 
+},
+"layout": {
+ "PANEL": [ 1 ],
+"ROW": [ 1 ],
+"COL": [ 1 ],
+"SCALE_X": [ 1 ],
+"SCALE_Y": [ 1 ],
+"AXIS_X": [ true ],
+"AXIS_Y": [ true ],
+"coord_fixed": [ false ],
+"width_proportion": [      1 ],
+"height_proportion": [      1 ] 
+},
+"geoms": [
+ "geom1_jitter_s5" 
+],
+"axis1": {
+ "x": [
+ 0.14286,
+0.38095,
+0.61905,
+0.85714 
+],
+"xlab": [
+ "20",
+"40",
+"60",
+"80" 
+],
+"xrange": [    0.4,    4.6 ],
+"xline": true,
+"xticks": true,
+"y": [
+ 0.14924,
+0.4619,
+0.77455 
+],
+"ylab": [
+ "25",
+"50",
+"75" 
+],
+"yrange": [ 13.067, 93.027 ],
+"yline": true,
+"yticks": true 
+},
+"xtitle": "xnew",
+"xanchor": "middle",
+"xangle":      0,
+"ytitle": "y",
+"yanchor": "end",
+"yangle":      0,
+"xlabs": [
+ "20",
+"40",
+"60",
+"80" 
+],
+"ylabs": [
+ "25",
+"50",
+"75" 
+],
+"legend": {
+ "class4": {
+ "guide": "legend",
+"geoms": "point",
+"title": "class4",
+"entries": [
+ {
+ "pointcolour": "#C77CFF",
+"pointfill": "#C77CFF",
+"pointshape":     16,
+"pointsize":      2,
+"label": [ "low" ] 
+},
+{
+ "pointcolour": "#00BFC4",
+"pointfill": "#00BFC4",
+"pointshape":     16,
+"pointsize":      2,
+"label": [ "medlow" ] 
+},
+{
+ "pointcolour": "#7CAE00",
+"pointfill": "#7CAE00",
+"pointshape":     16,
+"pointsize":      2,
+"label": [ "medhigh" ] 
+},
+{
+ "pointcolour": "#F8766D",
+"pointfill": "#F8766D",
+"pointshape":     16,
+"pointsize":      2,
+"label": [ "high" ] 
+} 
+] 
+} 
+},
+"title": "geom_jitter",
+"options": {
+ "width":    400,
+"height":    400 
+} 
+} 
+} 
+}

@@ -1,0 +1,139 @@
+{
+ "geoms": {
+ "geom1_linerange_g6": {
+ "geom": "linerange",
+"classed": "geom1_linerange_g6",
+"aes": {
+ "x": "factor(group)",
+"ymax": "ymax",
+"ymin": "ymin",
+"colour": "factor(group)" 
+},
+"params": [],
+"subset_order": [],
+"types": {
+ "colour": "rgb",
+"x": "numeric",
+"ymin": "numeric",
+"ymax": "numeric",
+"PANEL": "integer",
+"group": "integer" 
+},
+"PANEL": 1,
+"chunks": 1,
+"total": 1,
+"chunk_order": [],
+"nest_order": [] 
+} 
+},
+"selectors": [],
+"plots": {
+ "g6": {
+ "strips": {
+ "top": [
+ "" 
+],
+"right": [
+ "" 
+],
+"n": {
+ "top":      0,
+"right":      0 
+} 
+},
+"layout": {
+ "PANEL": [ 1 ],
+"ROW": [ 1 ],
+"COL": [ 1 ],
+"SCALE_X": [ 1 ],
+"SCALE_Y": [ 1 ],
+"AXIS_X": [ true ],
+"AXIS_Y": [ true ],
+"coord_fixed": [ false ],
+"width_proportion": [      1 ],
+"height_proportion": [      1 ] 
+},
+"geoms": [
+ "geom1_linerange_g6" 
+],
+"axis1": {
+ "x": [
+ 0.1875,
+   0.5,
+0.8125 
+],
+"xlab": [
+ "N(3,1)",
+"N(0,1)",
+"Gamma(2,1/3)" 
+],
+"xrange": [    0.4,    3.6 ],
+"xline": true,
+"xticks": true,
+"y": [
+ 0.15316,
+0.40085,
+0.64853,
+0.89621 
+],
+"ylab": [
+ "0",
+"5",
+"10",
+"15" 
+],
+"yrange": [ -3.0919, 17.095 ],
+"yline": true,
+"yticks": true 
+},
+"xtitle": "Distribution",
+"xanchor": "middle",
+"xangle":      0,
+"yanchor": "end",
+"yangle":      0,
+"xlabs": [
+ "N(3,1)",
+"N(0,1)",
+"Gamma(2,1/3)" 
+],
+"ylabs": [
+ "0",
+"5",
+"10",
+"15" 
+],
+"legend": {
+ "Distribution": {
+ "guide": "legend",
+"geoms": "path",
+"title": "Distribution",
+"entries": [
+ {
+ "pathcolour": "#619CFF",
+"pathsize":    0.5,
+"pathlinetype":      1,
+"label": [ "Gamma(2,1/3)" ] 
+},
+{
+ "pathcolour": "#00BA38",
+"pathsize":    0.5,
+"pathlinetype":      1,
+"label": [ "N(0,1)" ] 
+},
+{
+ "pathcolour": "#F8766D",
+"pathsize":    0.5,
+"pathlinetype":      1,
+"label": [ "N(3,1)" ] 
+} 
+] 
+} 
+},
+"title": "geom_linerange",
+"options": {
+ "width":    400,
+"height":    400 
+} 
+} 
+} 
+}

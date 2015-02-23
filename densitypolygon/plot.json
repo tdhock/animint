@@ -1,0 +1,182 @@
+{
+ "geoms": {
+ "geom1_polygon_g14": {
+ "geom": "polygon",
+"classed": "geom1_polygon_g14",
+"aes": {
+ "x": "duration",
+"y": "waiting",
+"fill": "..level..",
+"group": "..piece.." 
+},
+"params": {
+ "alpha":    0.5 
+},
+"subset_order": [],
+"types": {
+ "fill": "rgb",
+"group": "integer",
+"level": "numeric",
+"x": "numeric",
+"y": "numeric",
+"piece": "integer",
+"PANEL": "integer" 
+},
+"PANEL": 1,
+"chunks": 1,
+"total": 1,
+"chunk_order": [],
+"nest_order": [
+ "group" 
+],
+"nextgeom": "geom2_point_g14" 
+},
+"geom2_point_g14": {
+ "geom": "point",
+"classed": "geom2_point_g14",
+"aes": {
+ "x": "duration",
+"y": "waiting" 
+},
+"params": {
+ "na.rm": false 
+},
+"subset_order": [],
+"types": {
+ "y": "numeric",
+"x": "numeric",
+"PANEL": "integer" 
+},
+"PANEL": 1,
+"chunks": 1,
+"total": 1,
+"chunk_order": [],
+"nest_order": [] 
+} 
+},
+"selectors": [],
+"plots": {
+ "g14": {
+ "strips": {
+ "top": [
+ "" 
+],
+"right": [
+ "" 
+],
+"n": {
+ "top":      0,
+"right":      0 
+} 
+},
+"layout": {
+ "PANEL": [ 1 ],
+"ROW": [ 1 ],
+"COL": [ 1 ],
+"SCALE_X": [ 1 ],
+"SCALE_Y": [ 1 ],
+"AXIS_X": [ true ],
+"AXIS_Y": [ true ],
+"coord_fixed": [ false ],
+"width_proportion": [      1 ],
+"height_proportion": [      1 ] 
+},
+"geoms": [
+ "geom1_polygon_g14",
+"geom2_point_g14" 
+],
+"axis1": {
+ "x": [
+ 0.29339,
+0.62397,
+0.95455 
+],
+"xlab": [
+ "2",
+"4",
+"6" 
+],
+"xrange": [  0.225,  6.275 ],
+"xline": true,
+"xticks": true,
+"y": [
+ 0.86889 
+],
+"ylab": [
+ "100" 
+],
+"yrange": [ 1.5801, 2.0634 ],
+"yline": true,
+"yticks": true 
+},
+"xtitle": "duration",
+"xanchor": "middle",
+"xangle":      0,
+"ytitle": "waiting",
+"yanchor": "end",
+"yangle":      0,
+"xlabs": [
+ "2",
+"4",
+"6" 
+],
+"ylabs": [
+ "100" 
+],
+"legend": {
+ "Density Level": {
+ "guide": "legend",
+"geoms": "polygon",
+"title": "Density Level",
+"entries": [
+ {
+ "polygonfill": "#152F49",
+"polygoncolour": "#FFFFFF",
+"polygonsize":    0.5,
+"polygonlinetype":      1,
+"polygonalpha":      1,
+"label": [ "2.5" ] 
+},
+{
+ "polygonfill": "#22496B",
+"polygoncolour": "#FFFFFF",
+"polygonsize":    0.5,
+"polygonlinetype":      1,
+"polygonalpha":      1,
+"label": [ "2.0" ] 
+},
+{
+ "polygonfill": "#2F6490",
+"polygoncolour": "#FFFFFF",
+"polygonsize":    0.5,
+"polygonlinetype":      1,
+"polygonalpha":      1,
+"label": [ "1.5" ] 
+},
+{
+ "polygonfill": "#3E80B6",
+"polygoncolour": "#FFFFFF",
+"polygonsize":    0.5,
+"polygonlinetype":      1,
+"polygonalpha":      1,
+"label": [ "1.0" ] 
+},
+{
+ "polygonfill": "#4C9EDE",
+"polygoncolour": "#FFFFFF",
+"polygonsize":    0.5,
+"polygonlinetype":      1,
+"polygonalpha":      1,
+"label": [ "0.5" ] 
+} 
+] 
+} 
+},
+"title": "geom_density2d polygon",
+"options": {
+ "width":    400,
+"height":    400 
+} 
+} 
+} 
+}
