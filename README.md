@@ -1,4 +1,4 @@
-animint
+animint - an R package for *anim*ated *int*eractive web graphics
 =======
 
 [![Build Status](https://travis-ci.org/tdhock/animint.png?branch=master)](https://travis-ci.org/tdhock/animint)
@@ -19,7 +19,7 @@ there is a [pull request](https://github.com/hadley/ggplot2/pull/953)
 to merge [tdhock/ggplot2](https://github.com/tdhock/ggplot2) with the
 main ggplot2 repo.
 
-## Examples
+## Learning animint through examples
 
 The best way to learn animint is through examples. A couple of good
 introductions are Carson Sievert's [Interactive animations of
@@ -32,6 +32,13 @@ animint](https://github.com/tdhock/animint/tree/master/inst/examples), as
 well as more complex 'big data' examples in the
 [tdhock/animint-examples
 repo](https://github.com/tdhock/animint-examples/tree/master/examples).
+
+## Frequently asked questions (FAQ)
+
+- Can I use animint inside of a Shiny app?
+  (Yes)[https://cpsievert.shinyapps.io/animintShiny/].
+- Can I use animint inside of an interactive Rmarkdown document?
+  (Yes)[https://cpsievert.shinyapps.io/animintRmarkdown/].
 
 ## Animint paper
 
