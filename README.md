@@ -36,9 +36,9 @@ repo](https://github.com/tdhock/animint-examples/tree/master/examples).
 ## Frequently asked questions (FAQ)
 
 - Can I use animint inside of a Shiny app?
-  (Yes)[https://cpsievert.shinyapps.io/animintShiny/].
+  [Yes](https://cpsievert.shinyapps.io/animintShiny/).
 - Can I use animint inside of an interactive Rmarkdown document?
-  (Yes)[https://cpsievert.shinyapps.io/animintRmarkdown/].
+  [Yes](https://cpsievert.shinyapps.io/animintRmarkdown/).
 
 ## Animint paper
 
