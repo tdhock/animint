@@ -35,8 +35,19 @@ repo](https://github.com/tdhock/animint-examples/tree/master/examples).
 
 ## Frequently asked questions (FAQ)
 
+- Can I do brushing in Animint? If by "brushing" you mean "multiple
+  selection," then yes the designer can use the
+  [selector.types](https://github.com/tdhock/animint/wiki/Advanced-features-present-animint-but-not-in-ggplot2#multiple-selection)
+  option to declare a multiple selection variable, which means that
+  users will be able to click plot elements to add/remove items from
+  the multiple selection set. For example see the [WorldBank-facets
+  viz](http://bl.ocks.org/tdhock/raw/93a798530952338c87ac/) and
+  [source
+  code](https://github.com/tdhock/animint/blob/master/inst/examples/WorldBank.R).
+ 
 - Can I use animint inside of a Shiny app?
   [Yes](https://cpsievert.shinyapps.io/animintShiny/).
+
 - Can I use animint inside of an interactive Rmarkdown document?
   [Yes](https://cpsievert.shinyapps.io/animintRmarkdown/).
 
