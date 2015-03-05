@@ -58,11 +58,20 @@ repo](https://github.com/tdhock/animint-examples/tree/master/examples).
 
 ## Animint paper
 
-Susan VanderPlas and Toby Dylan Hocking wrote an [8-page conference paper](https://github.com/tdhock/animint-paper/blob/master/HOCKING-animint.pdf?raw=true) in March 2014. If you would like to contribute code to animint, please read the paper first to get an overview of the package. It explains:
-- the purpose of animint: make it easy to design interactive animations.
-- the clickSelects and showSelected keywords which permit interactivity.
-- the design of the animint package.
-- the advantages and disadvantages of animint compared to other interactive data viz libraries.
+Carson Sievert, Susan VanderPlas and Toby Dylan Hocking wrote an
+[academic paper describing
+Animint](https://github.com/tdhock/animint-paper/blob/master/HOCKING-animint.pdf?raw=true). If
+you would like to contribute code to animint, please read the paper
+first to get an overview of the package. It explains: 
+
+- the purpose of animint: make it easy to design data visualizations
+which can be both animated and interactive.
+
+- the clickSelects and showSelected keywords which permit
+interactive linked plots.
+
+- the advantages and disadvantages of animint compared to other
+interactive data viz libraries.
 
 ## Related work
 
