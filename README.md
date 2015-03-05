@@ -48,8 +48,13 @@ repo](https://github.com/tdhock/animint-examples/tree/master/examples).
 - Can I use animint inside of a Shiny app?
   [Yes](https://cpsievert.shinyapps.io/animintShiny/).
 
+- Can I use animint inside of knitr?  [Yes, but use `structure(viz,
+  class="animint")` rather than
+  `animint2dir(viz)`](http://cpsievert.github.io/animint/worldPop/worldPop.html)
+
 - Can I use animint inside of an interactive Rmarkdown document?
-  [Yes](https://cpsievert.shinyapps.io/animintRmarkdown/).
+  [Yes](https://cpsievert.shinyapps.io/animintRmarkdown/)
+  ([source](https://github.com/tdhock/animint/tree/master/inst/examples/rmarkdown)).
 
 ## Animint paper
 
