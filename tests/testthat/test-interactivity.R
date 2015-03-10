@@ -181,6 +181,9 @@ test_that("default is 2 <path> and <text> elements", {
   nodes <- getNodeSet(info$html, '//g[@class="geom7_line_ts"]//path')
   expect_equal(length(nodes), 2)
   nodes <- getNodeSet(info$html, '//g[@class="geom5_text_ts"]//text')
+  for(node in nodes){
+    expect_match(xmlAttrs(node)[["style"]], "text-anchor: start")
+  }
   expect_equal(length(nodes), 2)
 })
 
@@ -189,6 +192,9 @@ test_that("clickSelects CO adds 1 <path> and 1 <text>", {
   nodes <- getNodeSet(html, '//g[@class="geom7_line_ts"]//path')
   expect_equal(length(nodes), 3)
   nodes <- getNodeSet(html, '//g[@class="geom5_text_ts"]//text')
+  for(node in nodes){
+    expect_match(xmlAttrs(node)[["style"]], "text-anchor: start")
+  }
   expect_equal(length(nodes), 3)
 })
 
@@ -197,6 +203,9 @@ test_that("clickSelects CA removes 1 <path> and 1 <text>", {
   nodes <- getNodeSet(html, '//g[@class="geom7_line_ts"]//path')
   expect_equal(length(nodes), 2)
   nodes <- getNodeSet(html, '//g[@class="geom5_text_ts"]//text')
+  for(node in nodes){
+    expect_match(xmlAttrs(node)[["style"]], "text-anchor: start")
+  }
   expect_equal(length(nodes), 2)
 })
 
