@@ -1,4 +1,35 @@
-scale[var2] if selected. NOTE: should
+TODOs in approximate order of importance (higher is more important).
+
+ASK JS GUYS: grey after mouseout on ff? Talked to JS guys, maybe has
+something to do with mouseenter and mouseleave
+http://bl.ocks.org/mbostock/5247027 -------------------------------
+maybe has something to do with setInterval which is not executed in
+chrome when the browser window is inactive
+http://stackoverflow.com/questions/5927284
+
+When testing code on travis, record how much time, disk space, memory
+for compilation and rendering steps, and write those values to a CSV
+file. Then make a time series plot of these data to see if the code is
+getting more or less efficient. This could be useful in packages other
+than animint, so I proposed a GSOC2015 project
+https://github.com/rstats-gsoc/gsoc2015/wiki/Test-timings-on-Travis
+
+DSL: allow for example
+geom_tile(aes(clickSelects1=var1, clickSelects2=var2))
+which means that clicking a tile changes
+the selected values of BOTH selectors.
+
+DSL: customizable alpha/color/size/fill/linetype for selected geoms,
+using selected.alpha, selected.color, etc aesthetics, see
+examples/Climate-selected.R. The first implementation should only
+allow this at the geom level,
+e.g. geom_point(aes(clickSelects=var),selected.color="red") means to
+plot a bunch of points which are black if not selected and red if
+selected. In ggplot2-0.9.3.1, selected.color thus defined can be
+accessed as layer$stat_params$selected.color. In the future we can try
+an implementation at the aes level,
+e.g. geom_point(aes(clickSelects=var1,selected.color=var2)) means
+black if not selected and scale[var2] if selected. NOTE: should
 maintain compatibility with existing code, which assumes
 selected.color="black" and color="transparent" for
 e.g. geom_rect(aes(fill=numeric, clickSelects=id)) and otherwise,
@@ -115,8 +146,15 @@ methods should we use to define hoverSelects interactivity?
 
 GGPLOT: theme(legend.position)
 
-DSL: option list(layout=matrix of plot names) means render plots in an
-html table instead of in a line.
+DSL: how to specify the layout of SVG elements on the page? 
+- option list(layout=matrix of plot names) means 
+  render plots in an html table instead of in a line?
+- specifying newlines in the option list?
+  list(timeSeries=ggplot(),
+       newline=list(),
+       scatter=ggplot())
+  means that we should layout the plots in a <table> with
+  2 rows and 1 column.
 
 EXAMPLE: pirates data: world map?
 
