@@ -47,9 +47,6 @@ objective <- ldply(objective$iteration, function(i) {
 objective2 <- subset(objective, iteration == iteration2)
 
 grad.desc.viz <- function(hjust) {
-  if (!hjust %in% c(0, 0.5, 1)) {
-    warning("unsupported value of hjust was provided.")
-  }
   objective2$hjust <- hjust
   
   contour.plot <- ggplot() + 
@@ -78,7 +75,6 @@ grad.desc.viz <- function(hjust) {
   viz <- list(contour = contour.plot, objective = objective.plot, 
               time = list(variable = "iteration2", ms = 2000), 
               title = "Demonstration of Gradient Descent Algorithm")
-  info <- animint2HTML(viz)
 }
 
 getStyleValue <- function(html, xpath, style.name) {
@@ -90,26 +86,31 @@ getStyleValue <- function(html, xpath, style.name) {
 }
 
 test_that('geom_text(hjust=0) => <text style="text-anchor: start">', {
-  info <- grad.desc.viz(hjust = 0)
+  viz <- grad.desc.viz(hjust = 0)
+  info <- animint2HTML(viz)
   style.value <- getStyleValue(info$html, '//g[@class="geom8_text_objective"]//text', 
                                "text-anchor")
   expect_match(style.value, "start")
 })
 
 test_that('geom_text(hjust=1) => <text style="text-anchor: end">', {
-  info <- grad.desc.viz(hjust = 1)
+  viz <- grad.desc.viz(hjust = 1)
+  info <- animint2HTML(viz)
   style.value <- getStyleValue(info$html, '//g[@class="geom8_text_objective"]//text', 
                                "text-anchor")
   expect_match(style.value, "end")
 })
 
 test_that('geom_text(hjust=0.5) => <text style="text-anchor: middle">', {
-  info <- grad.desc.viz(hjust = 0.5)
+  viz <- grad.desc.viz(hjust = 0.5)
+  info <- animint2HTML(viz)
   style.value <- getStyleValue(info$html, '//g[@class="geom8_text_objective"]//text', 
                                "text-anchor")
   expect_match(style.value, "middle")
 })
 
 test_that('geom_text(hjust=other) => unsupported warning', {
+  viz <- grad.desc.viz(hjust = 0.8)
+  info <- animint2HTML(viz)
   expect_that(grad.desc.viz(hjust = 0.8), gives_warning())
 })
