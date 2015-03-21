@@ -730,25 +730,7 @@ var animint = function (to_select, json_file) {
         text_anchor = "end";
       }
       return text_anchor;
-      // if (d.hasOwnProperty("hjust")) {
-      //   if (d["hjust"] == 0) {
-      //     return "start";
-      //   }
-      //   if (d["hjust"] == 0.5) {
-      //     return "middle";
-      //   }
-      //   if (d["hjust"] == 1) {
-      //     return "end";
-      //   }
-      // }
-      // return text_anchor;
     }
-    // if (g_info.params.hjust == 0) {
-    //   text_anchor = "start";
-    // }
-    // if (g_info.params.hjust == 1) {
-    //   text_anchor = "end";
-    // }
 
     var eActions, eAppend;
     var key_fun = null;
