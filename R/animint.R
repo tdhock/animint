@@ -319,6 +319,15 @@ saveLayer <- function(l, d, meta){
   } else if(g$geom=="text"){
     ## group is meaningless for text, so delete it.
     g.data <- g.data[names(g.data) != "group"]
+    ## check invalid hjust value
+    if ("hjust" %in% names(g$params)) { #  hjust is parameter
+      hjust <- g$params$hjust
+    } else if ("hjust" %in% names(g.data)) { #  hjust is aesthetic
+      hjust <- unique(g.data['hjust'])
+    } else { #  default hjust
+      hjust <- 0.5
+    }
+    anchor <- hjust2anchor(hjust)
   } else if(g$geom=="rect"){
     ## group is meaningless for rects, so delete it.
     g.data <- g.data[names(g.data) != "group"]

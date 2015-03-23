@@ -68,7 +68,7 @@ grad.desc.viz <- function(hjust) {
     geom_tallrect(data = objective2, aes(xmin = iteration - 1 / 2, xmax = iteration + 1 / 2, 
                                          clickSelects = iteration2), alpha = .3) + 
     geom_text(data = objective2, aes(x = iteration, y = z + 0.3, showSelected = iteration2, 
-                                     label = iteration, hjust = hjust)) + 
+                                     label = iteration), hjust = hjust) + 
     ggtitle("objective value vs. iteration") + 
     theme_animint(width = 600, height = 600)
   
@@ -109,8 +109,7 @@ test_that('geom_text(hjust=0.5) => <text style="text-anchor: middle">', {
   expect_match(style.value, "middle")
 })
 
-test_that('geom_text(hjust=other) => unsupported warning', {
+test_that('geom_text(hjust=other) => unsupported value error', {
   viz <- grad.desc.viz(hjust = 0.8)
-  info <- animint2HTML(viz)
-  expect_that(grad.desc.viz(hjust = 0.8), gives_warning())
+  expect_error(animint2HTML(viz), "animint only supports hjust values 0, 0.5, 1")
 })
