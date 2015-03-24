@@ -164,10 +164,7 @@ http://fr.wikipedia.org/wiki/Histoire_démographique_de_la_France
 http://www.populstat.info/Asia/japanc.htm
 http://www.populstat.info/Americas/canadac.htm
 
-RENDER: Is it possible to fix geom_rect and geom_text alignment? The
-underlying problem is that there is no equivalent of R's vjust in SVG
-(the equivalent of R's hjust=0.5|1|0 is CSS text-anchor:
-middle|end|start). See examples/align_rect_text.R.
+RENDER: Is it possible to fix geom_rect and geom_text vertical alignment? There is no equivalent of R's vjust in SVG. See examples/align_rect_text.R.
 
 DSL: if there was no duration specified, should
 time=list(variable=2000) imply duration=list(variable=1000)?
@@ -190,6 +187,10 @@ does not respond to mouse clicks while the data is loading.
 
 DSL: Implement shape aesthetic with d3.svg.symbol()
 https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol_type
+
+2015.03.23
+
+BUGFIX: hjust aesthetic for geom_text. R's valid hjust=0.5|1|0 is equivalent to CSS text-anchor: middle|end|start.
 
 2015.01.27
 
