@@ -6,11 +6,12 @@
 
 language: r
 
-# Dependencies for running animint tests
 r_binary_packages:
-  - servr
   - XML
   - shiny
+  
+r_packages:
+  - servr
   - gistr
   - RSelenium
   - rmarkdown
