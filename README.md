@@ -1,4 +1,4 @@
-animint
+animint - an R package for *anim*ated *int*eractive web graphics
 =======
 
 [![Build Status](https://travis-ci.org/tdhock/animint.png?branch=master)](https://travis-ci.org/tdhock/animint)
@@ -19,7 +19,7 @@ there is a [pull request](https://github.com/hadley/ggplot2/pull/953)
 to merge [tdhock/ggplot2](https://github.com/tdhock/ggplot2) with the
 main ggplot2 repo.
 
-## Examples
+## Learning animint through examples
 
 The best way to learn animint is through examples. A couple of good
 introductions are Carson Sievert's [Interactive animations of
@@ -33,13 +33,45 @@ well as more complex 'big data' examples in the
 [tdhock/animint-examples
 repo](https://github.com/tdhock/animint-examples/tree/master/examples).
 
+## Frequently asked questions (FAQ)
+
+- Can I do brushing in Animint? If by "brushing" you mean "multiple
+  selection," then yes the designer can use the
+  [selector.types](https://github.com/tdhock/animint/wiki/Advanced-features-present-animint-but-not-in-ggplot2#multiple-selection)
+  option to declare a multiple selection variable, which means that
+  users will be able to click plot elements to add/remove items from
+  the multiple selection set. For example see the [WorldBank-facets
+  viz](http://bl.ocks.org/tdhock/raw/93a798530952338c87ac/) and
+  [source
+  code](https://github.com/tdhock/animint/blob/master/inst/examples/WorldBank.R).
+ 
+- Can I use animint inside of a Shiny app?
+  [Yes](https://cpsievert.shinyapps.io/animintShiny/).
+
+- Can I use animint inside of knitr?  [Yes, but use `structure(viz,
+  class="animint")` rather than
+  `animint2dir(viz)`](http://cpsievert.github.io/animint/worldPop/worldPop.html)
+
+- Can I use animint inside of an interactive Rmarkdown document?
+  [Yes](https://cpsievert.shinyapps.io/animintRmarkdown/)
+  ([source](https://github.com/tdhock/animint/tree/master/inst/examples/rmarkdown)).
+
 ## Animint paper
 
-Susan VanderPlas and Toby Dylan Hocking wrote an [8-page conference paper](https://github.com/tdhock/animint-paper/blob/master/HOCKING-animint.pdf?raw=true) in March 2014. If you would like to contribute code to animint, please read the paper first to get an overview of the package. It explains:
-- the purpose of animint: make it easy to design interactive animations.
-- the clickSelects and showSelected keywords which permit interactivity.
-- the design of the animint package.
-- the advantages and disadvantages of animint compared to other interactive data viz libraries.
+Carson Sievert, Susan VanderPlas and Toby Dylan Hocking wrote an
+[academic paper describing
+Animint](https://github.com/tdhock/animint-paper/blob/master/HOCKING-animint.pdf?raw=true). If
+you would like to contribute code to animint, please read the paper
+first to get an overview of the package. It explains: 
+
+- the purpose of animint: make it easy to design data visualizations
+which can be both animated and interactive.
+
+- the clickSelects and showSelected keywords which permit
+interactive linked plots.
+
+- the advantages and disadvantages of animint compared to other
+interactive data viz libraries.
 
 ## Related work
 
