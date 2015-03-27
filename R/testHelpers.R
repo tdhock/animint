@@ -23,10 +23,16 @@ tests_init <- function(browserName = "phantomjs", dir = ".", port = 4848, ...) {
   # initiate environment that will store important testing info
   env <- new.env(parent = globalenv())
   dir <- normalizePath(dir, mustWork = TRUE)
+  if (!grepl("animint", dir, fixed = TRUE)) 
+    stop("animint must appear somewhere in 'dir'")
   if (basename(dir) == 'animint') {
     env$.testDir <- file.path(dir, "tests/testthat")
+  } else if (basename(dir) == 'tests') {
+    env$.testDir <- file.path(dir, "testthat")
+  } else if (basename(dir) == 'testthat') {
+    env$.testDir <- dir
   } else {
-    stop("Please provide the path animint's source code in the 'dir' argument.")
+    stop("Unexpected path")
   }
   env$.outDir <- file.path(env$.testDir, "htmltest")
   # start a non-blocking local file server; remember port and process ID

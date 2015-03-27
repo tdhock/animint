@@ -10,18 +10,13 @@ library("rmarkdown")
 #'
 #' @param plotList A named list of ggplot2 objects
 animint2HTML <- function(plotList) {
-  ## When we do test_package("animint") it does
-  ## setwd("animint/tests/testthat") so when we call this function
-  ## inside of the tests, it will write the viz to
-  ## animint/tests/testthat/htmltest, so we also need to start the
-  ## servr in animint/tests/testthat.
-  res <- animint2dir(plotList, out.dir = .outDir, open.browser = FALSE)
-  # to avoid weird redirecting done in some browsers,
-  # we first navtigate to "http://localhost:port/", then *click*
-  # on the appropriate testing directory
+  res <- animint2dir(plotList, out.dir = "htmltest", open.browser = FALSE)
+  # navigate to the local file server address 
+  # (which should be serving path/to/animint/tests/testthat)
   remDr$navigate(.address)
-  xpath <- sprintf("//a[@href='%s/']", basename(.outDir))
-  res$html <- clickHTML("xpath" = xpath)
+  # to avoid weird redirecting by some browsers,
+  # we *click* on the appropriate testing directory
+  res$html <- clickHTML("xpath" = "//a[@href='htmltest/']")
   res
 }
 
