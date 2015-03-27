@@ -4,10 +4,11 @@
 \alias{tests_run}
 \title{Run animint tests}
 \usage{
-tests_run(envir, filter = NULL)
+tests_run(dir = ".", filter = NULL)
 }
 \arguments{
-  \item{envir}{an environmnent.}
+  \item{dir}{character string with the path to animint's
+  source code. Defaults to current directory}
 
   \item{filter}{If not NULL, only tests with file names
   matching this regular expression will be executed.
@@ -20,9 +21,12 @@ Convenience function for running animint tests.
 \examples{
 \dontrun{
 # run tests in test-rotate.R with Firefox
-env <- tests_init("firefox")
-tests_run(env, filter = "rotate")
-tests_exit(env)
+pid <- tests_init("firefox")
+tests_run(filter = "rotate")
+# clean-up
+tools::pskill(pid)
+remDr$closeWindow()
+remDr$closeServer()
 }
 }
 

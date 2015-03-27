@@ -7,9 +7,10 @@
 #' @param port port number used for local file server
 #' @param dir character string with the path to animint's source code. Defaults to current directory
 #' @param ... list of additional options passed onto RSelenium::remoteDriver
-#' @return invisible version of the testing environment
+#' @return invisible version of the process ID of a child R session running a local file server.
 #' @export
 #' @seealso \link{tests_run()}
+#' 
 
 tests_init <- function(browserName = "phantomjs", dir = ".", port = 4848, ...) {
   # remoteDriver methods won't work RSelenium is in search path
@@ -19,47 +20,37 @@ tests_init <- function(browserName = "phantomjs", dir = ".", port = 4848, ...) {
   }
   # avoid weird errors if this function is called via testhat::check()
   # https://github.com/hadley/testthat/issues/144
-  Sys.setenv("R_TESTS" = "")
-  # initiate environment that will store important testing info
-  env <- new.env(parent = globalenv())
-  dir <- normalizePath(dir, mustWork = TRUE)
-  if (!grepl("animint", dir, fixed = TRUE)) 
-    stop("animint must appear somewhere in 'dir'")
-  if (basename(dir) == 'animint') {
-    env$.testDir <- file.path(dir, "tests/testthat")
-  } else if (basename(dir) == 'tests') {
-    env$.testDir <- file.path(dir, "testthat")
-  } else if (basename(dir) == 'testthat') {
-    env$.testDir <- dir
-  } else {
-    stop("Unexpected path")
-  }
-  env$.outDir <- file.path(env$.testDir, "htmltest")
-  # start a non-blocking local file server; remember port and process ID
-  res <- run_servr(port = port, directory = env$.testDir)
-  env$.address <- sprintf("http://localhost:%s", res$port)
-  env$.filepid <- res$pid
+  #Sys.setenv("R_TESTS" = "")
+  # start a non-blocking local file server under path/to/animint/tests/testhat
+  res <- run_servr(port = port, directory = find_test_path(dir))
+  address <- sprintf("http://localhost:%s", res$port)
   # start-up remote driver 
   if (browserName == "phantomjs") {
-    env$pJS <- RSelenium::phantom()
+    message("Starting phantomjs binary. To shut it down, run: \n pJS$stop()")
+    pJS <<- RSelenium::phantom()
   } else {
+    message("Starting selenium binary. To shut it down, run: \n",
+            "remDr$closeWindow() \n",
+            "remDr$closeServer()")
     RSelenium::checkForServer(dir = system.file("bin", package = "RSelenium"))
     selenium <- RSelenium::startServer()
   }
   # give an binaries a moment to start up
   Sys.sleep(5)
-  env$remDr <- RSelenium::remoteDriver(browserName = browserName, ...)
+  remDr <<- RSelenium::remoteDriver(browserName = browserName, ...)
   # give the backend a moment to start-up
   Sys.sleep(2)
-  env$remDr$open(silent = TRUE)
-  invisible(env)
+  remDr$open(silent = TRUE)
+  Sys.sleep(2)
+  remDr$navigate(address)
+  invisible(res$pid)
 }
 
 #' Run animint tests
 #'
 #' Convenience function for running animint tests.
-#' 
-#' @param envir an environmnent.
+#'
+#' @param dir character string with the path to animint's source code. Defaults to current directory
 #' @param filter If not NULL, only tests with file names matching
 #' this regular expression will be executed. Matching will take on the
 #' file name after it has been stripped of "test-" and ".r".
@@ -68,60 +59,42 @@ tests_init <- function(browserName = "phantomjs", dir = ".", port = 4848, ...) {
 #'
 #' \dontrun{
 #' # run tests in test-rotate.R with Firefox
-#' env <- tests_init("firefox")
-#' tests_run(env, filter = "rotate")
-#' tests_exit(env)
+#' pid <- tests_init("firefox")
+#' tests_run(filter = "rotate")
+#' # clean-up
+#' tools::pskill(pid)
+#' remDr$closeWindow()
+#' remDr$closeServer()
 #' }
 #'
 
-tests_run <- function(envir, filter = NULL) {
-  if (!is.environment(envir)) stop("Must provide an environment!")
-  testDir <- envir$.testDir
-  sys.source(file.path(testDir, "functions.R"), envir = envir)
-  testthat::test_dir(testDir, filter = filter, env = envir)
+tests_run <- function(dir = ".", filter = NULL) {
+  if (!"package:testthat" %in% search()) {
+    warning("testthat must be loaded to run tests. Attempting to load for you...")
+    library("testthat")
+  }
+  test_path <- find_test_path(dir)
+  source(file.path(test_path, "functions.R"))
+  test_check("animint", filter = filter)
 }
 
+# --------------------------
+# Functions used in multiple places
+# --------------------------
 
-#' Shut down external processes necessary for running tests
-#'
-#' Shuts down the local file server and remote driver initiated by 
-#' \link{tests_init()}.
-#'
-#' @param envir an environmnent.
-#' @return invisible(FALSE) if an error occurred; invisible(TRUE) otherwise
-#' @export
-#' @seealso \link{tests_run()}
-
-tests_exit <- function(envir) {
-  if (!is.environment(envir)) stop("Must provide a testing environment!")
-  # try to shut down phantomjs, then remove it from environment
-  has_phantom <- exists("pJS", envir = envir)
-  has_driver <- exists("remDr", envir = envir)
-  if (!has_phantom && !has_driver) {
-    warning("No processes to shut down")
-    return(invisible())
-  }
-  if (has_phantom) {
-    e <- try(envir$pJS$stop())
-    rm("pJS", envir = envir)
-  } else {
-    st <- envir$remDr$getStatus()
-    # if running shut down; if not exit
-    e <- try({
-      envir$remDr$closeWindow()
-      envir$remDr$closeServer()
-    })
-    rm("remDr", envir = envir)
-  }
-  # stop file server
-  e2 <- tools::pskill(envir$.filepid)
-  invisible(e2 && !inherits(e, "try-error"))
+# resolve the path
+find_test_path <- function(dir) {
+  dir <- normalizePath(dir, mustWork = TRUE)
+  if (!grepl("animint", dir, fixed = TRUE)) 
+    stop("animint must appear somewhere in 'dir'")
+  base_dir <- basename(dir)
+  if (!base_dir %in% c("animint", "tests", "testhat"))
+    stop("Basename of dir must be one of: 'animint', 'tests', 'testhat'")
+  ext_dir <- switch(base_dir,
+                    animint = "tests/testthat",
+                    tests = "testthat")
+  file.path(dir, ext_dir)
 }
-
-
-# --------------------------
-# Helper functions
-# --------------------------
 
 # keep trying to start a server until success
 # note that command argument is convenient for running shiny apps during tests as well
@@ -133,6 +106,10 @@ run_servr <- function(port, directory = ".",
     new_port <- res$port + seq.int(-10, 10)[sample.int(n = 21, size = 1)]
     res <- try_servr(port = new_port, directory = directory, command = command)
   }
+  message("Serving directory ", directory, 
+          sprintf(" on http://localhost:%d", res$port), "\n",
+          "To shut down the local file server, run: \n",
+          sprintf(" tools::pskill(%d)", as.integer(res$pid)))
   list(pid = res$pid, port = res$port)
 }
 # try to run a blocking command (for example a file server or shiny app)

@@ -87,21 +87,10 @@ getYear <- function(html){
 test_that("animation updates", {
   old.year <- getYear(info$html)
   Sys.sleep(1) #wait for one animation frame.
-  new.html <- XML::htmlParse(animintEnv$remDr$getPageSource(), asText = TRUE)
+  new.html <- XML::htmlParse(remDr$getPageSource(), asText = TRUE)
   new.year <- getYear(new.html)
   expect_true(old.year != new.year)
 })
-
-clickID <- function(...){
-  v <- c(...)
-  stopifnot(length(v) == 1)
-  e <- animintEnv$remDr$findElement("id", as.character(v))
-  e$clickElement()
-}
-
-getHTML <- function(){
-  XML::htmlParse(animintEnv$remDr$getPageSource(), asText = TRUE)
-}
 
 clickID("show_hide_animation_controls")
 
@@ -125,7 +114,7 @@ test_that("play restarts animation", {
   expect_true(old.year != new.year)
 })
 
-e <- animintEnv$remDr$findElement("id", "updates_ms")
+e <- remDr$findElement("id", "updates_ms")
 e$clickElement()
 e$clearElement()
 e$sendKeysToElement(list("3000", key="enter"))
@@ -187,7 +176,7 @@ test_that("middle of transition != after when duration=1000", {
   expect_true(during.width != after.width)
 })
 
-e <- animintEnv$remDr$findElement("id", "duration_ms_year")
+e <- remDr$findElement("id", "duration_ms_year")
 e$clickElement()
 e$clearElement()
 e$sendKeysToElement(list("0", key="enter"))

@@ -19,7 +19,8 @@ tests_init(browserName = "phantomjs", dir = ".", port = 4848, ...)
   RSelenium::remoteDriver}
 }
 \value{
-invisible version of the testing environment
+invisible version of the process ID of a child R session
+running a local file server.
 }
 \description{
 Initiates a local file server and remote driver.

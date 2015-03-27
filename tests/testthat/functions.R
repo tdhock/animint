@@ -1,19 +1,8 @@
-library("testthat") 
-library("animint")
-library("servr")
-library("RSelenium")
-library("XML")
-library("shiny")
-library("rmarkdown")
-
 #' Apply `animint2dir` to a list ggplots and extract the (rendered) page source via RSelenium
 #'
 #' @param plotList A named list of ggplot2 objects
 animint2HTML <- function(plotList) {
   res <- animint2dir(plotList, out.dir = "htmltest", open.browser = FALSE)
-  # navigate to the local file server address 
-  # (which should be serving path/to/animint/tests/testthat)
-  remDr$navigate(.address)
   # to avoid weird redirecting by some browsers,
   # we *click* on the appropriate testing directory
   res$html <- clickHTML("xpath" = "//a[@href='htmltest/']")
@@ -26,6 +15,17 @@ clickHTML <- function(...){
   e <- remDr$findElement(names(v), as.character(v))
   e$clickElement()
   Sys.sleep(1)
+  XML::htmlParse(remDr$getPageSource(), asText = TRUE)
+}
+
+clickID <- function(...){
+  v <- c(...)
+  stopifnot(length(v) == 1)
+  e <- remDr$findElement("id", as.character(v))
+  e$clickElement()
+}
+
+getHTML <- function(){
   XML::htmlParse(remDr$getPageSource(), asText = TRUE)
 }
 
