@@ -6,6 +6,16 @@
 
 language: r
 
+# install phantomjs 2.0
+# http://blog.travis-ci.com/2014-10-30-november--build-environment-updates/
+# https://github.com/travis-ci/travis-ci/issues/3225#issuecomment-76759322
+before_install:
+  - sudo rm -rf /usr/local/phantomjs
+  - curl -L -O https://s3.amazonaws.com/travis-phantomjs/phantomjs-2.0.0-ubuntu-12.04.tar.bz2
+  - tar xjf phantomjs-2.0.0-ubuntu-12.04.tar.bz2
+  - sudo mv phantomjs-2.0.0-ubuntu-12.04 /usr/local/phantomjs
+  - phantomjs --version
+
 r_binary_packages:
   - XML
   - shiny
