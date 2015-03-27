@@ -17,6 +17,9 @@ tests_init <- function(browserName = "phantomjs", dir = ".", port = 4848, ...) {
     warning("RSelenium must be loaded to run tests. Attempting to load for you...")
     library("RSelenium")
   }
+  # avoid weird errors if this function is called via testhat::check()
+  # https://github.com/hadley/testthat/issues/144
+  Sys.setenv("R_TESTS" = "")
   # initiate environment that will store important testing info
   env <- new.env(parent = globalenv())
   dir <- normalizePath(dir, mustWork = TRUE)
@@ -67,9 +70,6 @@ tests_init <- function(browserName = "phantomjs", dir = ".", port = 4848, ...) {
 
 tests_run <- function(envir, filter = NULL) {
   if (!is.environment(envir)) stop("Must provide an environment!")
-  # avoid weird errors if this function is called via testhat::check()
-  # https://github.com/hadley/testthat/issues/144
-  Sys.setenv("R_TESTS" = "")
   testDir <- envir$.testDir
   sys.source(file.path(testDir, "functions.R"), envir = envir)
   testthat::test_dir(testDir, filter = filter, env = envir)
