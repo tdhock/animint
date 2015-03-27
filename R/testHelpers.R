@@ -1,16 +1,56 @@
+#' Initiate external processes necessary for running tests.
+#'
+#' Initiates a local file server and remote driver.
+#'
+#' @param browserName Name of the browser to use for testing.
+#' See ?RSelenium::remoteDriver for details.
+#' @param port port number used for local file server
+#' @param dir character string with the path to animint's source code. Defaults to current directory
+#' @param ... list of additional options passed onto RSelenium::remoteDriver
+#' @return invisible version of the testing environment
 #' @export
-animintEnv <- new.env(parent = emptyenv())
+#' @seealso \link{tests_run()}
+
+tests_init <- function(browserName = "phantomjs", dir = ".", port = 4848, ...) {
+  # remoteDriver methods won't work RSelenium is in search path
+  if (!"package:RSelenium" %in% search()) {
+    warning("RSelenium must be loaded to run tests. Attempting to load for you...")
+    library("RSelenium")
+  }
+  # initiate environment that will store important testing info
+  env <- new.env(parent = globalenv())
+  dir <- normalizePath(dir, mustWork = TRUE)
+  if (basename(dir) == 'animint') {
+    env$.testDir <- file.path(dir, "tests/testthat")
+  } else {
+    stop("Please provide the path animint's source code in the 'dir' argument.")
+  }
+  env$.outDir <- file.path(env$.testDir, "htmltest")
+  # start a non-blocking local file server; remember port and process ID
+  res <- run_servr(port = port, directory = env$.testDir)
+  env$.address <- sprintf("http://localhost:%s", res$port)
+  env$.filepid <- res$pid
+  # start-up remote driver 
+  if (browserName == "phantomjs") {
+    env$pJS <- RSelenium::phantom()
+  } else {
+    RSelenium::checkForServer(dir = system.file("bin", package = "RSelenium"))
+    selenium <- RSelenium::startServer()
+  }
+  # give an binaries a moment to start up
+  Sys.sleep(5)
+  env$remDr <- RSelenium::remoteDriver(browserName = browserName, ...)
+  # give the backend a moment to start-up
+  Sys.sleep(2)
+  env$remDr$open(silent = TRUE)
+  invisible(env)
+}
 
 #' Run animint tests
 #'
 #' Convenience function for running animint tests.
-#'
-#' @param browserName Name of the browser to use for testing.
-#' See ?RSelenium::remoteDriver for details.
-#' @param dir character string with the path to animint's source code.
-#' @param ... passed onto RSelenium::remoteDriver
-#' @param port port number used for local file server
-#' @param show.ps show user invoked processes
+#' 
+#' @param envir an environmnent.
 #' @param filter If not NULL, only tests with file names matching
 #' this regular expression will be executed. Matching will take on the
 #' file name after it has been stripped of "test-" and ".r".
@@ -18,119 +58,101 @@ animintEnv <- new.env(parent = emptyenv())
 #' @examples
 #'
 #' \dontrun{
-#' # testing requires that you load testthat first.
-#' library("testthat")
-#' # run all tests with phantomjs
-#' run_tests()
 #' # run tests in test-rotate.R with Firefox
-#' run_tests("firefox", filter = "rotate")
-#' run_tests("chrome")
+#' env <- tests_init("firefox")
+#' tests_run(env, filter = "rotate")
+#' tests_exit(env)
 #' }
 #'
 
-run_tests <- function(browserName = "phantomjs", dir = ".", ...,
-                      filter = NULL, show.ps = FALSE) {
-  # necessary evil? I think so, unless we want to put `::` everywhere
-  # one hack for CRAN would be to *not* export this function and run
-  # tests with animint:::run_tests()
-  library("testthat")
-  library("XML")
-  library("animint")
-  library("shiny")
-  library("rmarkdown")
-  library("RSelenium")
-
-  # try to shut down selenium/phantomjs in case tests exited improperly previously
-  e <- try({
-    animintEnv$remDr$closeWindow()
-    animintEnv$remDr$closeServer()
-    animintEnv$pJS$stop()
-  }, silent = TRUE)
-
+tests_run <- function(envir, filter = NULL) {
+  if (!is.environment(envir)) stop("Must provide an environment!")
   # avoid weird errors if this function is called via testhat::check()
   # https://github.com/hadley/testthat/issues/144
   Sys.setenv("R_TESTS" = "")
-
-  # packages required to run the tests
-  #pkgs <- lapply(c("RSelenium", "servr", "shiny", "rmarkdown", "XML"),
-  #               requireNamespace)
-  # make sure testthat is loaded
-  #if (!"package:testthat" %in% search())
-  #  stop("Testing requires the testthat package. Please library('testthat') and try again.")
-  ## To get the process long names look at (helps to debug)
-  if (show.ps) system("ps u")
-  old <- getwd()
-  dir <- normalizePath(dir, mustWork = TRUE)
-  if (!grepl("animint", dir)) stop("animint must be in the directory")
-  base_name <- basename(dir)
-  if (base_name == 'animint') {
-    setwd("tests/testthat")
-  } else if (base_name == "tests") {
-    setwd("testthat")
-  } else if (base_name != "testthat") {
-    stop("dir must point to either animint's source, its tests folder, or its tests/testthat folder.")
-  }
-  # start a non-blocking local file server and remember the address
-  res <- run_servr()
-  animintEnv$.address <- sprintf("http://localhost:%s", res$port)
-  animintEnv$.outDir <- "htmltest"
-  on.exit(unlink(animintEnv$.outDir, recursive = TRUE), add = TRUE)
-  # stop file server and selenium on exit
-  on.exit(tools::pskill(res$pid), add = TRUE)
-  if (browserName == "phantomjs") {
-    on.exit(animintEnv$pJS$stop(), add = TRUE)
-    animintEnv$pJS <- RSelenium::phantom()
-  } else {
-    on.exit({
-      animintEnv$remDr$closeWindow()
-      animintEnv$remDr$closeServer()
-    }, add = TRUE)
-    RSelenium::checkForServer(dir = system.file("bin", package="RSelenium"))
-    selenium <- RSelenium::startServer()
-  }
-  animintEnv$remDr <- RSelenium::remoteDriver(browserName = browserName, ...)
-  # give the backend a moment to start-up
-  Sys.sleep(5)
-  animintEnv$remDr$open(silent = TRUE)
-  # run the tests
-  source("functions.R")
-  # return to original directory on exit
-  on.exit(setwd(old), add = TRUE)
-  test_dir(".", filter = filter)
+  testDir <- envir$.testDir
+  sys.source(file.path(testDir, "functions.R"), envir = envir)
+  testthat::test_dir(testDir, filter = filter, env = envir)
 }
 
+
+#' Shut down external processes necessary for running tests
+#'
+#' Shuts down the local file server and remote driver initiated by 
+#' \link{tests_init()}.
+#'
+#' @param envir an environmnent.
+#' @return invisible(FALSE) if an error occurred; invisible(TRUE) otherwise
+#' @export
+#' @seealso \link{tests_run()}
+
+tests_exit <- function(envir) {
+  if (!is.environment(envir)) stop("Must provide a testing environment!")
+  # try to shut down phantomjs, then remove it from environment
+  has_phantom <- exists("pJS", envir = envir)
+  has_driver <- exists("remDr", envir = envir)
+  if (!has_phantom && !has_driver) {
+    warning("No processes to shut down")
+    return(invisible())
+  }
+  if (has_phantom) {
+    e <- try(envir$pJS$stop())
+    rm("pJS", envir = envir)
+  } else {
+    st <- envir$remDr$getStatus()
+    # if running shut down; if not exit
+    e <- try({
+      envir$remDr$closeWindow()
+      envir$remDr$closeServer()
+    })
+    rm("remDr", envir = envir)
+  }
+  # stop file server
+  e2 <- tools::pskill(envir$.filepid)
+  invisible(e2 && !inherits(e, "try-error"))
+}
+
+
+# --------------------------
+# Helper functions
+# --------------------------
+
 # keep trying to start a server until success
-run_servr <- function(port = 4848, ...) {
-  res <- try_servr(port = port, ...)
+# note that command argument is convenient for running shiny apps during tests as well
+run_servr <- function(port, directory = ".", 
+                      command = "servr::httd(dir=\"%s\", port=%d, launch.browser=FALSE)") {
+  res <- try_servr(port = port, directory = directory, command = command)
   while (!res$success) {
     # randomly alter port number
     new_port <- res$port + seq.int(-10, 10)[sample.int(n = 21, size = 1)]
-    res <- try_servr(port = new_port, ...)
+    res <- try_servr(port = new_port, directory = directory, command = command)
   }
   list(pid = res$pid, port = res$port)
 }
-
 # try to run a blocking command (for example a file server or shiny app)
 # on a specific port. If it fails, kill the R process according to it's process ID.
-try_servr <- function(port, pidfile = tempfile("pid"),
-                      command = "servr::httd(dir=\".\", port=%d, browser=FALSE)") {
+try_servr <- function(port, directory = ".", command) {
+  pid_file <- tempfile()
+  dir <- normalizePath(directory, mustWork = TRUE)
   cmd <- sprintf(
-    paste0("'library(methods); cat(Sys.getpid(), file=\"%s\"); ", command, "'"),
-    pidfile, port
+    paste0("'library(methods); cat(Sys.getpid(), file=\"%s\");", command, "'"),
+    pid_file, dir, port
   )
   output <- tempfile(fileext = "txt")
-  t <- suppressWarnings(system2("Rscript", c("-e", cmd),
-                                stdout = output, stderr = output, wait = FALSE))
+  t <- system2("Rscript", c("-e", cmd), 
+               stdout = output, stderr = output, wait = FALSE)
   # give it a second to write output (maybe addTaskCallback would be better?)
-  Sys.sleep(2)
-  # was the command successful?
-  outlines <- readLines(output, warn = FALSE)
-  ##print(outlines)
-  success <- !any(grepl("Error", outlines))
-  pid <- readLines(pidfile, warn = FALSE)
-  # if not, kill the process
-  if (!success) tools::pskill(pid)
-  file.remove(pidfile)
-  file.remove(output)
+  Sys.sleep(5)
+  success <- t == 0
+  # if something wasn't written, the process probably isn't running, right?
+  e <- try(readLines(pid_file, warn = FALSE), silent = TRUE)
+  if (!inherits(e, "try-error")) {
+    tools::pskill(e)
+    pid <- e
+  } else {
+    pid <- NA
+  }
+  unlink(pid_file)
+  unlink(output)
   list(pid = pid, port = port, success = success)
 }

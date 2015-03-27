@@ -1,11 +1,3 @@
-library("testthat") 
-library("animint")
-library("servr")
-library("RSelenium")
-library("XML")
-library("shiny")
-library("rmarkdown")
-
 #' Apply `animint2dir` to a list ggplots and extract the (rendered) page source via RSelenium
 #'
 #' @param plotList A named list of ggplot2 objects
@@ -15,13 +7,14 @@ animint2HTML <- function(plotList) {
   ## inside of the tests, it will write the viz to
   ## animint/tests/testthat/htmltest, so we also need to start the
   ## servr in animint/tests/testthat.
-  res <- animint2dir(plotList, out.dir = .outDir, open.browser = FALSE)
+  browser()
+  res <- animint2dir(plotList, out.dir = .outDir,
+                     open.browser = FALSE)
   # to avoid weird redirecting done in some browsers,
   # we first navtigate to "http://localhost:port/", then *click*
   # on the appropriate testing directory
   remDr$navigate(.address)
-  xpath <- sprintf("//a[@href='%s/']", basename(.outDir))
-  res$html <- clickHTML("xpath" = xpath)
+  res$html <- clickHTML("xpath"="//a[@href='htmltest/']")
   res
 }
 
