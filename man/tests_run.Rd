@@ -21,12 +21,10 @@ Convenience function for running animint tests.
 \examples{
 \dontrun{
 # run tests in test-rotate.R with Firefox
-pid <- tests_init("firefox")
+tests_init("firefox")
 tests_run(filter = "rotate")
 # clean-up
-tools::pskill(pid)
-remDr$closeWindow()
-remDr$closeServer()
+tests_exit()
 }
 }
 

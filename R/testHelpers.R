@@ -4,26 +4,34 @@
 #'
 #' @param browserName Name of the browser to use for testing.
 #' See ?RSelenium::remoteDriver for details.
-#' @param port port number used for local file server
 #' @param dir character string with the path to animint's source code. Defaults to current directory
+#' @param port port number used for local file server
 #' @param ... list of additional options passed onto RSelenium::remoteDriver
-#' @return invisible version of the process ID of a child R session running a local file server.
+#' @return invisible(TRUE)
 #' @export
-#' @seealso \link{tests_run()}
+#' @seealso \link{tests_run}
 #' 
 
 tests_init <- function(browserName = "phantomjs", dir = ".", port = 4848, ...) {
   # remoteDriver methods won't work RSelenium is in search path
   if (!"package:RSelenium" %in% search()) {
-    warning("RSelenium must be loaded to run tests. Attempting to load for you...")
+    message("RSelenium must be loaded to run tests. Attempting to load for you...")
     library("RSelenium")
   }
+  # try to exit out of previously initated processes
+  ex <- tests_exit()
+  # start a non-blocking local file server under path/to/animint/tests/testhat
+  testPath <- find_test_path(dir)
+  port <- run_servr(port = port, directory = testPath)
+  # animint tests are performed in path/to/testthat/animint-htmltest/
+  # note this path has to match the out.dir argument in animint2THML...
+  testDir <- file.path(testPath, "animint-htmltest")
+  # if the htmltest directory exists, wipe clean, then create an empty folder
+  unlink(testDir, recursive = TRUE)
+  dir.create(testDir)
   # avoid weird errors if this function is called via testhat::check()
   # https://github.com/hadley/testthat/issues/144
   #Sys.setenv("R_TESTS" = "")
-  # start a non-blocking local file server under path/to/animint/tests/testhat
-  res <- run_servr(port = port, directory = find_test_path(dir))
-  address <- sprintf("http://localhost:%s", res$port)
   # start-up remote driver 
   if (browserName == "phantomjs") {
     message("Starting phantomjs binary. To shut it down, run: \n pJS$stop()")
@@ -39,11 +47,15 @@ tests_init <- function(browserName = "phantomjs", dir = ".", port = 4848, ...) {
   Sys.sleep(5)
   remDr <<- RSelenium::remoteDriver(browserName = browserName, ...)
   # give the backend a moment to start-up
-  Sys.sleep(2)
+  Sys.sleep(4)
   remDr$open(silent = TRUE)
   Sys.sleep(2)
-  remDr$navigate(address)
-  invisible(res$pid)
+  # if we navigate to localhost:%s/htmltest directly, some browsers will
+  # redirect to www.htmltest.com. A 'safer' approach is to navigate, then click.
+  remDr$navigate(sprintf("http://localhost:%s", port))
+  e <- remDr$findElement("xpath", "//a[@href='animint-htmltest/']")
+  e$clickElement()
+  invisible(TRUE)
 }
 
 #' Run animint tests
@@ -59,83 +71,116 @@ tests_init <- function(browserName = "phantomjs", dir = ".", port = 4848, ...) {
 #'
 #' \dontrun{
 #' # run tests in test-rotate.R with Firefox
-#' pid <- tests_init("firefox")
+#' tests_init("firefox")
 #' tests_run(filter = "rotate")
 #' # clean-up
-#' tools::pskill(pid)
-#' remDr$closeWindow()
-#' remDr$closeServer()
+#' tests_exit()
 #' }
 #'
 
 tests_run <- function(dir = ".", filter = NULL) {
   if (!"package:testthat" %in% search()) {
-    warning("testthat must be loaded to run tests. Attempting to load for you...")
+    message("testthat must be loaded to run tests. Attempting to load for you...")
     library("testthat")
   }
-  test_path <- find_test_path(dir)
-  source(file.path(test_path, "functions.R"))
+  testDir <- find_test_path(dir)
+  # functions that are reused across tests
+  source(file.path(testDir, "functions.R"))
+  # testthat::test_check assumes we are in path/to/animint/tests
+  old <- getwd()
+  on.exit(setwd(old), add = TRUE)
+  setwd(dirname(testDir))
   test_check("animint", filter = filter)
 }
 
+#' Kill child process(es) that may have been initiated in animint testing
+#'
+#' Read process IDs from a file and kill those process(es)
+#' 
+#' @seealso \link{tests_run}
+#' @export
+tests_exit <- function() {
+  res <- stop_binary()
+  e <- try(readLines(pid_file(), warn = FALSE), silent = TRUE)
+  if (!inherits(e, "try-error")) {
+    pids <- as.integer(e)
+    res <- c(res, tools::pskill(pids))
+  }
+  unlink(pid_file())
+  invisible(all(res))
+}
+
+#' Spawn a child R session that runs a 'blocking' command
+#' 
+#' Run a blocking command in a child R session (for example a file server or shiny app)
+#'
+#' @param directory path that the  server should map to.
+#' @param port port number to _attempt_ to run server on.
+#' @param code R code to execute in a child session
+#' @return port number of the successful attempt
+run_servr <- function(directory = ".", port = 4848,
+                      code = "servr::httd(dir=\"%s\", port=%d, browser=FALSE)") {
+  dir <- normalizePath(directory)
+  cmd <- sprintf(
+    # escape all the things!
+    paste0("'library(methods); cat(Sys.getpid(), file=\"%s\", sep=\"\\\\n\", append=TRUE);", code, "'"),
+    pid_file(), dir, port
+  )
+  output <- tempfile(fileext = "txt")
+  t <- suppressWarnings(system2("Rscript", c("-e", cmd), 
+                                stderr = output, stdout = output, wait = FALSE))
+  Sys.sleep(5)
+  o <- paste(readLines(output, warn = FALSE), "\n")
+  message(o)
+  success <- !any(grepl("Error", o, fixed = TRUE))
+  if (success) {
+    return(port)
+  } else {
+    # if not successful, try a new port
+    # do I need to kill the other R process that failed?
+    new_port <- port + seq.int(-10, 10)[sample.int(n = 21, size = 1)]
+    message("couldn't start a server on port ", port, "; trying ", 
+            new_port, " instead")
+    run_servr(directory = directory, port = new_port, code = code)
+  }
+}
+
 # --------------------------
-# Functions used in multiple places
+# Functions that are used in multiple places
 # --------------------------
 
-# resolve the path
-find_test_path <- function(dir) {
+stop_binary <- function() {
+  if (exists("pJS")) {
+    pJS$stop()
+  } else if (exists("remDr")) {
+    # these methods are really queries to the server
+    # thus, if it is already shut down, we get some arcane error message
+    e <- try({
+      remDr$closeWindow()
+      remDr$closeServer()
+    })
+  }
+  TRUE
+}
+
+# file that will keep track of all processes were initiated during animint testing
+pid_file <- function() {
+  f <- file.path(find_test_path(), "pids.txt")
+  if (!file.exists(f)) file(f, "a")
+  f
+}
+
+# find the path to animint's testthat directory
+find_test_path <- function(dir = ".") {
   dir <- normalizePath(dir, mustWork = TRUE)
   if (!grepl("animint", dir, fixed = TRUE)) 
     stop("animint must appear somewhere in 'dir'")
   base_dir <- basename(dir)
-  if (!base_dir %in% c("animint", "tests", "testhat"))
+  if (!base_dir %in% c("animint", "tests", "testthat")) 
     stop("Basename of dir must be one of: 'animint', 'tests', 'testhat'")
   ext_dir <- switch(base_dir,
                     animint = "tests/testthat",
-                    tests = "testthat")
+                    tests = "testthat",
+                    testthat = "")
   file.path(dir, ext_dir)
-}
-
-# keep trying to start a server until success
-# note that command argument is convenient for running shiny apps during tests as well
-run_servr <- function(port, directory = ".", 
-                      command = "servr::httd(dir=\"%s\", port=%d, launch.browser=FALSE)") {
-  res <- try_servr(port = port, directory = directory, command = command)
-  while (!res$success) {
-    # randomly alter port number
-    new_port <- res$port + seq.int(-10, 10)[sample.int(n = 21, size = 1)]
-    res <- try_servr(port = new_port, directory = directory, command = command)
-  }
-  message("Serving directory ", directory, 
-          sprintf(" on http://localhost:%d", res$port), "\n",
-          "To shut down the local file server, run: \n",
-          sprintf(" tools::pskill(%d)", as.integer(res$pid)))
-  list(pid = res$pid, port = res$port)
-}
-# try to run a blocking command (for example a file server or shiny app)
-# on a specific port. If it fails, kill the R process according to it's process ID.
-try_servr <- function(port, directory = ".", command) {
-  pid_file <- tempfile()
-  dir <- normalizePath(directory, mustWork = TRUE)
-  cmd <- sprintf(
-    paste0("'library(methods); cat(Sys.getpid(), file=\"%s\");", command, "'"),
-    pid_file, dir, port
-  )
-  output <- tempfile(fileext = "txt")
-  t <- system2("Rscript", c("-e", cmd), 
-               stdout = output, stderr = output, wait = FALSE)
-  # give it a second to write output (maybe addTaskCallback would be better?)
-  Sys.sleep(5)
-  success <- t == 0
-  # if something wasn't written, the process probably isn't running, right?
-  e <- try(readLines(pid_file, warn = FALSE), silent = TRUE)
-  if (!inherits(e, "try-error")) {
-    tools::pskill(e)
-    pid <- e
-  } else {
-    pid <- NA
-  }
-  unlink(pid_file)
-  unlink(output)
-  list(pid = pid, port = port, success = success)
 }

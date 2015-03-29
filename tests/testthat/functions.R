@@ -2,10 +2,10 @@
 #'
 #' @param plotList A named list of ggplot2 objects
 animint2HTML <- function(plotList) {
-  res <- animint2dir(plotList, out.dir = "htmltest", open.browser = FALSE)
-  # to avoid weird redirecting by some browsers,
-  # we *click* on the appropriate testing directory
-  res$html <- clickHTML("xpath" = "//a[@href='htmltest/']")
+  res <- animint2dir(plotList, out.dir = "animint-htmltest", 
+                     open.browser = FALSE)
+  remDr$refresh()
+  res$html <- getHTML()
   res
 }
 
@@ -15,7 +15,7 @@ clickHTML <- function(...){
   e <- remDr$findElement(names(v), as.character(v))
   e$clickElement()
   Sys.sleep(1)
-  XML::htmlParse(remDr$getPageSource(), asText = TRUE)
+  getHTML()
 }
 
 clickID <- function(...){

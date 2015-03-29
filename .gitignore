@@ -15,4 +15,5 @@ GSoC application.txt
 .Rbuildignore
 .directory
 animint.Rproj
-tests/testthat/htmltest/
+tests/testthat/animint-htmltest/
+tests/testthat/pids.txt
