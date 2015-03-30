@@ -24,7 +24,7 @@ wb.facets <-
        geom_point(aes(year, life.expectancy, color=region, size=population,
                       showSelected=country, clickSelects=country),
                   data=TS(not.na))+
-       
+
        geom_line(aes(fertility.rate, year, group=country, colour=region,
                      clickSelects=country),
                  data=TS2(not.na), size=4, alpha=3/5)+
@@ -35,7 +35,7 @@ wb.facets <-
                          clickSelects=year,
                          id=paste0("year", year)),
                      data=TS2(years), alpha=1/2)+
-       
+
        geom_point(aes(fertility.rate, life.expectancy, clickSelects=country,
                       showSelected=year, colour=region, size=population,
                       key=country), # key aesthetic for animated transitions!
@@ -50,7 +50,7 @@ wb.facets <-
        geom_text(aes(5, 85, label=paste0("year = ", year),
                      showSelected=year),
                  data=SCATTER(years)),
-       
+
        bar=ggplot()+
        theme_animint(height=2400)+
        geom_bar(aes(country, life.expectancy, fill=region,
@@ -58,7 +58,7 @@ wb.facets <-
                     key=country, id=country),
                 data=not.na, stat="identity", position="identity")+
        coord_flip(),
-       
+
        time=list(variable="year", ms=1000),
        duration=list(year=1000),
        first=list(year=1975, country=c("United States", "Vietnam")),
@@ -91,17 +91,6 @@ test_that("animation updates", {
   new.year <- getYear(new.html)
   expect_true(old.year != new.year)
 })
-
-clickID <- function(...){
-  v <- c(...)
-  stopifnot(length(v) == 1)
-  e <- remDr$findElement("id", as.character(v))
-  e$clickElement()
-}
-
-getHTML <- function(){
-  XML::htmlParse(remDr$getPageSource(), asText = TRUE)
-}
 
 clickID("show_hide_animation_controls")
 

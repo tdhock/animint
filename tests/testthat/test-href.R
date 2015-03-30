@@ -41,22 +41,13 @@ test_that("aes(href) becomes <a href>", {
                  "http://en.wikipedia.org/wiki/gold"))
 })
 
-clickID <- function(...){
-  v <- c(...)
-  stopifnot(length(v) == 1)
-  e <- remDr$findElement("id", as.character(v))
-  e$clickElement()
-  Sys.sleep(1)
-  XML::htmlParse(remDr$getPageSource(), asText = TRUE)
-}
-
-stanford.html <- clickID("Stanford")
+stanford.html <- clickHTML("id"="Stanford")
 
 test_that("clicking updates href", {
   expect_links(stanford.html, "http://en.wikipedia.org/wiki/red")
 })
 
-osu.html <- clickID("Oregon State")
+osu.html <- clickHTML("id"="Oregon State")
 
 test_that("clicking updates href (again)", {
   expect_links(osu.html,

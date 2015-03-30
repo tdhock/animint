@@ -28,5 +28,6 @@ Suggests:
     digest,
     testthat,
     RSelenium,
-    XML
+    XML,
+    devtools
 Roxygen: list(wrap = TRUE)

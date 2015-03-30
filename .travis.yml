@@ -6,17 +6,18 @@
 
 language: r
 
-# Dependencies for running animint tests
 r_binary_packages:
-  - servr
   - XML
   - shiny
-# Binary install of rmarkdown doesn't work (currently?)
+  
+r_packages:
+  - gistr
+  - RSelenium
+  - rmarkdown
+
 r_github_packages:
   - tdhock/ggplot2
-  - rstudio/rmarkdown
-  - ropensci/RSelenium
-  - ropensci/gistr
+  - yihui/servr
 
 notifications:
   email:
