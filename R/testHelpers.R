@@ -29,9 +29,6 @@ tests_init <- function(browserName = "phantomjs", dir = ".", port = 4848, ...) {
   # if the htmltest directory exists, wipe clean, then create an empty folder
   unlink(testDir, recursive = TRUE)
   dir.create(testDir)
-  # avoid weird errors if this function is called via testhat::check()
-  # https://github.com/hadley/testthat/issues/144
-  #Sys.setenv("R_TESTS" = "")
   # start-up remote driver 
   if (browserName == "phantomjs") {
     message("Starting phantomjs binary. To shut it down, run: \n pJS$stop()")
@@ -90,6 +87,9 @@ tests_run <- function(dir = ".", filter = NULL) {
   old <- getwd()
   on.exit(setwd(old), add = TRUE)
   setwd(dirname(testDir))
+  # avoid weird errors if this function is called via testhat::check()
+  # https://github.com/hadley/testthat/issues/144
+  # Sys.setenv("R_TESTS" = "")
   test_check("animint", filter = filter)
 }
 

@@ -4,7 +4,7 @@ context("shiny")
 # and return when tests are done
 old_address <- remDr$getCurrentUrl()[[1]]
 
-shiny_dir <- system.file("inst/examples/shiny", package = "animint")
+shiny_dir <- system.file("examples/shiny", package = "animint")
 shiny_cmd <- "shiny::runApp(appDir=\"%s\", port=%d, launch.browser=FALSE)"
 port <- animint:::run_servr(port = 3147, directory = shiny_dir, code = shiny_cmd)
 address <- sprintf("http://localhost:%s/", port)
@@ -18,7 +18,7 @@ test_that("animint plot renders in a shiny app", {
   expect_true(length(circles) >= 1)
 })
 
-rmd_dir <- system.file("inst/examples/rmarkdown", package = "animint")
+rmd_dir <- system.file("examples/rmarkdown", package = "animint")
 rmd_cmd <- "rmarkdown::run(dir = \"%s\", shiny_args = list(port=%d, launch.browser=FALSE))"
 port <- animint:::run_servr(port = 3120, directory = rmd_dir, code = rmd_cmd)
 address <- sprintf("http://localhost:%s/", port)
