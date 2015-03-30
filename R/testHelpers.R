@@ -89,7 +89,7 @@ tests_run <- function(dir = ".", filter = NULL) {
   setwd(dirname(testDir))
   # avoid weird errors if this function is called via testhat::check()
   # https://github.com/hadley/testthat/issues/144
-  # Sys.setenv("R_TESTS" = "")
+  Sys.setenv("R_TESTS" = "")
   test_check("animint", filter = filter)
 }
 
