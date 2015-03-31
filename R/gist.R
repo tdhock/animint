@@ -33,19 +33,19 @@ animint2gist <- function(plot.list, url_prefix = "http://bl.ocks.org",
          "before using this function")
   }
   # use a flat file structure!
-  vendor.path <- file.path(out.dir, "vendor")
+  vendor.path <- file.path(res$out.dir, "vendor")
   vendor.files <- list.files(vendor.path)
   vendor.path.files <- file.path(vendor.path, vendor.files)
-  copied <- file.copy(vendor.path.files, file.path(out.dir, vendor.files))
+  copied <- file.copy(vendor.path.files, file.path(res$out.dir, vendor.files))
   file.remove(vendor.path.files)
   file.remove(vendor.path)
   # reflect script path in index.html to reflect the change in file structure
-  index.file <- file.path(out.dir, "index.html")
+  index.file <- file.path(res$out.dir, "index.html")
   html <- readLines(index.file)
   html <- gsub("vendor/", "", html)
   cat(html, file = index.file, sep = "\n")
   ## Figure out which files to post.
-  all.files <- Sys.glob(file.path(out.dir, "*"))
+  all.files <- Sys.glob(file.path(res$out.dir, "*"))
   all.file.info <- file.info(all.files)
   is.empty <- all.file.info$size == 0
   is.tilde <- grepl("~$", all.files)
