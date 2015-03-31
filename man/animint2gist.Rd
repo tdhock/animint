@@ -27,7 +27,7 @@ animint2gist(plot.list, out.dir = tempfile(), json.file = "plot.json",
   \item{screenshot}{logical. If TRUE, attempt to take
   screenshot of result and include with gist.}
 
-  \item{...}{options passed onto \link{gistr::gist_create}}
+  \item{...}{options passed onto \code{gistr::gist_create}}
 }
 \description{
 Before using this function set your appropriate

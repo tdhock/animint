@@ -75,6 +75,7 @@ types, so mapping between the two is difficult. }
 \examples{
 ## Make a Gapminder plot (aka Google motion chart), which is actually
 ## just a scatterplot with size and color that moves over time.
+library(animint)
 data(WorldBank)
 gapminder <-
   list(ts=ggplot()+

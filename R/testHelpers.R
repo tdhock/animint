@@ -13,11 +13,6 @@
 #' 
 
 tests_init <- function(browserName = "phantomjs", dir = ".", port = 4848, ...) {
-  # remoteDriver methods won't work RSelenium is in search path
-  if (!"package:RSelenium" %in% search()) {
-    message("RSelenium must be loaded to run tests. Attempting to load for you...")
-    library("RSelenium")
-  }
   # try to exit out of previously initated processes
   ex <- tests_exit()
   # start a non-blocking local file server under path/to/animint/tests/testhat
@@ -76,10 +71,6 @@ tests_init <- function(browserName = "phantomjs", dir = ".", port = 4848, ...) {
 #'
 
 tests_run <- function(dir = ".", filter = NULL) {
-  if (!"package:testthat" %in% search()) {
-    message("testthat must be loaded to run tests. Attempting to load for you...")
-    library("testthat")
-  }
   testDir <- find_test_path(dir)
   # functions that are reused across tests
   source(file.path(testDir, "functions.R"))

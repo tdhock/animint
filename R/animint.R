@@ -2,6 +2,7 @@
 #' @param meta environment with previously calculated plot data, and a new plot to parse, already stored in plot and plot.name.
 #' @return nothing, info is stored in meta.
 #' @export
+#' @import ggplot2
 parsePlot <- function(meta){
   meta$built <- ggplot2::ggplot_build(meta$plot)
   plot.meta <- list()

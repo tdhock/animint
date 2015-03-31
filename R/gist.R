@@ -9,7 +9,7 @@
 #' @param description Brief description of gist.
 #' This becomes the plot title on the bl.ocks/username page.
 #' @param screenshot logical. If TRUE, attempt to take screenshot of result and include with gist.
-#' @param ... options passed onto \link{gistr::gist_create}
+#' @param ... options passed onto \code{gistr::gist_create}
 #' @export
 #'
 #' @examples

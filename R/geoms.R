@@ -6,9 +6,10 @@
 #' @param ... other arguments
 #' @return ggplot2 layer
 #' @export
+#' @import proto
 #' @example inst/examples/breakpoints.R
 geom_tallrect <- function(mapping=NULL, data=NULL, stat="identity", position="identity", ...){
-  GeomTallRect <- proto::proto(ggplot2:::GeomRect,{
+  GeomTallRect <- proto(ggplot2:::GeomRect,{
     objname <- "tallrect"
     required_aes <- c("xmin", "xmax")
     draw <- draw_groups <- function(.,data,scales,coordinates,
@@ -44,7 +45,7 @@ geom_tallrect <- function(mapping=NULL, data=NULL, stat="identity", position="id
 #'    source(system.file("examples/WorldBank.R", package = "animint"))
 #'  }
 geom_widerect <- function(mapping=NULL, data=NULL, stat="identity", position="identity", ...){
-  GeomWideRect <- proto::proto(ggplot2:::GeomRect,{
+  GeomWideRect <- proto(ggplot2:::GeomRect,{
     objname <- "widerect"
     required_aes <- c("ymin", "ymax")
     draw <- draw_groups <- function(.,data,scales,coordinates,
