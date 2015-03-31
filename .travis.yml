@@ -23,3 +23,7 @@ notifications:
   email:
     on_success: change
     on_failure: change
+
+env:
+  global:
+    secure: "Xj6RfiCqNhJtTMOYlYwQ2OG4iauisc/MEGSM3u6RxRMe377p7lAyObqJLmMPiRGYuj7ho/Rt8lnY4n6xhxfd+vXC1nUvcJX0261xJPk8q/tzmoosV8/VJKuZ1B77w022njieqvBPiGWNwASNwEUyp2arKNyaIQbjKifBXhTRtCA="

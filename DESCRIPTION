@@ -1,7 +1,7 @@
 Package: animint
 Maintainer: Toby Dylan Hocking <tdhock5@gmail.com>
 Author: Toby Dylan Hocking, Susan VanderPlas, Carson Sievert
-Version: 2015.03.30
+Version: 2015.03.31
 License: GPL-3
 Title: Interactive animations
 Description: An interactive animation can be defined using a list of
@@ -14,9 +14,6 @@ Imports:
     RJSONIO (>= 1.3),
     grid,
     plyr,
-    maps,
-    reshape2,
-    MASS,
     hexbin,
     scales
 Suggests:
@@ -24,10 +21,12 @@ Suggests:
     servr,
     gistr,
     shiny,
+    htmltools,
     rmarkdown,
     digest,
     testthat,
     RSelenium,
     XML,
-    devtools
+    devtools,
+    maps
 Roxygen: list(wrap = TRUE)

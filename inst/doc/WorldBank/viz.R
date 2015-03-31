@@ -1,5 +1,6 @@
 ## Make a Gapminder plot (aka Google motion chart), which is actually
 ## just a scatterplot with size and color that moves over time.
+library(animint)
 data(WorldBank)
 viz <-
   list(ts=ggplot()+
