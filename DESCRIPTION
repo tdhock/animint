@@ -1,18 +1,18 @@
 Package: animint
 Maintainer: Toby Dylan Hocking <tdhock5@gmail.com>
 Author: Toby Dylan Hocking, Susan VanderPlas, Carson Sievert
-Version: 2015.03.30
+Version: 2015.03.31
 License: GPL-3
 Title: Interactive animations
 Description: An interactive animation can be defined using a list of
     ggplots with clickSelects and showSelected aesthetics.
 Depends:
     ggplot2,
-    proto,
     R (>= 2.10)
 Imports:
     RJSONIO (>= 1.3),
     grid,
+    proto,
     plyr,
     maps,
     reshape2,

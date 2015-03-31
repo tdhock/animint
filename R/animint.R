@@ -392,7 +392,7 @@ saveLayer <- function(l, d, meta){
     g$aes[["group"]] <- "group"
     dx <- ggplot2::resolution(g.data$x, FALSE)
     dy <- ggplot2::resolution(g.data$y, FALSE) / sqrt(3) / 2 * 1.15
-    hex <- as.data.frame(hexcoords(dx, dy))[,1:2]
+    hex <- as.data.frame(hexbin::hexcoords(dx, dy))[,1:2]
     hex <- rbind(hex, hex[1,]) # to join hexagon back to first point
     g.data$group <- as.numeric(interaction(g.data$group, 1:nrow(g.data)))
     ## this has the potential to be a bad assumption -

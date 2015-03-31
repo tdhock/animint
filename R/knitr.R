@@ -102,7 +102,7 @@ renderAnimint <- function(expr, env = parent.frame(), quoted = FALSE) {
     jsonFile <- paste0(digest::digest(val), '.json')
     tmp <- tempdir()
     stuff <- animint2dir(val, out.dir = tmp, json.file = jsonFile, open.browser = FALSE)
-    addResourcePath("animintAssets", tmp)
+    shiny::addResourcePath("animintAssets", tmp)
     list(jsonFile = jsonFile)
   }
   shiny::markRenderFunction(animint::animintOutput, renderFunc)
