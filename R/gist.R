@@ -5,14 +5,11 @@
 #' @param plot.list a named list of ggplots and option lists.
 #' @param out.dir local directory to store html/js/csv files.
 #' @param json.file character string that names the JSON file with metadata associated with the plot.
-#' @param url_prefix first part of URL for viewing result, with
-#' http:// but without trailing /
-#' e.g. "http://bl.ocks.org/tdhock/raw". Browser is prompted only if
-#' there is \link{httr::url_success}.
+#' @param url_prefix first part of URL for viewing result.
 #' @param description Brief description of gist.
-#' This is passed to gist_create
-#' and it becomes the plot title on the bl.ocks/username page.
-#' @param ... options passed onto \link{gistr::gist}
+#' This becomes the plot title on the bl.ocks/username page.
+#' @param screenshot logical. If TRUE, attempt to take screenshot of result and include with gist.
+#' @param ... options passed onto \link{gistr::gist_create}
 #' @export
 #'
 #' @examples
@@ -27,18 +24,19 @@
 #'                         clickSelects=id), data=iris))
 #' animint2gist(viz, description = "My animint plot")
 #' }
-animint2gist <- function
-(plot.list, out.dir = tempfile(), json.file = "plot.json", css.file = "",
- open.browser = interactive(),
- url_prefix = "http://bl.ocks.org/%s/raw",
- description=plot.list$title,
- ...){
-  if(!is.character(description))description <- ""
-  if(length(description) == 0)description <- ""
-  if(length(description) > 1)description <- description[[1]]
-  animint2dir(plot.list, out.dir, json.file, css.file, open.browser = FALSE)
-  if(!requireNamespace("gistr")){
-    error("Please run `devtools::install_github('rOpenSci/gistr')` before using this function")
+animint2gist <- function(plot.list, out.dir = tempfile(), 
+                         json.file = "plot.json", css.file = "",
+                         open.browser = interactive(), 
+                         url_prefix = "http://bl.ocks.org",
+                         description = plot.list$title, screenshot = TRUE, ...){
+  if (!is.character(description) || length(description) == 0) description <- ""
+  if (length(description) > 1) description <- description[[1]]
+  res <- animint2dir(plot.list, out.dir, json.file, css.file, 
+                     open.browser = FALSE)
+  if (!requireNamespace("gistr")) {
+    stop("Please run \n",
+         "devtools::install_github('rOpenSci/gistr')",
+         "before using this function")
   }
   # use a flat file structure!
   vendor.path <- file.path(out.dir, "vendor")
@@ -62,30 +60,33 @@ animint2gist <- function
   ## TODO: delete the next line when gist_create can upload PNGs.
   is.ignored <- is.ignored | is.png
   to.post <- all.files[!is.ignored]
-  gist <- gistr::gist_create(to.post, description=description, browse=FALSE, ...)
-  if (interactive()) print(gist)
-  if (open.browser) browseURL(sprintf(url_prefix, gist$id))
+  gist <- gistr::gist_create(to.post, description = description, 
+                             browse = FALSE, ...)
+  if (interactive()) gist
+  if (open.browser) browseURL(file.path(url_prefix, gist$id))
   ## Try rendering a screenshot using RSelenium.
-  has.cmds <- Sys.which(c("pkill", "git")) != ""
+  has.cmds <- all(Sys.which(c("git", "phantomjs")) != "")
   has.selenium <- requireNamespace("RSelenium")
-  if(has.cmds && has.selenium){
-    cloned.dir.base <- paste0("gist-", gist.code)
+  if (has.cmds && has.selenium && screenshot) {
+    cloned.dir.base <- paste0("gist-", gist$id)
     cloned.dir <- file.path(tempdir(), cloned.dir.base)
     clone.cmd <- sprintf("git clone git@github.com:%s.git %s",
-                         gist.code, cloned.dir)
-    system('pkill -f selenium-server-standalone') #kill the selenium server if it is currently running
+                         gist$id, cloned.dir)
     system(clone.cmd)
-    RSelenium::startServer()
-    Sys.sleep(2) # otherwise I get Error in function (type, msg, asError = TRUE)  : couldn't connect to host
-    dr <- RSelenium::remoteDriver$new(browserName = "firefox", port = 4444)
-    dr$open()
-    if (isTRUE(dr$value$takesScreenshot)){
-      dr$navigate(url_name)
-      screenshot <- file.path(cloned.dir, "screenshot.png")
-      dr$screenshot(file=screenshot)
+    tests_exit() # just in case, try to shut down remote driver
+    pJS <- RSelenium::phantom()
+    on.exit(pJS$stop(), add = TRUE)
+    Sys.sleep(5)
+    dr <- RSelenium::remoteDriver(browserName = "phantomjs")
+    dr$open(silent = TRUE)
+    if (isTRUE(dr$value$takesScreenshot)) {
+      raw <- file.path("http://bl.ocks.org", gist$owner$login, "raw", gist$id)
+      dr$navigate(raw)
+      screenfile <- file.path(cloned.dir, "screenshot.png")
+      dr$screenshot(file = screenfile)
       ## thumbnail.png is usually 230x120 pixels.
       thumbnail <- file.path(cloned.dir, "thumbnail.png")
-      cmd <- sprintf("convert %s -trim -resize 230 %s", screenshot, thumbnail)
+      cmd <- sprintf("convert %s -trim -resize 230 %s", screenfile, thumbnail)
       status <- system(cmd)
       if(status != 0){ # just use the full size image if we don't have convert.
         file.copy(screenshot, thumbnail)
@@ -97,16 +98,8 @@ animint2gist <- function
               "git push")
       system(git.cmds)
     }
-    dr$closeWindow()
-    dr$quit()
-    thumb.url <- sprintf("https://gist.github.com/%s/%s#file-thumbnail-png",
-                         getOption("github.username"),
-                         gist.code)
-    message("pushed thumbnail.png from ",
-            cloned.dir,
-            " to ",
-            thumb.url)
+    thumb.url <- sprintf("https://gist.github.com/%s#file-thumbnail-png", gist$id)
+    message("pushed thumbnail.png from ", cloned.dir, " to ", thumb.url)
   }
+  gist
 }
-
-

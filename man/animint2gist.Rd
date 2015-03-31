@@ -6,8 +6,8 @@
 \usage{
 animint2gist(plot.list, out.dir = tempfile(), json.file = "plot.json",
   css.file = "", open.browser = interactive(),
-  url_prefix = "http://bl.ocks.org/\%s/raw", description = plot.list$title,
-  ...)
+  url_prefix = "http://bl.ocks.org", description = plot.list$title,
+  screenshot = TRUE, ...)
 }
 \arguments{
   \item{plot.list}{a named list of ggplots and option
@@ -19,16 +19,15 @@ animint2gist(plot.list, out.dir = tempfile(), json.file = "plot.json",
   \item{json.file}{character string that names the JSON
   file with metadata associated with the plot.}
 
-  \item{url_prefix}{first part of URL for viewing result,
-  with http:// but without trailing / e.g.
-  "http://bl.ocks.org/tdhock/raw". Browser is prompted only
-  if there is \link{httr::url_success}.}
+  \item{url_prefix}{first part of URL for viewing result.}
 
-  \item{description}{Brief description of gist. This is
-  passed to gist_create and it becomes the plot title on
-  the bl.ocks/username page.}
+  \item{description}{Brief description of gist. This
+  becomes the plot title on the bl.ocks/username page.}
 
-  \item{...}{options passed onto \link{gistr::gist}}
+  \item{screenshot}{logical. If TRUE, attempt to take
+  screenshot of result and include with gist.}
+
+  \item{...}{options passed onto \link{gistr::gist_create}}
 }
 \description{
 Before using this function set your appropriate
