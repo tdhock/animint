@@ -279,7 +279,7 @@ saveLayer <- function(l, d, meta){
     if(is.bin & any(is.animint.aes)){
       warning(paste0("stat_bin is unpredictable ",
                     "when used with clickSelects/showSelected.\n",
-                     "Use ddply to do the binning ",
+                     "Use plyr::ddply() to do the binning ",
                      "or use make_bar if using geom_bar/geom_histogram."))
     }
   }
@@ -368,15 +368,15 @@ saveLayer <- function(l, d, meta){
     xmax <- g.data$xmax
     g.data$xminv <- x-vw*(x-xmin)
     g.data$xmaxv <- x+vw*(xmax-x)
-    newdata <- ddply(g.data, .(group), function(df){
+    newdata <- plyr::ddply(g.data, "group", function(df){
                   rbind(arrange(transform(df, x=xminv), y), arrange(transform(df, x=xmaxv), -y))
                 })
-    newdata <- ddply(newdata, .(group), function(df) rbind(df, df[1,]))
+    newdata <- plyr::ddply(newdata, "group", function(df) rbind(df, df[1,]))
     g.data <- newdata
     g$geom <- "polygon"
   } else if(g$geom=="step"){
     datanames <- names(g.data)
-    g.data <- ddply(g.data, .(group), function(df) ggplot2:::stairstep(df))
+    g.data <- plyr::ddply(g.data, "group", function(df) ggplot2:::stairstep(df))
     g$geom <- "path"
   } else if(g$geom=="contour" | g$geom=="density2d"){
     g$aes[["group"]] <- "piece"
@@ -405,7 +405,7 @@ saveLayer <- function(l, d, meta){
     ##   than "one single polygon".
     # CPS (07-24-14) what about this? --
     # http://tdhock.github.io/animint/geoms/polygon/index.html
-    newdata <- ddply(g.data, .(group), function(df){
+    newdata <- plyr::ddply(g.data, "group", function(df){
       df$xcenter <- df$x
       df$ycenter <- df$y
       cbind(x=df$x+hex$x, y=df$y+hex$y, df[,-which(names(df)%in%c("x", "y"))])
@@ -906,7 +906,6 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
   ## let's make a list of all possible values to cycle through, from
   ## all the values used in those geoms.
   if("time" %in% ls(meta)){
-    geom.names <- meta$selectors[[time.var]]$update
     meta$selectors[[meta$time$variable]]$type <- "single"
     anim.values <- lapply(meta$geoms, "[[", "timeValues")
     anim.not.null <- anim.values[!sapply(anim.values, is.null)]
