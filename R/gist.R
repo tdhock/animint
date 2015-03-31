@@ -57,7 +57,9 @@ animint2gist <- function(plot.list, url_prefix = "http://bl.ocks.org",
   gist <- gistr::gist_create(to.post, description = description, 
                              browse = FALSE, ...)
   if (interactive()) gist
-  if (open.browser) browseURL(file.path(url_prefix, gist$id))
+  # always launch browser, unless open.browser = FALSE is explicit
+  if (!isTRUE(as.list(match.call())$open.browser == FALSE)) 
+    browseURL(file.path(url_prefix, gist$id))
   ## Try rendering a screenshot using RSelenium.
   has.cmds <- all(Sys.which(c("git", "phantomjs")) != "")
   has.selenium <- requireNamespace("RSelenium")
