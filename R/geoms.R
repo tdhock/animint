@@ -8,7 +8,7 @@
 #' @export
 #' @example inst/examples/breakpoints.R
 geom_tallrect <- function(mapping=NULL, data=NULL, stat="identity", position="identity", ...){
-  GeomTallRect <- proto(ggplot2:::GeomRect,{
+  GeomTallRect <- proto::proto(ggplot2:::GeomRect,{
     objname <- "tallrect"
     required_aes <- c("xmin", "xmax")
     draw <- draw_groups <- function(.,data,scales,coordinates,
