@@ -71,7 +71,7 @@ animintOutput <- function(outputId) {
   # Note that requireNamespace("shiny") should load digest & htmltools (both used later on)
   if (!requireNamespace("shiny")) message("Please install.packages('shiny')")
   deps <- lapply(animint_dependencies(), shiny::createWebDependency)
-  htmltools::attachDependencies(tags$div(id = outputId, class = 'shinyAnimint'), deps)
+  htmltools::attachDependencies(htmltools::tags$div(id = outputId, class = 'shinyAnimint'), deps)
 }
 
 #' Create an animint output element

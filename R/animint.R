@@ -362,14 +362,11 @@ saveLayer <- function(l, d, meta){
     # as a single string which can then be parsed in JavaScript.
     # there has got to be a better way to do this!!
   } else if(g$geom=="violin"){
-    x <- g.data$x
-    vw <- g.data$violinwidth
-    xmin <- g.data$xmin
-    xmax <- g.data$xmax
-    g.data$xminv <- x-vw*(x-xmin)
-    g.data$xmaxv <- x+vw*(xmax-x)
+    g.data$xminv <- with(g.data, x - violinwidth * (x - xmin))
+    g.data$xmaxv <- with(g.data, x + violinwidth * (xmax - x))
     newdata <- plyr::ddply(g.data, "group", function(df){
-                  rbind(arrange(transform(df, x=xminv), y), arrange(transform(df, x=xmaxv), -y))
+                  rbind(plyr::arrange(transform(df, x=xminv), y), 
+                        plyr::arrange(transform(df, x=xmaxv), -y))
                 })
     newdata <- plyr::ddply(newdata, "group", function(df) rbind(df, df[1,]))
     g.data <- newdata

@@ -90,7 +90,7 @@ tests_run <- function(dir = ".", filter = NULL) {
   # avoid weird errors if this function is called via testhat::check()
   # https://github.com/hadley/testthat/issues/144
   Sys.setenv("R_TESTS" = "")
-  test_check("animint", filter = filter)
+  testthat::test_check("animint", filter = filter)
 }
 
 #' Kill child process(es) that may have been initiated in animint testing
