@@ -13,7 +13,9 @@ gg2animint_knitr <- function(plot.list){
 }
 
 #' Insert an interactive animation into an R markdown document using a customized print method.
-#' @param x named list of ggplots and option lists to pass to gg2animint.
+#' @param x named list of ggplots and option lists to pass to \code{animint2dir}.
+#' @param options knitr options.
+#' @param ... placeholder.
 #' @references https://github.com/yihui/knitr/blob/master/vignettes/knit_print.Rmd
 #' @author Carson Sievert
 #' @export
@@ -79,9 +81,10 @@ animintOutput <- function(outputId) {
 #' Shiny server output function customized for animint plots 
 #' (similar to \code{shiny::plotOutput} and friends).
 #' 
-#' @param expr
-#' @param env
-#' @param quoted
+#' @param expr An expression that creates a list of ggplot objects.
+#' @param env The environment in which to evaluate \code{expr}.
+#' @param quoted Is expr a quoted expression (with \code{quote()})? 
+#' This is useful if you want to save an expression in a variable.
 #' @seealso http://shiny.rstudio.com/articles/building-outputs.html
 #' @export
 #' 

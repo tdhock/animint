@@ -4,20 +4,12 @@
 \alias{animint2gist}
 \title{Convert a list of ggplots to an interactive animation and post files as a gist}
 \usage{
-animint2gist(plot.list, out.dir = tempfile(), json.file = "plot.json",
-  css.file = "", open.browser = interactive(),
-  url_prefix = "http://bl.ocks.org", description = plot.list$title,
-  screenshot = TRUE, ...)
+animint2gist(plot.list, url_prefix = "http://bl.ocks.org",
+  description = plot.list$title, screenshot = TRUE, ...)
 }
 \arguments{
   \item{plot.list}{a named list of ggplots and option
   lists.}
-
-  \item{out.dir}{local directory to store html/js/csv
-  files.}
-
-  \item{json.file}{character string that names the JSON
-  file with metadata associated with the plot.}
 
   \item{url_prefix}{first part of URL for viewing result.}
 
@@ -27,7 +19,8 @@ animint2gist(plot.list, out.dir = tempfile(), json.file = "plot.json",
   \item{screenshot}{logical. If TRUE, attempt to take
   screenshot of result and include with gist.}
 
-  \item{...}{options passed onto \code{gistr::gist_create}}
+  \item{...}{options passed onto \code{animint2dir} and
+  \code{gistr::gist_create}}
 }
 \description{
 Before using this function set your appropriate

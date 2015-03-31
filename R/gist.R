@@ -3,13 +3,11 @@
 #' Before using this function set your appropriate 'github.username' and 'github.password' \link{options}
 #'
 #' @param plot.list a named list of ggplots and option lists.
-#' @param out.dir local directory to store html/js/csv files.
-#' @param json.file character string that names the JSON file with metadata associated with the plot.
 #' @param url_prefix first part of URL for viewing result.
 #' @param description Brief description of gist.
 #' This becomes the plot title on the bl.ocks/username page.
 #' @param screenshot logical. If TRUE, attempt to take screenshot of result and include with gist.
-#' @param ... options passed onto \code{gistr::gist_create}
+#' @param ... options passed onto \code{animint2dir} and \code{gistr::gist_create}
 #' @export
 #'
 #' @examples
@@ -24,15 +22,11 @@
 #'                         clickSelects=id), data=iris))
 #' animint2gist(viz, description = "My animint plot")
 #' }
-animint2gist <- function(plot.list, out.dir = tempfile(), 
-                         json.file = "plot.json", css.file = "",
-                         open.browser = interactive(), 
-                         url_prefix = "http://bl.ocks.org",
+animint2gist <- function(plot.list, url_prefix = "http://bl.ocks.org",
                          description = plot.list$title, screenshot = TRUE, ...){
   if (!is.character(description) || length(description) == 0) description <- ""
   if (length(description) > 1) description <- description[[1]]
-  res <- animint2dir(plot.list, out.dir, json.file, css.file, 
-                     open.browser = FALSE)
+  res <- animint2dir(plot.list, open.browser = FALSE, ...)
   if (!requireNamespace("gistr")) {
     stop("Please run \n",
          "devtools::install_github('rOpenSci/gistr')",

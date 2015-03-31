@@ -8,7 +8,11 @@ knit_print.animint(x, options, ...)
 }
 \arguments{
   \item{x}{named list of ggplots and option lists to pass
-  to gg2animint.}
+  to \code{animint2dir}.}
+
+  \item{options}{knitr options.}
+
+  \item{...}{placeholder.}
 }
 \description{
 Insert an interactive animation into an R markdown document
