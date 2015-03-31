@@ -188,6 +188,12 @@ does not respond to mouse clicks while the data is loading.
 DSL: Implement shape aesthetic with d3.svg.symbol()
 https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol_type
 
+2015.03.31
+
+BUGFIX: Various improvements including namespace handling. Fixes
+https://github.com/tdhock/animint/issues/49
+https://github.com/tdhock/animint/issues/46
+
 2015.03.30
 
 Better testing "framework". See the testing page of the wiki for details
