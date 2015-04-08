@@ -11,13 +11,13 @@ r_binary_packages:
   - shiny
   
 r_packages:
-  - gistr
   - RSelenium
   - rmarkdown
 
 r_github_packages:
   - tdhock/ggplot2
   - yihui/servr
+  - ropensci/gistr
 
 notifications:
   email:
