@@ -716,7 +716,7 @@ var animint = function (to_select, json_file) {
     }
     var text_anchor = "middle";
     var get_text_anchor = function (d) {
-      hjust = g_info.params.hjust;
+      var hjust = g_info.params.hjust;
       if (d.hasOwnProperty("hjust")) {
         hjust = d["hjust"];
       }
@@ -1507,7 +1507,7 @@ var animint = function (to_select, json_file) {
 	  if(this.textContent == "Play"){
 	    play();
 	  }else{
-	    pause();
+	    pause(false);
 	  }
 	})
       ;
@@ -1522,7 +1522,7 @@ var animint = function (to_select, json_file) {
 	.attr("type", "text")
 	.attr("value", Animation.ms)
 	.on("change", function(){
-	  Animation.pause();
+	  Animation.pause(false);
 	  Animation.ms = this.value;
 	  Animation.play();
 	})
@@ -1596,7 +1596,9 @@ var animint = function (to_select, json_file) {
 	Widgets["play_pause"].text("Pause");
       }
       Animation.play = play;
-      function pause(){
+      Animation.play_after_visible = false;
+      function pause(play_after_visible){
+	Animation.play_after_visible = play_after_visible;
 	clearInterval(timer);
 	Widgets["play_pause"].text("Play");
       }
@@ -1606,10 +1608,14 @@ var animint = function (to_select, json_file) {
       // hidden, inspired by
       // http://stackoverflow.com/questions/1060008
       function onchange (evt) {
-	if(document.visibilityState == "hidden"){
-	  pause();
+	if(document.visibilityState == "visible"){
+	  if(Animation.play_after_visible){
+	    play();
+	  }
 	}else{
-	  play();
+	  if(Widgets["play_pause"].text() == "Pause"){
+	    pause(true);
+	  }
 	}
       }
       document.addEventListener("visibilitychange", onchange);
