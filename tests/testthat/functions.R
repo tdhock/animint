@@ -1,32 +1,32 @@
-#### helper functions to be reused in testing #####
-
 #' Apply `animint2dir` to a list ggplots and extract the (rendered) page source via RSelenium
-#' 
-#' @details This function assumes an object named 'context' exists -- this should be a 
-#' character string as it will be used specify a directory which is bound to a testing context.
-#' @author Carson Sievert
+#'
 #' @param plotList A named list of ggplot2 objects
-#' @param dir a name for a directory (this should be specific to a testing context)
-#' @param subdir a name for a subdirectory (under dir) to place files
 animint2HTML <- function(plotList) {
-  ## When we do test_package("animint") it does
-  ## setwd("animint/tests/testthat") so when we call this function
-  ## inside of the tests, it will write the viz to
-  ## animint/tests/testthat/htmltest, so we also need to start the
-  ## servr in animint/tests/testthat.
-
-  ##on.exit(unlink("htmltest", recursive=TRUE))
-  res <- animint2dir(plotList, out.dir="htmltest", open.browser = FALSE)
-  address <- "http://localhost:4848/htmltest/"
-  remDr$navigate(address)
-  ## find/get methods are kinda slow in RSelenium (here is an example)
-  ## remDr$navigate(attr(info, "address"))
-  ## t <- remDr$findElement(using = 'class name', value = 'title')
-  ## t$getElementText()[[1]]
-
-  ## I think parsing using XML::htmlParse() and XML::getNodeSet() is faster/easier
-  res$html <- XML::htmlParse(remDr$getPageSource(), asText = TRUE)
+  res <- animint2dir(plotList, out.dir = "animint-htmltest", 
+                     open.browser = FALSE)
+  remDr$refresh()
+  res$html <- getHTML()
   res
+}
+
+clickHTML <- function(...){
+  v <- c(...)
+  stopifnot(length(v) == 1)
+  e <- remDr$findElement(names(v), as.character(v))
+  e$clickElement()
+  Sys.sleep(1)
+  getHTML()
+}
+
+clickID <- function(...){
+  v <- c(...)
+  stopifnot(length(v) == 1)
+  e <- remDr$findElement("id", as.character(v))
+  e$clickElement()
+}
+
+getHTML <- function(){
+  XML::htmlParse(remDr$getPageSource(), asText = TRUE)
 }
 
 expect_transform <- function(actual, expected, context = "translate", tolerance = 5) {
@@ -162,4 +162,29 @@ normDiffs <- function(xdiff, ydiff, ratio = 1) {
   c(ratio * xdiff / xlab, ydiff / ylab)
 }
 
+getTicks <- function(html, p.name){
+  xp <- sprintf('//svg[@id="%s"]//g[@id="xaxis"]//text', p.name)
+  nodes <- getNodeSet(html, xp)
+  stopifnot(length(nodes) > 0)
+  sapply(nodes, xmlAttrs)
+}
+
+expect_rotate_anchor <- function(info, rotate, anchor){
+  not <- getTicks(info$html, 'not')
+  expect_match(not["style", ], "text-anchor: middle", fixed=TRUE)
+  expect_match(not["transform", ], "rotate(0", fixed=TRUE)
+  rotated <- getTicks(info$html, 'rotated')
+  expect_match(rotated["style", ], paste("text-anchor:", anchor), fixed=TRUE)
+  expect_match(rotated["transform", ], paste0("rotate(", rotate), fixed=TRUE)
+  e.axis <- remDr$findElement(using="css selector", "g#xaxis")
+  e.text <- e.axis$findChildElement("css selector", "text")
+  tick.loc <- e.text$getElementLocation()
+  tick.size <- e.text$getElementSize()
+  ## Subtract a magic number that lets the test pass for un-rotated
+  ## labels in firefox.
+  tick.bottom.y <- tick.loc$y + tick.size$height - 6
+  e.title <- remDr$findElement("css selector", "text#xtitle")
+  title.loc <- e.title$getElementLocation()
+  expect_true(tick.bottom.y < title.loc$y)
+}
 

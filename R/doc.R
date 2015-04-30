@@ -5,7 +5,6 @@
 ##' @export
 ##' 
 makeDocs <- function(doc.dir){
-  require("knitr")
   viz.path <- Sys.glob(file.path(doc.dir, "*", "viz.R"))
   sub.dirs <- dirname(viz.path)
   Rmd.tmp.file <- file.path(doc.dir, "template.Rmd")
@@ -34,8 +33,8 @@ makeDocs <- function(doc.dir){
     writeLines(Rmd.filled, "viz.Rmd")
     convert.cmd <- "convert big.png -geometry 200 small.png"
     system(convert.cmd)
-    knit2html("viz.Rmd")
-    meta <- fromJSON("plot.json")
+    knitr::knit2html("viz.Rmd")
+    meta <- RJSONIO::fromJSON("plot.json")
     aes.list <- lapply(meta$geoms, "[[", "aes")
     i.aes <- c("clickSelects", "showSelected", "showSelected2", "showSelected3")
     ivars <- sapply(aes.list, "[", i.aes)

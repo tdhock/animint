@@ -6,6 +6,7 @@
 #' @param ... other arguments
 #' @return ggplot2 layer
 #' @export
+#' @import proto
 #' @example inst/examples/breakpoints.R
 geom_tallrect <- function(mapping=NULL, data=NULL, stat="identity", position="identity", ...){
   GeomTallRect <- proto(ggplot2:::GeomRect,{
@@ -16,14 +17,14 @@ geom_tallrect <- function(mapping=NULL, data=NULL, stat="identity", position="id
       ymin <- grid::unit(ymin,"npc")
       ymax <- grid::unit(ymax,"npc")
       with(ggplot2:::coord_transform(coordinates, data, scales),
-           ggname(.$my_name(), {
-        rectGrob(xmin, ymin, xmax - xmin, ymax-ymin,
+           ggplot2:::ggname(.$my_name(), {
+             grid::rectGrob(xmin, ymin, xmax - xmin, ymax-ymin,
                  default.units = "native", just = c("left", "bottom"), 
-                 gp=gpar(
-                   col=colour, fill=alpha(fill, alpha), 
+                 gp=grid::gpar(
+                   col=colour, fill=scales::alpha(fill, alpha), 
                    lwd=size * .pt, lty=linetype, lineend="butt"
                    )
-                 )
+              )
       }))
     }
   })
@@ -52,14 +53,14 @@ geom_widerect <- function(mapping=NULL, data=NULL, stat="identity", position="id
       xmin <- grid::unit(xmin,"npc")
       xmax <- grid::unit(xmax,"npc")
       with(ggplot2:::coord_transform(coordinates, data, scales),
-           ggname(.$my_name(), {
-        rectGrob(xmin, ymin, xmax - xmin, ymax-ymin,
+           ggplot2:::ggname(.$my_name(), {
+             grid::rectGrob(xmin, ymin, xmax - xmin, ymax-ymin,
                  default.units = "native", just = c("left", "bottom"), 
-                 gp=gpar(
-                   col=colour, fill=alpha(fill, alpha), 
+                 gp=grid::gpar(
+                   col=colour, fill=scales::alpha(fill, alpha), 
                    lwd=size * .pt, lty=linetype, lineend="butt"
                    )
-                 )
+              )
       }))
     }
   })
@@ -78,7 +79,7 @@ geom_widerect <- function(mapping=NULL, data=NULL, stat="identity", position="id
 #' @author Toby Dylan Hocking
 #' @export
 make_tallrect <- function(data, x.name, even=FALSE, alpha=1/2){
-  stopifnot(is.data.frame(data))
+  data <- as.data.frame(data)
   stopifnot(is.character(x.name))
   stopifnot(length(x.name)==1)
   x <- data[,x.name]
@@ -107,7 +108,7 @@ make_tallrect <- function(data, x.name, even=FALSE, alpha=1/2){
 #' @author Toby Dylan Hocking
 #' @export
 make_bar <- function(data, x.name, alpha=1){
-  stopifnot(is.data.frame(data))
+  data <- as.data.frame(data)
   stopifnot(is.character(x.name))
   stopifnot(length(x.name)==1)
   x <- data[,x.name]
@@ -126,7 +127,7 @@ make_bar <- function(data, x.name, alpha=1){
 #' @author Toby Dylan Hocking
 #' @export
 make_text <- function(data, x, y, label.var, format=NULL){
-  stopifnot(is.data.frame(data))
+  data <- as.data.frame(data)
   stopifnot(length(x)==1)
   stopifnot(length(y)==1)
   ## TODO: position based on the data?

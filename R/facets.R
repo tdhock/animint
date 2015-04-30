@@ -27,7 +27,6 @@ getStrips.grid <- function(facet, panel, ...) {
 
 build_strip <- function(panel, label_df, labeller, side = "right", ...) {
   side <- match.arg(side, c("top", "left", "bottom", "right"))
-  horizontal <- side %in% c("top", "bottom")
   labeller <- match.fun(labeller)
   # No labelling data, so return empty string?
   if (plyr::empty(label_df)) {
