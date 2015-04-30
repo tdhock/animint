@@ -4,14 +4,12 @@
 \alias{animint2gist}
 \title{Convert a list of ggplots to an interactive animation and post files as a gist}
 \usage{
-animint2gist(plot.list, url_prefix = "http://bl.ocks.org",
-  description = plot.list$title, screenshot = TRUE, ...)
+animint2gist(plot.list, description = plot.list$title, screenshot = TRUE,
+  ...)
 }
 \arguments{
   \item{plot.list}{a named list of ggplots and option
   lists.}
-
-  \item{url_prefix}{first part of URL for viewing result.}
 
   \item{description}{Brief description of gist. This
   becomes the plot title on the bl.ocks/username page.}

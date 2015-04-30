@@ -3,7 +3,6 @@
 #' Before using this function set your appropriate 'github.username' and 'github.password' \link{options}
 #'
 #' @param plot.list a named list of ggplots and option lists.
-#' @param url_prefix first part of URL for viewing result.
 #' @param description Brief description of gist.
 #' This becomes the plot title on the bl.ocks/username page.
 #' @param screenshot logical. If TRUE, attempt to take screenshot of result and include with gist.
@@ -22,8 +21,8 @@
 #'                         clickSelects=id), data=iris))
 #' animint2gist(viz, description = "My animint plot")
 #' }
-animint2gist <- function(plot.list, url_prefix = "http://bl.ocks.org",
-                         description = plot.list$title, screenshot = TRUE, ...){
+animint2gist <- function(plot.list, description = plot.list$title, 
+                         screenshot = TRUE, ...){
   if (!is.character(description) || length(description) == 0) description <- ""
   if (length(description) > 1) description <- description[[1]]
   res <- animint2dir(plot.list, open.browser = FALSE, ...)
@@ -56,10 +55,8 @@ animint2gist <- function(plot.list, url_prefix = "http://bl.ocks.org",
   to.post <- all.files[!is.ignored]
   gist <- gistr::gist_create(to.post, description = description, 
                              browse = FALSE, ...)
-  if (interactive()) gist
-  # always launch browser, unless open.browser = FALSE is explicit
-  if (!isTRUE(as.list(match.call())$open.browser == FALSE)) 
-    browseURL(file.path(url_prefix, gist$id))
+  if (interactive())
+    browseURL(sprintf("http://bl.ocks.org/%s/raw/%s/", gist$owner$login, gist$id))
   ## Try rendering a screenshot using RSelenium.
   has.cmds <- all(Sys.which(c("git", "phantomjs")) != "")
   has.selenium <- requireNamespace("RSelenium")
