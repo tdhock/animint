@@ -1,0 +1,6 @@
+box: rocker/hadleyverse
+build:
+  steps:
+    - jimhester/r-dependencies:
+      github_packages: tdhock/ggplot2 ropensci/gistr
+    - jimhester/r-check
