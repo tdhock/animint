@@ -6,18 +6,11 @@
 
 language: r
 
-r_binary_packages:
-  - XML
-  - shiny
-  
-r_packages:
-  - RSelenium
-  - rmarkdown
-
 r_github_packages:
   - tdhock/ggplot2
-  - yihui/servr
-  - ropensci/gistr
+
+before_install:
+  - phantomjs --version
 
 notifications:
   email:
