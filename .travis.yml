@@ -9,6 +9,9 @@ language: r
 r_github_packages:
   - tdhock/ggplot2
 
+before_install:
+  - phantomjs --version
+
 notifications:
   email:
     on_success: change
