@@ -71,6 +71,7 @@ animint2gist <- function(plot.list, description = plot.list$title,
     on.exit(pJS$stop(), add = TRUE)
     Sys.sleep(5)
     dr <- RSelenium::remoteDriver(browserName = "phantomjs")
+    Sys.sleep(5)
     dr$open(silent = TRUE)
     if (isTRUE(dr$value$takesScreenshot)) {
       raw <- file.path("http://bl.ocks.org", gist$owner$login, "raw", gist$id)
