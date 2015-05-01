@@ -36,10 +36,10 @@ tests_init <- function(browserName = "phantomjs", dir = ".", port = 4848, ...) {
     selenium <- RSelenium::startServer()
   }
   # give an binaries a moment to start up
-  Sys.sleep(5)
+  Sys.sleep(8)
   remDr <<- RSelenium::remoteDriver(browserName = browserName, ...)
   # give the backend a moment to start-up
-  Sys.sleep(4)
+  Sys.sleep(6)
   remDr$open(silent = TRUE)
   Sys.sleep(2)
   # if we navigate to localhost:%s/htmltest directly, some browsers will
