@@ -20,7 +20,7 @@ install:
   - ./travis-tool.sh install_github tdhock/ggplot2
   
 script: 
-  - Rscript -e "setwd('tests'); source('testthat.R')"
+  - Rscript -e "devtools::load_all(); setwd('tests'); source('testthat.R')"
 
 after_failure:
   - ./travis-tool.sh dump_logs
