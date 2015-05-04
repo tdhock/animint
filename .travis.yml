@@ -1,23 +1,27 @@
-# Sample .travis.yml for R projects.
-#
-# See README.md for instructions, or for more configuration options,
-# see the wiki:
-#   https://github.com/craigcitro/r-travis/wiki
+language: c
 
-language: r
-
-r_binary_packages:
-  - XML
-  - shiny
+before_install:
+  - curl -OL http://raw.github.com/craigcitro/r-travis/master/scripts/travis-tool.sh
+  - chmod 755 ./travis-tool.sh
+  - ./travis-tool.sh bootstrap
+install:
+  # Dependencies for shiny/rmarkdown integration
+  # Thanks RStudio! https://github.com/rstudio/rmarkdown/blob/master/.travis.yml
+  # Install binary pandoc from Rstudio 
+  - mkdir -p $HOME/opt/pandoc
+  - curl -O https://s3.amazonaws.com/rstudio-buildtools/pandoc-1.12.3.zip
+  - unzip -j pandoc-1.12.3.zip pandoc-1.12.3/linux/debian/x86_64/pandoc
+    -d $HOME/opt/pandoc
+  - chmod +x $HOME/opt/pandoc/pandoc*
+  - rm pandoc-1.12.3.zip
+  - $HOME/opt/pandoc/pandoc --version
+  # install uninstalled packages which this pkg depends on/links to/suggests. 
+  - ./travis-tool.sh install_deps
+  - ./travis-tool.sh install_github tdhock/ggplot2
   
-r_packages:
-  - RSelenium
-  - rmarkdown
-
-r_github_packages:
-  - tdhock/ggplot2
-  - yihui/servr
-  - ropensci/gistr
+script: ./travis-tool.sh run_tests
+after_failure:
+  - ./travis-tool.sh dump_logs
 
 notifications:
   email:
