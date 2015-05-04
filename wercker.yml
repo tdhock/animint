@@ -11,5 +11,5 @@ build:
           sudo ln -sf /usr/local/share/$PHANTOM_JS/bin/phantomjs /usr/local/bin
           phantomjs --version
     - jimhester/r-dependencies:
-      github_packages: tdhock/ggplot2 ropensci/gistr
+        github_packages: tdhock/ggplot2 cpsievert/RSelenium
     - jimhester/r-check
