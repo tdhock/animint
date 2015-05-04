@@ -1,9 +1,3 @@
-# Sample .travis.yml for R projects.
-#
-# See README.md for instructions, or for more configuration options,
-# see the wiki:
-#   https://github.com/craigcitro/r-travis/wiki
-
 language: c
 
 before_install:
@@ -24,8 +18,9 @@ install:
   # install uninstalled packages which this pkg depends on/links to/suggests. 
   - ./travis-tool.sh install_deps
   - ./travis-tool.sh install_github tdhock/ggplot2
-
-script: ./travis-tool.sh run_tests
+  
+script: 
+  - Rscript -e "setwd('tests'); source('testthat.R')"
 
 after_failure:
   - ./travis-tool.sh dump_logs
@@ -33,3 +28,8 @@ after_failure:
 notifications:
   email:
     on_success: change
+    on_failure: change
+
+env:
+  global:
+    secure: "Xj6RfiCqNhJtTMOYlYwQ2OG4iauisc/MEGSM3u6RxRMe377p7lAyObqJLmMPiRGYuj7ho/Rt8lnY4n6xhxfd+vXC1nUvcJX0261xJPk8q/tzmoosV8/VJKuZ1B77w022njieqvBPiGWNwASNwEUyp2arKNyaIQbjKifBXhTRtCA="
