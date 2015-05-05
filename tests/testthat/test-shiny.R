@@ -10,7 +10,7 @@ port <- animint:::run_servr(port = 3147, directory = shiny_dir, code = shiny_cmd
 address <- sprintf("http://localhost:%s/", port)
 
 test_that("animint plot renders in a shiny app", {
-  Sys.sleep(5) # give shiny a second to do it's thing
+  Sys.sleep(10) # give shiny a second to do it's thing
   remDr$navigate(address)
   Sys.sleep(10)
   html <- getHTML()
