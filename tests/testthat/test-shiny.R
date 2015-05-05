@@ -3,6 +3,7 @@ context("shiny")
 # shiny tests require navigating to different ports, so remember where we are
 # and return when tests are done
 old_address <- remDr$getCurrentUrl()[[1]]
+remDr$setImplicitWaitTimeout(milliseconds = 30000)
 
 shiny_dir <- system.file("examples/shiny", package = "animint")
 shiny_cmd <- "shiny::runApp(appDir=\"%s\", port=%d, launch.browser=FALSE)"
@@ -12,10 +13,9 @@ address <- sprintf("http://localhost:%s/", port)
 test_that("animint plot renders in a shiny app", {
   Sys.sleep(10) # give shiny a second to do it's thing
   remDr$navigate(address)
-  Sys.sleep(10)
-  html <- getHTML()
-  circles <- getNodeSet(html, "//div[@id='animint']//circle")
-  expect_true(length(circles) >= 1)
+  # just check that svg is displayed
+  e <- remDr$findElement("tag name", "svg")
+  expect_true(unlist(e$isElementDisplayed()))
 })
 
 rmd_dir <- system.file("examples/rmarkdown", package = "animint")
@@ -26,10 +26,9 @@ address <- sprintf("http://localhost:%s/", port)
 test_that("animint plot renders in an interactive document", {
   Sys.sleep(10) # give shiny a second to do it's thing
   remDr$navigate(address)
-  Sys.sleep(10)
-  html <- getHTML()
-  circles <- getNodeSet(html, "//svg//circle")
-  expect_true(length(circles) >= 1)
+  # just check that svg is displayed
+  e <- remDr$findElement("tag name", "svg")
+  expect_true(unlist(e$isElementDisplayed()))
 })
 
 # go back to "normal" tests
