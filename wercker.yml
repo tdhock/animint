@@ -2,7 +2,7 @@ box: rocker/hadleyverse
 build:
   steps:
     - script:
-        name: echo install phantomjs
+        name: phantomjs
         code: |
           export PHANTOM_JS="phantomjs-1.9.8-linux-x86_64"
           wget https://bitbucket.org/ariya/phantomjs/downloads/$PHANTOM_JS.tar.bz2
@@ -10,11 +10,6 @@ build:
           sudo mv $PHANTOM_JS /usr/local/share
           sudo ln -sf /usr/local/share/$PHANTOM_JS/bin/phantomjs /usr/local/bin
           phantomjs --version
-    - script:
-        name: echo install firefox
-        code: |
-          sudo apt-get update -y
-          sudo apt-get install firefox
     - script:
       name: echo install animint dependencies
       code: |

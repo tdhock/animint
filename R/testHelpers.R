@@ -143,16 +143,13 @@ run_servr <- function(directory = ".", port = 4848,
 # --------------------------
 
 stop_binary <- function() {
-  if (exists("pJS")) {
-    pJS$stop()
-  } else if (exists("remDr")) {
-    # these methods are really queries to the server
-    # thus, if it is already shut down, we get some arcane error message
-    e <- try({
-      remDr$closeWindow()
-      remDr$closeServer()
-    })
-  }
+  if (exists("pJS")) pJS$stop()
+  # these methods are really queries to the server
+  # thus, if it is already shut down, we get some arcane error message
+  e <- try({
+    remDr$closeWindow()
+    remDr$closeServer()
+  }, silent = TRUE)
   TRUE
 }
 
