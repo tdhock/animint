@@ -11,11 +11,13 @@ port <- animint:::run_servr(port = 3147, directory = shiny_dir, code = shiny_cmd
 address <- sprintf("http://localhost:%s/", port)
 
 test_that("animint plot renders in a shiny app", {
-  Sys.sleep(10) # give shiny a second to do it's thing
+  Sys.sleep(30) # give shiny a second to do it's thing
   remDr$navigate(address)
+  Sys.sleep(30)
   # just check that svg is displayed
-  e <- remDr$findElement("tag name", "svg")
-  expect_true(unlist(e$isElementDisplayed()))
+  html <- getHTML()
+  circles <- getNodeSet(html, "//div[@id='animint']//circle")
+  expect_true(length(circles) >= 1)
 })
 
 rmd_dir <- system.file("examples/rmarkdown", package = "animint")
@@ -24,11 +26,12 @@ port <- animint:::run_servr(port = 3120, directory = rmd_dir, code = rmd_cmd)
 address <- sprintf("http://localhost:%s/", port)
 
 test_that("animint plot renders in an interactive document", {
-  Sys.sleep(10) # give shiny a second to do it's thing
+  Sys.sleep(30) # give shiny a second to do it's thing
   remDr$navigate(address)
-  # just check that svg is displayed
-  e <- remDr$findElement("tag name", "svg")
-  expect_true(unlist(e$isElementDisplayed()))
+  Sys.sleep(30)
+  html <- getHTML()
+  circles <- getNodeSet(html, "//svg//circle")
+  expect_true(length(circles) >= 1)
 })
 
 # go back to "normal" tests
