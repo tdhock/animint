@@ -86,8 +86,8 @@ test_that("wide/tallrect renders a <rect> for every year", {
     style.list <- list()
     for(node.i in seq_along(node.set)){
       node <- node.set[[node.i]]
-      style.list[[node.i]] <- a.vec[["style"]]
       a.vec <- xmlAttrs(node)
+      style.list[[node.i]] <- a.vec[["style"]]
       sizes <- as.numeric(a.vec[c("height", "width")])
       expect_true(all(sizes > 0))
     }
