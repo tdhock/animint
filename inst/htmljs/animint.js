@@ -1007,6 +1007,7 @@ var animint = function (to_select, json_file) {
           .attr("y", scales.y.range()[1])
           .attr("height", scales.y.range()[0] - scales.y.range()[1])
           .style("fill", get_fill)
+          .style("stroke-dasharray", get_dasharray)
           .style("stroke-width", get_size)
           .style("stroke", get_colour);
       }
@@ -1021,6 +1022,7 @@ var animint = function (to_select, json_file) {
           .attr("x", scales.x.range()[0])
           .attr("width", scales.x.range()[1] - scales.x.range()[0])
           .style("fill", get_fill)
+          .style("stroke-dasharray", get_dasharray)
           .style("stroke-width", get_size)
           .style("stroke", get_colour);
       }
