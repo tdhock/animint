@@ -43,6 +43,47 @@ breakpointError <-
 ##animint2dir(breakpointError, "breakpointError-single")
 info <- animint2HTML(breakpointError)
 
+dasharrayPattern <-
+  paste0("stroke-dasharray:",
+         "(?<value>.*?)",
+         ";")
+
+get.dasharray <- function(node.set){
+  expect_true(length(node.set) > 0)
+  style.list <- list()
+  for(node.i in seq_along(node.set)){
+    node <- node.set[[node.i]]
+    a.vec <- xmlAttrs(node)
+    style.list[[node.i]] <- a.vec[["style"]]
+  }
+  style.vec <- do.call(c, style.list)
+  str_match_perl(style.vec, dasharrayPattern)
+}
+
+dashed.xpaths <-
+  c('//g[@class="geom4_vline_signal"]//g[@class="PANEL1"]//line')
+solid.xpaths <- 
+  c('//g[@class="geom2_line_signal"]//g[@class="PANEL1"]//path',
+    '//g[@class="geom3_segment_signal"]//g[@class="PANEL1"]//line',
+    '//g[@class="geom6_vline_error"]//g[@class="PANEL1"]//line',
+    '//g[@class="geom7_line_error"]//g[@class="PANEL1"]//path')
+
+test_that("stroke-dasharray default solid (no stroke-dasharray)", {
+  for(xpath in dashed.xpaths){
+    node.set <- getNodeSet(info$html, xpath)
+    dash.mat <- get.dasharray(node.set)
+    expect_match(dash.mat[, "value"], "8, *8")
+  }
+})
+
+test_that("stroke-dasharray: 8,8 for dashed", {
+  for(xpath in solid.xpaths){
+    node.set <- getNodeSet(info$html, xpath)
+    dash.mat <- get.dasharray(node.set)
+    expect_true(all(is.na(dash.mat[, 1])))
+  }
+})
+
 test_that("default is single selection", {
   selector.types <- lapply(info$selectors, "[[", "type")
   expect_match(selector.types$samples, "single")
