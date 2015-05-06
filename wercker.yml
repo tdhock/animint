@@ -3,13 +3,23 @@ build:
   steps:
     - script:
         name: echo install phantomjs
-        code: |-
+        code: |
           export PHANTOM_JS="phantomjs-1.9.8-linux-x86_64"
           wget https://bitbucket.org/ariya/phantomjs/downloads/$PHANTOM_JS.tar.bz2
           sudo tar xvjf $PHANTOM_JS.tar.bz2
           sudo mv $PHANTOM_JS /usr/local/share
           sudo ln -sf /usr/local/share/$PHANTOM_JS/bin/phantomjs /usr/local/bin
           phantomjs --version
-    - jimhester/r-dependencies:
-        github_packages: tdhock/ggplot2 cpsievert/RSelenium
-    - jimhester/r-check
+    - script:
+        name: echo install firefox
+        code: |
+          sudo apt-get update -y
+          sudo apt-get install firefox
+    - script:
+      name: echo install animint dependencies
+      code: |
+        Rscript -e "library(devtools); install_deps(dependencies = TRUE); install_github(c('cpsievert/RSelenium', 'tdhock/ggplot2')); install()"
+    - script:
+      name: echo run animint tests
+      code: |
+        Rscript -e "setwd('tests'); source('testthat.R')"
