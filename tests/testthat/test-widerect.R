@@ -93,7 +93,8 @@ test_that("wide/tallrect renders a <rect> for every year", {
     }
     style.vec <- do.call(c, style.list)
     dash.mat <- str_match_perl(style.vec, dasharrayPattern)
-    dash.table <- table(dash.mat[, "value"])
+    ## Use paste() to treat NA as a value instead of ignoring it.
+    dash.table <- table(paste(dash.mat[, "value"]))
     ## There should be 2 unique values of stoke-dasharray.
     expect_equal(length(dash.table), 2)
   }
