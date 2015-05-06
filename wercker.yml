@@ -17,5 +17,5 @@ build:
     - script:
       name: echo run animint tests
       code: |
-        mv pipeline/source pipeline/animint
-        Rscript -e "setwd('pipeline/animint/tests'); source('testthat.R')"
+        mv /pipeline/source /pipeline/animint
+        Rscript -e "setwd('/pipeline/animint/tests'); source('testthat.R')"
