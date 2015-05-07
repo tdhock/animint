@@ -170,6 +170,7 @@ getTicks <- function(html, p.name){
 }
 
 expect_rotate_anchor <- function(info, rotate, anchor){
+  browser(expr = rotate == "-70" && anchor == "middle")
   not <- getTicks(info$html, 'not')
   expect_match(not["style", ], "text-anchor: middle", fixed=TRUE)
   expect_match(not["transform", ], "rotate(0", fixed=TRUE)

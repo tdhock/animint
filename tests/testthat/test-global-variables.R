@@ -12,7 +12,10 @@ for(var b in window) {
 return myArray;'
 
 getVariables <- function(){
-  remDr$executeScript(myScript)[[1]]
+  vars <- remDr$executeScript(myScript)[[1]]
+  # ignore the "plot" variable -- 
+  # https://github.com/tdhock/animint/pull/62#issuecomment-100008532
+  vars[!vars %in% "plot"]
 }
 
 test_that("animint.js only defines 1 object, called animint", {
@@ -22,8 +25,11 @@ test_that("animint.js only defines 1 object, called animint", {
   html.lines <- readLines(index.file)
   html.without <- html.lines[!grepl("animint.js", html.lines)]
   cat(html.without, file=index.file, sep="\n")
+  # Note: It's OK for the webdriver to spit out 
+  # ReferenceError: Can't find variable: animint
+  # since we've removed the animint.js script
   remDr$refresh()
   without.vars <- getVariables()
   diff.vars <- animint.vars[!animint.vars %in% without.vars]
-  expect_identical(sort(diff.vars), c("animint", "plot"))
+  expect_identical(diff.vars, "animint")
 })
