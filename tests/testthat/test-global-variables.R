@@ -18,12 +18,12 @@ getVariables <- function(){
 test_that("animint.js only defines 1 object, called animint", {
   info <- animint2HTML(viz)
   animint.vars <- getVariables()
-  index.file <- "animint-htmltest/index.html"
+  index.file <- file.path("animint-htmltest", "index.html")
   html.lines <- readLines(index.file)
   html.without <- html.lines[!grepl("animint.js", html.lines)]
   cat(html.without, file=index.file, sep="\n")
   remDr$refresh()
   without.vars <- getVariables()
   diff.vars <- animint.vars[!animint.vars %in% without.vars]
-  expect_identical(diff.vars, "animint")
+  expect_identical(sort(diff.vars), c("animint", "plot"))
 })
