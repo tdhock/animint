@@ -25,5 +25,6 @@ test_that("animint.js only defines 1 object, called animint", {
   remDr$refresh()
   without.vars <- getVariables()
   diff.vars <- animint.vars[!animint.vars %in% without.vars]
+  print(diff.vars)
   expect_identical(diff.vars, "animint")
 })
