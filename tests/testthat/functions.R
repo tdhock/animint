@@ -176,15 +176,8 @@ expect_rotate_anchor <- function(info, rotate, anchor){
   rotated <- getTicks(info$html, 'rotated')
   expect_match(rotated["style", ], paste("text-anchor:", anchor), fixed=TRUE)
   expect_match(rotated["transform", ], paste0("rotate(", rotate), fixed=TRUE)
-  e.axis <- remDr$findElement(using="css selector", "g#xaxis")
-  e.text <- e.axis$findChildElement("css selector", "text")
-  tick.loc <- e.text$getElementLocation()
-  tick.size <- e.text$getElementSize()
-  ## Subtract a magic number that lets the test pass for un-rotated
-  ## labels in firefox.
-  tick.bottom.y <- tick.loc$y + tick.size$height - 6
-  e.title <- remDr$findElement("css selector", "text#xtitle")
-  title.loc <- e.title$getElementLocation()
-  expect_true(tick.bottom.y < title.loc$y)
+  # http://stackoverflow.com/questions/442404/retrieve-the-position-x-y-of-an-html-element
+  tick_box <- remDr$executeScript('return document.getElementById("xaxis").firstChild.getBoundingClientRect()')
+  title_box <- remDr$executeScript('return document.getElementById("xtitle").getBoundingClientRect()')
+  expect_true(title_box$top >= tick_box$bottom)
 }
-
