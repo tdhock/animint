@@ -1,7 +1,7 @@
 context("shiny")
 
 if (Sys.getenv("TRAVIS") == "true") {
-  skip("shiny tests don't work on travis (but probably should)")
+  message("shiny tests currently don't work on travis (but should someday)")
 } else {
   # shiny tests require navigating to different ports, so remember where we are
   # and return when tests are done
