@@ -44,6 +44,8 @@ tests_init <- function(browserName = "phantomjs", dir = ".", port = 4848, ...) {
   Sys.sleep(2)
   # wait a maximum of 30 seconds when searching for elements.
   remDr$setImplicitWaitTimeout(milliseconds = 30000)
+  # wait a maximum of 30 seconds for a particular type of operation to execute
+  remDr$setTimeout(type = "page load", milliseconds = 30000)
   # if we navigate to localhost:%s/htmltest directly, some browsers will
   # redirect to www.htmltest.com. A 'safer' approach is to navigate, then click.
   remDr$navigate(sprintf("http://localhost:%s", port))
@@ -160,7 +162,7 @@ stop_binary <- function() {
 # file that will keep track of all processes were initiated during animint testing
 pid_file <- function() {
   f <- file.path(find_test_path(), "pids.txt")
-  if (!file.exists(f)) file(f, "a")
+  if (!file.exists(f)) file(f)
   f
 }
 
