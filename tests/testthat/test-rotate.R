@@ -64,7 +64,7 @@ test_that('hjust=0.75 is an error', {
     list(rotated=fg+theme(axis.text.x=element_text(hjust=0.75)),
          not=sg)
   expect_error({
-    info <- animint2HTML(map)
+    info <- animint2dir(map)
   }, "animint only supports hjust values 0, 0.5, 1")
 })
 
