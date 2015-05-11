@@ -188,6 +188,14 @@ does not respond to mouse clicks while the data is loading.
 DSL: Implement shape aesthetic with d3.svg.symbol()
 https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol_type
 
+2015.05.11
+
+For complete details, see https://github.com/tdhock/animint/pull/62
+
+DSL: The url_prefix argument in animint2dir() was removed. Now the result will always be viewed at http://bl.ocks.org/:owner/raw/:id for better viewing. 
+BUGFIX: The animint.js file introduces only 1 thing (animint) into the global JavaScript environment.
+Added continuous integration with wercker and made several improvements to testing infrastructure.
+
 2015.03.31
 
 BUGFIX: Various improvements including namespace handling. Fixes

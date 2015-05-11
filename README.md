@@ -2,6 +2,7 @@ animint - an R package for *anim*ated *int*eractive web graphics
 =======
 
 [![Build Status](https://travis-ci.org/tdhock/animint.png?branch=master)](https://travis-ci.org/tdhock/animint)
+[![wercker status](https://app.wercker.com/status/3e56e443fb24a5ce304b706425ba6987/s "wercker status")](https://app.wercker.com/project/bykey/3e56e443fb24a5ce304b706425ba6987)
 
 Interactive animations using [ggplot2](https://github.com/hadley/ggplot2)'s grammar of graphics implementation combined with clickSelects and showSelected aesthetics.
 
