@@ -42,6 +42,8 @@ tests_init <- function(browserName = "phantomjs", dir = ".", port = 4848, ...) {
   Sys.sleep(6)
   remDr$open(silent = TRUE)
   Sys.sleep(2)
+  # some tests don't run reliably with phantomjs (see tests-widerect.R)
+  Sys.setenv("ANIMINT_BROWSER" = browserName)
   # wait a maximum of 30 seconds when searching for elements.
   remDr$setImplicitWaitTimeout(milliseconds = 30000)
   # wait a maximum of 30 seconds for a particular type of operation to execute
@@ -100,6 +102,7 @@ tests_run <- function(dir = ".", filter = NULL) {
 #' @export
 tests_exit <- function() {
   res <- stop_binary()
+  Sys.unsetenv("ANIMINT_BROWSER")
   e <- try(readLines(pid_file(), warn = FALSE), silent = TRUE)
   if (!inherits(e, "try-error")) {
     pids <- as.integer(e)
