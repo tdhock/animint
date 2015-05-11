@@ -82,8 +82,6 @@ tests_run <- function(dir = ".", filter = NULL) {
   if (!"package:testthat" %in% search()) 
     stop("Please load testthat: library(testthat)")
   testDir <- find_test_path(dir)
-  # functions that are reused across tests
-  source(file.path(testDir, "functions.R"))
   # testthat::test_check assumes we are in path/to/animint/tests
   old <- getwd()
   on.exit(setwd(old), add = TRUE)
