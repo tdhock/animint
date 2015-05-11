@@ -42,16 +42,12 @@ test_that("aes(href) becomes <a href>", {
 })
 
 test_that("clicking updates href", {
-  clickID("Stanford")
-  Sys.sleep(2)
-  stanford.html <- getHTML()
+  stanford.html <- clickHTML("id"="Stanford")
   expect_links(stanford.html, "http://en.wikipedia.org/wiki/red")
 })
 
 test_that("clicking updates href (again)", {
-  clickID("Oregon State")
-  Sys.sleep(2)
-  osu.html <- getHTML()
+  osu.html <- clickHTML("id"="Oregon State")
   expect_links(osu.html,
                c("http://en.wikipedia.org/wiki/orange",
                  "http://en.wikipedia.org/wiki/black"))

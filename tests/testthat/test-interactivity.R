@@ -65,14 +65,14 @@ test_that("default is 4 <line> segments", {
 })
 
 test_that("clickSelects 300 makes 300 <circle> elements", {
-  clickID(300)
-  nodes <- getNodeSet(getHTML(), '//g[@class="geom1_point_signal"]//circle')
+  html <- clickHTML(id=300)
+  nodes <- getNodeSet(html, '//g[@class="geom1_point_signal"]//circle')
   expect_equal(length(nodes), 300)
 })
 
 test_that("clickSelects 1 changes to 1 <line> element", {
-  clickID(1)
-  nodes <- getNodeSet(getHTML(), '//g[@class="geom3_segment_signal"]//line')
+  html <- clickHTML(id=1)
+  nodes <- getNodeSet(html, '//g[@class="geom3_segment_signal"]//line')
   expect_equal(length(nodes), 1)
 })
 
@@ -98,32 +98,32 @@ test_that("default is 150 and 4 <circle> elements", {
 })
 
 test_that("clickSelects 300 makes 300 <circle> elements", {
-  clickID(300)
-  nodes <- getNodeSet(getHTML(), '//g[@class="geom1_point_signal"]//circle')
+  html <- clickHTML(id=300)
+  nodes <- getNodeSet(html, '//g[@class="geom1_point_signal"]//circle')
   expect_equal(length(nodes), 300)
 })
 
 test_that("clickSelects 1 adds 1 <line> and 4 <circle>", {
-  clickID(1)
-  nodes <- getNodeSet(getHTML(), '//g[@class="geom3_segment_signal"]//line')
+  html <- clickHTML(id=1)
+  nodes <- getNodeSet(html, '//g[@class="geom3_segment_signal"]//line')
   expect_equal(length(nodes), 5)
-  nodes <- getNodeSet(getHTML(), '//g[@class="geom5_point_points"]//circle')
+  nodes <- getNodeSet(html, '//g[@class="geom5_point_points"]//circle')
   expect_equal(length(nodes), 8)
 })
 
 test_that("clickSelects 4 removes 4 <line> elements and 4 <circle>", {
-  clickID(4)
-  nodes <- getNodeSet(getHTML(), '//g[@class="geom3_segment_signal"]//line')
+  html <- clickHTML(id=4)
+  nodes <- getNodeSet(html, '//g[@class="geom3_segment_signal"]//line')
   expect_equal(length(nodes), 1)
-  nodes <- getNodeSet(getHTML(), '//g[@class="geom5_point_points"]//circle')
+  nodes <- getNodeSet(html, '//g[@class="geom5_point_points"]//circle')
   expect_equal(length(nodes), 4)
 })
 
 test_that("clickSelects 1 removes all <line> elements and all <circle>", {
-  clickID(1)
-  nodes <- getNodeSet(getHTML(), '//g[@class="geom3_segment_signal"]//line')
+  html <- clickHTML(id=1)
+  nodes <- getNodeSet(html, '//g[@class="geom3_segment_signal"]//line')
   expect_equal(length(nodes), 0)
-  nodes <- getNodeSet(getHTML(), '//g[@class="geom5_point_points"]//circle')
+  nodes <- getNodeSet(html, '//g[@class="geom5_point_points"]//circle')
   expect_equal(length(nodes), 0)
 })
 
@@ -175,18 +175,18 @@ test_that("default is 2 <path> and <text> elements", {
 })
 
 test_that("clickSelects CO adds 1 <path> and 1 <text>", {
-  clickID("CO")
-  nodes <- getNodeSet(getHTML(), '//g[@class="geom7_line_ts"]//path')
+  html <- clickHTML(id="CO")
+  nodes <- getNodeSet(html, '//g[@class="geom7_line_ts"]//path')
   expect_equal(length(nodes), 3)
-  nodes <- getNodeSet(getHTML(), '//g[@class="geom5_text_ts"]//text')
+  nodes <- getNodeSet(html, '//g[@class="geom5_text_ts"]//text')
   expect_equal(length(nodes), 3)
 })
 
 test_that("clickSelects CA removes 1 <path> and 1 <text>", {
-  clickID("CA")
-  nodes <- getNodeSet(getHTML(), '//g[@class="geom7_line_ts"]//path')
+  html <- clickHTML(id="CA")
+  nodes <- getNodeSet(html, '//g[@class="geom7_line_ts"]//path')
   expect_equal(length(nodes), 2)
-  nodes <- getNodeSet(getHTML(), '//g[@class="geom5_text_ts"]//text')
+  nodes <- getNodeSet(html, '//g[@class="geom5_text_ts"]//text')
   expect_equal(length(nodes), 2)
 })
 
