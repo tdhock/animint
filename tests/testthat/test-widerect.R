@@ -100,17 +100,16 @@ test_that("wide/tallrect renders a <rect> for every year", {
   }
 })
 
-getYear <- function(html){
-  node.set <- getNodeSet(html, '//g[@class="geom9_text_ts"]//text')
+getYear <- function(){
+  node.set <- getNodeSet(getHTML(), '//g[@class="geom9_text_ts"]//text')
   expect_equal(length(node.set), 1)
   xmlValue(node.set[[1]])
 }
 
 test_that("animation updates", {
-  old.year <- getYear(info$html)
+  old.year <- getYear()
   Sys.sleep(1) #wait for one animation frame.
-  new.html <- XML::htmlParse(remDr$getPageSource(), asText = TRUE)
-  new.year <- getYear(new.html)
+  new.year <- getYear()
   expect_true(old.year != new.year)
 })
 
@@ -118,103 +117,85 @@ clickID("show_hide_animation_controls")
 
 test_that("pause stops animation", {
   clickID("play_pause")
-  old.html <- getHTML()
-  old.year <- getYear(old.html)
+  old.year <- getYear()
   Sys.sleep(1)
-  new.html <- getHTML()
-  new.year <- getYear(new.html)
+  new.year <- getYear()
   expect_true(old.year == new.year)
 })
 
 test_that("play restarts animation", {
-  old.html <- getHTML()
-  old.year <- getYear(old.html)
+  old.year <- getYear()
   clickID("play_pause")
   Sys.sleep(2)
-  new.html <- getHTML()
-  new.year <- getYear(new.html)
+  new.year <- getYear()
   expect_true(old.year != new.year)
 })
 
-e <- remDr$findElement("id", "updates_ms")
-e$clickElement()
-e$clearElement()
-e$sendKeysToElement(list("3000", key="enter"))
-
 test_that("pause stops animation (second time)", {
   clickID("play_pause")
-  old.html <- getHTML()
-  old.year <- getYear(old.html)
+  old.year <- getYear()
   Sys.sleep(1)
-  new.html <- getHTML()
-  new.year <- getYear(new.html)
+  new.year <- getYear()
   expect_true(old.year == new.year)
 })
 
-test_that("play restarts animation (slower)", {
-  old.html <- getHTML()
-  old.year <- getYear(old.html)
+test_that("play restarts animation (second time)", {
+  old.year <- getYear()
   clickID("play_pause")
-  Sys.sleep(1)
-  new.html <- getHTML()
-  new.year <- getYear(new.html)
-  expect_true(old.year == new.year)
-  Sys.sleep(3)
-  newer.html <- getHTML()
-  newer.year <- getYear(newer.html)
-  expect_true(old.year != newer.year)
+  Sys.sleep(2)
+  new.year <- getYear()
+  expect_true(old.year != new.year)
 })
 
-test_that("pause stops animation (third time)", {
-  clickID("play_pause")
-  old.html <- getHTML()
-  old.year <- getYear(old.html)
-  Sys.sleep(4)
-  new.html <- getHTML()
-  new.year <- getYear(new.html)
-  expect_true(old.year == new.year)
-})
-
-getWidth <- function(html){
-  node.set <-
-    getNodeSet(html, '//g[@class="geom10_bar_bar"]//rect[@id="Vietnam"]')
-  expect_equal(length(node.set), 1)
-  alist <- xmlAttrs(node.set[[1]])
-  alist[["width"]]
+# skip these tests if the browser is phantomjs 
+# (version 1.9.8 seems to stall on some machines)
+if (Sys.getenv("ANIMINT_BROWSER") != "phantomjs") {
+  
+  e <- remDr$findElement("id", "updates_ms")
+  e$clickElement()
+  e$clearElement()
+  e$sendKeysToElement(list("3000", key="enter"))
+  
+  test_that("pause stops animation (third time)", {
+    clickID("play_pause")
+    old.year <- getYear()
+    Sys.sleep(4)
+    new.year <- getYear()
+    expect_true(old.year == new.year)
+  })
+  
+  getWidth <- function(){
+    node.set <-
+      getNodeSet(getHTML(), '//g[@class="geom10_bar_bar"]//rect[@id="Vietnam"]')
+    expect_equal(length(node.set), 1)
+    alist <- xmlAttrs(node.set[[1]])
+    alist[["width"]]
+  }
+  
+  test_that("middle of transition != after when duration=1000", {
+    clickID("year2010")
+    during.width <- getWidth()
+    Sys.sleep(1.5)
+    after.width <- getWidth()
+    expect_true(during.width != after.width)
+  })
+  
+  # doesn't quite work
+  # remDr$executeScript('return document.getElementById("duration_ms_year").value = 0')
+  e <- remDr$findElement("id", "duration_ms_year")
+  e$clickElement()
+  e$clearElement()
+  e$sendKeysToElement(list("0", key="enter"))
+  
+  test_that("middle of transition == after when duration=0", {
+    clickID("year1960")
+    Sys.sleep(1.5)
+    before.width <- getWidth()
+    clickID("year2010")
+    during.width <- getWidth()
+    Sys.sleep(1.5)
+    after.width <- getWidth()
+    expect_true(before.width != after.width)
+    expect_true(during.width == after.width)
+  })
 }
-
-test_that("middle of transition != after when duration=1000", {
-  clickID("year1960")
-  Sys.sleep(1.5)
-  before.html <- getHTML()
-  before.width <- getWidth(before.html)
-  clickID("year2010")
-  during.html <- getHTML()
-  during.width <- getWidth(during.html)
-  Sys.sleep(1.5)
-  after.html <- getHTML()
-  after.width <- getWidth(after.html)
-  rbind(before.width, during.width, after.width)
-  expect_true(during.width != after.width)
-})
-
-e <- remDr$findElement("id", "duration_ms_year")
-e$clickElement()
-e$clearElement()
-e$sendKeysToElement(list("0", key="enter"))
-
-test_that("middle of transition == after when duration=0", {
-  clickID("year1960")
-  Sys.sleep(1.5)
-  before.html <- getHTML()
-  before.width <- getWidth(before.html)
-  clickID("year2010")
-  during.html <- getHTML()
-  during.width <- getWidth(during.html)
-  Sys.sleep(1.5)
-  after.html <- getHTML()
-  after.width <- getWidth(after.html)
-  rbind(before.width, during.width, after.width)
-  expect_true(during.width == after.width)
-})
-

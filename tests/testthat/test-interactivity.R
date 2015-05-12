@@ -106,7 +106,6 @@ test_that("default is 4 <line> segments", {
 })
 
 test_that("clickSelects 300 makes 300 <circle> elements", {
-    # randomly fails
   html <- clickHTML(id=300)
   nodes <- getNodeSet(html, '//g[@class="geom1_point_signal"]//circle')
   expect_equal(length(nodes), 300)

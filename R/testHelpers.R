@@ -36,12 +36,18 @@ tests_init <- function(browserName = "phantomjs", dir = ".", port = 4848, ...) {
     selenium <- RSelenium::startServer()
   }
   # give an binaries a moment to start up
-  Sys.sleep(5)
+  Sys.sleep(8)
   remDr <<- RSelenium::remoteDriver(browserName = browserName, ...)
   # give the backend a moment to start-up
-  Sys.sleep(4)
+  Sys.sleep(6)
   remDr$open(silent = TRUE)
   Sys.sleep(2)
+  # some tests don't run reliably with phantomjs (see tests-widerect.R)
+  Sys.setenv("ANIMINT_BROWSER" = browserName)
+  # wait a maximum of 30 seconds when searching for elements.
+  remDr$setImplicitWaitTimeout(milliseconds = 30000)
+  # wait a maximum of 30 seconds for a particular type of operation to execute
+  remDr$setTimeout(type = "page load", milliseconds = 30000)
   # if we navigate to localhost:%s/htmltest directly, some browsers will
   # redirect to www.htmltest.com. A 'safer' approach is to navigate, then click.
   remDr$navigate(sprintf("http://localhost:%s", port))
@@ -71,9 +77,11 @@ tests_init <- function(browserName = "phantomjs", dir = ".", port = 4848, ...) {
 #'
 
 tests_run <- function(dir = ".", filter = NULL) {
+  if (!"package:RSelenium" %in% search()) 
+    stop("Please load RSelenium: library(RSelenium)")
+  if (!"package:testthat" %in% search()) 
+    stop("Please load testthat: library(testthat)")
   testDir <- find_test_path(dir)
-  # functions that are reused across tests
-  source(file.path(testDir, "functions.R"))
   # testthat::test_check assumes we are in path/to/animint/tests
   old <- getwd()
   on.exit(setwd(old), add = TRUE)
@@ -92,6 +100,7 @@ tests_run <- function(dir = ".", filter = NULL) {
 #' @export
 tests_exit <- function() {
   res <- stop_binary()
+  Sys.unsetenv("ANIMINT_BROWSER")
   e <- try(readLines(pid_file(), warn = FALSE), silent = TRUE)
   if (!inherits(e, "try-error")) {
     pids <- as.integer(e)
@@ -141,23 +150,20 @@ run_servr <- function(directory = ".", port = 4848,
 # --------------------------
 
 stop_binary <- function() {
-  if (exists("pJS")) {
-    pJS$stop()
-  } else if (exists("remDr")) {
-    # these methods are really queries to the server
-    # thus, if it is already shut down, we get some arcane error message
-    e <- try({
-      remDr$closeWindow()
-      remDr$closeServer()
-    })
-  }
+  if (exists("pJS")) pJS$stop()
+  # these methods are really queries to the server
+  # thus, if it is already shut down, we get some arcane error message
+  e <- try({
+    remDr$closeWindow()
+    remDr$closeServer()
+  }, silent = TRUE)
   TRUE
 }
 
 # file that will keep track of all processes were initiated during animint testing
 pid_file <- function() {
   f <- file.path(find_test_path(), "pids.txt")
-  if (!file.exists(f)) file(f, "a")
+  if (!file.exists(f)) file(f)
   f
 }
 
