@@ -68,15 +68,15 @@ solid.xpaths <-
     '//g[@class="geom6_vline_error"]//g[@class="PANEL1"]//line',
     '//g[@class="geom7_line_error"]//g[@class="PANEL1"]//path')
 
-test_that("stroke-dasharray default solid (no stroke-dasharray)", {
+test_that("stroke-dasharray: 8,8 for dashed", {
   for(xpath in dashed.xpaths){
     node.set <- getNodeSet(info$html, xpath)
     dash.mat <- get.dasharray(node.set)
-    expect_match(dash.mat[, "value"], "8, *8")
+    expect_match(dash.mat[, "value"], "8(px)?, *8(px)?")
   }
 })
 
-test_that("stroke-dasharray: 8,8 for dashed", {
+test_that("stroke-dasharray default solid (no stroke-dasharray)", {
   for(xpath in solid.xpaths){
     node.set <- getNodeSet(info$html, xpath)
     dash.mat <- get.dasharray(node.set)
