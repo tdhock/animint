@@ -9,8 +9,10 @@ var animint = function (to_select, json_file) {
   var linetypesize2dasharray = function (lt, size) {
     var isInt = function(n) { return typeof n === 'number' && parseFloat(n) == parseInt(n, 10) && !isNaN(n); }
     if(isInt(lt)){ // R integer line types.
+      if(lt == 0){
+	return null;
+      }
       var o = {
-	0: size * 0 + "," + size * 10,
 	1: 0,
 	2: size * 4 + "," + size * 4,
 	3: size + "," + size * 2,
@@ -19,10 +21,12 @@ var animint = function (to_select, json_file) {
 	6: size * 2 + "," + size * 2 + "," + size * 6 + "," + size * 2
       };
     } else { //R defined line types
+      if(lt == "solid"){
+	return null;
+      }
       var o = {
 	"blank": size * 0 + "," + size * 10,
 	"none": size * 0 + "," + size * 10,
-	"solid": 0,
 	"dashed": size * 4 + "," + size * 4,
 	"dotted": size + "," + size * 2,
 	"dotdash": size + "," + size * 2 + "," + size * 4 + "," + size * 2,
