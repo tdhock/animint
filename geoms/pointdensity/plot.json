@@ -62,25 +62,23 @@
 ],
 "axis1": {
  "x": [
- 0.23113,
-0.47227,
-0.71341,
-0.95455 
+ 0.30427,
+0.62779,
+0.95131 
 ],
 "xlab": [
  "1",
 "2",
-"3",
-"4" 
+"3" 
 ],
-"xrange": [ 0.0415, 4.1885 ],
+"xrange": [ 0.0595, 3.1505 ],
 "xline": true,
 "xticks": true,
 "y": [
- 0.026316,
-0.27295,
-0.51958,
-0.76622 
+ 0.028652,
+0.27648,
+0.52431,
+0.77214 
 ],
 "ylab": [
  "0",
@@ -88,7 +86,7 @@
 "10000",
 "15000" 
 ],
-"yrange": [ -533.5,  19740 ],
+"yrange": [ -578.05,  19597 ],
 "yline": true,
 "yticks": true 
 },
@@ -101,8 +99,7 @@
 "xlabs": [
  "1",
 "2",
-"3",
-"4" 
+"3" 
 ],
 "ylabs": [
  "0",
@@ -117,28 +114,28 @@
 "title": "Density",
 "entries": [
  {
- "pointalpha": 0.9046,
+ "pointalpha": 0.8398,
 "pointshape":     16,
 "pointcolour": "#000000",
 "pointsize":      1,
 "label": [ "4e-04" ] 
 },
 {
- "pointalpha":  0.703,
+ "pointalpha": 0.6544,
 "pointshape":     16,
 "pointcolour": "#000000",
 "pointsize":      1,
 "label": [ "3e-04" ] 
 },
 {
- "pointalpha": 0.5014,
+ "pointalpha":  0.469,
 "pointshape":     16,
 "pointcolour": "#000000",
 "pointsize":      1,
 "label": [ "2e-04" ] 
 },
 {
- "pointalpha": 0.3016,
+ "pointalpha": 0.2854,
 "pointshape":     16,
 "pointcolour": "#000000",
 "pointsize":      1,

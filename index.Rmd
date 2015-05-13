@@ -143,7 +143,7 @@ ts <- ggplot() +
 # theme_animint() requires Toby's fork of ggplot2
 # devtools::install_github("tdhock/ggplot2")
 # (we're hopeful this fork will be merged with ggplot2 master)
-map <- map + theme_animint(height = 970)
+map <- map + theme_animint(width = 970)
 
 tornado.bar <- list(map = map, ts = ts) 
 

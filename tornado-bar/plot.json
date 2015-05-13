@@ -249,8 +249,8 @@
 "legend": {},
 "title": "Tornadoes in the US",
 "options": {
- "width":    400,
-"height":    970 
+ "width":    970,
+"height":    400 
 } 
 },
 "ts": {
