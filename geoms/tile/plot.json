@@ -117,25 +117,31 @@
 "title": "n",
 "entries": [
  {
- "polygonfill": "#1D3F5F",
+ "polygonfill": "#152F49",
+"polygonsize":    0.1,
+"polygonlinetype":      1,
+"label": [ "25" ] 
+},
+{
+ "polygonfill": "#21486A",
 "polygonsize":    0.1,
 "polygonlinetype":      1,
 "label": [ "20" ] 
 },
 {
- "polygonfill": "#2B5B84",
+ "polygonfill": "#2E628D",
 "polygonsize":    0.1,
 "polygonlinetype":      1,
 "label": [ "15" ] 
 },
 {
- "polygonfill": "#3A78AB",
+ "polygonfill": "#3C7DB1",
 "polygonsize":    0.1,
 "polygonlinetype":      1,
 "label": [ "10" ] 
 },
 {
- "polygonfill": "#4997D4",
+ "polygonfill": "#4A99D7",
 "polygonsize":    0.1,
 "polygonlinetype":      1,
 "label": [ "5" ] 

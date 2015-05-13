@@ -209,7 +209,7 @@ The `make_text()` function included in **animint** makes it easy to create text 
 
 Syntax is  `make_text(data, x, y, label.var, format=NULL)` where `format` can be specified using a string containing `%d`, `%f`, etc. to represent the variable value.
 
-```{r tornadotsbar, message=FALSE, warning=FALSE, cache=TRUE}
+```{r tornadotsbar, message=FALSE, warning=FALSE}
 map <- ggplot() + 
   make_text(UStornadoCounts, -100, 50, "year", "Tornadoes in %d") +
   geom_polygon(aes(x = long, y = lat, group = group, clickSelects = state),
