@@ -35,7 +35,7 @@ p
 
 ### Creating and developing locally
 
-The `animint2dir()` function is most useful for local development and quickly iterating your **animint** plots. This function compiles a list of ggplot objects (and a [list of other options](TODO-make-list)), [compiles them](https://github.com/tdhock/animint/wiki/Compiler-details), and write a set of files to a directory. Here we write those files to the "simple" directory.
+The `animint2dir()` function is most useful for local development and quickly iterating your **animint** plots. This function compiles a list of ggplot objects (and a [list of other options](https://github.com/tdhock/animint/wiki/Advanced-features-present-animint-but-not-in-ggplot2)), [compiles them](https://github.com/tdhock/animint/wiki/Compiler-details), and write a set of files to a directory. Here we write those files to the "simple" directory.
 
 ```{r, eval = FALSE}
 library("animint")
@@ -143,7 +143,7 @@ ts <- ggplot() +
 # theme_animint() requires Toby's fork of ggplot2
 # devtools::install_github("tdhock/ggplot2")
 # (we're hopeful this fork will be merged with ggplot2 master)
-map <- map + theme_animint(height = 970)
+map <- map + theme_animint(width = 970)
 
 tornado.bar <- list(map = map, ts = ts) 
 
@@ -209,7 +209,7 @@ The `make_text()` function included in **animint** makes it easy to create text 
 
 Syntax is  `make_text(data, x, y, label.var, format=NULL)` where `format` can be specified using a string containing `%d`, `%f`, etc. to represent the variable value.
 
-```{r tornadotsbar, message=FALSE, warning=FALSE, cache=TRUE}
+```{r tornadotsbar, message=FALSE, warning=FALSE}
 map <- ggplot() + 
   make_text(UStornadoCounts, -100, 50, "year", "Tornadoes in %d") +
   geom_polygon(aes(x = long, y = lat, group = group, clickSelects = state),
