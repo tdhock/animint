@@ -1,5 +1,5 @@
 animint
-=======
+=====
 
 [![Build Status](https://travis-ci.org/tdhock/animint.png?branch=master)](https://travis-ci.org/tdhock/animint)
 
