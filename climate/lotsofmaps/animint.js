@@ -5,6 +5,83 @@
 // </script>
 // Constructor for animint Object.
 var animint = function (to_select, json_file) {
+
+  var linetypesize2dasharray = function (lt, size) {
+    var isInt = function(n) { return typeof n === 'number' && parseFloat(n) == parseInt(n, 10) && !isNaN(n); }
+    if(isInt(lt)){ // R integer line types.
+      var o = {
+	0: size * 0 + "," + size * 10,
+	1: 0,
+	2: size * 4 + "," + size * 4,
+	3: size + "," + size * 2,
+	4: size + "," + size * 2 + "," + size * 4 + "," + size * 2,
+	5: size * 8 + "," + size * 4,
+	6: size * 2 + "," + size * 2 + "," + size * 6 + "," + size * 2
+      };
+    } else { //R defined line types
+      var o = {
+	"blank": size * 0 + "," + size * 10,
+	"none": size * 0 + "," + size * 10,
+	"solid": 0,
+	"dashed": size * 4 + "," + size * 4,
+	"dotted": size + "," + size * 2,
+	"dotdash": size + "," + size * 2 + "," + size * 4 + "," + size * 2,
+	"longdash": size * 8 + "," + size * 4,
+	"twodash": size * 2 + "," + size * 2 + "," + size * 6 + "," + size * 2,
+	"22": size * 2 + "," + size * 2,
+	"42": size * 4 + "," + size * 2,
+	"44": size * 4 + "," + size * 4,
+	"13": size + "," + size * 3,
+	"1343": size + "," + size * 3 + "," + size * 4 + "," + size * 3,
+	"73": size * 7 + "," + size * 3,
+	"2262": size * 2 + "," + size * 2 + "," + size * 6 + "," + size * 2,
+	"12223242": size + "," + size * 2 + "," + size * 2 + "," + size * 2 + "," + size * 3 + "," + size * 2 + "," + size * 4 + "," + size * 2,
+	"F282": size * 15 + "," + size * 2 + "," + size * 8 + "," + size * 2,
+	"F4448444": size * 15 + "," + size * 4 + "," + size * 4 + "," + size * 4 + "," + size * 8 + "," + size * 4 + "," + size * 4 + "," + size * 4,
+	"224282F2": size * 2 + "," + size * 2 + "," + size * 4 + "," + size * 2 + "," + size * 8 + "," + size * 2 + "," + size * 16 + "," + size * 2,
+	"F1": size * 16 + "," + size
+      };
+    }
+
+    if (lt in o){
+      return o[lt];
+    } else{ // manually specified line types
+      str = lt.split("");
+      strnum = str.map(function (d) {
+	return size * parseInt(d, 16);
+      });
+      return strnum;
+    }
+  }
+
+  var isArray = function(o) {
+    return Object.prototype.toString.call(o) === '[object Array]';
+  }
+
+  // create a dummy element, apply the appropriate classes,
+  // and then measure the element
+  // Inspired from http://jsfiddle.net/uzddx/2/
+  var measureText = function(pText, pFontSize, pAngle, pStyle) {
+    if (!pText || pText.length === 0) return {height: 0, width: 0};
+    if (pAngle === null || isNaN(pAngle)) pAngle = 0;
+
+    var container = d3.select('body').append('svg')
+    // do we need to set the class so that styling is applied?
+    //.attr('class', classname);
+
+    container.append('text')
+      .attr({x: -1000, y: -1000})
+      .attr("transform", "rotate(" + pAngle + ")")
+      .attr("style", pStyle)
+      .attr("font-size", pFontSize)
+      .text(pText);
+
+    var bbox = container.node().getBBox();
+    container.remove();
+
+    return {height: bbox.height, width: bbox.width};
+  }
+
   var dirs = json_file.split("/");
   dirs.pop(); //if a directory path exists, remove the JSON file from dirs
   var element = d3.select(to_select);
@@ -138,7 +215,7 @@ var animint = function (to_select, json_file) {
 	     return measureText(entry, 11).width;
       }));
     }
-    var axispaddingx = 10 + 9;
+    var axispaddingx = 10 + 20;
     if(p_info.hasOwnProperty("xlabs") && p_info.xlabs.length){
       // TODO: throw warning if text height is large portion of plot height?
       axispaddingx += Math.max.apply(null, p_info.xlabs.map(function(entry){
@@ -715,11 +792,21 @@ var animint = function (to_select, json_file) {
       fill = g_info.params.colour;
     }
     var text_anchor = "middle";
-    if (g_info.params.hjust == 0) {
-      text_anchor = "start";
-    }
-    if (g_info.params.hjust == 1) {
-      text_anchor = "end";
+    var get_text_anchor = function (d) {
+      hjust = g_info.params.hjust;
+      if (d.hasOwnProperty("hjust")) {
+        hjust = d["hjust"];
+      }
+      if (hjust == 0) {
+        text_anchor = "start";
+      }
+      if (hjust == 0.5) {
+        text_anchor = "middle";
+      }
+      if (hjust == 1) {
+        text_anchor = "end";
+      }
+      return text_anchor;
     }
 
     var eActions, eAppend;
@@ -969,7 +1056,7 @@ var animint = function (to_select, json_file) {
           .attr("y", toXY("y", "y"))
 	  .style("fill", get_colour)
 	  .attr("font-size", get_size)
-          .style("text-anchor", text_anchor)
+          .style("text-anchor", get_text_anchor)
           .text(function (d) {
             return d.label;
           });
@@ -1608,81 +1695,4 @@ var animint = function (to_select, json_file) {
     }
   });
 }
-
-// create a dummy element, apply the appropriate classes,
-// and then measure the element
-// Inspired from http://jsfiddle.net/uzddx/2/
-var measureText = function(pText, pFontSize, pAngle, pStyle) {
-    if (!pText || pText.length === 0) return {height: 0, width: 0};
-    if (pAngle === null || isNaN(pAngle)) pAngle = 0;
-
-    var container = d3.select('body').append('svg')
-      // do we need to set the class so that styling is applied?
-      //.attr('class', classname);
-
-    container.append('text')
-      .attr({x: -1000, y: -1000})
-      .attr("transform", "rotate(" + pAngle + ")")
-      .attr("style", pStyle)
-      .attr("font-size", pFontSize)
-      .text(pText);
-
-    var bbox = container.node().getBBox();
-    container.remove();
-
-    return {height: bbox.height, width: bbox.width};
-}
-
-var linetypesize2dasharray = function (lt, size) {
-  var isInt = function(n) { return typeof n === 'number' && parseFloat(n) == parseInt(n, 10) && !isNaN(n); }
-  if(isInt(lt)){ // R integer line types.
-    var o = {
-      0: size * 0 + "," + size * 10,
-      1: 0,
-      2: size * 4 + "," + size * 4,
-      3: size + "," + size * 2,
-      4: size + "," + size * 2 + "," + size * 4 + "," + size * 2,
-      5: size * 8 + "," + size * 4,
-      6: size * 2 + "," + size * 2 + "," + size * 6 + "," + size * 2
-    };
-  } else { //R defined line types
-    var o = {
-      "blank": size * 0 + "," + size * 10,
-      "none": size * 0 + "," + size * 10,
-      "solid": 0,
-      "dashed": size * 4 + "," + size * 4,
-      "dotted": size + "," + size * 2,
-      "dotdash": size + "," + size * 2 + "," + size * 4 + "," + size * 2,
-      "longdash": size * 8 + "," + size * 4,
-      "twodash": size * 2 + "," + size * 2 + "," + size * 6 + "," + size * 2,
-      "22": size * 2 + "," + size * 2,
-      "42": size * 4 + "," + size * 2,
-      "44": size * 4 + "," + size * 4,
-      "13": size + "," + size * 3,
-      "1343": size + "," + size * 3 + "," + size * 4 + "," + size * 3,
-      "73": size * 7 + "," + size * 3,
-      "2262": size * 2 + "," + size * 2 + "," + size * 6 + "," + size * 2,
-      "12223242": size + "," + size * 2 + "," + size * 2 + "," + size * 2 + "," + size * 3 + "," + size * 2 + "," + size * 4 + "," + size * 2,
-      "F282": size * 15 + "," + size * 2 + "," + size * 8 + "," + size * 2,
-      "F4448444": size * 15 + "," + size * 4 + "," + size * 4 + "," + size * 4 + "," + size * 8 + "," + size * 4 + "," + size * 4 + "," + size * 4,
-      "224282F2": size * 2 + "," + size * 2 + "," + size * 4 + "," + size * 2 + "," + size * 8 + "," + size * 2 + "," + size * 16 + "," + size * 2,
-      "F1": size * 16 + "," + size
-    };
-  }
-
-  if (lt in o){
-    return o[lt];
-  } else{ // manually specified line types
-    str = lt.split("");
-    strnum = str.map(function (d) {
-      return size * parseInt(d, 16);
-    });
-    return strnum;
-  }
-}
-
-var isArray = function(o) {
-  return Object.prototype.toString.call(o) === '[object Array]';
-}
-
 
