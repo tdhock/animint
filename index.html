@@ -132,7 +132,7 @@ p</code></pre>
 <p><img src="index_files/figure-html/density-1.png" title="" alt="" width="576" style="display: block; margin: auto;" /></p>
 <div id="creating-and-developing-locally" class="section level3">
 <h3>Creating and developing locally</h3>
-<p>The <code>animint2dir()</code> function is most useful for local development and quickly iterating your <strong>animint</strong> plots. This function compiles a list of ggplot objects (and a <a href="TODO-make-list">list of other options</a>), <a href="https://github.com/tdhock/animint/wiki/Compiler-details">compiles them</a>, and write a set of files to a directory. Here we write those files to the “simple” directory.</p>
+<p>The <code>animint2dir()</code> function is most useful for local development and quickly iterating your <strong>animint</strong> plots. This function compiles a list of ggplot objects (and a <a href="https://github.com/tdhock/animint/wiki/Advanced-features-present-animint-but-not-in-ggplot2">list of other options</a>), <a href="https://github.com/tdhock/animint/wiki/Compiler-details">compiles them</a>, and write a set of files to a directory. Here we write those files to the “simple” directory.</p>
 <pre class="r"><code>library(&quot;animint&quot;)
 animint2dir(list(plot = p), out.dir = &quot;simple&quot;, open.browser = FALSE)</code></pre>
 <p>To view the result, you’ll probably want to start a local <a href="http://en.wikipedia.org/wiki/File_server">file server</a> in the “simple” directory. This can be done easily from the <code>R</code> console with the <a href="http://cran.r-project.org/web/packages/servr/index.html"><strong>servr</strong></a> package:</p>
