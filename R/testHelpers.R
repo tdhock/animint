@@ -119,15 +119,15 @@ tests_exit <- function() {
 #' @param code R code to execute in a child session
 #' @return port number of the successful attempt
 run_servr <- function(directory = ".", port = 4848,
-                      code = "servr::httd(dir=\"%s\", port=%d, browser=FALSE)") {
+                      code = "servr::httd(dir='%s', port=%d)") {
   dir <- normalizePath(directory, winslash = "/", mustWork = TRUE)
   cmd <- sprintf(
     # escape all the things!
-    paste0("'library(methods); cat(Sys.getpid(), file=\"%s\", sep=\"\\\\n\", append=TRUE);", code, "'"),
+    paste("library(methods); write.table(Sys.getpid(), file='%s', append=T, row.name=F, col.names=F);", code),
     pid_file(), dir, port
   )
   output <- tempfile(fileext = "txt")
-  t <- suppressWarnings(system2("Rscript", c("-e", cmd), 
+  t <- suppressWarnings(system2("Rscript", c("-e", shQuote(cmd)), 
                                 stderr = output, stdout = output, wait = FALSE))
   Sys.sleep(5)
   o <- paste(readLines(output, warn = FALSE), "\n")
