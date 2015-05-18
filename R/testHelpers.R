@@ -120,7 +120,7 @@ tests_exit <- function() {
 #' @return port number of the successful attempt
 run_servr <- function(directory = ".", port = 4848,
                       code = "servr::httd(dir=\"%s\", port=%d, browser=FALSE)") {
-  dir <- normalizePath(directory)
+  dir <- normalizePath(directory, winslash = "/", mustWork = TRUE)
   cmd <- sprintf(
     # escape all the things!
     paste0("'library(methods); cat(Sys.getpid(), file=\"%s\", sep=\"\\\\n\", append=TRUE);", code, "'"),
@@ -169,7 +169,7 @@ pid_file <- function() {
 
 # find the path to animint's testthat directory
 find_test_path <- function(dir = ".") {
-  dir <- normalizePath(dir, mustWork = TRUE)
+  dir <- normalizePath(dir, winslash = "/", mustWork = TRUE)
   if (!grepl("animint", dir, fixed = TRUE)) 
     stop("animint must appear somewhere in 'dir'")
   base_dir <- basename(dir)
