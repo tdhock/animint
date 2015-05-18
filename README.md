@@ -93,7 +93,7 @@ We keep a TODO list at top of the [NEWS](https://github.com/tdhock/animint/blob/
 - BUG: things which used to work but have stopped working. Tests should be added to prevent these. For example at one point in 2013, animint rendered the correct number of legend entries for the WorldBank viz, but in the beginning of 2014 animint rendered too many legend entries. 
 - GGPLOT: things which ggplot2 supports but animint does not yet support. For example facets, coord_equal.
 - DSL: changes to the animint domain-specific language (DSL) which would allow interactive/animated features. These involve changes to how we define the ggplots, and how the compiler works. For example custom alpha/color/etc for selected geoms, using selected.alpha/selected.color/etc aesthetics.
-- EXAMPLE: examples to show off animint features, which should affect neither the compiler nor renderer. For example the pirates data set.
+- EXAMPLE: examples to show off animint features, which should affect neither the compiler nor renderer. 
 - RENDER: changes to the JavaScript rendering code which would result in better interactive plots, without having to change the definition of the ggplots. For example rendering a selection widget for every selection variable.
 - OUTPUT: different output formats for viewing/sharing an interactive animation.
 - OPTIMIZATION: things which are currently supported, but with an implementation that could be improved in terms of render/compile speed, disk usage, memory, etc. Typically these optimizations are not really noticed for small data sets, but make it easier to visualize large data sets. For example, can we gzip the TSV plot data files to reduce disk space and download times?
