@@ -38,6 +38,7 @@ test_that("color is converted to RGB colour", {
     expect_match(stroke, expected.regex)
     ## On firefox, stroke is "rgb(127, 127, 127)"
   }else{
+    print(stroke)
     expect_identical(stroke, expected.colour)
     ## On phantomjs, stroke is "#7f7f7f"
   }
