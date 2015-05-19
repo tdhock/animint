@@ -1,5 +1,3 @@
-library(testthat)
-
 context("params")
 
 df <- data.frame(z=rnorm(100))
@@ -34,5 +32,6 @@ test_that("color is converted to RGB colour", {
   style.vec <- style.mat[, "value"]
   expect_identical(style.vec[["fill"]], "none")
   expect_identical(style.vec[["stroke-width"]], "3")
-  expect_identical(style.vec[["stroke"]], expected.colour)
+  expected.regex <- paste(col2rgb(expected.colour), collapse=", *")
+  expect_match(style.vec[["stroke"]], expected.regex)
 })
