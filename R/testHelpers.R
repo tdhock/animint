@@ -119,7 +119,7 @@ tests_exit <- function() {
 #' @param code R code to execute in a child session
 #' @return port number of the successful attempt
 run_servr <- function(directory = ".", port = 4848,
-                      code = "servr::httd(dir='%s', port=%d, browser=F)") {
+                      code = "servr::httd(dir='%s', port=%d)") {
   dir <- normalizePath(directory, winslash = "/", mustWork = TRUE)
   cmd <- sprintf(
     paste("library(methods); write.table(Sys.getpid(), file='%s', append=T, row.name=F, col.names=F);", code),
