@@ -33,15 +33,12 @@ test_that("color is converted to RGB colour", {
   expect_identical(style.vec[["fill"]], "none")
   expect_match(style.vec[["stroke-width"]], "3")
   stroke <- style.vec[["stroke"]]
-  print(stroke)
-  print(expected.colour)
   if(grepl("rgb", stroke)){
     expected.regex <- paste(col2rgb(expected.colour), collapse=", *")
-    print(expected.regex)
     expect_match(stroke, expected.regex)
     ## On firefox, stroke is "rgb(127, 127, 127)"
   }else{
-    expect_identical(stroke, expected.colour)
+    expect_identical(toupper(stroke), toupper(expected.colour))
     ## On phantomjs, stroke is "#7f7f7f"
   }
 })
