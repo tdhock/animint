@@ -11,10 +11,12 @@ TS <- function(df)BOTH(df, "Years", "Life expectancy")
 SCATTER <- function(df)BOTH(df, "Fertility rate", "Life expectancy")
 TS2 <- function(df)BOTH(df, "Fertility rate", "Years")
 years <- unique(not.na[, "year", drop=FALSE])
+years$status <- ifelse(years$year %% 2, "odd", "even")
 wb.facets <-
   list(ts=ggplot()+
        xlab("")+
        geom_tallrect(aes(xmin=year-1/2, xmax=year+1/2,
+                         linetype=status,
                          clickSelects=year),
                      data=TS(years), alpha=1/2)+
        theme_animint(width=1000, height=800)+
@@ -33,6 +35,7 @@ wb.facets <-
                   data=TS2(not.na))+
        geom_widerect(aes(ymin=year-1/2, ymax=year+1/2,
                          clickSelects=year,
+                         linetype=status,
                          id=paste0("year", year)),
                      data=TS2(years), alpha=1/2)+
 
@@ -67,14 +70,33 @@ wb.facets <-
 
 info <- animint2HTML(wb.facets)
 
-test_that("widerect renders a <rect> for every year", {
-  node.set <-
-    getNodeSet(info$html,
-               '//g[@class="geom6_widerect_ts"]//g[@class="PANEL1"]//rect')
-  expect_equal(length(node.set), nrow(years))
-  for(node in node.set){
-    sizes <- as.numeric(xmlAttrs(node)[c("height", "width")])
-    expect_true(all(sizes > 0))
+dasharrayPattern <-
+  paste0("stroke-dasharray:",
+         "(?<value>.*?)",
+         ";")
+
+rect.xpaths <-
+  c('//g[@class="geom6_widerect_ts"]//g[@class="PANEL1"]//rect',
+    '//g[@class="geom1_tallrect_ts"]//g[@class="PANEL4"]//rect')
+
+test_that("wide/tallrect renders a <rect> for every year", {
+  for(rect.xpath in rect.xpaths){
+    node.set <- getNodeSet(info$html, rect.xpath)
+    expect_equal(length(node.set), nrow(years))
+    style.list <- list()
+    for(node.i in seq_along(node.set)){
+      node <- node.set[[node.i]]
+      a.vec <- xmlAttrs(node)
+      style.list[[node.i]] <- a.vec[["style"]]
+      sizes <- as.numeric(a.vec[c("height", "width")])
+      expect_true(all(sizes > 0))
+    }
+    style.vec <- do.call(c, style.list)
+    dash.mat <- str_match_perl(style.vec, dasharrayPattern)
+    ## Use paste() to treat NA as a value instead of ignoring it.
+    dash.table <- table(paste(dash.mat[, "value"]))
+    ## There should be 2 unique values of stoke-dasharray.
+    expect_equal(length(dash.table), 2)
   }
 })
 

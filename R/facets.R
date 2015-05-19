@@ -18,7 +18,7 @@ getStrips.grid <- function(facet, panel, ...) {
   col_vars <- unique(panel$layout[names(facet$cols)])
   strips.top[panel$layout$ROW == 1] <-
     build_strip(panel, col_vars, facet$labeller, side = "top", ...)
-  strips <- list(right = strips.right, top = strips.top)
+  strips <- list(right = as.list(strips.right), top = as.list(strips.top))
   # the right/top element should exist if there are non-trivial labels
   # strips <- strips[sapply(strips, function(x) !identical(x, strips.empty))]
   strips$n <- list(top = 1, right = 1)

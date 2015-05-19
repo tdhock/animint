@@ -448,6 +448,9 @@ saveLayer <- function(l, d, meta){
     if(color.var %in% names(g.data)){
       g.data[,color.var] <- toRGB(g.data[,color.var])
     }
+    if(color.var %in% names(g$params)){
+      g$params[[color.var]] <- toRGB(g$params[[color.var]])
+    }
   }
 
   if(any(g.data$size == 0, na.rm=TRUE)){
@@ -1001,7 +1004,9 @@ is.rgb <- function(x){
 #' @return hexadecimal color value (if is.na(x), return "none" for compatibility with JavaScript)
 #' @export
 toRGB <- function(x){
-  sapply(x, function(i) if(!is.na(i)) rgb(t(col2rgb(as.character(i))), maxColorValue=255) else "none")
+  named.vec <- sapply(x, function(i) if(!is.na(i)) rgb(t(col2rgb(as.character(i))), maxColorValue=255) else "none")
+  not.named <- as.character(named.vec)
+  not.named
 }
 
 #' Function to get legend information from ggplot
