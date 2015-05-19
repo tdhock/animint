@@ -31,7 +31,14 @@ test_that("color is converted to RGB colour", {
   style.mat <- str_match_all_perl(style.str, pattern)[[1]]
   style.vec <- style.mat[, "value"]
   expect_identical(style.vec[["fill"]], "none")
-  expect_identical(style.vec[["stroke-width"]], "3")
-  expected.regex <- paste(col2rgb(expected.colour), collapse=", *")
-  expect_match(style.vec[["stroke"]], expected.regex)
+  expect_match(style.vec[["stroke-width"]], "3")
+  stroke <- style.vec[["stroke"]]
+  if(grepl("rgb", stroke)){
+    expected.regex <- paste(col2rgb(expected.colour), collapse=", *")
+    expect_match(stroke, expected.regex)
+    ## On firefox, stroke is "rgb(127, 127, 127)"
+  }else{
+    expect_identical(stroke, expected.colour)
+    ## On phantomjs, stroke is "#7f7f7f"
+  }
 })
