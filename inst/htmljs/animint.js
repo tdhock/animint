@@ -228,13 +228,14 @@ var animint = function (to_select, json_file) {
       // TODO: carefully calculating this gets complicated with rotating xlabs
       margin.right += 5;
     }
-    var strip_height =  Math.max.apply(null, p_info.strips.top.map(function(entry){
-      return measureText(entry, 11).height;
-    }))
-    var strip_width =  Math.max.apply(null, p_info.strips.right.map(function(entry){
-      return measureText(entry, 11).height;
-    }))
     plotdim.margin = margin;
+    
+    var strip_heights = p_info.strips.top.map(function(entry){ 
+      return measureText(entry, 11).height; 
+    })
+    var strip_widths = p_info.strips.right.map(function(entry){ 
+      return measureText(entry, 11).height; 
+    })
 
     // track the number of x/y axes to account for when calculating
     // height/width of graphing region
@@ -247,11 +248,11 @@ var animint = function (to_select, json_file) {
 
     // the *entire graph* height/width
     var graph_width = p_info.options.width - ncols * (margin.left + margin.right) -
-                      p_info.strips.n.right * strip_width -
+                      strip_widths.reduce(function(a, b) { return a + b; }) -
                       n_yaxes * axispaddingy - ytitlepadding;
     var graph_height = p_info.options.height - nrows * (margin.top + margin.bottom) -
-                        titlepadding - (p_info.strips.n.top * strip_height) -
-                        n_xaxes * axispaddingx - xtitlepadding;
+                        strip_heights.reduce(function(a, b) { return a + b; }) -
+                        titlepadding - n_xaxes * axispaddingx - xtitlepadding;
 
     // Impose the pixelated aspect ratio of the graph upon the width/height
     // proportions calculated by the compiler. This has to be done on the
@@ -380,10 +381,12 @@ var animint = function (to_select, json_file) {
                       graph_width_cum + n_yaxes * axispaddingy + ytitlepadding;
     // room for right strips should be distributed evenly across panels to preserve aspect ratio
     plotdim.xend = plotdim.xstart + plotdim.graph.width;
-    plotdim.ystart = current_row * (plotdim.margin.top + strip_height) +
+    // total height of strips drawn thus far
+    var strip_height = strip_heights.slice(0, current_row)
+                       .reduce(function(a, b) { return a + b; })
+    plotdim.ystart = current_row * plotdim.margin.top +
                      (current_row - 1) * plotdim.margin.bottom +
-                     graph_height_cum + titlepadding +
-                     Math.min(p_info.strips.n.top, current_row) * strip_height;
+                     graph_height_cum + titlepadding + strip_height;
     // room for xaxis title should be distributed evenly across panels to preserve aspect ratio
     plotdim.yend = plotdim.ystart + plotdim.graph.height;
     // always add to the width (note it may have been reset earlier)
@@ -418,10 +421,10 @@ var animint = function (to_select, json_file) {
         }
         // assume right is top until it isn't
         var x = (plotdim.xstart + plotdim.xend) / 2;
-        var y = plotdim.ystart - strip_height / 2;
+        var y = plotdim.ystart - strip_heights[layout_i] / 2;
         var rotate = 0;
         if (side == "right") {
-          x = plotdim.xend + strip_width / 2;
+          x = plotdim.xend + strip_widths[layout_i] / 2;
           y = (plotdim.ystart + plotdim.yend) / 2;
           rotate = 90;
         }

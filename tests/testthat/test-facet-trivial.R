@@ -39,7 +39,7 @@ test_that("facet_grid(1 row and/or 1 column) is fine", {
     trans.mat <- str_match_perl(xtitle.attrs[["transform"]], translatePattern)
     trans.y <- as.numeric(trans.mat[, "y"])
     ## 400 is the default animint plot height.
-    expect_that(trans.y, is_less_than(400))
+    expect_less_than(trans.y, 400)
   }
   expect_axes("kk", 1, 1)
   expect_axes("kx", 1, 1)
