@@ -568,12 +568,14 @@ saveLayer <- function(l, d, meta){
           chunk.vec <- g.data[[chunk.var]]
           counts <- table(chunk.vec)
           if(length(counts) == 1){
-            stop("only 1 chunk") # do we ever get here?
-          }
-          if(all(counts == 1)){
-            FALSE #each chunk has only 1 row -- chunks are too small.
-          }else{
+            ##stop("only 1 chunk") # do we ever get here?
             TRUE
+          }else{
+            if(all(counts == 1)){
+              FALSE #each chunk has only 1 row -- chunks are too small.
+            }else{
+              TRUE
+            }
           }
         }else{
           FALSE
