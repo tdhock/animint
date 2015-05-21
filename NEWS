@@ -202,6 +202,12 @@ BUGFIX: R colors defined in parameters such as
 geom_line(colour="grey50") are now corrected translated to 
 rgb(127, 127, 127) in JSON.
 
+2015.05.21
+
+BUGFIX: Testing should now work on Windows with Firefox.
+
+For complete details, see https://github.com/tdhock/animint/pull/70
+
 2015.05.11
 
 For complete details, see https://github.com/tdhock/animint/pull/62
