@@ -16,18 +16,25 @@ dasharrayPattern <-
 
 rect.xpaths <- 
   c('//svg[@id="numeric"]//rect',
-    '//svg[@id="character"]//rect')
+    '//svg[@id="character"]//rect',
+    '//td[@id="numeric_legend"]//rect',
+    '//td[@id="character_legend"]//rect')
+    
 
 test_that("linetypes render correctly", {
   viz <-
     list(numeric=gg+
            scale_linetype_manual(values=c(correct=0,
                                    "false positive"=1,
-                                   "false negative"=3)),
+                                   "false negative"=3),
+                                limits=c("correct", "false positive",
+                                 "false negative")),
 
          character=gg+scale_linetype_manual(values=c(correct="blank",
                                               "false positive"="solid",
-                                              "false negative"="dotted")))
+                                              "false negative"="dotted"),
+                                limits=c("correct", "false positive",
+                                 "false negative")))
   info <- animint2HTML(viz)
 
   for(xpath in rect.xpaths){
