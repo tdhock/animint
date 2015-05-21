@@ -9,11 +9,11 @@ var animint = function (to_select, json_file) {
   var linetypesize2dasharray = function (lt, size) {
     var isInt = function(n) { return typeof n === 'number' && parseFloat(n) == parseInt(n, 10) && !isNaN(n); }
     if(isInt(lt)){ // R integer line types.
-      if(lt == 0){
+      if(lt == 1){
 	return null;
       }
       var o = {
-	1: 0,
+	0: size * 0 + "," + size * 10,
 	2: size * 4 + "," + size * 4,
 	3: size + "," + size * 2,
 	4: size + "," + size * 2 + "," + size * 4 + "," + size * 2,
@@ -1457,7 +1457,7 @@ var animint = function (to_select, json_file) {
 	  .attr("height", 10)
           .style("stroke-width", function(d){return d["polygonsize"]||1;})
           .style("stroke-dasharray", function(d){
-	    return linetypesize2dasharray(d["polygonlinetype"]||"solid",
+	    return linetypesize2dasharray(d["polygonlinetype"],
 					  d["size"]||2);
 	  })
           .style("stroke", function(d){return d["polygoncolour"] || "#000000";})
@@ -1483,7 +1483,7 @@ var animint = function (to_select, json_file) {
 	    return linescale(d["pathsize"])||2;
 	  })
           .style("stroke-dasharray", function(d){
-	    return linetypesize2dasharray(d["pathlinetype"]||"solid",
+	    return linetypesize2dasharray(d["pathlinetype"],
 					  d["pathsize"] || 2);
 	  })
           .style("stroke", function(d){return d["pathcolour"] || "#000000";})
