@@ -1434,6 +1434,7 @@ var animint = function (to_select, json_file) {
 	.sort(function(d) {return d["order"];})
 	.enter()
 	.append("tr")
+        .attr("id", function(d) { return d["label"]; })
       ;
       var legend_svgs = legend_rows.append("td")
         .append("svg")
