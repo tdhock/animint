@@ -1422,7 +1422,8 @@ var animint = function (to_select, json_file) {
     var legendkeys = d3.keys(p_info.legend);
     for(var i=0; i<legendkeys.length; i++){
       // the table that contains one row for each legend element.
-      var legend_table = tdRight.append("table").append("tr")
+      var legend_table = tdRight.append("table")
+        .append("tr").attr("id", "legend")
         .append("th").attr("align", "left")
         .text(p_info.legend[legendkeys[i]].title);
       var l_info = p_info.legend[legendkeys[i]];
