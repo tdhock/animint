@@ -1005,10 +1005,13 @@ is.rgb <- function(x){
 
 #' Convert R colors to RGB hexadecimal color values
 #' @param x character
-#' @return hexadecimal color value (if is.na(x), return "none" for compatibility with JavaScript)
+#' @return hexadecimal color value or "transparent" if is.na
 #' @export
 toRGB <- function(x){
-  named.vec <- sapply(x, function(i) if(!is.na(i)) rgb(t(col2rgb(as.character(i))), maxColorValue=255) else "none")
+  is.transparent <- is.na(x) | x=="transparent"
+  rgb.mat <- col2rgb(x)
+  rgb.vec <- rgb(t(rgb.mat), maxColorValue=255)
+  named.vec <- ifelse(is.transparent, "transparent", rgb.vec)
   not.named <- as.character(named.vec)
   not.named
 }
