@@ -1506,6 +1506,17 @@ var animint = function (to_select, json_file) {
 	.text(function(d){ return d["label"];})
       ;
     }
+    
+    // selecting points based on legend
+    var temp_select = function() {
+      d3.select("#plot").selectAll("#legend").selectAll("tr")
+        .on("click", function() { 
+          var row_id = d3.select(this).attr("id");
+          update_selector("Species", row_id);
+        })
+      ;
+    }
+    temp_select();
   }
 
   // Download the main description of the interactive plot.
