@@ -156,8 +156,6 @@ DSL: how to specify the layout of SVG elements on the page?
   means that we should layout the plots in a <table> with
   2 rows and 1 column.
 
-EXAMPLE: pirates data: world map?
-
 EXAMPLE: US state population since 1790, compare w/ other countries?
 http://en.wikipedia.org/wiki/List_of_U.S._states_by_historical_population
 http://fr.wikipedia.org/wiki/Histoire_démographique_de_la_France
