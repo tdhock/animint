@@ -1112,7 +1112,7 @@ getLegend <- function(mb){
   if(length(dataframes)>0) {
     data <- merge_recurse(dataframes)
   } else return(NULL)
-  data <- lapply(nrow(data):1, function(i) as.list(data[i,]))
+  data <- lapply(1:nrow(data), function(i) as.list(data[i,]))
   if(guidetype=="none"){
     NULL
   } else{
