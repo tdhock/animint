@@ -858,7 +858,8 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
         update.vars <- L$mapping[is.ss | is.cs]
         has.var <- update.vars %in% names(L$data)
         if(!all(has.var)){
-          print(list(interactive.variables=update.vars[!has.var],
+          print(L)
+          print(list(problem.aes=update.vars[!has.var],
                      data.variables=names(L$data)))
           stop("data does not have interactive variables")
         }
