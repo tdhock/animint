@@ -15,12 +15,24 @@ pattern <-
          "(?<value>.+?)",
          ";")
 
+test_that("transparent does not convert", {
+  expect_identical(toRGB("transparent"), "transparent")
+})
+
+test_that("NA converts to transparent", {
+  expect_identical(toRGB(NA), "transparent")
+})
+
+test_that("grey50 converts", {
+  expect_identical(toRGB("grey50"), "#7F7F7F")
+})
+
 test_that("color is converted to RGB colour", {
   info <- animint2HTML(viz)
 
   expect_equal(length(info$geoms), 1)
   g <- info$geoms[[1]]
-  expected.colour <- as.character(animint::toRGB("grey50"))
+  expected.colour <- as.character(toRGB("grey50"))
   expect_identical(g$params$colour, expected.colour)
   
   node.list <- getNodeSet(info$html, '//g[@class="geom1_step_step"]//path')
