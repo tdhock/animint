@@ -10,8 +10,8 @@ if (Sys.getenv("TRAVIS") == "true") {
   
   shiny_dir <- system.file("examples/shiny", package = "animint")
   shiny_cmd <- "shiny::runApp(appDir=\"%s\", port=%d, launch.browser=FALSE)"
-  port <- animint:::run_servr(port = 3147, directory = shiny_dir, code = shiny_cmd)
-  address <- sprintf("http://localhost:%s/", port)
+  animint:::run_servr(port = 3147, directory = shiny_dir, code = shiny_cmd)
+  address <- sprintf("http://localhost:3147")
   
   test_that("animint plot renders in a shiny app", {
     Sys.sleep(10) # give shiny a second to do it's thing
@@ -25,8 +25,8 @@ if (Sys.getenv("TRAVIS") == "true") {
   
   rmd_dir <- system.file("examples/rmarkdown", package = "animint")
   rmd_cmd <- "rmarkdown::run(dir = \"%s\", shiny_args = list(port=%d, launch.browser=FALSE))"
-  port <- animint:::run_servr(port = 3120, directory = rmd_dir, code = rmd_cmd)
-  address <- sprintf("http://localhost:%s/", port)
+  animint:::run_servr(port = 3120, directory = rmd_dir, code = rmd_cmd)
+  address <- sprintf("http://localhost:3120")
   
   test_that("animint plot renders in an interactive document", {
     Sys.sleep(10) # give shiny a second to do it's thing

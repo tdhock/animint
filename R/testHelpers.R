@@ -17,7 +17,7 @@ tests_init <- function(browserName = "phantomjs", dir = ".", port = 4848, ...) {
   ex <- tests_exit()
   # start a non-blocking local file server under path/to/animint/tests/testhat
   testPath <- find_test_path(dir)
-  port <- run_servr(port = port, directory = testPath)
+  run_servr(port = port, directory = testPath)
   # animint tests are performed in path/to/testthat/animint-htmltest/
   # note this path has to match the out.dir argument in animint2THML...
   testDir <- file.path(testPath, "animint-htmltest")
@@ -119,30 +119,13 @@ tests_exit <- function() {
 #' @param code R code to execute in a child session
 #' @return port number of the successful attempt
 run_servr <- function(directory = ".", port = 4848,
-                      code = "servr::httd(dir=\"%s\", port=%d, browser=FALSE)") {
-  dir <- normalizePath(directory)
+                      code = "servr::httd(dir='%s', port=%d)") {
+  dir <- normalizePath(directory, winslash = "/", mustWork = TRUE)
   cmd <- sprintf(
-    # escape all the things!
-    paste0("'library(methods); cat(Sys.getpid(), file=\"%s\", sep=\"\\\\n\", append=TRUE);", code, "'"),
+    paste("library(methods); write.table(Sys.getpid(), file='%s', append=T, row.name=F, col.names=F);", code),
     pid_file(), dir, port
   )
-  output <- tempfile(fileext = "txt")
-  t <- suppressWarnings(system2("Rscript", c("-e", cmd), 
-                                stderr = output, stdout = output, wait = FALSE))
-  Sys.sleep(5)
-  o <- paste(readLines(output, warn = FALSE), "\n")
-  message(o)
-  success <- !any(grepl("Error", o, fixed = TRUE))
-  if (success) {
-    return(port)
-  } else {
-    # if not successful, try a new port
-    # do I need to kill the other R process that failed?
-    new_port <- port + seq.int(-10, 10)[sample.int(n = 21, size = 1)]
-    message("couldn't start a server on port ", port, "; trying ", 
-            new_port, " instead")
-    run_servr(directory = directory, port = new_port, code = code)
-  }
+  system2("Rscript", c("-e", shQuote(cmd)), wait = FALSE)
 }
 
 # --------------------------
@@ -169,7 +152,7 @@ pid_file <- function() {
 
 # find the path to animint's testthat directory
 find_test_path <- function(dir = ".") {
-  dir <- normalizePath(dir, mustWork = TRUE)
+  dir <- normalizePath(dir, winslash = "/", mustWork = TRUE)
   if (!grepl("animint", dir, fixed = TRUE)) 
     stop("animint must appear somewhere in 'dir'")
   base_dir <- basename(dir)
