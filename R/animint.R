@@ -563,22 +563,18 @@ saveLayer <- function(l, d, meta){
         chunk.cols <- NULL
       }else{
         can.chunk.i <- which(can.chunk)[[1]]
-        several.chunks <- if(length(g$subset_order)){
+        several.chunks <- if(length(g$subset_order)==0) FALSE else {
           chunk.var <- subset.vec[[can.chunk.i]]
           chunk.vec <- g.data[[chunk.var]]
           counts <- table(chunk.vec)
           if(length(counts) == 1){
             ##stop("only 1 chunk") # do we ever get here?
             TRUE
+          }else if(all(counts == 1)){
+            FALSE #each chunk has only 1 row -- chunks are too small.
           }else{
-            if(all(counts == 1)){
-              FALSE #each chunk has only 1 row -- chunks are too small.
-            }else{
-              TRUE
-            }
+            TRUE
           }
-        }else{
-          FALSE
         }
         if(several.chunks){
           nest.cols <- subset.vec[-can.chunk.i]
