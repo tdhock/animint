@@ -198,6 +198,15 @@ does not respond to mouse clicks while the data is loading.
 DSL: Implement shape aesthetic with d3.svg.symbol()
 https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol_type
 
+2015.05.21
+
+BUGFIX: linetypes, legend ordering, color=NA means "transparent" etc
+https://github.com/tdhock/animint/pull/72
+
+BUGFIX: Testing should now work on Windows with Firefox.
+
+For complete details, see https://github.com/tdhock/animint/pull/70
+
 2015.05.20 https://github.com/tdhock/animint/pull/48
 
 RENDER: if the animation is paused when the user hides the animint
