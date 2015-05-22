@@ -29,4 +29,3 @@ Suggests:
     XML,
     devtools,
     maps
-Roxygen: list(wrap = TRUE)
