@@ -74,6 +74,16 @@ data=other.inserts, but they should both use the "insert" selection
 variable, in geom_point(aes(clickSelects=insert,
 showSelected=insert.show, data=other.inserts). See the example in
 https://github.com/tdhock/animint-examples/blob/master/examples/scaffolds.R#L65
+A better way to define this would be 
+aes(clickSelects=insert, 
+    showSelected.variable="insert",
+    showSelected.value=insert.show)
+Such a syntax would also be useful to avoid the use of for loops when
+defining a data viz with many selection variables, as in
+https://github.com/tdhock/animint-examples/blob/master/examples/PSJ.R
+For loops are bad for two reasons: 
+- more code to type (144 lines versus 122 lines), 
+- and slower construction of the data viz (30 seconds versus 1 second).
 
 DSL/RENDER: after clicking and changing the displayed data subset,
 zoom/update the axes of related plots. For animations we clearly want
@@ -186,6 +196,15 @@ does not respond to mouse clicks while the data is loading.
 DSL: Implement shape aesthetic with d3.svg.symbol()
 https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol_type
 
+2015.05.21
+
+BUGFIX: linetypes, legend ordering, color=NA means "transparent" etc
+https://github.com/tdhock/animint/pull/72
+
+BUGFIX: Testing should now work on Windows with Firefox.
+
+For complete details, see https://github.com/tdhock/animint/pull/70
+
 2015.05.20 https://github.com/tdhock/animint/pull/48
 
 RENDER: if the animation is paused when the user hides the animint
@@ -199,12 +218,6 @@ BUGFIX: facet_grid bugfix for when there is only 1 row or column.
 BUGFIX: R colors defined in parameters such as
 geom_line(colour="grey50") are now corrected translated to 
 rgb(127, 127, 127) in JSON.
-
-2015.05.21
-
-BUGFIX: Testing should now work on Windows with Firefox.
-
-For complete details, see https://github.com/tdhock/animint/pull/70
 
 2015.05.11
 

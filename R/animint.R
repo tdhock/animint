@@ -563,20 +563,18 @@ saveLayer <- function(l, d, meta){
         chunk.cols <- NULL
       }else{
         can.chunk.i <- which(can.chunk)[[1]]
-        several.chunks <- if(length(g$subset_order)){
+        several.chunks <- if(length(g$subset_order)==0) FALSE else {
           chunk.var <- subset.vec[[can.chunk.i]]
           chunk.vec <- g.data[[chunk.var]]
           counts <- table(chunk.vec)
           if(length(counts) == 1){
-            stop("only 1 chunk") # do we ever get here?
-          }
-          if(all(counts == 1)){
+            ##stop("only 1 chunk") # do we ever get here?
+            TRUE
+          }else if(all(counts == 1)){
             FALSE #each chunk has only 1 row -- chunks are too small.
           }else{
             TRUE
           }
-        }else{
-          FALSE
         }
         if(several.chunks){
           nest.cols <- subset.vec[-can.chunk.i]
@@ -856,7 +854,9 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
         update.vars <- L$mapping[is.ss | is.cs]
         has.var <- update.vars %in% names(L$data)
         if(!all(has.var)){
-          print(update.vars[!has.var])
+          print(L)
+          print(list(problem.aes=update.vars[!has.var],
+                     data.variables=names(L$data)))
           stop("data does not have interactive variables")
         }
         has.cs <- any(is.cs)
@@ -1001,10 +1001,13 @@ is.rgb <- function(x){
 
 #' Convert R colors to RGB hexadecimal color values
 #' @param x character
-#' @return hexadecimal color value (if is.na(x), return "none" for compatibility with JavaScript)
+#' @return hexadecimal color value or "transparent" if is.na
 #' @export
 toRGB <- function(x){
-  named.vec <- sapply(x, function(i) if(!is.na(i)) rgb(t(col2rgb(as.character(i))), maxColorValue=255) else "none")
+  is.transparent <- is.na(x) | x=="transparent"
+  rgb.mat <- col2rgb(x)
+  rgb.vec <- rgb(t(rgb.mat), maxColorValue=255)
+  named.vec <- ifelse(is.transparent, "transparent", rgb.vec)
   not.named <- as.character(named.vec)
   not.named
 }
@@ -1105,7 +1108,7 @@ getLegend <- function(mb){
   if(length(dataframes)>0) {
     data <- merge_recurse(dataframes)
   } else return(NULL)
-  data <- lapply(nrow(data):1, function(i) as.list(data[i,]))
+  data <- lapply(1:nrow(data), function(i) as.list(data[i,]))
   if(guidetype=="none"){
     NULL
   } else{
