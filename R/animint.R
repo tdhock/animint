@@ -59,6 +59,31 @@ parsePlot <- function(meta){
   ## grid 0-1 scale). This allows transformations to be used
   ## out of the box, with no additional d3 coding.
   theme.pars <- ggplot2:::plot_theme(meta$plot)
+  
+  ## extract pnale backgrounds from theme.pars
+  temp_background <- theme.pars$panel.background
+  # convert fill to RGB if necessary
+  if(!(is.rgb(temp_background$fill))) { 
+    temp_background$fill <- toRGB(temp_background$fill)
+  }
+  # if border color is specified
+  if(!is.na(temp_background$colour)) {
+    # convert color to RGB if necessary
+    if(!(is.rgb(temp_background$colour))) { 
+      temp_background$colour <- toRGB(temp_background$colour)
+    }
+    # check if the user specified linetype for the border
+    if(is.null(temp_background$linetype)) {
+      temp_background$linetype <- "solid"
+    } else {
+      # make sure linetype is correctly specified
+      stopifnot(temp_background$linetype %in% 
+                  c("blank", "solid", "dashed", "dotted", 
+                    "dotdash", "longdash", "twodash"))
+    }
+  }
+  # saving background info
+  plot.meta$panel_background <- temp_background
 
   ## Flip labels if coords are flipped - transform does not take care
   ## of this. Do this BEFORE checking if it is blank or not, so that
