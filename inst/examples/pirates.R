@@ -136,7 +136,8 @@ p_tiles <- ggplot() +
             fill = "lightblue", size = I(.3)) + 
   geom_polygon(aes(long, lat, group = group), size = I(1), 
                data = countries, fill = "lightgrey", colour = "darkgreen") +
-  geom_tile(aes(xmid, ymid, fill = log(attacks), showSelected = date), 
+  geom_tile(aes(xmid, ymid, fill = log(attacks), 
+                clickSelects = id, showSelected = date), 
             data = p_df3, colour = I("red")) + 
   make_text(p_df, 0, 90, "date", "Pirate Attacks from 1995 to %d") + 
   scale_fill_gradient(low = "#fee5d9", high = "#a50f15", name = "Attacks", 
@@ -146,6 +147,11 @@ p_tiles <- ggplot() +
         axis.ticks=element_blank(), axis.title=element_blank(), 
         panel.grid.major=element_blank(), panel.grid.minor=element_blank()) + 
   theme_animint(width = 800)
+
+# tiles over time
+p_time2 <- ggplot() + 
+  geom_line(aes(date, log(attacks), group = id, showSelected = id), 
+            data = p_df3)
 
 # passing to animint
 ani_list <- list( 
