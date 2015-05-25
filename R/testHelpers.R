@@ -99,7 +99,6 @@ tests_run <- function(dir = ".", filter = NULL) {
 #' @seealso \link{tests_run}
 #' @export
 tests_exit <- function() {
-  
   res <- stop_binary()
   Sys.unsetenv("ANIMINT_BROWSER")
   # release port used for local file server
