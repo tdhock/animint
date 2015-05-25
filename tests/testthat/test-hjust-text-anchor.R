@@ -40,7 +40,7 @@ grad.desc <- function(
 dat <- grad.desc()
 contour <- dat$contour
 objective <- dat$objective
-objective <- ldply(objective$iteration, function(i) {
+objective <- plyr::ldply(objective$iteration, function(i) {
   df <- subset(objective, iteration <= i)
   cbind(df, iteration2 = i)
 })
