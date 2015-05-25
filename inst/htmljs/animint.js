@@ -510,6 +510,14 @@ var animint = function (to_select, json_file) {
 
     Plots[p_name].scales = scales;
 
+    // draw background
+    svg.append("rect")
+      .attr("x", plotdim.xstart)
+      .attr("y", plotdim.ystart)
+      .attr("width", graph_width)
+      .attr("height", graph_height)
+      .attr("fill", p_info.panel_background.fill);
+
   } //end of add_plot()
 
   var add_selector = function (s_name, s_info) {
