@@ -93,15 +93,3 @@ test_that("tornado animation frames correct", {
   info <- animint2dir(evolution, open.browser=FALSE)
   expect_identical(info$time$sequence, as.character(1:100))
 })
-
-
-diamondz <- do.call("rbind", replicate(100, diamonds, simplify = FALSE))
-
-p <- ggplot() + geom_point(aes(x = carat, y = price, showSelected = table), 
-                           data = diamonds)
-l <- list(
-  p = p,
-  duration = list(table = 100),
-  time = list(variable = "table", ms = 100)
-)
-animint2dir(l)
