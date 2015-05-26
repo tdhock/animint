@@ -79,7 +79,7 @@ bytes.used <- function(file.vec, ...){
   tryCatch({
     du.lines <- system(cmd, intern=TRUE)
     as.integer(sub("\t.*", "", du.lines))
-  }, function(e){
+  }, error=function(e){
     rep(NA_integer_, length(file.vec))
   })
 }
