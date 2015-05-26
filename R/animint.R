@@ -572,6 +572,15 @@ saveLayer <- function(l, d, meta){
         rows.per.chunk <- table(g.data[,can.chunk.cols])
         bytes.per.chunk <- rows.per.chunk * bytes.per.line
         if(all(4096 < bytes.per.chunk))return(NULL)
+        ## If all of the tsv chunk files are greater than 4KB, then we
+        ## return NULL here to indicate that the current chunk
+        ## variables (indicated in can.chunk) are fine.
+
+        ## In other words, the compiler will not break a geom into
+        ## chunks if any of the resulting chunk tsv files is estimated
+        ## to be less than 4KB (of course, if the layer has very few
+        ## data overall, the compiler creates 1 file which may be less
+        ## than 4KB, but that is fine).
         dim.vec <- seq_along(dim(bytes.per.chunk))
         dim.byte.list <- if(length(dim.vec) == 1){
           list(sum(bytes.per.chunk))
