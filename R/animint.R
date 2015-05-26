@@ -557,32 +557,38 @@ saveLayer <- function(l, d, meta){
       selector.names <- g$aes[subset.vec]
       subset.types <- selector.types[selector.names]
       can.chunk <- subset.types != "multiple"
-      if(all(!can.chunk)){
-        ## no possible chunk variables, just make 1 chunk.
+      ## Guess how big the chunk files will be, and reduce the number of
+      ## chunks if there are any that are too small.
+      tmp <- tempfile()
+      some.lines <- rbind(head(g.data), tail(g.data))
+      write.table(some.lines, tmp,
+                  col.names=FALSE,
+                  quote=FALSE, row.names=FALSE, sep="\t")
+      bytes <- file.size(tmp)
+      bytes.per.line <- bytes/nrow(some.lines)
+      bad.chunk <- function(){
+        if(all(!can.chunk))return(NULL)
+        can.chunk.cols <- subset.vec[can.chunk]
+        rows.per.chunk <- table(g.data[,can.chunk.cols])
+        bytes.per.chunk <- rows.per.chunk * bytes.per.line
+        if(all(4096 < bytes.per.chunk))return(NULL)
+        dim.vec <- seq_along(dim(bytes.per.chunk))
+        dim.byte.list <- lapply(dim.vec, function(i) {
+          apply(bytes.per.chunk, -i, sum)
+        })
+        n.chunks <- sapply(dim.byte.list, length)
+        min.bytes <- sapply(dim.byte.list, min)
+        which.max(min.bytes)
+      }
+      while(!is.null(bad <- bad.chunk())){
+        can.chunk[bad] <- FALSE
+      }
+      if(any(can.chunk)){
+        nest.cols <- subset.vec[!can.chunk]
+        chunk.cols <- subset.vec[can.chunk]
+      }else{
         nest.cols <- subset.vec
         chunk.cols <- NULL
-      }else{
-        can.chunk.i <- which(can.chunk)[[1]]
-        several.chunks <- if(length(g$subset_order)==0) FALSE else {
-          chunk.var <- subset.vec[[can.chunk.i]]
-          chunk.vec <- g.data[[chunk.var]]
-          counts <- table(chunk.vec)
-          if(length(counts) == 1){
-            ##stop("only 1 chunk") # do we ever get here?
-            TRUE
-          }else if(all(counts == 1)){
-            FALSE #each chunk has only 1 row -- chunks are too small.
-          }else{
-            TRUE
-          }
-        }
-        if(several.chunks){
-          nest.cols <- subset.vec[-can.chunk.i]
-          chunk.cols <- chunk.var
-        }else{
-          nest.cols <- subset.vec
-          chunk.cols <- NULL
-        }
       }
     }
   }
