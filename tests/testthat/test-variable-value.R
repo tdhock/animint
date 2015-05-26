@@ -1,0 +1,92 @@
+context("variable value")
+
+problems <-
+  data.frame(problemStart=c(100, 200, 100, 150, 200, 250),
+             problemEnd=c(200, 300, 150, 200, 250, 300),
+             problem.i=c(1, 2, 1, 2, 3, 4),
+             bases.per.problem=c(100, 100, 50, 50, 50, 50))
+problems$problem.name <- with(problems, {
+  sprintf("size%dproblem%d", bases.per.problem, problem.i)
+})
+
+sizes <- data.frame(bases.per.problem=c(50, 100),
+                    problems=c(2, 4))
+
+problems$peakStart <- problems$problemStart + 10
+problems$peakEnd <- problems$problemEnd - 10
+
+samples <-
+  rbind(data.frame(problems, sample.id="sample1", peaks=1),
+        data.frame(problems, sample.id="sample2", peaks=2))
+
+peaks <-
+  expand.grid(peaks=0:2, 
+              problem.name=problems$problem.name)
+
+peak.problems <-
+  rbind(data.frame(problems, peaks=1),
+        data.frame(problems, peaks=2))
+
+viz <-
+  list(problems=ggplot()+
+         ggtitle("select problem")+
+         geom_segment(aes(problemStart, problem.i,
+                          clickSelects=problem.name,
+                          showSelected=bases.per.problem,
+                          xend=problemEnd, yend=problem.i),
+                      size=5,
+                      data=data.frame(problems, sample.id="problems"))+
+         geom_text(aes(200, 5,
+                       label=paste("problem size", bases.per.problem),
+                       showSelected=bases.per.problem),
+                   data=data.frame(sizes, sample.id="problems"))+
+         geom_segment(aes(peakStart, problem.i,
+                          showSelected.variable=paste0(problem.name, "peaks"),
+                          showSelected.value=peaks,
+                          clickSelects=problem.name,
+                          showSelected2=bases.per.problem,
+                          xend=peakEnd, yend=problem.i),
+                      data=data.frame(peak.problems, sample.id="problems"),
+                      size=10,
+                      color="deepskyblue")+
+         geom_segment(aes(peakStart, 0,
+                          showSelected.variable=paste0(problem.name, "peaks"),
+                          showSelected.value=peaks,
+                          clickSelects=problem.name,
+                          showSelected2=bases.per.problem,
+                          xend=peakEnd, yend=0),
+                      data=samples,
+                      size=10,
+                      color="deepskyblue")+
+         theme_bw()+
+         theme(panel.margin=grid::unit(0, "cm"))+
+         facet_grid(sample.id ~ .),
+       
+       sizes=ggplot()+
+         ggtitle("select problem size")+
+         geom_point(aes(bases.per.problem, problems,
+                        clickSelects=bases.per.problem),
+                    size=10,
+                    data=sizes),
+
+       peaks=ggplot()+
+         ggtitle("select number of peaks")+
+         geom_point(aes(peaks, peaks,
+                        showSelected=problem.name,
+                        clickSelects.variable=paste0(problem.name, "peaks"),
+                        clickSelects.value=peaks),
+                    size=10,
+                    data=peaks)+
+         geom_text(aes(1, 3, label=problem.name,
+                       showSelected=problem.name),
+                   data=problems))
+
+test_that(".variable and .value makes compiler create selectors", {
+  info <- animint2HTML(viz)
+  selector.names <- sort(names(info$selectors))
+  expected.names <-
+    sort(c("problem.name",
+           paste0(problems$problem.name, "peaks"),
+           "bases.per.problem"))
+  expect_identical(selector.names, expected.names)
+})
