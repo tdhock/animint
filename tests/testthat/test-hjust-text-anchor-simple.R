@@ -64,24 +64,3 @@ test_that('geom_text(hjust=0) => <text style="text-anchor: start">', {
                                "text-anchor")
   expect_match(style.value, "start")
 })
-
-test_that('geom_text(hjust=1) => <text style="text-anchor: end">', {
-  viz <- grad.desc.viz(hjust = 1)
-  info <- animint2HTML(viz)
-  style.value <- getStyleValue(info$html, '//g[@class="geom4_text_objective"]//text', 
-                               "text-anchor")
-  expect_match(style.value, "end")
-})
-
-test_that('geom_text(hjust=0.5) => <text style="text-anchor: middle">', {
-  viz <- grad.desc.viz(hjust = 0.5)
-  info <- animint2HTML(viz)
-  style.value <- getStyleValue(info$html, '//g[@class="geom4_text_objective"]//text', 
-                               "text-anchor")
-  expect_match(style.value, "middle")
-})
-
-test_that('geom_text(hjust=other) => unsupported value error', {
-  viz <- grad.desc.viz(hjust = 0.8)
-  expect_error(animint2HTML(viz), "animint only supports hjust values 0, 0.5, 1")
-})
