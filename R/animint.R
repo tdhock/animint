@@ -557,6 +557,7 @@ saveLayer <- function(l, d, meta){
       selector.names <- g$aes[subset.vec]
       subset.types <- selector.types[selector.names]
       can.chunk <- subset.types != "multiple"
+      names(can.chunk) <- subset.vec
       ## Guess how big the chunk files will be, and reduce the number of
       ## chunks if there are any that are too small.
       tmp <- tempfile()
@@ -581,20 +582,27 @@ saveLayer <- function(l, d, meta){
         ## to be less than 4KB (of course, if the layer has very few
         ## data overall, the compiler creates 1 file which may be less
         ## than 4KB, but that is fine).
-        dim.vec <- seq_along(dim(bytes.per.chunk))
-        dim.byte.list <- if(length(dim.vec) == 1){
-          list(sum(bytes.per.chunk))
+        dim.byte.list <- list()
+        if(length(can.chunk.cols) == 1){
+          dim.byte.list[[can.chunk.cols]] <- sum(bytes.per.chunk)
         }else{
-          lapply(dim.vec, function(i) {
-            apply(bytes.per.chunk, -i, sum)
-          })
+          for(dim.i in seq_along(can.chunk.cols)){
+            dim.name <- can.chunk.cols[[dim.i]]
+            dim.byte.list[[dim.name]] <-
+              apply(bytes.per.chunk, -dim.i, sum)
+          }
         }
         n.chunks <- sapply(dim.byte.list, length)
         min.bytes <- sapply(dim.byte.list, min)
-        which.max(min.bytes)
+        can.chunk.cols[[which.max(min.bytes)]]
       }
-      while(!is.null(bad <- bad.chunk())){
-        can.chunk[bad] <- FALSE
+      while({
+        bad <- bad.chunk()
+        ## str(bad)
+        ## browser()
+        !is.null(bad)
+      }){
+        can.chunk[[bad]] <- FALSE
       }
       if(any(can.chunk)){
         nest.cols <- subset.vec[!can.chunk]
