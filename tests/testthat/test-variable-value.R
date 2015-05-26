@@ -17,6 +17,7 @@ problems$peakEnd <- problems$problemEnd - 10
 
 samples <-
   rbind(data.frame(problems, sample.id="sample1", peaks=1),
+        data.frame(problems, sample.id="sample1", peaks=2),        
         data.frame(problems, sample.id="sample2", peaks=2))
 
 peaks <-
@@ -89,4 +90,79 @@ test_that(".variable and .value makes compiler create selectors", {
            paste0(problems$problem.name, "peaks"),
            "bases.per.problem"))
   expect_identical(selector.names, expected.names)
+})
+
+viz.for <-
+  list(problems=ggplot()+
+         ggtitle("select problem")+
+         geom_segment(aes(problemStart, problem.i,
+                          clickSelects=problem.name,
+                          showSelected=bases.per.problem,
+                          xend=problemEnd, yend=problem.i),
+                      size=5,
+                      data=data.frame(problems, sample.id="problems"))+
+         geom_text(aes(200, 5,
+                       label=paste("problem size", bases.per.problem),
+                       showSelected=bases.per.problem),
+                   data=data.frame(sizes, sample.id="problems"))+
+         theme_bw()+
+         theme(panel.margin=grid::unit(0, "cm"))+
+         facet_grid(sample.id ~ .),
+       
+       sizes=ggplot()+
+         ggtitle("select problem size")+
+         geom_point(aes(bases.per.problem, problems,
+                        clickSelects=bases.per.problem),
+                    size=10,
+                    data=sizes),
+
+       peaks=ggplot()+
+         ggtitle("select number of peaks")+
+         geom_text(aes(1, 3, label=problem.name,
+                       showSelected=problem.name),
+                   data=problems))
+
+pp.list <- split(peak.problems, peak.problems$problem.name)
+s.list <- split(samples, samples$problem.name)
+p.list <- split(peaks, peaks$problem.name)
+
+for(problem.name in names(p.list)){
+  s.name <- paste0(problem.name, "peaks")
+  p <- p.list[[problem.name]]
+  p[[s.name]] <- p$peaks
+  pp <- pp.list[[problem.name]]
+  pp[[s.name]] <- pp$peaks
+  s <- s.list[[problem.name]]
+  s[[s.name]] <- s$peaks
+  viz.for$problems <- viz.for$problems+
+    geom_segment(aes_string("peakStart", "problem.i",
+                            showSelected=s.name,
+                            clickSelects="problem.name",
+                            showSelected2="bases.per.problem",
+                            xend="peakEnd", yend="problem.i"),
+                 data=data.frame(pp, sample.id="problems"),
+                 size=10,
+                 color="deepskyblue")+
+    geom_segment(aes_string("peakStart", "0",
+                            showSelected=s.name,
+                            clickSelects="problem.name",
+                            showSelected2="bases.per.problem",
+                            xend="peakEnd", yend="0"),
+                 data=s,
+                 size=10,
+                 color="deepskyblue")
+  viz.for$peaks <- viz.for$peaks+
+         geom_point(aes_string("peaks", "peaks",
+                               showSelected="problem.name",
+                               clickSelects=s.name),
+                    size=10,
+                    data=p)
+}
+
+test_that("some chunks are not downloaded", {
+  info <- animint2HTML(viz.for)
+  node.set <-
+    getNodeSet(info$html, '//td[@class="downloaded"]')
+  value.vec <- sapply(node.set, xmlValue)
+  expect_true("0" %in% value.vec)
 })
