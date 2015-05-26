@@ -76,8 +76,12 @@ bytes.used <- function(file.vec, ...){
   ## actual amount of space used on disk.
   file.str <- paste(file.vec, collapse=" ")
   cmd <- paste("du --block-size=1", ..., file.str)
-  du.lines <- system(cmd, intern=TRUE)
-  as.integer(sub("\t.*", "", du.lines))
+  tryCatch({
+    du.lines <- system(cmd, intern=TRUE)
+    as.integer(sub("\t.*", "", du.lines))
+  }, function(e){
+    rep(NA_integer_, length(file.vec))
+  })
 }
 
 test.paths <- 
