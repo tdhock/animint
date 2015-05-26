@@ -573,9 +573,13 @@ saveLayer <- function(l, d, meta){
         bytes.per.chunk <- rows.per.chunk * bytes.per.line
         if(all(4096 < bytes.per.chunk))return(NULL)
         dim.vec <- seq_along(dim(bytes.per.chunk))
-        dim.byte.list <- lapply(dim.vec, function(i) {
-          apply(bytes.per.chunk, -i, sum)
-        })
+        dim.byte.list <- if(length(dim.vec) == 1){
+          list(sum(bytes.per.chunk))
+        }else{
+          lapply(dim.vec, function(i) {
+            apply(bytes.per.chunk, -i, sum)
+          })
+        }
         n.chunks <- sapply(dim.byte.list, length)
         min.bytes <- sapply(dim.byte.list, min)
         which.max(min.bytes)
