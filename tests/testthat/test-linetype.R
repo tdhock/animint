@@ -19,7 +19,6 @@ rect.xpaths <-
     '//svg[@id="character"]//rect',
     '//td[@id="numeric_legend"]//rect',
     '//td[@id="character_legend"]//rect')
-    
 
 test_that("linetypes render correctly", {
   viz <-
