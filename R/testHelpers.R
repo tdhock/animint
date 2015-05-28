@@ -147,14 +147,6 @@ stop_binary <- function() {
   TRUE
 }
 
-# file that will keep track of all processes were initiated during animint testing
-# pid_file <- function() {
-#   f <- file.path(find_test_path(), "pids.txt")
-#   file(f)
-# #   if (!file.exists(f)) file(f)
-# #   f
-# }
-
 # find the path to animint's testthat directory
 find_test_path <- function(dir = ".") {
   dir <- normalizePath(dir, winslash = "/", mustWork = TRUE)
