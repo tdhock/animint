@@ -64,8 +64,11 @@ test_that('hiding all legends works with theme(legend.position="none")',{
   expect_identical(generated.names, NULL)
 })
 
+error.types <-
+  data.frame(x=1:3, status=c("correct", "false positive", "false negative"))
+
 gg <- 
-  ggplot(df)+
+  ggplot(error.types)+
     geom_point(aes(x, x))+
     geom_tallrect(aes(xmin=x, xmax=x+0.5, fill=x),
                   color="black")
