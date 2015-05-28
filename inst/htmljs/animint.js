@@ -1501,6 +1501,7 @@ var animint = function (to_select, json_file) {
       }
       legend_rows.append("td")
 	.attr("align", "left")
+	.attr("id", "legend_entry_label")
 	.text(function(d){ return d["label"];})
       ;
     }
