@@ -101,10 +101,15 @@ tests_run <- function(dir = ".", filter = NULL) {
 tests_exit <- function() {
   res <- stop_binary()
   Sys.unsetenv("ANIMINT_BROWSER")
-  # release port used for local file server
-  if (exists("serv.port")) {
-    pid <- port2pid(port = serv.port)
-    res <- c(res, tools::pskill(pid))
+  f <- file.path(find_test_path(), "pids.txt")
+  if (file.exists(f)) {
+    e <- try(readLines(con <- file(f), warn = FALSE), silent = TRUE)
+    if (!inherits(e, "try-error")) {
+      pids <- as.integer(e)
+      res <- c(res, tools::pskill(pids))
+    }
+    close(con)
+    unlink(f)
   }
   invisible(all(res))
 }
@@ -117,11 +122,13 @@ tests_exit <- function() {
 #' @param port port number to _attempt_ to run server on.
 #' @param code R code to execute in a child session
 #' @return port number of the successful attempt
-run_servr <- function(directory = ".", port = 4848, 
+run_servr <- function(directory = ".", port = 4848,
                       code = "servr::httd(dir='%s', port=%d)") {
-  assign("serv.port", port, envir = .GlobalEnv)
   dir <- normalizePath(directory, winslash = "/", mustWork = TRUE)
-  cmd <- sprintf(code, dir, port)
+  cmd <- sprintf(
+    paste("write.table(Sys.getpid(), file='%s', append=T, row.name=F, col.names=F);", code),
+    file.path(find_test_path(), "pids.txt"), dir, port
+  )
   system2("Rscript", c("-e", shQuote(cmd)), wait = FALSE)
 }
 
@@ -137,14 +144,16 @@ stop_binary <- function() {
     remDr$closeWindow()
     remDr$closeServer()
   }, silent = TRUE)
-  # remDr doesn't release the default port 4444
-  # remDr or pJS are removed accidently, but the default port is still occupied.
-  # Failed to create server for GhostDriver
-  # kill process explicitly
-  pid <- port2pid()
-  tools::pskill(pid)
   TRUE
 }
+
+# file that will keep track of all processes were initiated during animint testing
+# pid_file <- function() {
+#   f <- file.path(find_test_path(), "pids.txt")
+#   file(f)
+# #   if (!file.exists(f)) file(f)
+# #   f
+# }
 
 # find the path to animint's testthat directory
 find_test_path <- function(dir = ".") {
@@ -159,13 +168,4 @@ find_test_path <- function(dir = ".") {
                     tests = "testthat",
                     testthat = "")
   file.path(dir, ext_dir)
-}
-
-# get process id via port number
-port2pid <- function(port = 4444) {
-#   args <- paste0("-i :", port, " -t")
-#   pid <- as.integer(system2("lsof", args = args, stdout = TRUE))
-  cmd <- paste0("lsof -i :", port, " -t")
-  pid <- as.integer(system(cmd, intern = TRUE))
-  pid
 }
