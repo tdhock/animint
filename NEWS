@@ -199,6 +199,12 @@ does not respond to mouse clicks while the data is loading.
 DSL: Implement shape aesthetic with d3.svg.symbol()
 https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol_type
 
+2015.05.28
+
+BUGFIX: ordering of legend entries now correctly reverses the order of
+numeric legend entries, so that smaller numbers appear lower in the
+legend.
+
 2015.05.21
 
 BUGFIX: linetypes, legend ordering, color=NA means "transparent" etc
