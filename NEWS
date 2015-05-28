@@ -74,6 +74,16 @@ data=other.inserts, but they should both use the "insert" selection
 variable, in geom_point(aes(clickSelects=insert,
 showSelected=insert.show, data=other.inserts). See the example in
 https://github.com/tdhock/animint-examples/blob/master/examples/scaffolds.R#L65
+A better way to define this would be 
+aes(clickSelects=insert, 
+    showSelected.variable="insert",
+    showSelected.value=insert.show)
+Such a syntax would also be useful to avoid the use of for loops when
+defining a data viz with many selection variables, as in
+https://github.com/tdhock/animint-examples/blob/master/examples/PSJ.R
+For loops are bad for two reasons: 
+- more code to type (144 lines versus 122 lines), 
+- and slower construction of the data viz (30 seconds versus 1 second).
 
 DSL/RENDER: after clicking and changing the displayed data subset,
 zoom/update the axes of related plots. For animations we clearly want
@@ -89,7 +99,8 @@ RENDER: move stats computation to the renderer, to support e.g.
 examples/stats.R
 
 RENDER: it would be nice to zoom by dragging a rectangle on the plot
-background, as in plotly. Then double-click to zoom back out.
+background, as in plotly. Then double-click to zoom back out. This lib
+might help do the heavy lifting -- https://github.com/romsson/dragit
 
 RENDER: It would be nice to be able to resize plots interactively,
 like we can do in shiny+ggvis.
