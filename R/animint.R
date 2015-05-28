@@ -1085,7 +1085,6 @@ getLegendList <- function(plistextra){
 #' Function to get legend information for each scale
 #' @param mb single entry from ggplot2:::guides_merge() list of legend data
 #' @return list of legend information, NULL if guide=FALSE.
-
 getLegend <- function(mb){
   guidetype <- mb$name
   ## The main idea of legends:
