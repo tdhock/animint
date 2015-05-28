@@ -64,3 +64,49 @@ test_that('hiding all legends works with theme(legend.position="none")',{
   expect_identical(generated.names, NULL)
 })
 
+error.types <-
+  data.frame(x=1:3, status=c("correct", "false positive", "false negative"))
+
+gg <- 
+  ggplot(error.types)+
+    geom_point(aes(x, x))+
+    geom_tallrect(aes(xmin=x, xmax=x+0.5, fill=x),
+                  color="black")
+
+expected.legend.list <- 
+  list(increasing=1:3,
+       default=seq(3, 1, by=-0.5),
+       decreasing=3:1)
+    
+test_that("renderer shows legend entries in correct order", {
+  viz <-
+    list(increasing=gg+
+           scale_fill_continuous(breaks=1:3),
+         decreasing=gg+
+           scale_fill_continuous(breaks=3:1),
+         default=gg)
+  info <- animint2HTML(viz)
+  ##sapply(info$plots, function(p)sapply(p$legend$x$entries, "[[", "label"))
+  
+  ## NOTE: it is important to test the renderer here (not the
+  ## compiler) since maybe the order specified in the plot.json file
+  ## is not the same as the order of appearance on the web page.
+
+  ## The expected behavior is smaller numeric entries on the bottom of
+  ## the legend by default, and if they are manually specified via
+  ## breaks, we have:
+  breaks <-
+    c("top",
+      "middle",
+      "bottom")
+  for(plot.name in names(expected.legend.list)){
+    xpath <-
+      sprintf('//td[@id="%s_legend"]//td[@class="legend_entry_label"]',
+              plot.name)
+    expected.entries <- expected.legend.list[[plot.name]]
+    node.set <- getNodeSet(info$html, xpath)
+    value.str <- sapply(node.set, xmlValue)
+    value.num <- as.numeric(value.str)
+    expect_equal(value.num, expected.entries)
+  }
+})
