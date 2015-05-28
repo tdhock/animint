@@ -75,7 +75,7 @@ gg <-
 
 expected.legend.list <- 
   list(increasing=1:3,
-       default=seq(3, 1, by=0.5),
+       default=seq(3, 1, by=-0.5),
        decreasing=3:1)
     
 test_that("renderer shows legend entries in correct order", {
