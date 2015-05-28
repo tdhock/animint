@@ -1043,12 +1043,19 @@ getLegendList <- function(plistextra){
   position <- theme$legend.position
   # locate guide argument in scale_*, and use that for a default.
   # Note, however, that guides(colour = ...) has precendence! See https://gist.github.com/cpsievert/ece28830a6c992b29ab6
-  guides.list <- list()
-  for(sc in scales$scales){
-    if(sc$guide != "none"){
-      guides.list[sc$aesthetics] <- "legend"
+  guides.args <- list()
+  for(aes.name in c("colour", "fill")){
+    aes.loc <- which(scales$find(aes.name))
+    guide.type <- if (length(aes.loc) == 1){
+      scales$scales[[aes.loc]][["guide"]]
+    }else{
+      "legend"
     }
+    if(guide.type=="colourbar")guide.type <- "legend"
+    guides.args[[aes.name]] <- guide.type
   }
+  guides.result <- do.call(ggplot2::guides, guides.args)
+  guides.list <- plyr::defaults(plot$guides, guides.result)
   gdefs <-
     ggplot2:::guides_train(scales = scales,
                            theme = theme,
@@ -1062,11 +1069,14 @@ getLegendList <- function(plistextra){
   ## Add a flag to specify whether or not breaks was manually
   ## specified. If it was, then it should be respected. If not, and
   ## the legend shows a numeric variable, then it should be reversed.
-  for(guide.i in seq_along(guides.list)){
-    aes.name <- names(guides.list)[[guide.i]]
+  for(legend.name in names(gdefs)){
+    key.df <- gdefs[[legend.name]]$key
+    aes.name <- names(key.df)[1]
     scale.i <- which(scales$find(aes.name))
-    sc <- scales$scales[[scale.i]]
-    gdefs[[guide.i]]$breaks <- sc$breaks
+    if(length(scale.i) == 1){
+      sc <- scales$scales[[scale.i]]
+      gdefs[[legend.name]]$breaks <- sc$breaks
+    }
   }
   legend.list <- lapply(gdefs, getLegend)
   legend.list[0 < sapply(legend.list, length)]
