@@ -86,6 +86,8 @@ test_that("renderer shows legend entries in correct order", {
            scale_fill_continuous(breaks=3:1),
          default=gg)
   info <- animint2HTML(viz)
+  ##sapply(info$plots, function(p)sapply(p$legend$x$entries, "[[", "label"))
+  
   ## NOTE: it is important to test the renderer here (not the
   ## compiler) since maybe the order specified in the plot.json file
   ## is not the same as the order of appearance on the web page.

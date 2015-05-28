@@ -139,16 +139,11 @@ parsePlot <- function(meta){
   plot.meta$xlabs <- as.list(unique(unlist(lapply(axis.info, "[", "xlab"))))
   plot.meta$ylabs <- as.list(unique(unlist(lapply(axis.info, "[", "ylab"))))
 
-  plot.meta$legend <- getLegendList(meta$built)
-  if(length(plot.meta$legend)>0){
-    plot.meta$legend <-
-      plot.meta$legend[which(sapply(plot.meta$legend, function(i) {
-        length(i)>0
-      }))]
-  }  # only pass out legends that have guide = "legend" or guide="colorbar"
-
-  # Remove legend if theme has no legend position
-  if(theme.pars$legend.position=="none") plot.meta$legend <- NULL
+  
+  ## No legend if theme(legend.postion="none").
+  plot.meta$legend <- if(theme.pars$legend.position != "none"){
+    getLegendList(meta$built)
+  }
 
   if("element_blank"%in%attr(theme.pars$plot.title, "class")){
     plot.meta$title <- ""
@@ -1048,32 +1043,39 @@ getLegendList <- function(plistextra){
   position <- theme$legend.position
   # locate guide argument in scale_*, and use that for a default.
   # Note, however, that guides(colour = ...) has precendence! See https://gist.github.com/cpsievert/ece28830a6c992b29ab6
-  guides.args <- list()
-  for(aes.name in c("colour", "fill")){
-    aes.loc <- which(scales$find(aes.name))
-    guide.type <- if (length(aes.loc) == 1){
-      scales$scales[[aes.loc]][["guide"]]
-    }else{
-      "legend"
+  guides.list <- list()
+  for(sc in scales$scales){
+    if(sc$guide != "none"){
+      guides.list[sc$aesthetics] <- "legend"
     }
-    if(guide.type=="colourbar")guide.type <- "legend"
-    guides.args[[aes.name]] <- guide.type
   }
-  guides.result <- do.call(ggplot2::guides, guides.args)
-  guides <- plyr::defaults(plot$guides, guides.result)
-  labels <- plot$labels
-  gdefs <- ggplot2:::guides_train(scales = scales, theme = theme, guides = guides, labels = labels)
+  gdefs <-
+    ggplot2:::guides_train(scales = scales,
+                           theme = theme,
+                           guides = guides.list,
+                           labels = plot$labels)
   if (length(gdefs) != 0) {
     gdefs <- ggplot2:::guides_merge(gdefs)
     gdefs <- ggplot2:::guides_geom(gdefs, layers, default_mapping)
   } else (ggplot2:::zeroGrob())
   names(gdefs) <- sapply(gdefs, function(i) i$title)
-  lapply(gdefs, getLegend)
+  ## Add a flag to specify whether or not breaks was manually
+  ## specified. If it was, then it should be respected. If not, and
+  ## the legend shows a numeric variable, then it should be reversed.
+  for(guide.i in seq_along(guides.list)){
+    aes.name <- names(guides.list)[[guide.i]]
+    scale.i <- which(scales$find(aes.name))
+    sc <- scales$scales[[scale.i]]
+    gdefs[[guide.i]]$breaks <- sc$breaks
+  }
+  legend.list <- lapply(gdefs, getLegend)
+  legend.list[0 < sapply(legend.list, length)]
 }
 
 #' Function to get legend information for each scale
 #' @param mb single entry from ggplot2:::guides_merge() list of legend data
 #' @return list of legend information, NULL if guide=FALSE.
+
 getLegend <- function(mb){
   guidetype <- mb$name
   ## The main idea of legends:
@@ -1108,7 +1110,15 @@ getLegend <- function(mb){
   if(length(dataframes)>0) {
     data <- merge_recurse(dataframes)
   } else return(NULL)
-  data <- lapply(1:nrow(data), function(i) as.list(data[i,]))
+  label.num <- suppressWarnings({
+    as.numeric(data$label)
+  })
+  entry.order <- if(is.atomic(mb$breaks) || anyNA(label.num)){
+    1:nrow(data)
+  }else{
+    nrow(data):1
+  }
+  data <- lapply(entry.order, function(i) as.list(data[i,]))
   if(guidetype=="none"){
     NULL
   } else{
