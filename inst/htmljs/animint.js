@@ -513,7 +513,9 @@ var animint = function (to_select, json_file) {
         .attr("y", plotdim.ystart)
         .attr("width", plotdim.xend - plotdim.xstart)
         .attr("height", plotdim.yend - plotdim.ystart)
-        .attr("fill", p_info.panel_background.fill);
+        .attr("fill", p_info.panel_background.fill)
+        .attr("stroke", p_info.panel_background.colour)
+        .attr("stroke-width", p_info.panel_background.size);
 
     } //end of for loop
 
