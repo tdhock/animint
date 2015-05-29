@@ -77,14 +77,6 @@ grad.desc.viz <- function(hjust) {
               title = "Demonstration of Gradient Descent Algorithm")
 }
 
-getStyleValue <- function(html, xpath, style.name) {
-  nodes <- getNodeSet(html, xpath)
-  node.style <- xmlAttrs(nodes[[1]])["style"]
-  pattern <-paste0("(?<name>\\S+?)", ": *", "(?<value>.+?)", ";")
-  style.matrices <- str_match_all_perl(node.style, pattern)
-  style.value <- style.matrices[[1]][style.name, "value"]
-}
-
 test_that('geom_text(hjust=0) => <text style="text-anchor: start">', {
   viz <- grad.desc.viz(hjust = 0)
   info <- animint2HTML(viz)
