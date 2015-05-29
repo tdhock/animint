@@ -511,11 +511,12 @@ var animint = function (to_select, json_file) {
     Plots[p_name].scales = scales;
 
     // draw background
-    svg.append("rect")
+    // uses insert to draw it right before the #plottitle
+    svg.insert("rect", "#plottitle")
       .attr("x", plotdim.xstart)
       .attr("y", plotdim.ystart)
-      .attr("width", graph_width)
-      .attr("height", graph_height)
+      .attr("width", plotdim.xend - plotdim.xstart)
+      .attr("height", plotdim.yend - plotdim.ystart)
       .attr("fill", p_info.panel_background.fill);
 
   } //end of add_plot()
