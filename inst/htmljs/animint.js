@@ -505,19 +505,19 @@ var animint = function (to_select, json_file) {
     	if(!axis.yticks) {
     	  styles.push("#"+p_name+" #yaxis .tick"+" line{stroke:none;}");
     	}
+      
+      // draw background
+      // uses insert to draw it right before the #plottitle
+      svg.insert("rect", "#plottitle")
+        .attr("x", plotdim.xstart)
+        .attr("y", plotdim.ystart)
+        .attr("width", plotdim.xend - plotdim.xstart)
+        .attr("height", plotdim.yend - plotdim.ystart)
+        .attr("fill", p_info.panel_background.fill);
 
     } //end of for loop
 
     Plots[p_name].scales = scales;
-
-    // draw background
-    // uses insert to draw it right before the #plottitle
-    svg.insert("rect", "#plottitle")
-      .attr("x", plotdim.xstart)
-      .attr("y", plotdim.ystart)
-      .attr("width", plotdim.xend - plotdim.xstart)
-      .attr("height", plotdim.yend - plotdim.ystart)
-      .attr("fill", p_info.panel_background.fill);
 
   } //end of add_plot()
 
