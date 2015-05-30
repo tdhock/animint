@@ -122,7 +122,7 @@ make_bar <- function(data, x.name, alpha=1){
 #' @param x x coordinate of label position
 #' @param y y coordinate of label position
 #' @param label.var variable matching showSelected, used to obtain label value
-#' @param format String format for label. Use %d, %f, etc. to insert relevant label.var value.
+#' @param format String format for label. Use \%d, \%f, etc. to insert relevant label.var value.
 #' @return a geom_text layer.
 #' @author Toby Dylan Hocking
 #' @export
