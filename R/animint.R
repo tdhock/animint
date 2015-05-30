@@ -77,9 +77,9 @@ parsePlot <- function(meta){
       temp_background$linetype <- "solid"
     } else {
       # make sure linetype is correctly specified
-      stopifnot(temp_background$linetype %in% 
-                  c("blank", "solid", "dashed", "dotted", 
-                    "dotdash", "longdash", "twodash"))
+      stopifnot(
+        temp_background$linetype %in% c("blank", "solid", "dashed", "dotted", "dotdash", "longdash", "twodash") | 
+          is.numeric(temp_background$linetype))
     }
   }
   # saving background info
