@@ -99,7 +99,8 @@ RENDER: move stats computation to the renderer, to support e.g.
 examples/stats.R
 
 RENDER: it would be nice to zoom by dragging a rectangle on the plot
-background, as in plotly. Then double-click to zoom back out.
+background, as in plotly. Then double-click to zoom back out. This lib
+might help do the heavy lifting -- https://github.com/romsson/dragit
 
 RENDER: It would be nice to be able to resize plots interactively,
 like we can do in shiny+ggvis.
@@ -195,6 +196,16 @@ does not respond to mouse clicks while the data is loading.
 
 DSL: Implement shape aesthetic with d3.svg.symbol()
 https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol_type
+
+2015.05.29
+
+BUGFIX: warnings for opening pid.txt, closing unused connection and generating make_text.Rd.
+
+2015.05.28
+
+BUGFIX: ordering of legend entries now correctly reverses the order of
+numeric legend entries, so that smaller numbers appear lower in the
+legend.
 
 2015.05.21
 

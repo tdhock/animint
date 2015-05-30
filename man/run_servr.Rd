@@ -5,7 +5,7 @@
 \title{Spawn a child R session that runs a 'blocking' command}
 \usage{
 run_servr(directory = ".", port = 4848,
-  code = "servr::httd(dir=\\"\%s\\", port=\%d, browser=FALSE)")
+  code = "servr::httd(dir='\%s', port=\%d)")
 }
 \arguments{
   \item{directory}{path that the server should map to.}
