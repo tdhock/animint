@@ -92,8 +92,8 @@ d <- p_df %>%
   group_by(date) %>% 
   do(count = count_bins(bin_df, .$coords.x1, .$coords.x2))
 
+## merging dates and counts
 ## should figure out how to do this with dplyr
-# merging dates and counts
 l <- list()
 for(i in 1:nrow(d)) {
   l[[i]] <- d$count[[i]]
@@ -116,7 +116,8 @@ p_df4 <- p_df3 %>%
   arrange(id, date) %>% 
   group_by(id) %>% 
   summarise(text_loc_x = last(date), 
-            text_loc_y = last(log(attacks)))
+            text_loc_y = last(log(attacks))) %>% 
+  filter(attacks > 0)
 
 # animint plots -----------------------------------------
 
@@ -130,8 +131,6 @@ p_time <- ggplot() +
 
 # points on world map
 p_points <- ggplot() + 
-  #   geom_rect(aes(xmin = -180, xmax = 192, ymin = -60, ymax = 84), 
-  #             fill = "lightblue", size = I(.3)) + 
   geom_polygon(aes(long, lat, group = group), size = I(1), 
                data = countries, fill = "lightgrey", colour = "darkgreen") +
   geom_point(aes(coords.x1, coords.x2, showSelected = date), 
@@ -145,15 +144,12 @@ p_points <- ggplot() +
 
 # tiles on world map
 p_tiles <- ggplot() + 
-  #   geom_rect(aes(xmin = -180, xmax = 192, ymin = -60, ymax = 84), 
-  #             fill = "lightblue", size = I(.3)) + 
   geom_polygon(aes(long, lat, group = group), size = I(1), 
                data = countries, fill = "lightgrey", colour = "darkgreen") +
   geom_tile(aes(xmid, ymid, fill = log(attacks), 
-                clickSelects = id, showSelected = date), 
+                showSelected = date, clickSelects = id), 
             data = p_df3, colour = I("red")) + 
-  geom_text(aes(xmid, ymid, label = id, 
-                showSelected = id), 
+  geom_text(aes(xmid, ymid, label = id, showSelected = id), 
             data = p_df3) + 
   make_text(p_df, 0, 90, "date", "Pirate Attacks from 1995 to %d") + 
   scale_fill_gradient(low = "#fee5d9", high = "#a50f15", name = "Attacks", 
@@ -188,7 +184,7 @@ ani_list <- list(
   time = list(variable = "date", ms = 300), 
   selector.types = list(id = "multiple"),
   first = list(id = 767), 
-  title = ""
+  title = "Pirates Example"
 )
 animint2dir(ani_list, "pirates_viz", open.browser = FALSE)
 servr::httd("pirates_viz")
