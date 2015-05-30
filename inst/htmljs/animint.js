@@ -8,53 +8,57 @@ var animint = function (to_select, json_file) {
 
   var linetypesize2dasharray = function (lt, size) {
     var isInt = function(n) { return typeof n === 'number' && parseFloat(n) == parseInt(n, 10) && !isNaN(n); }
-    if(isInt(lt)){ // R integer line types.
-      if(lt == 1){
-	return null;
+    if(lt == null) {
+      return null;
+    } else {
+      if(isInt(lt)){ // R integer line types.
+        if(lt == 1){
+  	return null;
+        }
+        var o = {
+  	0: size * 0 + "," + size * 10,
+  	2: size * 4 + "," + size * 4,
+  	3: size + "," + size * 2,
+  	4: size + "," + size * 2 + "," + size * 4 + "," + size * 2,
+  	5: size * 8 + "," + size * 4,
+  	6: size * 2 + "," + size * 2 + "," + size * 6 + "," + size * 2
+        };
+      } else { //R defined line types
+        if(lt == "solid"){
+  	return null;
+        }
+        var o = {
+  	"blank": size * 0 + "," + size * 10,
+  	"none": size * 0 + "," + size * 10,
+  	"dashed": size * 4 + "," + size * 4,
+  	"dotted": size + "," + size * 2,
+  	"dotdash": size + "," + size * 2 + "," + size * 4 + "," + size * 2,
+  	"longdash": size * 8 + "," + size * 4,
+  	"twodash": size * 2 + "," + size * 2 + "," + size * 6 + "," + size * 2,
+  	"22": size * 2 + "," + size * 2,
+  	"42": size * 4 + "," + size * 2,
+  	"44": size * 4 + "," + size * 4,
+  	"13": size + "," + size * 3,
+  	"1343": size + "," + size * 3 + "," + size * 4 + "," + size * 3,
+  	"73": size * 7 + "," + size * 3,
+  	"2262": size * 2 + "," + size * 2 + "," + size * 6 + "," + size * 2,
+  	"12223242": size + "," + size * 2 + "," + size * 2 + "," + size * 2 + "," + size * 3 + "," + size * 2 + "," + size * 4 + "," + size * 2,
+  	"F282": size * 15 + "," + size * 2 + "," + size * 8 + "," + size * 2,
+  	"F4448444": size * 15 + "," + size * 4 + "," + size * 4 + "," + size * 4 + "," + size * 8 + "," + size * 4 + "," + size * 4 + "," + size * 4,
+  	"224282F2": size * 2 + "," + size * 2 + "," + size * 4 + "," + size * 2 + "," + size * 8 + "," + size * 2 + "," + size * 16 + "," + size * 2,
+  	"F1": size * 16 + "," + size
+        };
       }
-      var o = {
-	0: size * 0 + "," + size * 10,
-	2: size * 4 + "," + size * 4,
-	3: size + "," + size * 2,
-	4: size + "," + size * 2 + "," + size * 4 + "," + size * 2,
-	5: size * 8 + "," + size * 4,
-	6: size * 2 + "," + size * 2 + "," + size * 6 + "," + size * 2
-      };
-    } else { //R defined line types
-      if(lt == "solid"){
-	return null;
-      }
-      var o = {
-	"blank": size * 0 + "," + size * 10,
-	"none": size * 0 + "," + size * 10,
-	"dashed": size * 4 + "," + size * 4,
-	"dotted": size + "," + size * 2,
-	"dotdash": size + "," + size * 2 + "," + size * 4 + "," + size * 2,
-	"longdash": size * 8 + "," + size * 4,
-	"twodash": size * 2 + "," + size * 2 + "," + size * 6 + "," + size * 2,
-	"22": size * 2 + "," + size * 2,
-	"42": size * 4 + "," + size * 2,
-	"44": size * 4 + "," + size * 4,
-	"13": size + "," + size * 3,
-	"1343": size + "," + size * 3 + "," + size * 4 + "," + size * 3,
-	"73": size * 7 + "," + size * 3,
-	"2262": size * 2 + "," + size * 2 + "," + size * 6 + "," + size * 2,
-	"12223242": size + "," + size * 2 + "," + size * 2 + "," + size * 2 + "," + size * 3 + "," + size * 2 + "," + size * 4 + "," + size * 2,
-	"F282": size * 15 + "," + size * 2 + "," + size * 8 + "," + size * 2,
-	"F4448444": size * 15 + "," + size * 4 + "," + size * 4 + "," + size * 4 + "," + size * 8 + "," + size * 4 + "," + size * 4 + "," + size * 4,
-	"224282F2": size * 2 + "," + size * 2 + "," + size * 4 + "," + size * 2 + "," + size * 8 + "," + size * 2 + "," + size * 16 + "," + size * 2,
-	"F1": size * 16 + "," + size
-      };
-    }
 
-    if (lt in o){
-      return o[lt];
-    } else{ // manually specified line types
-      str = lt.split("");
-      strnum = str.map(function (d) {
-	return size * parseInt(d, 16);
-      });
-      return strnum;
+      if (lt in o){
+        return o[lt];
+      } else{ // manually specified line types
+        str = lt.split("");
+        strnum = str.map(function (d) {
+  	return size * parseInt(d, 16);
+        });
+        return strnum;
+      }
     }
   }
 
