@@ -84,6 +84,28 @@ parsePlot <- function(meta){
   }
   # saving background info
   plot.meta$panel_background <- temp_background
+  
+  ### function to extract grid info from theme.pars
+  get_grid <- function(pars) {
+    # convert colour to RGB if necessary
+    if(!is.rgb(pars$colour)) pars$colour <- toRGB(pars$colour)
+    # if size is null, set it to 1
+    if(is.null(pars$size)) pars$size <- 1
+    # if linetype is null, set it to solid
+    if(is.null(pars$linetype)) pars$linetype <- "solid"
+    # pretty sure I don't care about lineend
+    
+    pars
+  }
+  # extract major grid lines
+  plot.meta$grid_major <- get_grid(theme.pars$panel.grid.major)
+  # extract minor grid lines
+  plot.meta$grid_minor <- get_grid(theme.pars$panel.grid.minor)
+  
+  ### extract grid lines
+  grid_major <- theme.pars$panel.grid.major
+  # convert colour to RGB if necessary
+  if(!is.rgb(grid))
 
   ## Flip labels if coords are flipped - transform does not take care
   ## of this. Do this BEFORE checking if it is blank or not, so that
