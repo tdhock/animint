@@ -60,7 +60,7 @@ parsePlot <- function(meta){
   ## out of the box, with no additional d3 coding.
   theme.pars <- ggplot2:::plot_theme(meta$plot)
   
-  ## extract pnale backgrounds from theme.pars
+  ## extract panel backgrounds from theme.pars
   temp_background <- theme.pars$panel.background
   # convert fill to RGB if necessary
   if(!(is.rgb(temp_background$fill))) { 
