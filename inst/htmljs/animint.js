@@ -525,35 +525,43 @@ var animint = function (to_select, json_file) {
                                         p_info.panel_background.size);
         });
       
-      // draw horizontal grid lines
-      var grid_line_hor = function(element) {
-        svg.insert("line", "#plottitle")
-          .attr("x1", plotdim.xstart)
-          .attr("x2", plotdim.xend)
-          .attr("y1", function() { return scales[panel_i].y(element); })
-          .attr("y2", function() { return scales[panel_i].y(element); })
-          .style("stroke", function() { return p_info.grid_major.colour})
-          .style("stroke-dasharray", function() {
-            return linetypesize2dasharray(p_info.grid_major.linetype,
-                                          p_info.grid_major.size);
-          });
+      // function to draw the grid lines when supplied with one of the elements
+      var grid_line = function(grid_background) {
+        var col = grid_background.colour;
+        var lt = grid_background.linetype;
+        var size = grid_background.size;
+
+        // draw horizontal grid lines
+        var draw_hor_line = function(element) {
+          svg.insert("line", "#plottitle")
+            .attr("x1", plotdim.xstart)
+            .attr("x2", plotdim.xend)
+            .attr("y1", function() { return scales[panel_i].y(element); })
+            .attr("y2", function() { return scales[panel_i].y(element); })
+            .style("stroke", col)
+            .style("stroke-dasharray", function() {
+              return linetypesize2dasharray(lt, size);
+            });
+        }
+        grid_background.loc.y.forEach(draw_hor_line);
+
+        // draw vertical grid lines
+        var draw_vert_line = function(element) {
+          svg.insert("line", "#plottitle")
+            .attr("y1", plotdim.ystart)
+            .attr("y2", plotdim.yend)
+            .attr("x1", function() { return scales[panel_i].x(element); })
+            .attr("x2", function() { return scales[panel_i].x(element); })
+            .style("stroke", col)
+            .style("stroke-dasharray", function() {
+              return linetypesize2dasharray(lt, size);
+            });            
+        }
+        grid_background.loc.x.forEach(draw_vert_line);
       }
-      // draw vertical grid lines
-      var grid_line_vert = function(element) {
-        svg.insert("line", "#plottitle")
-          .attr("y1", plotdim.ystart)
-          .attr("y2", plotdim.yend)
-          .attr("x1", function() { return scales[panel_i].x(element); })
-          .attr("x2", function() { return scales[panel_i].x(element); })
-          .style("stroke", function() { return p_info.grid_major.colour})
-          .style("stroke-dasharray", function() {
-            return linetypesize2dasharray(p_info.grid_major.linetype,
-                                          p_info.grid_major.size);
-          });
-      }
-      // major grid lines
-      yaxisvals.forEach(grid_line_hor);
-      xaxisvals.forEach(grid_line_vert);
+      // drawing the grid lines
+      grid_line(p_info.grid_minor);
+      grid_line(p_info.grid_major);
 
     } //end of for loop
 
