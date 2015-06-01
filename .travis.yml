@@ -1,5 +1,7 @@
 language: c
 
+sudo: required
+
 before_install:
   - curl -OL http://raw.github.com/craigcitro/r-travis/master/scripts/travis-tool.sh
   - chmod 755 ./travis-tool.sh
@@ -17,13 +19,16 @@ install:
   - $HOME/opt/pandoc/pandoc --version
   # install uninstalled packages which this pkg depends on/links to/suggests. 
   - ./travis-tool.sh install_deps
-  - ./travis-tool.sh install_github tdhock/ggplot2
+  - ./travis-tool.sh install_github tdhock/ggplot2 jimhester/covr
   
 script: 
   - Rscript -e "devtools::load_all(); setwd('tests'); source('testthat.R')"
 
 after_failure:
   - ./travis-tool.sh dump_logs
+
+after_success:
+  - Rscript -e "library(covr);coveralls()"
 
 notifications:
   email:
