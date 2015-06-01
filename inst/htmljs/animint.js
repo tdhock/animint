@@ -517,6 +517,7 @@ var animint = function (to_select, json_file) {
         .attr("y", plotdim.ystart)
         .attr("width", plotdim.xend - plotdim.xstart)
         .attr("height", plotdim.yend - plotdim.ystart)
+        .attr("class", "background-rect")
         .style("fill", p_info.panel_background.fill)
         .style("stroke", p_info.panel_background.colour)
         .style("stroke-dasharray", function() {
