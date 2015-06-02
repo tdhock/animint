@@ -510,8 +510,21 @@ var animint = function (to_select, json_file) {
     	  styles.push("#"+p_name+" #yaxis .tick"+" line{stroke:none;}");
     	}
       
-      // draw background
+      // drawing border
       // uses insert to draw it right before the #plottitle
+      svg.insert("rect", "#plottitle")
+        .attr("x", plotdim.xstart)
+        .attr("y", plotdim.ystart)
+        .attr("width", plotdim.xend - plotdim.xstart)
+        .attr("height", plotdim.yend - plotdim.ystart)
+        .style("fill", p_info.panel_border.fill)
+        .style("stroke", p_info.panel_border.colour)
+        .style("stroke-dasharray", function() {
+          return linetypesize2dasharray(p_info.panel_border.linetype,
+                                        p_info.panel_border.size);
+        });
+        
+      // drawing background
       svg.insert("rect", "#plottitle")
         .attr("x", plotdim.xstart)
         .attr("y", plotdim.ystart)
