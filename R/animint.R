@@ -61,29 +61,38 @@ parsePlot <- function(meta){
   theme.pars <- ggplot2:::plot_theme(meta$plot)
   
   ## extract panel backgrounds from theme.pars
-  temp_background <- theme.pars$panel.background
-  # convert fill to RGB if necessary
-  if(!(is.rgb(temp_background$fill))) { 
-    temp_background$fill <- toRGB(temp_background$fill)
-  }
-  # if border color is specified
-  if(!is.na(temp_background$colour)) {
-    # convert color to RGB if necessary
-    if(!(is.rgb(temp_background$colour))) { 
-      temp_background$colour <- toRGB(temp_background$colour)
-    }
-    # check if the user specified linetype for the border
-    if(is.null(temp_background$linetype)) {
-      temp_background$linetype <- "solid"
+  get_bg <- function(pars) {
+    # if no border specified 
+    if(length(pars) == 0) {
+      pars <- list(fill = NULL, colour = NULL, size = NULL, linetype = NULL)
     } else {
-      # make sure linetype is correctly specified
-      stopifnot(
-        temp_background$linetype %in% c("blank", "solid", "dashed", "dotted", "dotdash", "longdash", "twodash") | 
-          is.numeric(temp_background$linetype))
+      # convert fill to RGB if necessary
+      if(!(is.rgb(pars$fill))) { 
+        pars$fill <- toRGB(pars$fill)
+      }
+      # if border color is specified
+      if(!is.na(pars$colour)) {
+        # convert color to RGB if necessary
+        if(!(is.rgb(pars$colour))) { 
+          pars$colour <- toRGB(pars$colour)
+        }
+        # check if the user specified linetype for the border
+        if(is.null(pars$linetype)) {
+          pars$linetype <- "solid"
+        } else {
+          # make sure linetype is correctly specified
+          stopifnot(
+            pars$linetype %in% c("blank", "solid", "dashed", "dotted", "dotdash", "longdash", "twodash") | 
+              is.numeric(pars$linetype))
+        }
+      }
     }
+    pars
   }
+
   # saving background info
-  plot.meta$panel_background <- temp_background
+  plot.meta$panel_background <- get_bg(theme.pars$panel.background)
+  plot.meta$panel_border <- get_bg(theme.pars$panel.border)
   
   ### function to extract grid info from theme.pars
   get_grid <- function(pars) {
