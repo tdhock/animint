@@ -1048,7 +1048,11 @@ servr::httd("', normalizePath( out.dir,winslash="/" ), '")')
 #' @return True/False value
 #' @export
 is.rgb <- function(x){
-  grepl("NULL", x) | (grepl("#", x) & nchar(x)==7)
+  if(is.null(x)) {
+    TRUE
+  } else {
+    (grepl("#", x) & nchar(x)==7)
+  }
 }
 
 #' Convert R colors to RGB hexadecimal color values
