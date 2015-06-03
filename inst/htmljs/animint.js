@@ -561,7 +561,7 @@ var animint = function (to_select, json_file) {
             .attr("x2", plotdim.xend)
             .attr("y1", function() { return scales[panel_i].y(element); })
             .attr("y2", function() { return scales[panel_i].y(element); })
-            .attr("class", grid_class)
+            .attr("class", function() { return "grid " + grid_class; })
             .style("stroke", col)
             .style("stroke-dasharray", function() {
               return linetypesize2dasharray(lt, size);
@@ -576,7 +576,7 @@ var animint = function (to_select, json_file) {
             .attr("y2", plotdim.yend)
             .attr("x1", function() { return scales[panel_i].x(element); })
             .attr("x2", function() { return scales[panel_i].x(element); })
-            .attr("class", grid_class)
+            .attr("class", function() { return "grid " + grid_class; })
             .style("stroke", col)
             .style("stroke-dasharray", function() {
               return linetypesize2dasharray(lt, size);
