@@ -116,17 +116,9 @@ var animint = function (to_select, json_file) {
   var styles = [".axis path{fill: none;stroke: black;shape-rendering: crispEdges;}",
             ".axis line{fill: none;stroke: black;shape-rendering: crispEdges;}",
             ".axis text {font-family: sans-serif;font-size: 11px;}"];
-
-  // 'margins' are fixed across panels and do not
-  // include title/axis/label padding (since these are not
-  // fixed across panels). They do, however, account for
-  // spacing between panels
-  var margin = {
-    left: 0,
-    right: 10,
-    top: 10,
-    bottom: 0
-  };
+            
+  // the dimensions of each plot
+  // this is used to draw each plot in the list passed to animint()
   var plotdim = {
     width: 0,
     height: 0,
@@ -138,7 +130,12 @@ var animint = function (to_select, json_file) {
       width: 0,
       height: 0
     },
-    margin: margin,
+    margin: {
+      top: 0, 
+      bottom: 10, 
+      left: 0, 
+      right: 10
+    },
     xlab: {
       x: 0,
       y: 0
@@ -178,6 +175,18 @@ var animint = function (to_select, json_file) {
     update_geom(g_name, null);
   }
   var add_plot = function (p_name, p_info) {
+    
+    // 'margins' are fixed across panels and do not
+    // include title/axis/label padding (since these are not
+    // fixed across panels). They do, however, account for
+    // spacing between panels
+    var margin = {
+      left: p_info.panel_margin.len,
+      right: p_info.panel_margin.len,
+      top: p_info.panel_margin.len,
+      bottom: p_info.panel_margin.len
+    };
+  
     // Each plot may have one or more legends. To make space for the
     // legends, we put each plot in a table with one row and two
     // columns: tdLeft and tdRight.
