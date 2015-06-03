@@ -526,6 +526,7 @@ var animint = function (to_select, json_file) {
         .attr("y", plotdim.ystart)
         .attr("width", plotdim.xend - plotdim.xstart)
         .attr("height", plotdim.yend - plotdim.ystart)
+        .attr("class", "border_rect")
         .style("fill", p_info.panel_border.fill)
         .style("stroke", p_info.panel_border.colour)
         .style("stroke-dasharray", function() {
@@ -539,7 +540,7 @@ var animint = function (to_select, json_file) {
         .attr("y", plotdim.ystart)
         .attr("width", plotdim.xend - plotdim.xstart)
         .attr("height", plotdim.yend - plotdim.ystart)
-        .attr("id", "background-rect")
+        .attr("class", "background_rect")
         .style("fill", p_info.panel_background.fill)
         .style("stroke", p_info.panel_background.colour)
         .style("stroke-dasharray", function() {
@@ -548,7 +549,7 @@ var animint = function (to_select, json_file) {
         });
       
       // function to draw the grid lines when supplied with one of the elements
-      var grid_line = function(grid_background) {
+      var grid_line = function(grid_background, grid_class) {
         var col = grid_background.colour;
         var lt = grid_background.linetype;
         var size = grid_background.size;
@@ -560,6 +561,7 @@ var animint = function (to_select, json_file) {
             .attr("x2", plotdim.xend)
             .attr("y1", function() { return scales[panel_i].y(element); })
             .attr("y2", function() { return scales[panel_i].y(element); })
+            .attr("class", grid_class)
             .style("stroke", col)
             .style("stroke-dasharray", function() {
               return linetypesize2dasharray(lt, size);
@@ -574,6 +576,7 @@ var animint = function (to_select, json_file) {
             .attr("y2", plotdim.yend)
             .attr("x1", function() { return scales[panel_i].x(element); })
             .attr("x2", function() { return scales[panel_i].x(element); })
+            .attr("class", grid_class)
             .style("stroke", col)
             .style("stroke-dasharray", function() {
               return linetypesize2dasharray(lt, size);
@@ -582,8 +585,8 @@ var animint = function (to_select, json_file) {
         grid_background.loc.x.forEach(draw_vert_line);
       }
       // drawing the grid lines
-      grid_line(p_info.grid_minor);
-      grid_line(p_info.grid_major);
+      grid_line(p_info.grid_minor, "grid_minor");
+      grid_line(p_info.grid_major, "grid_major");
 
     } //end of for loop
 
