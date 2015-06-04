@@ -1,0 +1,91 @@
+context("Panel background")
+
+p1 <- ggplot() + 
+  geom_point(aes(Sepal.Length, Sepal.Width, colour = Species, size = Sepal.Width, 
+                 clickSelects = Species), 
+             data = iris) + 
+  theme(panel.background = element_rect(fill = "lightblue", 
+                                        color = "black", 
+                                        size = 2, 
+                                        linetype = "dashed"), 
+        panel.margin=grid::unit(0, "cm")) + 
+  facet_wrap(~Species, nrow = 2)
+p2 <- ggplot() + 
+  geom_point(aes(Petal.Length, Petal.Width, colour = Species, 
+                 showSelected = Species), data = iris) + 
+  ggtitle("Petal Data")
+
+info <- animint2HTML(list(sepal = p1, petal = p2))
+
+# background rectangle for each panel
+background_sepal <- getNodeSet(info$html, '//svg[@id="sepal"]//rect[@class="background_rect"]')
+attr_back_sepal <- sapply(background_sepal, xmlAttrs)
+
+background_petal <- getNodeSet(info$html, '//svg[@id="petal"]//rect[@class="background_rect"]')
+attr_back_petal <- sapply(background_petal, xmlAttrs)
+
+# border rectangle for each panel
+border_sepal <- getNodeSet(info$html, '//svg[@id="sepal"]//rect[@class="border_rect"]')
+attr_border_sepal <- sapply(border_sepal, xmlAttrs)
+
+border_petal <- getNodeSet(info$html, '//svg[@id="petal"]//rect[@class="border_rect"]')
+attr_border_petal <- sapply(border_petal, xmlAttrs)
+
+# major grid lines
+grid_major_sepal <- getNodeSet(info$html, '//svg[@id="sepal"]//line[@class="grid grid_major"]')
+attr_major_sepal <- sapply(grid_major_sepal, xmlAttrs)
+
+grid_major_petal <- getNodeSet(info$html, '//svg[@id="petal"]//line[@class="grid grid_major"]')
+attr_major_petal <- sapply(grid_major_petal, xmlAttrs)
+
+# different patterns to access
+fillPattern <-
+  paste0("fill: ",
+         "(?<value>.*?)",
+         ";")
+strokePattern <- paste0("stroke: ", 
+                        "(?<value>.*?)", 
+                        ";")
+dasharrayPattern <-
+  paste0("stroke-dasharray:",
+         "(?<value>.*?)",
+         ";")
+
+test_that("panel backgrounds render correctly", {
+  # testing that there are the correct number of panels
+  expect_equal(length(background_sepal), 3)
+  expect_equal(length(background_petal), 1)
+  
+  # test background fills
+  match_sepal <- str_match_perl(attr_back_sepal["style",], fillPattern)
+  value_sepal <- match_sepal[, "value"]
+  expect_equal(value_sepal[1], "rgb(173, 216, 230)")
+  
+  match_petal <- str_match_perl(attr_back_petal["style",], fillPattern)
+  value_petal <- match_petal[, "value"]
+  expect_equal(value_petal[1], "rgb(229, 229, 229)")
+})
+
+test_that("panel boders render correctly", {
+  # testing that there are the correct number of panels
+  expect_equal(length(border_sepal), 3)
+  expect_equal(length(border_petal), 1)
+
+  #  test border colors
+#   browser()
+  
+})
+
+test_that("major grid lines are drawn correctly", {
+  # correct number of grid lines in both plots
+  expect_equal(length(grid_major_sepal), 30)
+  expect_equal(length(grid_major_petal), 9)
+  
+  # correct location of grid lines
+})
+
+test_that("margins between panels are correct", {
+  # correct spacing between top-left and top-right
+  
+  # correct spacing in plot with only one rectangle
+})
