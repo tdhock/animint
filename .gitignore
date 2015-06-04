@@ -17,3 +17,4 @@ GSoC application.txt
 animint.Rproj
 tests/testthat/animint-htmltest/
 tests/testthat/pids.txt
+tests/testthat/.httr-oauth
