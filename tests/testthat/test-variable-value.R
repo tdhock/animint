@@ -79,6 +79,7 @@ viz <-
                     size=10,
                     data=peaks)+
          geom_text(aes(1, 3, label=problem.name,
+                       showSelected2=bases.per.problem,
                        showSelected=problem.name),
                    data=problems))
 
@@ -134,6 +135,7 @@ for(problem.name in names(p.list)){
   pp[[s.name]] <- pp$peaks
   s <- s.list[[problem.name]]
   s[[s.name]] <- s$peaks
+  p$bases.per.problem <- pp$bases.per.problem[1]
   viz.for$problems <- viz.for$problems+
     geom_segment(aes_string("peakStart", "problem.i",
                             showSelected=s.name,
@@ -154,6 +156,7 @@ for(problem.name in names(p.list)){
   viz.for$peaks <- viz.for$peaks+
          geom_point(aes_string("peaks", "peaks",
                                showSelected="problem.name",
+                               showSelected2="bases.per.problem",
                                clickSelects=s.name),
                     size=10,
                     data=p)
