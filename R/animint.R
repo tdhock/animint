@@ -570,7 +570,11 @@ saveLayer <- function(l, d, meta){
       bad.chunk <- function(){
         if(all(!can.chunk))return(NULL)
         can.chunk.cols <- subset.vec[can.chunk]
-        rows.per.chunk <- table(g.data[,can.chunk.cols])
+        maybe.factors <- g.data[, can.chunk.cols, drop=FALSE]
+        for(N in names(maybe.factors)){
+          maybe.factors[[N]] <- paste(maybe.factors[[N]])
+        }
+        rows.per.chunk <- table(maybe.factors)
         bytes.per.chunk <- rows.per.chunk * bytes.per.line
         if(all(4096 < bytes.per.chunk))return(NULL)
         ## If all of the tsv chunk files are greater than 4KB, then we
@@ -592,9 +596,22 @@ saveLayer <- function(l, d, meta){
               apply(bytes.per.chunk, -dim.i, sum)
           }
         }
-        n.chunks <- sapply(dim.byte.list, length)
-        min.bytes <- sapply(dim.byte.list, min)
-        can.chunk.cols[[which.max(min.bytes)]]
+        selector.df <-
+          data.frame(chunks.for=length(rows.per.chunk),
+                     chunks.without=sapply(dim.byte.list, length),
+                     min.bytes=sapply(dim.byte.list, min))
+        ## chunks.for is the number of chunks you get if you split the
+        ## data set using just this column. If it is 1, then it is
+        ## fine to chunk on this variable (since we certainly won't
+        ## make more than 1 small tsv file) and in fact we want to
+        ## chunk on this variable, since then this layer's data won't
+        ## be downloaded at first if it is not needed.
+        not.one <- subset(selector.df, 1 < chunks.for)
+        if(nrow(not.one) == 0){
+          NULL
+        }else{
+          rownames(not.one)[[which.max(not.one$min.bytes)]]
+        }
       }
       while({
         bad <- bad.chunk()
@@ -611,7 +628,7 @@ saveLayer <- function(l, d, meta){
         nest.cols <- subset.vec
         chunk.cols <- NULL
       }
-    }
+    }#meta$selectors > 0
   }
   # If there is only one PANEL, we don't need it anymore.
   plot.has.panels <- nrow(meta$built$panel$layout) > 1

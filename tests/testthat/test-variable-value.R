@@ -62,6 +62,8 @@ viz <-
          theme_bw()+
          theme(panel.margin=grid::unit(0, "cm"))+
          facet_grid(sample.id ~ .),
+
+       title="viz with .variable .value",
        
        sizes=ggplot()+
          ggtitle("select problem size")+
@@ -109,6 +111,8 @@ viz.for <-
          theme_bw()+
          theme(panel.margin=grid::unit(0, "cm"))+
          facet_grid(sample.id ~ .),
+
+       title="viz with for loop",
        
        sizes=ggplot()+
          ggtitle("select problem size")+
@@ -162,10 +166,13 @@ for(problem.name in names(p.list)){
                     data=p)
 }
 
+##animint2dir(viz.for, "problem-peaks-for")
+
 test_that("some chunks are not downloaded", {
   info <- animint2HTML(viz.for)
   node.set <-
     getNodeSet(info$html, '//td[@class="downloaded"]')
   value.vec <- sapply(node.set, xmlValue)
   expect_true("0" %in% value.vec)
+  expect_match(value.vec,  "[01]")
 })
