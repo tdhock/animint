@@ -4,17 +4,15 @@
 \alias{animint2gist}
 \title{Convert a list of ggplots to an interactive animation and post files as a gist}
 \usage{
-animint2gist(plot.list, description = plot.list$title, screenshot = TRUE,
-  ...)
+animint2gist(plot.list, description = plot.list$title, browse = TRUE, ...)
 }
 \arguments{
   \item{plot.list}{a named list of ggplots and option
   lists.} \item{description}{Brief description of gist.
-  This becomes the plot title on the bl.ocks/username
-  page.} \item{screenshot}{logical. If TRUE, attempt
-  to take screenshot of result and include with gist.}
-  \item{...}{options passed onto \code{animint2dir} and
-  \code{gistr::gist_create}}
+  This becomes the plot title on the bl.ocks/username page.}
+  \item{browse}{logical. Prompt browser to view viz on
+  \url{http://bl.ocks.org}} \item{...}{options passed onto
+  \code{animint2dir} and \code{gistr::gist_create}}
 }
 \description{
 Before using this function set your appropriate

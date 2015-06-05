@@ -52,14 +52,14 @@ parsePlot <- function(meta){
       meta$geoms[[geom.prev]]$nextgeom <- meta$geoms[[geom.next]]$classed
     }
   }
-
+  
   ## Export axis specification as a combination of breaks and
   ## labels, on the relevant axis scale (i.e. so that it can
   ## be passed into d3 on the x axis scale instead of on the
   ## grid 0-1 scale). This allows transformations to be used
   ## out of the box, with no additional d3 coding.
   theme.pars <- ggplot2:::plot_theme(meta$plot)
-
+  
   ## Flip labels if coords are flipped - transform does not take care
   ## of this. Do this BEFORE checking if it is blank or not, so that
   ## individual axes can be hidden appropriately, e.g. #1.
@@ -139,16 +139,12 @@ parsePlot <- function(meta){
   plot.meta$xlabs <- as.list(unique(unlist(lapply(axis.info, "[", "xlab"))))
   plot.meta$ylabs <- as.list(unique(unlist(lapply(axis.info, "[", "ylab"))))
 
-  plot.meta$legend <- getLegendList(meta$built)
-  if(length(plot.meta$legend)>0){
-    plot.meta$legend <-
-      plot.meta$legend[which(sapply(plot.meta$legend, function(i) {
-        length(i)>0
-      }))]
-  }  # only pass out legends that have guide = "legend" or guide="colorbar"
-
-  # Remove legend if theme has no legend position
-  if(theme.pars$legend.position=="none") plot.meta$legend <- NULL
+  
+  ## No legend if theme(legend.postion="none").
+  plot.meta$legend <- if(theme.pars$legend.position != "none"){
+    getLegendList(meta$built)
+  }
+  
 
   if("element_blank"%in%attr(theme.pars$plot.title, "class")){
     plot.meta$title <- ""
@@ -1060,15 +1056,39 @@ getLegendList <- function(plistextra){
     guides.args[[aes.name]] <- guide.type
   }
   guides.result <- do.call(ggplot2::guides, guides.args)
-  guides <- plyr::defaults(plot$guides, guides.result)
-  labels <- plot$labels
-  gdefs <- ggplot2:::guides_train(scales = scales, theme = theme, guides = guides, labels = labels)
+  guides.list <- plyr::defaults(plot$guides, guides.result)
+  gdefs <-
+    ggplot2:::guides_train(scales = scales,
+                           theme = theme,
+                           guides = guides.list,
+                           labels = plot$labels)
   if (length(gdefs) != 0) {
     gdefs <- ggplot2:::guides_merge(gdefs)
     gdefs <- ggplot2:::guides_geom(gdefs, layers, default_mapping)
   } else (ggplot2:::zeroGrob())
   names(gdefs) <- sapply(gdefs, function(i) i$title)
-  lapply(gdefs, getLegend)
+  for(leg in seq_len(length(gdefs))) {
+    legend_scales <- names(gdefs[[leg]]$key)
+    legend_scales <- legend_scales[legend_scales != ".label"]
+    vars <- sapply(legend_scales, function(z) { 
+      as.character( plot$layers[[1]]$mapping[[z]] )
+    })
+    gdefs[[leg]]$vars <- setNames(vars, NULL)
+  }
+  ## Add a flag to specify whether or not breaks was manually
+  ## specified. If it was, then it should be respected. If not, and
+  ## the legend shows a numeric variable, then it should be reversed.
+  for(legend.name in names(gdefs)){
+    key.df <- gdefs[[legend.name]]$key
+    aes.name <- names(key.df)[1]
+    scale.i <- which(scales$find(aes.name))
+    if(length(scale.i) == 1){
+      sc <- scales$scales[[scale.i]]
+      gdefs[[legend.name]]$breaks <- sc$breaks
+    }
+  }
+  legend.list <- lapply(gdefs, getLegend)
+  legend.list[0 < sapply(legend.list, length)]
 }
 
 #' Function to get legend information for each scale
@@ -1077,7 +1097,7 @@ getLegendList <- function(plistextra){
 getLegend <- function(mb){
   guidetype <- mb$name
   ## The main idea of legends:
-
+  
   ## 1. Here in getLegend I export the legend entries as a list of
   ## rows that can be used in a data() bind in D3.
 
@@ -1108,13 +1128,22 @@ getLegend <- function(mb){
   if(length(dataframes)>0) {
     data <- merge_recurse(dataframes)
   } else return(NULL)
-  data <- lapply(1:nrow(data), function(i) as.list(data[i,]))
+  label.num <- suppressWarnings({
+    as.numeric(data$label)
+  })
+  entry.order <- if(is.atomic(mb$breaks) || anyNA(label.num)){
+    1:nrow(data)
+  }else{
+    nrow(data):1
+  }
+  data <- lapply(entry.order, function(i) as.list(data[i,]))
   if(guidetype=="none"){
     NULL
   } else{
     list(guide = guidetype,
          geoms = geoms,
          title = mb$title,
+         vars = mb$vars, 
          entries = data)
   }
 }
