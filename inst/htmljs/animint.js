@@ -1425,7 +1425,8 @@ var animint = function (to_select, json_file) {
       var legend_table = tdRight.append("table")
         .append("tr").attr("id", "legend")
         .append("th").attr("align", "left")
-        .text(p_info.legend[legendkeys[i]].title);
+        .text(p_info.legend[legendkeys[i]].title)
+        .attr("class", p_info.legend[legendkeys[i]].vars);
       var l_info = p_info.legend[legendkeys[i]];
       // the legend table with breaks/value/label.
       var legendgeoms = l_info.geoms;
@@ -1513,7 +1514,8 @@ var animint = function (to_select, json_file) {
       d3.select("#plot").selectAll("#legend").selectAll("tr")
         .on("click", function() { 
           var row_id = d3.select(this).attr("id");
-          update_selector("Species", row_id);
+          var selector_variable = this.parentElement.className;
+          update_selector(selector_variable, row_id);
         })
       ;
     }

@@ -1073,7 +1073,7 @@ getLegendList <- function(plistextra){
     vars <- sapply(legend_scales, function(z) { 
       as.character( plot$layers[[1]]$mapping[[z]] )
     })
-    gdefs[[leg]]$vars <- setNames(vars, NULL)
+    gdefs[[leg]]$vars <- unique( setNames(vars, NULL))
   }
   ## Add a flag to specify whether or not breaks was manually
   ## specified. If it was, then it should be respected. If not, and
