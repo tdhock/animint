@@ -566,7 +566,10 @@ var animint = function (to_select, json_file) {
               .attr("class", function() { return "grid " + grid_class; })
               .style("stroke", col)
               .style("stroke-linecap", cap)
-              .style("stroke-width", size);
+              .style("stroke-width", size)
+              .style("stroke-dasharray", function() {
+                return linetypesize2dasharray(lt, size);
+              });
           }
           grid_background.loc.y.forEach(draw_hor_line);
         }
@@ -582,7 +585,10 @@ var animint = function (to_select, json_file) {
               .attr("class", function() { return "grid " + grid_class; })
               .style("stroke", col)
               .style("stroke-linecap", cap)
-              .style("stroke-width", size);
+              .style("stroke-width", size
+              .style("stroke-dasharray", function() {
+                return linetypesize2dasharray(lt, size);
+              }));
           }
           grid_background.loc.x.forEach(draw_vert_line);
         }
