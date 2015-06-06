@@ -71,9 +71,23 @@ test_that("panel boders render correctly", {
   expect_equal(length(border_sepal), 3)
   expect_equal(length(border_petal), 1)
 
-  #  test border colors
-#   browser()
+  # test border colors
+  match_sepal <- str_match_perl(attr_border_sepal["style",], strokePattern)
+  value_sepal <- match_sepal[, "value"]
+  expect_equal(value_sepal[1], "rgb(127, 127, 127)")
   
+  match_petal <- str_match_perl(attr_border_petal["style",], strokePattern)
+  value_petal <- match_petal[, "value"]
+  expect_equal(value_petal[1], "rgb(229, 229, 229)")
+  
+  # test border linetypes
+  match_sepal <- str_match_perl(attr_border_sepal["style",], dasharrayPattern)
+  value_sepal <- match_sepal[, "value"]
+  expect_equal(value_sepal[1], "0(px)?, *20(px)?")
+  
+  match_petal <- str_match_perl(attr_border_petal["style",], dasharrayPattern)
+  value_petal <- match_petal[, "value"]
+  expect_equal(value_petal[1], "0(px)?, *20(px)?")
 })
 
 test_that("major grid lines are drawn correctly", {
