@@ -25,8 +25,8 @@ viz <- list(sepal = p1,
             selector.types=list(Species="multiple"))
 
 animint2dir(viz, 
-            out.dir = "~/temp/test_animint/iris_animint", 
+            out.dir = "iris_animint", 
             open.browser = F)
-servr::httd("~/temp/test_animint/iris_animint")
+servr::httd("iris_animint")
 
 animint2gist(viz, "Interactive Legends")
