@@ -553,6 +553,7 @@ var animint = function (to_select, json_file) {
         var col = grid_background.colour;
         var lt = grid_background.linetype;
         var size = grid_background.size;
+        var cap = grid_background.lineend;
 
         // draw horizontal grid lines if they are defined
         if(typeof grid_background.loc.y != "undefined") {
@@ -564,6 +565,7 @@ var animint = function (to_select, json_file) {
               .attr("y2", function() { return scales[panel_i].y(element); })
               .attr("class", function() { return "grid " + grid_class; })
               .style("stroke", col)
+              .style("stroke-linecap", cap)
               .style("stroke-width", size);
           }
           grid_background.loc.y.forEach(draw_hor_line);
@@ -579,6 +581,7 @@ var animint = function (to_select, json_file) {
               .attr("x2", function() { return scales[panel_i].x(element); })
               .attr("class", function() { return "grid " + grid_class; })
               .style("stroke", col)
+              .style("stroke-linecap", cap)
               .style("stroke-width", size);
           }
           grid_background.loc.x.forEach(draw_vert_line);
