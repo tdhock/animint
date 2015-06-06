@@ -1514,8 +1514,12 @@ var animint = function (to_select, json_file) {
       d3.select("#plot").selectAll("#legend").selectAll("tr")
         .on("click", function() { 
           var row_id = d3.select(this).attr("id");
-          var selector_variable = this.parentElement.className;
-          update_selector(selector_variable, row_id);
+          var selector_variable_string = this.parentElement.className;
+          var selector_variable = selector_variable_string.split(",");
+          var my_forEach = function(element) {
+            update_selector(element, row_id);
+          }
+          selector_variable.forEach(my_forEach);
         })
       ;
     }
