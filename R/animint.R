@@ -641,6 +641,7 @@ saveLayer <- function(l, d, meta){
   ## Split into chunks and save tsv files.
   meta$classed <- g$classed
   meta$chunk.i <- 1L
+  meta$geom <- g$geom
   g$chunks <- saveChunks(g.data, chunk.cols, meta)
   g$total <- length(unlist(g$chunks))
 
@@ -693,12 +694,22 @@ saveLayer <- function(l, d, meta){
 saveChunks <- function(x, vars, meta){
   if(is.data.frame(x)){
     if(length(vars) == 0){
+      if(meta$geom %in% c("line", "path", "polygon", "ribbon")) {
+        if("group" %in% names(x)) {
+          # common info for groups
+          x1 <- x[c("x", "y", "group")]
+          csv.name <- sprintf("%s_chunk_shape.tsv", meta$classed)
+          write.table(x1, file.path(meta$out.dir, csv.name), quote = FALSE, 
+                      row.names = FALSE, sep = "\t")
+          # info for each group
+          x2 <- x[, !names(x) %in% c("x", "y")]
+          x <- x2[!duplicated(x2), ]
+          }
+      }
       this.i <- meta$chunk.i
-      csv.name <- sprintf("%s_chunk%d.tsv", meta$classed, this.i)
       meta$chunk.i <- meta$chunk.i + 1L
-      write.table(x,
-                  file.path(meta$out.dir, csv.name),
-                  quote=FALSE, row.names=FALSE, sep="\t")
+      csv.name <- sprintf("%s_chunk%d.tsv", meta$classed, this.i)
+      write.table(x, file.path(meta$out.dir, csv.name), quote=FALSE, row.names=FALSE, sep="\t")
       this.i
     }else{
       use <- vars[[1]]
