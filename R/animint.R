@@ -696,11 +696,14 @@ saveChunks <- function(x, vars, meta){
     if(length(vars) == 0){
       if(meta$geom %in% c("line", "path", "polygon", "ribbon")) {
         if("group" %in% names(x)) {
-          # common info for groups
-          x1 <- x[c("x", "y", "group")]
+          # common info for groups, save only once
           csv.name <- sprintf("%s_chunk_shape.tsv", meta$classed)
-          write.table(x1, file.path(meta$out.dir, csv.name), quote = FALSE, 
-                      row.names = FALSE, sep = "\t")
+          chunk.shape <- file.path(meta$out.dir, csv.name)
+          if(!file.exists(chunk.shape)){
+            x1 <- x[c("x", "y", "group")]
+            write.table(x1, chunk.shape, quote = FALSE, row.names = FALSE, 
+                        sep = "\t")
+          }
           # info for each group
           x2 <- x[, !names(x) %in% c("x", "y")]
           x <- x2[!duplicated(x2), ]
@@ -709,7 +712,8 @@ saveChunks <- function(x, vars, meta){
       this.i <- meta$chunk.i
       meta$chunk.i <- meta$chunk.i + 1L
       csv.name <- sprintf("%s_chunk%d.tsv", meta$classed, this.i)
-      write.table(x, file.path(meta$out.dir, csv.name), quote=FALSE, row.names=FALSE, sep="\t")
+      write.table(x, file.path(meta$out.dir, csv.name), quote=FALSE, 
+                  row.names=FALSE, sep="\t")
       this.i
     }else{
       use <- vars[[1]]
