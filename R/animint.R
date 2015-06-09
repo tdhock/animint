@@ -44,10 +44,14 @@ parsePlot <- function(meta){
     
     ## If any legends are specified, add showSelected aesthetic
     for(legend.i in seq_along(plot.meta$legend)) {
+      # the name of the variable used in this legend
       var_name <- plot.meta$legend[[legend.i]]$vars
+      # the actual values for that variable
       var <- L$data[[var_name]]
+      # checking if it is a discrete variable
       if(is.factor(var) | is.character(var)) {
-        L$mapping$showSelectedcolour <- as.symbol(var_name)
+        # if it is, adding a showSelected aesthetic for it
+        L$mapping$showSelected <- as.symbol(var_name)
       }
     }
 
