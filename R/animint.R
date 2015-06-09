@@ -735,6 +735,12 @@ saveChunks <- function(x, vars, meta){
   }
 }
 
+##' Parse selectors from aes names.
+##' @title Parse selectors from aes names.
+##' @param a.vec character vector of aes names.
+##' @return list of selector info.
+##' @author Toby Dylan Hocking
+##' @export
 selector.aes <- function(a.vec){
   stopifnot(is.character(a.vec))
   cs.or.ss <- grepl("clickSelects|showSelected", a.vec)
