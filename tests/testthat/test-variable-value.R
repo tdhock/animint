@@ -1,5 +1,32 @@
 context("variable value")
 
+test_that("selector.aes errors when no matching variable for value", {
+  a.list <-
+    list(c("clickSelects.variable", "clickSelects2.variable",
+           "clickSelects2.value"),
+         c("clickSelects.variable", "clickSelects2.variable",
+           "clickSelects.value"),
+         c("showSelected.variable", "showSelected2.variable",
+           "showSelected2.value"),
+         c("showSelected.variable", "showSelected2.variable",
+           "showSelected.value"),
+         c("clickSelects.variable", "showSelected2.variable",
+           "clickSelects.value"),
+         "showSelected.variable",
+         "showSelected2.variable",
+         "clickSelects.variable",
+         "clickSelects2.variable",
+         "showSelected.value",
+         "showSelected2.value",
+         "clickSelects.value",
+         "clickSelects2.value")
+  for(a.vec in a.list){
+    expect_error({
+      selector.aes(a.vec)
+    }, ".variable or .value aes not found")
+  }
+})
+
 problems <-
   data.frame(problemStart=c(100, 200, 100, 150, 200, 250),
              problemEnd=c(200, 300, 150, 200, 250, 300),
@@ -50,6 +77,7 @@ viz <-
                       data=data.frame(peak.problems, sample.id="problems"),
                       size=10,
                       color="deepskyblue")+
+         ## TODO: yend=y=0 as params not aes?
          geom_segment(aes(peakStart, 0,
                           showSelected.variable=paste0(problem.name, "peaks"),
                           showSelected.value=peaks,
@@ -85,34 +113,7 @@ viz <-
                        showSelected=problem.name),
                    data=problems))
 
-##info <- animint2dir(viz)
-
-test_that("selector.aes errors when no matching variable for value", {
-  a.list <-
-    list(c("clickSelects.variable", "clickSelects2.variable",
-           "clickSelects2.value"),
-         c("clickSelects.variable", "clickSelects2.variable",
-           "clickSelects.value"),
-         c("showSelected.variable", "showSelected2.variable",
-           "showSelected2.value"),
-         c("showSelected.variable", "showSelected2.variable",
-           "showSelected.value"),
-         c("clickSelects.variable", "showSelected2.variable",
-           "clickSelects.value"),
-         "showSelected.variable",
-         "showSelected2.variable",
-         "clickSelects.variable",
-         "clickSelects2.variable",
-         "showSelected.value",
-         "showSelected2.value",
-         "clickSelects.value",
-         "clickSelects2.value")
-  for(a.vec in a.list){
-    expect_error({
-      selector.aes(a.vec)
-    }, ".variable or .value aes not found")
-  }
-})
+info <- animint2dir(viz, "variable-value")
 
 test_that(".variable and .value makes compiler create selectors", {
   info <- animint2HTML(viz)

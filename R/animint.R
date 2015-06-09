@@ -253,23 +253,41 @@ saveLayer <- function(l, d, meta){
   is.cs <- names(g$aes) %in% s.aes$clickSelects$one
   update.vars <- g$aes[is.ss | is.cs]
 
+  interactive.aes <- with(s.aes, {
+    rbind(clickSelects$several, showSelected$several,
+          data.frame(variable=names(update.vars), value=NA))
+  })
+
   ## Construct the selector.
-  for(sel.i in seq_along(update.vars)){
-    v.name <- update.vars[[sel.i]]
-    col.name <- names(update.vars)[[sel.i]]
-    if(!v.name %in% names(meta$selectors)){
-      value <- g.data[[col.name]][1]
-      selector.type <- meta$selector.types[[v.name]]
-      if(is.null(selector.type))selector.type <- "single"
-      stopifnot(is.character(selector.type))
-      stopifnot(length(selector.type)==1)
-      stopifnot(selector.type %in% c("single", "multiple"))
-      meta$selectors[[v.name]] <-
-        list(selected=as.character(value),
-             type=selector.type)
+  for(row.i in 1:nrow(interactive.aes)){
+    aes.row <- interactive.aes[row.i, ]
+    selector.df <- if(is.na(aes.row$value)){
+      value.col <- paste(aes.row$variable)
+      data.frame(value.col,
+                 selector.name=update.vars[[value.col]])
+    }else{
+      selector.vec <- g.data[[paste(aes.row$variable)]]
+      data.frame(value.col=aes.row$value,
+                 selector.name=unique(paste(selector.vec)))
     }
-    meta$selectors[[v.name]]$update <-
-      c(meta$selectors[[v.name]]$update, as.list(g$classed))
+    for(row.i in 1:nrow(selector.df)){
+      sel.row <- selector.df[row.i,]
+      value.col <- paste(sel.row$value.col)
+      selector.name <- paste(sel.row$selector.name)
+      if(!selector.name %in% names(meta$selectors)){
+        value <- g.data[[value.col]][1]
+        selector.type <- meta$selector.types[[selector.name]]
+        if(is.null(selector.type))selector.type <- "single"
+        stopifnot(is.character(selector.type))
+        stopifnot(length(selector.type)==1)
+        stopifnot(selector.type %in% c("single", "multiple"))
+        meta$selectors[[selector.name]] <-
+          list(selected=as.character(value),
+               type=selector.type)
+      }
+      meta$selectors[[selector.name]]$update <-
+        c(meta$selectors[[selector.name]]$update, as.list(g$classed))
+    }
   }
 
   ## Warn if stat_bin is used with animint aes. geom_bar + stat_bin
