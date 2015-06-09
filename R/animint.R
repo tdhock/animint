@@ -244,11 +244,13 @@ saveLayer <- function(l, d, meta){
   ## currently selected values of these variables are stored in
   ## plot.Selectors.
 
-  is.ss <- is.showSelected(names(g$aes))
+  s.aes <- selector.aes(names(g$aes))
+
+  is.ss <- names(g$aes) %in% s.aes$showSelected$one
   show.vars <- g$aes[is.ss]
   g$subset_order <- as.list(names(show.vars))
 
-  is.cs <- is.clickSelects(names(g$aes))
+  is.cs <- names(g$aes) %in% s.aes$clickSelects$one
   update.vars <- g$aes[is.ss | is.cs]
 
   ## Construct the selector.
@@ -715,26 +717,37 @@ saveChunks <- function(x, vars, meta){
   }
 }
 
-##' Test if aesthetics are showSelected.
-##' @param x character vector.
-##' @return logical vector
-##' @export
-##' @author Toby Dylan Hocking
-is.showSelected <- function(x){
-  if(length(x) == 0)return(logical())
-  stopifnot(is.character(x))
-  grepl("showSelected", x)
-}
-
-##' Test if aesthetics are clickSelects.
-##' @param x character vector.
-##' @return logical vector
-##' @export
-##' @author Susan VanderPlas
-is.clickSelects <- function(x){
-  if(length(x) == 0)return(logical())
-  stopifnot(is.character(x))
-  grepl("clickSelects", x)
+selector.aes <- function(a.vec){
+  stopifnot(is.character(a.vec))
+  cs.or.ss <- grepl("clickSelects|showSelected", a.vec)
+  for(v in c("value", "variable")){
+    regex <- paste0("[.]", v, "$")
+    is.v <- grepl(regex, a.vec)
+    if(any(is.v)){
+      a <- a.vec[is.v & cs.or.ss]
+      other.v <- if(v=="value")"variable" else "value"
+      other.a <- sub(paste0(v, "$"), other.v, a)
+      not.found <- ! other.a %in% a.vec
+      if(any(not.found)){
+        print(list(present=a, missing=other.a[not.found]))
+        stop(".variable or .value aes not found")
+      }
+    }
+  }
+  aes.list <- list()
+  for(a in c("clickSelects", "showSelected")){
+    is.a <- grepl(a, a.vec)
+    is.value <- grepl("[.]value$", a.vec)
+    is.variable <- grepl("[.]variable$", a.vec)
+    var.or.val <- is.variable | is.value
+    a.value <- a.vec[is.a & is.value]
+    a.variable <- sub("value$", "variable", a.value)
+    single <- a.vec[is.a & (!var.or.val)]
+    aes.list[[a]] <-
+      list(several=data.frame(variable=a.variable, value=a.value),
+           one=single)
+  }
+  aes.list
 }
 
 ##' Deprecated alias for animint2dir.
@@ -893,9 +906,9 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
         ## This code assumes that the layer has the complete aesthetic
         ## mapping and data. TODO: Do we need to copy any global
         ## values to this layer?
-        is.ss <- is.showSelected(names(L$mapping))
-        is.cs <- is.clickSelects(names(L$mapping))
-        update.vars <- L$mapping[is.ss | is.cs]
+        iaes <- selector.aes(names(L$mapping))
+        one.names <- with(iaes, c(clickSelects$one, showSelected$one))
+        update.vars <- L$mapping[one.names]
         has.var <- update.vars %in% names(L$data)
         if(!all(has.var)){
           print(L)
@@ -903,7 +916,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
                      data.variables=names(L$data)))
           stop("data does not have interactive variables")
         }
-        has.cs <- any(is.cs)
+        has.cs <- 0 < with(iaes$clickSelects, nrow(several) + length(one))
         has.href <- "href" %in% names(L$mapping)
         if(has.cs && has.href){
           stop("aes(clickSelects) can not be used with aes(href)")
