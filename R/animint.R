@@ -51,9 +51,11 @@ parsePlot <- function(meta){
       # checking if it is a discrete variable
       if(is.factor(var) | is.character(var)) {
         # if it is, adding a showSelected aesthetic for it
-        L$mapping$showSelected <- as.symbol(var_name)
+        L$mapping$showSelectedcolour <- as.symbol(var_name)
       }
     }
+    ## need to call ggplot_build again because I've added to the plot
+    meta$built <- ggplot2::ggplot_build(meta$plot)
 
     ## for each layer, there is a correpsonding data.frame which
     ## evaluates the aesthetic mapping.
