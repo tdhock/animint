@@ -41,6 +41,15 @@ parsePlot <- function(meta){
 
     ## This is the layer from the original ggplot object.
     L <- meta$plot$layers[[layer.i]]
+    
+    ## If any legends are specified, add showSelected aesthetic
+    for(legend.i in seq_along(plot.meta$legend)) {
+      var_name <- plot.meta$legend[[legend.i]]$vars
+      var <- L$data[[var_name]]
+      if(is.factor(var) | is.character(var)) {
+        L$mapping$showSelectedcolour <- as.symbol(var_name)
+      }
+    }
 
     ## for each layer, there is a correpsonding data.frame which
     ## evaluates the aesthetic mapping.
