@@ -22,6 +22,20 @@ parsePlot <- function(meta){
       plot.meta$scales[[sc$aesthetics]] <- makeScale(sc)
     }
   }
+  
+  ## Export axis specification as a combination of breaks and
+  ## labels, on the relevant axis scale (i.e. so that it can
+  ## be passed into d3 on the x axis scale instead of on the
+  ## grid 0-1 scale). This allows transformations to be used
+  ## out of the box, with no additional d3 coding.
+  theme.pars <- ggplot2:::plot_theme(meta$plot)
+  
+  ## No legend if theme(legend.postion="none").
+  plot.meta$legend <- if(theme.pars$legend.position != "none"){
+    getLegendList(meta$built)
+  }
+  
+  ## save each layer
   for(layer.i in seq_along(meta$plot$layers)){
     ##cat(sprintf("%4d / %4d layers\n", layer.i, length(meta$plot$layers)))
 
@@ -52,13 +66,6 @@ parsePlot <- function(meta){
       meta$geoms[[geom.prev]]$nextgeom <- meta$geoms[[geom.next]]$classed
     }
   }
-  
-  ## Export axis specification as a combination of breaks and
-  ## labels, on the relevant axis scale (i.e. so that it can
-  ## be passed into d3 on the x axis scale instead of on the
-  ## grid 0-1 scale). This allows transformations to be used
-  ## out of the box, with no additional d3 coding.
-  theme.pars <- ggplot2:::plot_theme(meta$plot)
   
   ## Flip labels if coords are flipped - transform does not take care
   ## of this. Do this BEFORE checking if it is blank or not, so that
@@ -137,14 +144,7 @@ parsePlot <- function(meta){
   # grab the unique axis labels (makes rendering simpler)
   axis.info <- plot.meta[grepl("^axis[0-9]+$", names(plot.meta))]
   plot.meta$xlabs <- as.list(unique(unlist(lapply(axis.info, "[", "xlab"))))
-  plot.meta$ylabs <- as.list(unique(unlist(lapply(axis.info, "[", "ylab"))))
-
-  
-  ## No legend if theme(legend.postion="none").
-  plot.meta$legend <- if(theme.pars$legend.position != "none"){
-    getLegendList(meta$built)
-  }
-  
+  plot.meta$ylabs <- as.list(unique(unlist(lapply(axis.info, "[", "ylab"))))  
 
   if("element_blank"%in%attr(theme.pars$plot.title, "class")){
     plot.meta$title <- ""
