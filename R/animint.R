@@ -253,13 +253,18 @@ saveLayer <- function(l, d, meta){
   is.cs <- names(g$aes) %in% s.aes$clickSelects$one
   update.vars <- g$aes[is.ss | is.cs]
 
+  update.var.names <- if(0 < length(update.vars)){
+    data.frame(variable=names(update.vars), value=NA)
+  }else{
+    ##browser()
+  }
   interactive.aes <- with(s.aes, {
     rbind(clickSelects$several, showSelected$several,
-          data.frame(variable=names(update.vars), value=NA))
+          update.var.names)
   })
 
   ## Construct the selector.
-  for(row.i in 1:nrow(interactive.aes)){
+  for(row.i in seq_along(interactive.aes$variable)){
     aes.row <- interactive.aes[row.i, ]
     selector.df <- if(is.na(aes.row$value)){
       value.col <- paste(aes.row$variable)
@@ -1034,10 +1039,17 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
   ## The first selection:
   for(selector.name in names(meta$first)){
     first <- as.character(meta$first[[selector.name]])
-    if(meta$selectors[[selector.name]]$type == "single"){
-      stopifnot(length(first) == 1)
+    if(selector.name %in% names(meta$selectors)){
+      s.type <- meta$selectors[[selector.name]]$type
+      if(s.type == "single"){
+        stopifnot(length(first) == 1)
+      }
+      meta$selectors[[selector.name]]$selected <- first
+    }else{
+      print(list(selectors=names(meta$selectors),
+                 missing.first=selector.name))
+      stop("missing first selector variable")
     }
-    meta$selectors[[selector.name]]$selected <- first
   }
 
   ## Finally, copy html/js/json files to out.dir.
