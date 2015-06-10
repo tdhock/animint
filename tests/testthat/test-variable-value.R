@@ -103,6 +103,7 @@ viz <-
        peaks=ggplot()+
          ggtitle("select number of peaks")+
          geom_point(aes(peaks, peaks,
+                        id=peaks,
                         showSelected=problem.name,
                         clickSelects.variable=paste0(problem.name, "peaks"),
                         clickSelects.value=peaks),
@@ -130,6 +131,16 @@ test_that(".variable and .value makes compiler create selectors", {
   node.list <-
     getNodeSet(info$html, '//g[@class="geom4_segment_problems"]//line')
   expect_equal(length(node.list), 2)
+
+  no.peaks.html <- clickHTML(id=0)
+  node.list <-
+    getNodeSet(no.peaks.html, '//g[@class="geom4_segment_problems"]//line')
+  expect_equal(length(node.list), 0)
+
+  more.peaks.html <- clickHTML(id=2)
+  node.list <-
+    getNodeSet(more.peaks.html, '//g[@class="geom4_segment_problems"]//line')
+  expect_equal(length(node.list), 4)
 })
 
 viz.for <-
