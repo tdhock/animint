@@ -248,7 +248,7 @@ saveLayer <- function(l, d, meta){
 
   is.ss <- names(g$aes) %in% s.aes$showSelected$one
   show.vars <- g$aes[is.ss]
-  g$subset_order <- as.list(names(show.vars))
+  pre.subset.order <- as.list(names(show.vars))
 
   is.cs <- names(g$aes) %in% s.aes$clickSelects$one
   update.vars <- g$aes[is.ss | is.cs]
@@ -541,7 +541,11 @@ saveLayer <- function(l, d, meta){
     names(g$aes)[g$aes==meta$time$var & click.or.show]
   }
   if(length(time.col)){
-    g$subset_order <- g$subset_order[order(g$subset_order != time.col)]
+    pre.subset.order <- pre.subset.order[order(pre.subset.order != time.col)]
+  }
+  ## Get unique values of time variable.
+  if(length(time.col)){ # if this layer/geom is animated,
+    g$timeValues <- unique(g.data[[time.col]])
   }
 
   ## Determine which showSelected values to use for breaking the data
@@ -550,7 +554,7 @@ saveLayer <- function(l, d, meta){
   ## when year is clicked, we may need to download some new data for
   ## this geom.
 
-  subset.vec <- unlist(g$subset_order)
+  subset.vec <- unlist(pre.subset.order)
   if("chunk_vars" %in% names(g$params)){ #designer-specified chunk vars.
     designer.chunks <- g$params$chunk_vars
     if(!is.character(designer.chunks)){
@@ -664,7 +668,7 @@ saveLayer <- function(l, d, meta){
   g$chunks <- saveChunks(g.data, chunk.cols, meta)
   g$total <- length(unlist(g$chunks))
 
-  ## Also add pointers to these chunks to the related selectors.
+  ## Also add pointers to these chunks from the related selectors.
   if(length(chunk.cols)){
     selector.names <- as.character(g$aes[chunk.cols])
     chunk.name <- paste(selector.names, collapse="_")
@@ -676,26 +680,31 @@ saveLayer <- function(l, d, meta){
   }else{
     g$chunk_order <- list()
   }
+
+  ## If this plot has more than one PANEL then add it to subset_order
+  ## and nest_order.
+  if(plot.has.panels){
+    nest.cols <- c(nest.cols, "PANEL")
+  }
+
   g$nest_order <- as.list(nest.cols)
   names(g$chunk_order) <- NULL
   names(g$nest_order) <- NULL
   g$subset_order <- g$nest_order
 
-  ## If this plot has more than one PANEL then add it to subset_order
-  ## and nest_order.
-  if(plot.has.panels){
-    g$subset_order <- c(g$subset_order, "PANEL")
-    g$nest_order <- c(g$nest_order, "PANEL")
+  ## nest_order should contain both .variable .value aesthetics, but
+  ## subset_order should contain only .variable.
+  if(0 < nrow(s.aes$showSelected$several)){
+    g$nest_order <- with(s.aes$showSelected$several, {
+      c(g$nest_order, paste(variable), paste(value))
+    })
+    g$subset_order <-
+      c(g$subset_order, paste(s.aes$showSelected$several$variable))
   }
 
   ## group should be the last thing in nest_order, if it is present.
   if("group" %in% names(g$aes)){
     g$nest_order <- c(g$nest_order, "group")
-  }
-
-  ## Get unique values of time variable.
-  if(length(time.col)){ # if this layer/geom is animated,
-    g$timeValues <- unique(g.data[[time.col]])
   }
 
   ## Finally save to the master geom list.

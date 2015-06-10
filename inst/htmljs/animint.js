@@ -673,28 +673,45 @@ var animint = function (to_select, json_file) {
     var scales = Plots[p_name].scales[PANEL];
     var selected_arrays = [ [] ]; //double array necessary.
     g_info.subset_order.forEach(function (aes_name) {
-      var selected, values, old_array, value, new_array;
-      //if (aes_name != "group") { // why do we need this?
-	if(aes_name == "PANEL"){
-	  selected = PANEL;
-	}else{
-          var v_name = g_info.aes[aes_name];
-          selected = Selectors[v_name].selected;
-	}
-	if(isArray(selected)){
-	  values = selected;
-	}else{
-	  values = [selected];
-	}
-	var new_arrays = [];
-	values.forEach(function(value){
-	  selected_arrays.forEach(function(old_array){
-	    new_array = old_array.concat(value);
+      var selected, values;
+      var new_arrays = [];
+      if(0 < aes_name.indexOf(".variable")){ 
+	selected_arrays.forEach(function(old_array){
+	  var some_data = chunk;
+	  old_array.forEach(function(value){
+            if(some_data.hasOwnProperty(value)) {
+              some_data = some_data[value];
+            } else {
+              some_data = {};
+            }
+	  })
+	  values = d3.keys(some_data);
+	  values.forEach(function(s_name){
+	    var selected = Selectors[s_name].selected;
+	    var new_array = old_array.concat(s_name).concat(selected);
 	    new_arrays.push(new_array);
 	  })
 	})
-	selected_arrays = new_arrays;
-    //}
+      }else{//not .variable aes:
+	if(aes_name == "PANEL"){
+	  selected = PANEL;
+	}else{
+          var s_name = g_info.aes[aes_name];
+          selected = Selectors[s_name].selected;
+	}
+	if(isArray(selected)){ 
+	  values = selected; //multiple selection.
+	}else{
+	  values = [selected]; //single selection.
+	}
+	values.forEach(function(value){
+	  selected_arrays.forEach(function(old_array){
+	    var new_array = old_array.concat(value);
+	    new_arrays.push(new_array);
+	  })
+	})
+      }
+      selected_arrays = new_arrays;
     })
     var data = []
     selected_arrays.forEach(function(value_array){
