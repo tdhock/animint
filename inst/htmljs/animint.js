@@ -1249,12 +1249,22 @@ var animint = function (to_select, json_file) {
       ;
     }
     var has_clickSelects = g_info.aes.hasOwnProperty("clickSelects");
-    if (has_clickSelects) {
+    var has_clickSelects_variable =
+      g_info.aes.hasOwnProperty("clickSelects.variable");
+    if (has_clickSelects || has_clickSelects_variable) {
       var selected_funs = {
 	"opacity":{
 	  "mouseout":function (d) {
-            return ifSelectedElse(d, g_info.aes.clickSelects,
-				  get_alpha(d), get_alpha(d) - 1/2);
+	    var alpha_on = get_alpha(d);
+	    var alpha_off = get_alpha(d) - 0.5;
+	    if(has_clickSelects){
+              return ifSelectedElse(d.clickSelects, g_info.aes.clickSelects,
+				    alpha_on, alpha_off);
+	    }else{
+	      return ifSelectedElse(d["clickSelects.value"],
+				    d["clickSelects.variable"],
+				    alpha_on, alpha_off);
+	    }
 	  },
 	  "mouseover":function (d) {
             return get_alpha(d);
@@ -1262,8 +1272,16 @@ var animint = function (to_select, json_file) {
 	},
 	"stroke":{
 	  "mouseout":function(d){
-	    return ifSelectedElse(d, g_info.aes.clickSelects,
-				  "black", "transparent");
+	    var stroke_on = "black";
+	    var stroke_off = "transparent";
+	    if(has_clickSelects){
+	      return ifSelectedElse(d.clickSelects, g_info.aes.clickSelects,
+				    stroke_on, stroke_off);
+	    }else{
+	      return ifSelectedElse(d["clickSelects.value"],
+				    d["clickSelects.variable"],
+				    stroke_on, stroke_off);
+	    }
 	  },
 	  "mouseover":function(d){
 	    return "black";
@@ -1322,8 +1340,14 @@ var animint = function (to_select, json_file) {
 	  // The main idea of how clickSelects works: when we click
 	  // something, we call update_selector with the clicked
 	  // value.
-          var v_name = g_info.aes.clickSelects;
-          update_selector(v_name, d.clickSelects);
+	  if(has_clickSelects){
+            var s_name = g_info.aes.clickSelects;
+            update_selector(s_name, d.clickSelects);
+	  }else{
+	    var s_name = d["clickSelects.variable"];
+	    var s_value = d["clickSelects.value"];
+	    update_selector(s_name, s_value);
+	  }
         })
       ;
     } else { //no clickSelects for this geom.
@@ -1397,14 +1421,13 @@ var animint = function (to_select, json_file) {
       update_geom(g_name, v_name);
     });
   }
-  var ifSelectedElse = function (d, v_name, selected, not_selected) {
+  var ifSelectedElse = function (s_value, s_name, selected, not_selected) {
     var is_selected;
-    var value = d.clickSelects + "";
-    var s_info = Selectors[v_name];
+    var s_info = Selectors[s_name];
     if(s_info.type == "single"){
-      is_selected = value == s_info.selected;
+      is_selected = s_value == s_info.selected;
     }else{
-      is_selected = s_info.selected.indexOf(value) != -1;
+      is_selected = s_info.selected.indexOf(s_value) != -1;
     }
     if(is_selected){
       return selected;
