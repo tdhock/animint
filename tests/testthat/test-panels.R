@@ -13,7 +13,8 @@ p1 <- ggplot() +
 p2 <- ggplot() + 
   geom_point(aes(Petal.Length, Petal.Width, colour = Species, 
                  showSelected = Species), data = iris) + 
-  ggtitle("Petal Data")
+  ggtitle("Petal Data") + 
+  theme_bw()
 
 info <- animint2HTML(list(sepal = p1, petal = p2))
 
