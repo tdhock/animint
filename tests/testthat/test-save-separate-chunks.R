@@ -1,8 +1,13 @@
-context("save chunks")
+context("save separate chunks")
 
-library(cdcfluview)
-# retrieve state-level data from the CDC's FluView Portal
-state_flu <- get_state_data(2008:2014)
+# retrieve state-level data from the CDC's FluView Portal and save as FluView.RData
+# under animint/data directory
+# library(cdcfluview)
+# state_flu <- get_state_data(2008:2014)
+# save(state_flu, file = "~/Documents/R/packages/animint/data/FluView.RData", 
+#      compress = "xz")
+data(FluView)
+
 # data clean
 state_flu <- state_flu[, !names(state_flu) %in% c("URL", "WEBSITE")]
 state_flu$state <- tolower(state_flu$STATENAME)
@@ -51,8 +56,8 @@ USdots <- ddply(USpolygons, .(region), summarise, mean.lat = mean(lat),
 # add state flu
 map_flu <- ldply(unique(state_flu$WEEKEND), function(we) {
   df <- subset(state_flu, WEEKEND == we)
-  ##merge(USpolygons, df)
-  merge(USdots, df)
+  # merge(USpolygons, df, by.x = "region", by.y = "state")
+  merge(USdots, df, by.x = "region", by.y = "state")
 })
 
 state.map <- ggplot() + 
@@ -68,5 +73,5 @@ state.map <- ggplot() +
   theme_animint(width = 750, height= 500)
 
 viz <- list(levelHeatmap = level.heatmap, stateMap = state.map, title = "FluView")
-# animint2dir(viz, out.dir = "FluView")
-animint2gist(viz, out.dir = "FluView")
+animint2dir(viz, out.dir = "FluView")
+# animint2gist(viz, out.dir = "FluView")
