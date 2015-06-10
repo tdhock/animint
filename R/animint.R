@@ -52,6 +52,10 @@ parsePlot <- function(meta){
       if(is.factor(var) | is.character(var) | is.logical(var)) {
         # if it is, adding a showSelected aesthetic for it
         L$mapping$showSelectedcolour <- as.symbol(var_name)
+        # if first is not specified, add all to first
+        if(is.null(meta$first[[var_name]])) {
+          meta$first[[var_name]] <- unique(var)
+        }
       }
     }
     ## need to call ggplot_build again because I've added to the plot
