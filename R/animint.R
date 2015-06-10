@@ -49,7 +49,7 @@ parsePlot <- function(meta){
       # the actual values for that variable
       var <- L$data[[var_name]]
       # checking if it is a discrete variable
-      if(is.factor(var) | is.character(var)) {
+      if(is.factor(var) | is.character(var) | is.logical(var)) {
         # if it is, adding a showSelected aesthetic for it
         L$mapping$showSelectedcolour <- as.symbol(var_name)
       }
@@ -1082,14 +1082,18 @@ getLegendList <- function(plistextra){
     gdefs <- ggplot2:::guides_geom(gdefs, layers, default_mapping)
   } else (ggplot2:::zeroGrob())
   names(gdefs) <- sapply(gdefs, function(i) i$title)
+  
+  ## adding the variable used to each LegendList
   for(leg in seq_len(length(gdefs))) {
     legend_scales <- names(gdefs[[leg]]$key)
     legend_scales <- legend_scales[legend_scales != ".label"]
+    # something wrong here.  This should not just be [[1]]
     vars <- sapply(legend_scales, function(z) { 
       as.character( plot$layers[[1]]$mapping[[z]] )
     })
     gdefs[[leg]]$vars <- unique( setNames(vars, NULL))
   }
+  
   ## Add a flag to specify whether or not breaks was manually
   ## specified. If it was, then it should be respected. If not, and
   ## the legend shows a numeric variable, then it should be reversed.
