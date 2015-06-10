@@ -114,7 +114,7 @@ viz <-
                        showSelected=problem.name),
                    data=problems))
 
-info <- animint2dir(viz, "variable-value")
+##info <- animint2dir(viz, "variable-value")
 
 test_that(".variable and .value makes compiler create selectors", {
   info <- animint2HTML(viz)
@@ -135,12 +135,12 @@ test_that(".variable and .value makes compiler create selectors", {
   no.peaks.html <- clickHTML(id=0)
   node.list <-
     getNodeSet(no.peaks.html, '//g[@class="geom4_segment_problems"]//line')
-  expect_equal(length(node.list), 0)
+  expect_equal(length(node.list), 1)
 
   more.peaks.html <- clickHTML(id=2)
   node.list <-
     getNodeSet(more.peaks.html, '//g[@class="geom4_segment_problems"]//line')
-  expect_equal(length(node.list), 4)
+  expect_equal(length(node.list), 3)
 })
 
 viz.for <-
