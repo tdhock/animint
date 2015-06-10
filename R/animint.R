@@ -52,9 +52,12 @@ parsePlot <- function(meta){
       var <- L$data[[var_name]]
       # checking if it is a discrete variable
       if(plyr::is.discrete(var)) {
-        # if it is, adding a showSelected aesthetic for it
-        L$mapping$temp <- as.symbol(var_name)
-        names(L$mapping)["temp"] <- paste("showSelected", legend_type, collapse = "")
+        # adding a showSelected aesthetic for each legend entry
+        for(i in legend_type) {
+          temp_name <- paste0("showSelected", i)
+          L$mapping[[temp_name]] <- as.symbol(var_name)
+#           browser()
+        }
         # if first is not specified, add all to first
         if(is.null(meta$first[[var_name]])) {
           meta$first[[var_name]] <- unique(var)
@@ -64,7 +67,6 @@ parsePlot <- function(meta){
           meta$selector.types[[var_name]] <- "multiple"
         }
       }
-#       browser()
     }
     ## need to call ggplot_build again because I've added to the plot
     meta$built <- ggplot2::ggplot_build(meta$plot)
