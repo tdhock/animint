@@ -44,14 +44,17 @@ parsePlot <- function(meta){
     
     ## If any legends are specified, add showSelected aesthetic
     for(legend.i in seq_along(plot.meta$legend)) {
+      # the type of legend: colour, fill, etc
+      legend_type <- plot.meta$legend[[legend.i]]$legend_type
       # the name of the variable used in this legend
       var_name <- plot.meta$legend[[legend.i]]$vars
       # the actual values for that variable
       var <- L$data[[var_name]]
       # checking if it is a discrete variable
-      if(is.factor(var) | is.character(var) | is.logical(var)) {
+      if(plyr::is.discrete(var)) {
         # if it is, adding a showSelected aesthetic for it
-        L$mapping$showSelectedcolour <- as.symbol(var_name)
+        L$mapping$temp <- as.symbol(var_name)
+        names(L$mapping)["temp"] <- paste("showSelected", legend_type, collapse = "")
         # if first is not specified, add all to first
         if(is.null(meta$first[[var_name]])) {
           meta$first[[var_name]] <- unique(var)
@@ -61,6 +64,7 @@ parsePlot <- function(meta){
           meta$selector.types[[var_name]] <- "multiple"
         }
       }
+#       browser()
     }
     ## need to call ggplot_build again because I've added to the plot
     meta$built <- ggplot2::ggplot_build(meta$plot)
@@ -1093,10 +1097,11 @@ getLegendList <- function(plistextra){
   
   ## adding the variable used to each LegendList
   for(leg in seq_len(length(gdefs))) {
-    legend_scales <- names(gdefs[[leg]]$key)
-    legend_scales <- legend_scales[legend_scales != ".label"]
+    legend_type <- names(gdefs[[leg]]$key)
+    legend_type <- legend_type[legend_type != ".label"]
+    gdefs[[leg]]$legend_type <- legend_type
     # something wrong here.  This should not just be [[1]]
-    vars <- sapply(legend_scales, function(z) { 
+    vars <- sapply(legend_type, function(z) { 
       as.character( plot$layers[[1]]$mapping[[z]] )
     })
     gdefs[[leg]]$vars <- unique( setNames(vars, NULL))
@@ -1171,6 +1176,7 @@ getLegend <- function(mb){
          geoms = geoms,
          title = mb$title,
          vars = mb$vars, 
+         legend_type = mb$legend_type, 
          entries = data)
   }
 }
