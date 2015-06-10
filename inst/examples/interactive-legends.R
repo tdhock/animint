@@ -16,14 +16,14 @@ p1 <- ggplot() +
   facet_wrap(~Species, nrow = 2)
 p2 <- ggplot() + 
   geom_point(aes(Petal.Length, Petal.Width, 
-                 colour = Species), 
+                 colour = Species, size = Species
+  ), 
   data = iris) + 
   ggtitle("Petal Data") + 
   theme_bw()
 viz <- list(sepal = p1, 
             petal = p2, 
-            title = "Different Panel Styles", 
-            selector.types=list(Species="multiple"))
+            title = "Different Panel Styles")
 
 animint2dir(viz, 
             out.dir = "iris_animint", 
