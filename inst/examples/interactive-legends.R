@@ -4,7 +4,7 @@ library(animint)
 
 p1 <- ggplot() + 
   geom_point(aes(Sepal.Length, Sepal.Width, 
-                 colour = Species, alpha = Species, size = Sepal.Width), 
+                 colour = Species, size = Sepal.Width), 
              data = iris) + 
   scale_colour_discrete(name = "species") + 
   theme(panel.background = element_rect(fill = "lightblue"), 
@@ -15,8 +15,9 @@ p1 <- ggplot() +
         panel.margin = grid::unit(.1, "cm")) + 
   facet_wrap(~Species, nrow = 2)
 p2 <- ggplot() + 
-  geom_point(aes(Petal.Length, Petal.Width, colour = Species, 
-                 showSelected = Species), data = iris) + 
+  geom_point(aes(Petal.Length, Petal.Width, 
+                 colour = Species), 
+  data = iris) + 
   ggtitle("Petal Data") + 
   theme_bw()
 viz <- list(sepal = p1, 
