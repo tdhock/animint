@@ -56,6 +56,10 @@ parsePlot <- function(meta){
         if(is.null(meta$first[[var_name]])) {
           meta$first[[var_name]] <- unique(var)
         }
+        # if selectortypes is not specified, set it to multiple
+        if(is.null(meta$selector.types[[var_name]])) {
+          meta$selector.types[[var_name]] <- "multiple"
+        }
       }
     }
     ## need to call ggplot_build again because I've added to the plot
