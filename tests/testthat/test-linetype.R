@@ -1,9 +1,10 @@
 context("linetype")
 
-df <- data.frame(x=1:3, status=c("correct", "false positive", "false negative"))
+error.types <-
+  data.frame(x=1:3, status=c("correct", "false positive", "false negative"))
 
 gg <- 
-  ggplot(df)+
+  ggplot(error.types)+
     geom_point(aes(x, x))+
     geom_tallrect(aes(xmin=x, xmax=x+0.5, linetype=status),
                   fill="grey",
@@ -19,7 +20,6 @@ rect.xpaths <-
     '//svg[@id="character"]//rect',
     '//td[@id="numeric_legend"]//rect',
     '//td[@id="character_legend"]//rect')
-    
 
 test_that("linetypes render correctly", {
   viz <-
