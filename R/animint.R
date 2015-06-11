@@ -642,7 +642,8 @@ saveLayer <- function(l, d, meta){
   meta$classed <- g$classed
   meta$chunk.i <- 1L
   meta$geom <- g$geom
-  g$chunks <- saveChunks(g.data, chunk.cols, meta)
+  g.data.vary <- saveCommonChunk(g.data, chunk.cols, meta)
+  g$chunks <- saveChunks(g.data.vary, chunk.cols, meta)
   g$total <- length(unlist(g$chunks))
 
   ## Also add pointers to these chunks to the related selectors.
@@ -685,6 +686,15 @@ saveLayer <- function(l, d, meta){
   g
 }
 
+##' Save the common columns for each tsv to one chunk
+##' @param x data.frame.
+##' @param vars character vector of variable names to split on.
+##' @param meta environment.
+##' @return data.frame comprised of varied columns for each tsv.
+saveCommonChunk <- function(x, vars, meta){
+  x
+}
+
 ##' Split data set into chunks and save them to separate files.
 ##' @param x data.frame.
 ##' @param vars character vector of variable names to split on.
@@ -705,7 +715,7 @@ saveChunks <- function(x, vars, meta){
                         sep = "\t")
           }
           # attributes for each group of feature
-          feature.attr <- x[, !names(x) %in% c("x", "y")]
+          feature.attr <- x[, !names(x) %in% c("x", "y"), drop = FALSE]
           x <- feature.attr[!duplicated(feature.attr), ]
           }
       }
