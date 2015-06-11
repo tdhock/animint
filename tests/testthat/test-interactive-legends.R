@@ -30,14 +30,29 @@ test_that("compiler adds aesthetics, selector.types, and first", {
   expect_true(all(dir$first$Species %in% c("setosa", "virginica", "versicolor")))
 })
 
+get_circles <- function(id) {
+  getNodeSet(getHTML(), paste0("//svg[@id='", id, "']//circle"))
+}
+
 test_that("all points are initially draw", {
-  
+  expect_equal(length(get_circles("sepal")), 150)
+  expect_equal(length(get_circles("petal")), 150)
 })
 
 test_that("clicking species legend adds and removes points", {
+  # virginica points are removed
+  clickID("virginica")
+  expect_equal(length(get_circles("sepal")), 100)
+  expect_equal(length(get_circles("petal")), 100)
   
+  # virginica points are added back
+  clickID("virginica")
+  expect_equal(length(get_circles("sepal")), 150)
+  expect_equal(length(get_circles("petal")), 150)
 })
 
 test_that("clicking sepal.width legend does nothing", {
-  
+  clickID("2.5")
+  expect_equal(length(get_circles("sepal")), 150)
+  expect_equal(length(get_circles("petal")), 150)
 })
