@@ -1,18 +1,21 @@
 context("Panel background")
 
 p1 <- ggplot() + 
-  geom_point(aes(Sepal.Length, Sepal.Width, colour = Species, size = Sepal.Width, 
-                 clickSelects = Species), 
+  geom_point(aes(Sepal.Length, Sepal.Width, 
+                 colour = Species, size = Species), 
              data = iris) + 
-  theme(panel.background = element_rect(fill = "lightblue", 
-                                        color = "black", 
-                                        size = 2, 
-                                        linetype = "dashed"), 
-        panel.margin=grid::unit(0, "cm")) + 
+  theme(panel.background = element_rect(fill = "lightblue"), 
+        panel.border = element_rect(fill = NA, 
+                                    color = "black", 
+                                    size = 2, 
+                                    linetype = "dashed"), 
+        panel.margin = grid::unit(.1, "cm")) + 
   facet_wrap(~Species, nrow = 2)
 p2 <- ggplot() + 
-  geom_point(aes(Petal.Length, Petal.Width, colour = Species, 
-                 showSelected = Species), data = iris) + 
+  geom_point(aes(Petal.Length, Petal.Width, 
+                 colour = Species, size = Species
+  ), 
+  data = iris) + 
   ggtitle("Petal Data") + 
   theme_bw()
 
@@ -64,14 +67,14 @@ test_that("panel backgrounds render correctly", {
   
   match_petal <- str_match_perl(attr_back_petal["style",], fillPattern)
   value_petal <- match_petal[, "value"]
-  expect_equal(value_petal[1], "rgb(229, 229, 229)")
+  expect_equal(value_petal[1], "rgb(255, 255, 255)")
 })
 
 test_that("panel boders render correctly", {
   # testing that there are the correct number of panels
   expect_equal(length(border_sepal), 3)
   expect_equal(length(border_petal), 1)
-
+  
   # test border colors
   match_sepal <- str_match_perl(attr_border_sepal["style",], strokePattern)
   value_sepal <- match_sepal[, "value"]
@@ -81,22 +84,20 @@ test_that("panel boders render correctly", {
   value_petal <- match_petal[, "value"]
   expect_equal(value_petal[1], "rgb(127, 127, 127)")
   
-  # test border linetypes
-  match_sepal <- str_match_perl(attr_border_sepal["style",], dasharrayPattern)
+  # test border fills
+  match_sepal <- str_match_perl(attr_border_sepal["style",], fillPattern)
   value_sepal <- match_sepal[, "value"]
-  expect_equal(value_sepal[1], "0(px)?, *20(px)?")
+  expect_equal(value_sepal[1], "transparent")
   
-  match_petal <- str_match_perl(attr_border_petal["style",], dasharrayPattern)
+  match_petal <- str_match_perl(attr_border_petal["style",], fillPattern)
   value_petal <- match_petal[, "value"]
-  expect_equal(value_petal[1], "0(px)?, *20(px)?")
+  expect_match(value_petal[1], "transparent")
 })
 
 test_that("major grid lines are drawn correctly", {
   # correct number of grid lines in both plots
   expect_equal(length(grid_major_sepal), 30)
   expect_equal(length(grid_major_petal), 9)
-  
-  # correct location of grid lines
   
   # correct size of grid lines
 })
