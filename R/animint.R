@@ -665,8 +665,8 @@ saveLayer <- function(l, d, meta){
   ## Split into chunks and save tsv files.
   meta$classed <- g$classed
   meta$chunk.i <- 1L
-  meta$geom <- g$geom
-  g$chunks <- saveChunks(g.data, chunk.cols, meta)
+  g.data.vary <- saveCommonChunk(g.data, chunk.cols, meta)
+  g$chunks <- saveChunks(g.data.vary, NULL, meta)
   g$total <- length(unlist(g$chunks))
 
   ## Also add pointers to these chunks from the related selectors.
@@ -714,6 +714,50 @@ saveLayer <- function(l, d, meta){
   g
 }
 
+##' Save the common columns for each tsv to one chunk
+##' @param x data.frame.
+##' @param vars character vector of variable names to split on.
+##' @param meta environment.
+##' @return a list of data.frames comprised of varied columns for each tsv.
+saveCommonChunk <- function(x, vars, meta){
+  if(length(vars) == 0){
+    x
+  } else{
+    # compare first two data.frames to determine common columns
+    vec <- x[[vars]]
+    df.list <- split(x[names(x) != vars], vec, drop=TRUE)
+    df1 <- df.list[[1]]
+    df2 <- df.list[[2]]
+    cols <- names(df1)
+    is.common <- laply(cols, function(col){
+      identical(df1[, col], df2[, col])
+    })
+    if(any(is.common)){
+      common.cols <- cols[is.common]
+      # save common data to chunk
+      csv.name <- sprintf("%s_chunk_common.tsv", meta$classed)
+      common.chunk <- file.path(meta$out.dir, csv.name)
+      common.data <- df1[common.cols]
+      write.table(common.data, common.chunk, quote = FALSE, row.names = FALSE, 
+                  sep = "\t")
+      # remove common data for df.list but keep 'group' field if it exists in case 
+      # of the need of recovering the data.frame in the future
+      if("group" %in% common.cols){
+        remove.cols <- common.cols[!common.cols %in% "group"]
+      } else{ # WorldBank example
+        remove.cols <- common.cols
+      }
+      df.list <- llply(df.list, function(df){
+        df <- df[, !names(df) %in% remove.cols, drop = FALSE]
+        # remove duplicated rows to further reduce chunk file size
+        if("group" %in% common.cols) df <- df[!duplicated(df), ]
+        df
+      })
+    }
+    df.list
+  }
+}
+
 ##' Split data set into chunks and save them to separate files.
 ##' @param x data.frame.
 ##' @param vars character vector of variable names to split on.
@@ -723,26 +767,11 @@ saveLayer <- function(l, d, meta){
 saveChunks <- function(x, vars, meta){
   if(is.data.frame(x)){
     if(length(vars) == 0){
-      if(meta$geom %in% c("line", "path", "polygon", "ribbon")) {
-        if("group" %in% names(x)) {
-          # shape coordinates for each group of feature, save only once
-          csv.name <- sprintf("%s_chunk_shape.tsv", meta$classed)
-          chunk.shape <- file.path(meta$out.dir, csv.name)
-          if(!file.exists(chunk.shape)){
-            feature.shape <- x[c("x", "y", "group")]
-            write.table(feature.shape, chunk.shape, quote = FALSE, row.names = FALSE, 
-                        sep = "\t")
-          }
-          # attributes for each group of feature
-          feature.attr <- x[, !names(x) %in% c("x", "y")]
-          x <- feature.attr[!duplicated(feature.attr), ]
-          }
-      }
       this.i <- meta$chunk.i
-      meta$chunk.i <- meta$chunk.i + 1L
       csv.name <- sprintf("%s_chunk%d.tsv", meta$classed, this.i)
       write.table(x, file.path(meta$out.dir, csv.name), quote=FALSE, 
                   row.names=FALSE, sep="\t")
+      meta$chunk.i <- meta$chunk.i + 1L
       this.i
     }else{
       use <- vars[[1]]
