@@ -141,6 +141,9 @@ test_that(".variable and .value makes compiler create selectors", {
   node.list <-
     getNodeSet(more.peaks.html, '//g[@class="geom4_segment_problems"]//line')
   expect_equal(length(node.list), 3)
+
+  ## TODO: test for //g[@class="geom6_point_peaks"]//circle//title
+  ## (tooltip that indicates the number of peaks).
 })
 
 viz.for <-
