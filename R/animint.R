@@ -2,7 +2,7 @@
 #' @param meta environment with previously calculated plot data, and a new plot to parse, already stored in plot and plot.name.
 #' @return nothing, info is stored in meta.
 #' @export
-#' @import ggplot2
+#' @import ggplot2 plyr
 parsePlot <- function(meta){
   meta$built <- ggplot2::ggplot_build(meta$plot)
   plot.meta <- list()
@@ -642,7 +642,7 @@ saveLayer <- function(l, d, meta){
   meta$classed <- g$classed
   meta$chunk.i <- 1L
   g.data.vary <- saveCommonChunk(g.data, chunk.cols, meta)
-  g$chunks <- saveChunks(g.data.vary, NULL, meta)
+  g$chunks <- saveChunks(g.data.vary, meta)
   g$total <- length(unlist(g$chunks))
 
   ## Also add pointers to these chunks to the related selectors.
@@ -694,13 +694,12 @@ saveCommonChunk <- function(x, vars, meta){
   if(length(vars) == 0){
     x
   } else{
-    # compare first two data.frames to determine common columns
-    vec <- x[[vars]]
-    df.list <- split(x[names(x) != vars], vec, drop=TRUE)
+    # compare the first and the last data.frames to determine common columns
+    df.list <- split(x[!names(x) %in% vars], x[, vars], drop = TRUE)
     df1 <- df.list[[1]]
-    df2 <- df.list[[2]]
+    df2 <- df.list[[length(df.list)]]
     cols <- names(df1)
-    is.common <- laply(cols, function(col){
+    is.common <- plyr::laply(cols, function(col){
       identical(df1[, col], df2[, col])
     })
     if(any(is.common)){
@@ -718,7 +717,7 @@ saveCommonChunk <- function(x, vars, meta){
       } else{ # WorldBank example
         remove.cols <- common.cols
       }
-      df.list <- llply(df.list, function(df){
+      df.list <- plyr::llply(df.list, function(df){
         df <- df[, !names(df) %in% remove.cols, drop = FALSE]
         # remove duplicated rows to further reduce chunk file size
         if("group" %in% common.cols) df <- df[!duplicated(df), ]
@@ -731,28 +730,19 @@ saveCommonChunk <- function(x, vars, meta){
 
 ##' Split data set into chunks and save them to separate files.
 ##' @param x data.frame.
-##' @param vars character vector of variable names to split on.
 ##' @param meta environment.
 ##' @return recursive list of chunk file names.
 ##' @author Toby Dylan Hocking
-saveChunks <- function(x, vars, meta){
+saveChunks <- function(x, meta){
   if(is.data.frame(x)){
-    if(length(vars) == 0){
-      this.i <- meta$chunk.i
-      csv.name <- sprintf("%s_chunk%d.tsv", meta$classed, this.i)
-      write.table(x, file.path(meta$out.dir, csv.name), quote=FALSE, 
-                  row.names=FALSE, sep="\t")
-      meta$chunk.i <- meta$chunk.i + 1L
-      this.i
-    }else{
-      use <- vars[[1]]
-      rest <- vars[-1]
-      vec <- x[[use]]
-      df.list <- split(x[names(x) != use], vec, drop=TRUE)
-      saveChunks(df.list, rest, meta)
-    }
+    this.i <- meta$chunk.i
+    csv.name <- sprintf("%s_chunk%d.tsv", meta$classed, this.i)
+    write.table(x, file.path(meta$out.dir, csv.name), quote=FALSE, 
+                row.names=FALSE, sep="\t")
+    meta$chunk.i <- meta$chunk.i + 1L
+    this.i
   }else if(is.list(x)){
-    lapply(x, saveChunks, vars, meta)
+    lapply(x, saveChunks, meta)
   }else{
     str(x)
     stop("unknown object")
