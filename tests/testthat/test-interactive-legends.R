@@ -24,12 +24,12 @@ viz <- list(sepal = p1,
 info <- animint2HTML(viz)
 
 test_that("compiler adds aesthetics, selector.types, and first", {
-  dir <- animint2dir(viz, out.dir = "animint-htmltest", open.browser = F)
-  
-  expect_match(dir$selector.types, "multiple")
-  expect_true(all(dir$first$Species %in% c("setosa", "virginica", "versicolor")))
+  expect_true("showSelectedcolour" %in% names(info$geoms$geom1_point_sepal$aes))
+  expect_match(info$selector.types, "multiple")
+  expect_true(all(info$first$Species %in% c("setosa", "virginica", "versicolor")))
 })
 
+## function to extract all circles from an HTML page
 get_circles <- function(id) {
   getNodeSet(getHTML(), paste0("//svg[@id='", id, "']//circle"))
 }
