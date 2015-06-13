@@ -68,7 +68,12 @@ parsePlot <- function(meta){
         }
       }
     }
-    ## need to call ggplot_build again because I've added to the plot
+    ## need to call ggplot_build again because we've added to the plot
+    # I'm sure that there is a way around this, but not immediately sure how. 
+    # There's sort of a Catch-22 here because to create the interactivity, 
+    # we need to specify the variable corresponding to each legend. 
+    # To do this, we need to have the legend. 
+    # And to have the legend, I think that we need to use ggplot_build
     meta$built <- ggplot2::ggplot_build(meta$plot)
 
     ## for each layer, there is a correpsonding data.frame which
