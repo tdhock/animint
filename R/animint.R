@@ -56,7 +56,6 @@ parsePlot <- function(meta){
         for(i in legend_type) {
           temp_name <- paste0("showSelected", i)
           L$mapping[[temp_name]] <- as.symbol(var_name)
-#           browser()
         }
         # if first is not specified, add all to first
         if(is.null(meta$first[[var_name]])) {
@@ -68,7 +67,12 @@ parsePlot <- function(meta){
         }
       }
     }
-    ## need to call ggplot_build again because I've added to the plot
+    ## need to call ggplot_build again because we've added to the plot
+    # I'm sure that there is a way around this, but not immediately sure how. 
+    # There's sort of a Catch-22 here because to create the interactivity, 
+    # we need to specify the variable corresponding to each legend. 
+    # To do this, we need to have the legend. 
+    # And to have the legend, I think that we need to use ggplot_build
     meta$built <- ggplot2::ggplot_build(meta$plot)
 
     ## for each layer, there is a correpsonding data.frame which
@@ -1098,15 +1102,25 @@ getLegendList <- function(plistextra){
   names(gdefs) <- sapply(gdefs, function(i) i$title)
   
   ## adding the variable used to each LegendList
-  for(leg in seq_len(length(gdefs))) {
+  for(leg in seq_along(gdefs)) {
     legend_type <- names(gdefs[[leg]]$key)
     legend_type <- legend_type[legend_type != ".label"]
     gdefs[[leg]]$legend_type <- legend_type
     # something wrong here.  This should not just be [[1]]
-    vars <- sapply(legend_type, function(z) { 
-      as.character( plot$layers[[1]]$mapping[[z]] )
-    })
-    gdefs[[leg]]$vars <- unique( setNames(vars, NULL))
+    vars <- character()
+    for(i in seq_along(plot$layers)) {
+      temp <- sapply(legend_type, function(z) { 
+        if(!is.null(plot$layers[[i]]$mapping[[z]])) {
+          as.character( plot$layers[[i]]$mapping[[z]] )
+        }
+      })
+      if(!is.null(unlist(temp))) {
+        vars <- c(vars, temp)
+      }
+    }
+    if(length(vars) > 0) {
+      gdefs[[leg]]$vars <- unique( setNames(vars, NULL))
+    }
   }
   
   ## Add a flag to specify whether or not breaks was manually
