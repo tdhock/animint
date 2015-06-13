@@ -105,9 +105,3 @@ test_that("major grid lines are drawn correctly", {
   
   # correct size of grid lines
 })
-
-test_that("margins between panels are correct", {
-  # correct spacing between top-left and top-right
-  
-  # correct spacing in plot with only one rectangle
-})
