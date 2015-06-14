@@ -65,7 +65,7 @@ test_color <- function(value, expected) {
     expected_string <- expected_col
   }
   
-  expect_equal(value, expected_string)
+  expect_equal(toupper(value), toupper(expected_string))
 }
 
 test_that("panel backgrounds render correctly", {
