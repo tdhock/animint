@@ -98,15 +98,6 @@ test_that("panel boders render correctly", {
   value_petal <- match_petal[, "value"]
   test_color(value_petal[1], "grey50")
   expect_equal(value_petal[1], "rgb(127, 127, 127)")
-  
-  # test border fills
-  match_sepal <- str_match_perl(attr_border_sepal["style",], fillPattern)
-  value_sepal <- match_sepal[, "value"]
-  expect_equal(value_sepal[1], "transparent")
-  
-  match_petal <- str_match_perl(attr_border_petal["style",], fillPattern)
-  value_petal <- match_petal[, "value"]
-  expect_match(value_petal[1], "transparent")
 })
 
 test_that("major grid lines are drawn correctly", {
