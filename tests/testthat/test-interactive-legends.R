@@ -4,19 +4,13 @@ p1 <- ggplot() +
   geom_point(aes(Sepal.Length, Sepal.Width, 
                  colour = Species, size = Petal.Width), 
              data = iris) + 
-  theme(panel.background = element_rect(fill = "lightblue"), 
-        panel.border = element_rect(fill = NA, 
-                                    color = "black", 
-                                    size = 2, 
-                                    linetype = "dashed"), 
-        panel.margin = grid::unit(.1, "cm")) + 
-  facet_wrap(~Species, nrow = 2)
+  facet_wrap(~Species, nrow = 2) + 
+  ggtitle("Sepal Data")
 p2 <- ggplot() + 
   geom_point(aes(Petal.Length, Petal.Width, 
                  colour = Species, size = Species), 
   data = iris) + 
-  ggtitle("Petal Data") + 
-  theme_bw()
+  ggtitle("Petal Data")
 
 viz <- list(sepal = p1, 
             petal = p2, 
