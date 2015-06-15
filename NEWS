@@ -197,6 +197,8 @@ does not respond to mouse clicks while the data is loading.
 DSL: Implement shape aesthetic with d3.svg.symbol()
 https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol_type
 
+RENDER: Determine why border of tiles in pirates example does not seem to be rendering.
+
 2015.05.29
 
 BUGFIX: warnings for opening pid.txt, closing unused connection and generating make_text.Rd.
