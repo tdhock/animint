@@ -1,5 +1,6 @@
 context("save separate chunks")
 
+### test case 1
 # retrieve state-level data from the CDC's FluView Portal and save as FluView.RData
 # under animint/data directory
 # library(cdcfluview)
@@ -18,7 +19,7 @@ state_flu <- subset(state_flu, WEEKEND <= as.Date("2015-05-23") &
                       !STATENAME %in% c("District of Columbia", "New York City", 
                                         "Puerto Rico", "Alaska", "Hawaii"))
 
-### visualize CDC FluView data
+# visualize CDC FluView data
 library(animint)
 library(plyr)
 
@@ -50,28 +51,181 @@ USpolygons <- map_data("state")
 USpolygons$subregion <- NULL
 USpolygons <- subset(USpolygons, region != "district of columbia")
 
-USdots <- ddply(USpolygons, .(region), summarise, mean.lat = mean(lat), 
-                      mean.long = mean(long))
-
 # add state flu
 map_flu <- ldply(unique(state_flu$WEEKEND), function(we) {
   df <- subset(state_flu, WEEKEND == we)
-  # merge(USpolygons, df, by.x = "region", by.y = "state")
-  merge(USdots, df, by.x = "region", by.y = "state")
+  merge(USpolygons, df, by.x = "region", by.y = "state")
 })
 
-state.map <- ggplot() + 
+p <- ggplot() + 
   make_text(map_flu, -100, 50, "WEEKEND", "CDC FluView in Lower 48 States ending %s") + 
-#   geom_polygon(data = map_flu, aes(x = long, y = lat, group = group, fill = level, 
-#                                    showSelected = WEEKEND), 
-#                colour = "black", size = 1) + 
-  geom_point(data = map_flu, aes(x = mean.long, y = mean.lat, fill = level, 
-                                 showSelected = WEEKEND), 
-             color = "black", size = 10) + 
   scale_fill_gradient2(low = "white", high = "red", breaks = 0:10, guide = "none") + 
   theme_opts + 
   theme_animint(width = 750, height= 500)
 
-viz <- list(levelHeatmap = level.heatmap, stateMap = state.map, title = "FluView")
-animint2dir(viz, out.dir = "FluView")
-# animint2gist(viz, out.dir = "FluView")
+test_that("save separate chunks for geom_polygon", {
+  state.map <- p + 
+    geom_polygon(data = map_flu, aes(x = long, y = lat, group = group, fill = level, 
+                                     showSelected = WEEKEND), 
+                 colour = "black", size = 1)
+  viz <- list(levelHeatmap = level.heatmap, stateMap = state.map, title = "FluView")
+  out.dir <- file.path(getwd(), "FluView")
+  animint2dir(viz, out.dir = out.dir, open.browser = FALSE)
+  common.chunk <- list.files(path = out.dir, pattern = "geom.+polygon.+chunk_common.tsv", 
+                             full.names = TRUE)
+  varied.chunks <- list.files(path = out.dir, pattern = "geom.+polygon.+chunk[0-9]+.tsv", 
+                              full.names = TRUE)
+  # number of chunks
+  expect_equal(length(common.chunk), 1L)
+  no.chunks <- length(varied.chunks)
+  expect_equal(no.chunks, length(unique(map_flu$WEEKEND)))
+  # test common.chunk
+  common.data <- read.csv(common.chunk, sep = "\t")
+  expect_equal(nrow(common.data), nrow(USpolygons))
+  expect_true(all(c("x", "y", "group") %in% names(common.data)))
+  # randomly choose an varied.chunk to test
+  idx <- sample(no.chunks, 1)
+  varied.data <- read.csv(varied.chunks[idx], sep = "\t")
+  expect_equal(nrow(varied.data), length(unique(USpolygons$group)))
+  expect_true(all(c("fill", "group") %in% names(varied.data)))
+  
+  unlink(out.dir, recursive = TRUE)
+})
+
+
+### test case 2
+USdots <- ddply(USpolygons, .(region), summarise, mean.lat = mean(lat), 
+                mean.long = mean(long))
+# add state flu
+map_flu <- ldply(unique(state_flu$WEEKEND), function(we) {
+  df <- subset(state_flu, WEEKEND == we)
+  merge(USdots, df, by.x = "region", by.y = "state")
+})
+
+test_that("save separate chunks for geom_point without group", {
+  # the compiler will not break a geom into chunks if any of the resulting 
+  # chunk tsv files is estimated to be less than 4KB.
+  state.map <- p + 
+    geom_point(data = map_flu, aes(x = mean.long, y = mean.lat, fill = level, 
+                                   showSelected = WEEKEND), color = "black", size = 10)
+  viz <- list(levelHeatmap = level.heatmap, stateMap = state.map, title = "FluView")
+  out.dir <- file.path(getwd(), "FluView")
+  animint2dir(viz, out.dir = out.dir, open.browser = FALSE)
+  
+  common.chunk <- list.files(path = out.dir, pattern = "geom.+point.+chunk_common.tsv", 
+                             full.names = TRUE)
+  varied.chunks <- list.files(path = out.dir, pattern = "geom.+point.+chunk[0-9]+.tsv", 
+                              full.names = TRUE)
+  # number of chunks
+  expect_equal(length(common.chunk), 0L)
+  expect_equal(length(varied.chunks), 1L)
+  # test the only one varied.chunk
+  varied.data <- read.csv(varied.chunks, sep = "\t")
+  expect_equal(nrow(varied.data), nrow(map_flu))
+  expect_true(all(c("fill", "x", "y", "showSelected") %in% names(varied.data)))
+  
+  unlink(out.dir, recursive = TRUE)
+  
+  ## force to split into chunks
+  state.map <- p + 
+    geom_point(data = map_flu, aes(x = mean.long, y = mean.lat, fill = level, 
+                                   showSelected = WEEKEND), 
+               color = "black", size = 10, chunk_vars = "WEEKEND")
+  viz <- list(levelHeatmap = level.heatmap, stateMap = state.map, title = "FluView")
+  animint2dir(viz, out.dir = out.dir, open.browser = FALSE)
+  
+  common.chunk <- list.files(path = out.dir, pattern = "geom.+point.+chunk_common.tsv", 
+                             full.names = TRUE)
+  varied.chunks <- list.files(path = out.dir, pattern = "geom.+point.+chunk[0-9]+.tsv", 
+                              full.names = TRUE)
+  # number of chunks
+  expect_equal(length(common.chunk), 1L)
+  no.chunks <- length(varied.chunks)
+  expect_equal(no.chunks, length(unique(map_flu$WEEKEND)))
+  # test common.chunk
+  common.data <- read.csv(common.chunk, sep = "\t")
+  expect_equal(nrow(common.data), nrow(USdots))
+  expect_true(all(c("x", "y") %in% names(common.data)))
+  # randomly choose an varied.chunk to test
+  idx <- sample(no.chunks, 1)
+  varied.data <- read.csv(varied.chunks[idx], sep = "\t")
+  expect_equal(nrow(varied.data), nrow(USdots))
+  expect_true(all(c("fill") %in% names(varied.data)))
+    
+  unlink(out.dir, recursive = TRUE)
+})
+
+
+### test case 3
+data(WorldBank)
+
+scatter=ggplot()+
+  geom_point(aes(life.expectancy, fertility.rate, clickSelects=country,
+                 showSelected=year, colour=region, size=population,
+                 tooltip=paste(country, "population", population),
+                 key=country), # key aesthetic for animated transitions!
+             data=WorldBank)+
+  geom_text(aes(life.expectancy, fertility.rate, label=country,
+                showSelected=country, showSelected2=year,
+                key=country), #also use key here!
+            data=WorldBank, chunk_vars=c("year", "country"))+
+  scale_size_animint(breaks=10^(5:9))+
+  make_text(WorldBank, 55, 9, "year")
+
+ts=ggplot()+
+  make_tallrect(WorldBank, "year")+
+  geom_line(aes(year, life.expectancy, group=country, colour=region,
+                clickSelects=country),
+            data=WorldBank, size=4, alpha=3/5)
+
+bar=ggplot()+
+  theme_animint(height=2400)+
+  geom_bar(aes(country, life.expectancy, fill=region,
+               showSelected=year, clickSelects=country),
+           data=WorldBank, stat="identity", position="identity")+
+  coord_flip()
+
+test_that("save separate chunks for non-spatial geoms with repetitive field and multiple vars selected", {
+  viz <- list(scatter = scatter, ts = ts, bar = bar, time=list(variable="year", ms=3000),
+         duration=list(year=1000), first=list(year=1975, country="United States"),
+         title="World Bank data (multiple selections)")
+  out.dir <- file.path(getwd(), "WorldBank-all")
+  animint2dir(viz, out.dir = out.dir, open.browser = FALSE)
+  
+  ## multiple vars selected
+  common.chunk <- list.files(path = out.dir, pattern = "geom2_text.+chunk_common.tsv", 
+                             full.names = TRUE)
+  varied.chunks <- list.files(path = out.dir, pattern = "geom2_text.+chunk[0-9]+.tsv", 
+                              full.names = TRUE)
+  # number of chunks
+  expect_equal(length(common.chunk), 0L)
+  no.chunks <- length(varied.chunks)
+  expect_equal(no.chunks, length(unique(WorldBank$year)) * length(unique(WorldBank$country)))
+  # randomly choose an varied.chunk to test
+  idx <- sample(no.chunks, 1)
+  varied.data <- read.csv(varied.chunks[idx], sep = "\t")
+  expect_equal(nrow(varied.data), nrow(WorldBank) / length(unique(WorldBank$year)) / length(unique(WorldBank$country)))
+  expect_true(all(c("x", "y",	"label",	"key") %in% names(varied.data)))
+  
+  ## single var selected
+  ## geom6_bar_bar_chunks are very similar to geom1_point_scatter_chunks and won't be tested.
+  common.chunk <- list.files(path = out.dir, pattern = "geom.+point.+chunk_common.tsv", 
+                             full.names = TRUE)
+  varied.chunks <- list.files(path = out.dir, pattern = "geom.+point.+chunk[0-9]+.tsv", 
+                              full.names = TRUE)
+  # number of chunks
+  expect_equal(length(common.chunk), 1L)
+  no.chunks <- length(varied.chunks)
+  expect_equal(no.chunks, length(unique(WorldBank$year)))
+  # test common.chunk
+  common.data <- read.csv(common.chunk, sep = "\t")
+  expect_equal(nrow(common.data), length(unique(WorldBank$country)))
+  expect_true(all(c("colour", "clickSelects", "key", "fill") %in% names(common.data)))
+  # randomly choose an varied.chunk to test
+  idx <- sample(no.chunks, 1)
+  varied.data <- read.csv(varied.chunks[idx], sep = "\t")
+  expect_equal(nrow(varied.data), length(unique(WorldBank$country)))
+  expect_true(all(c("size", "x",	"y",	"tooltip") %in% names(varied.data)))
+  
+  unlink(out.dir, recursive = TRUE)
+})
