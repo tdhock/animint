@@ -115,9 +115,9 @@ p_df3 <- l %>%
 p_df4 <- p_df3 %>% 
   arrange(id, date) %>% 
   group_by(id) %>% 
+  filter(attacks > 0) %>% 
   summarise(text_loc_x = last(date), 
-            text_loc_y = last(log(attacks))) %>% 
-  filter(attacks > 0)
+            text_loc_y = last(log(attacks)))
 
 # animint plots -----------------------------------------
 
@@ -176,7 +176,7 @@ p_time2 <- ggplot() +
   ggtitle("Attacks in Individual Tiles")
 
 # passing to animint
-ani_list <- list( 
+viz <- list( 
   points = p_points, 
   tiles = p_tiles, 
   total = p_time, 
@@ -186,7 +186,7 @@ ani_list <- list(
   first = list(id = 767), 
   title = "Pirates Example"
 )
-animint2dir(ani_list, "pirates_viz", open.browser = FALSE)
+animint2dir(viz, "pirates_viz", open.browser = FALSE)
 servr::httd("pirates_viz")
 
 animint2gist(ani_list, "Pirate Attacks Since 1995")
