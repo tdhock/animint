@@ -286,8 +286,11 @@ saveLayer <- function(l, d, meta){
     col.name <- names(update.vars)[[sel.i]]
     if(!v.name %in% names(meta$selectors)){
       value <- g.data[[col.name]][1]
-      selector.type <- meta$selector.types[[v.name]]
-      if(is.null(selector.type))selector.type <- "single"
+      if(v.name %in% names(meta$selector.types)) {
+        selector.type <- meta$selector.types[[v.name]]
+      } else {
+        selector.type <- "single"
+      }
       stopifnot(is.character(selector.type))
       stopifnot(length(selector.type)==1)
       stopifnot(selector.type %in% c("single", "multiple"))
