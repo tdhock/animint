@@ -116,10 +116,6 @@ parsePlot <- function(meta){
   plot.meta$grid_minor$loc$x <- meta$built$panel$ranges[[1]]$x.minor
   plot.meta$grid_minor$loc$y <- meta$built$panel$ranges[[1]]$y.minor
   
-  ### extract margin of panels
-  plot.meta$panel_margin$len <- theme.pars$panel.margin[[1]]
-  plot.meta$panel_margin$unit <- attr(theme.pars$panel.margin, "unit")
-
   ## Flip labels if coords are flipped - transform does not take care
   ## of this. Do this BEFORE checking if it is blank or not, so that
   ## individual axes can be hidden appropriately, e.g. #1.
