@@ -199,6 +199,12 @@ https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol_type
 
 RENDER: Determine why border of tiles in pirates example does not seem to be rendering.
 
+2015.06.16
+
+RENDER: Implement panel backgrounds, panel borders, and grid lines in plots.
+
+EXAMPLE: Incorporate example with pirates data.
+
 2015.05.29
 
 BUGFIX: warnings for opening pid.txt, closing unused connection and generating make_text.Rd.
