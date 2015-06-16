@@ -189,4 +189,4 @@ viz <- list(
 animint2dir(viz, "pirates_viz", open.browser = FALSE)
 servr::httd("pirates_viz")
 
-animint2gist(ani_list, "Pirate Attacks Since 1995")
+animint2gist(viz, "Pirate Attacks Since 1995")
