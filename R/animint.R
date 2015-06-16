@@ -79,11 +79,9 @@ parsePlot <- function(meta){
         # check if the user specified linetype for the border
         if(is.null(pars$linetype)) {
           pars$linetype <- "solid"
-        } else {
-          # make sure linetype is correctly specified
-          stopifnot(
-            pars$linetype %in% c("blank", "solid", "dashed", "dotted", "dotdash", "longdash", "twodash") | 
-              is.numeric(pars$linetype))
+        } else if(!is.numeric(pars$linetype)) {
+          pars$linetype <- match.arg(pars$linetype, 
+                                      c("blank", "solid", "dashed", "dotted", "dotdash", "longdash", "twodash"))
         }
       }
     }
