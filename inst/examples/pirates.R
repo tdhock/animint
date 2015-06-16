@@ -140,7 +140,7 @@ p_points <- ggplot() +
         axis.line=element_blank(), axis.text=element_blank(), 
         axis.ticks=element_blank(), axis.title=element_blank(), 
         panel.grid.major=element_blank(), panel.grid.minor=element_blank()) + 
-  theme_animint(width = 600, height = 350)
+  theme_animint(width = 550, height = 350)
 
 # tiles on world map
 p_tiles <- ggplot() + 
@@ -159,7 +159,7 @@ p_tiles <- ggplot() +
         axis.line=element_blank(), axis.text=element_blank(), 
         axis.ticks=element_blank(), axis.title=element_blank(), 
         panel.grid.major=element_blank(), panel.grid.minor=element_blank()) + 
-  theme_animint(width = 600, height = 350)
+  theme_animint(width = 550, height = 350)
 
 # tiles over time
 p_time2 <- ggplot() + 
