@@ -1,15 +1,15 @@
 context("Interactive Legends")
 
 p1 <- ggplot() + 
-  geom_point(aes(Sepal.Length, Sepal.Width, 
-                 colour = Species, size = Petal.Width), 
+  geom_point(aes(Sepal.Length, Sepal.Width, colour = Species, 
+                 size = Petal.Width, clickSelects = Species), 
              data = iris) + 
   facet_wrap(~Species, nrow = 2) + 
   ggtitle("Sepal Data")
 p2 <- ggplot() + 
-  geom_point(aes(Petal.Length, Petal.Width, 
-                 colour = Species, size = Species), 
-  data = iris) + 
+  geom_point(aes(Sepal.Length, Sepal.Width, colour = Species, 
+                 size = Petal.Width, showSelected = Species), 
+             data = iris) + 
   ggtitle("Petal Data")
 
 viz <- list(sepal = p1, 
