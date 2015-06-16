@@ -99,6 +99,74 @@ parsePlot <- function(meta){
       meta$geoms[[geom.prev]]$nextgeom <- meta$geoms[[geom.next]]$classed
     }
   }
+
+  ## Export axis specification as a combination of breaks and
+  ## labels, on the relevant axis scale (i.e. so that it can
+  ## be passed into d3 on the x axis scale instead of on the
+  ## grid 0-1 scale). This allows transformations to be used
+  ## out of the box, with no additional d3 coding.
+  theme.pars <- ggplot2:::plot_theme(meta$plot)
+  
+  ## extract panel backgrounds from theme.pars
+  get_bg <- function(pars) {
+    # if no border specified 
+    if(length(pars) == 0) {
+      pars <- list(fill = NULL, colour = NULL, size = NULL, linetype = NULL)
+    } else {
+      # convert fill to RGB if necessary
+      if(!(is.rgb(pars$fill))) { 
+        pars$fill <- toRGB(pars$fill)
+      }
+      # if border color is specified
+      if(!is.na(pars$colour)) {
+        # convert color to RGB if necessary
+        if(!(is.rgb(pars$colour))) { 
+          pars$colour <- toRGB(pars$colour)
+        }
+        # check if the user specified linetype for the border
+        if(is.null(pars$linetype)) {
+          pars$linetype <- "solid"
+        } else if(!is.numeric(pars$linetype)) {
+          pars$linetype <- match.arg(pars$linetype, 
+                                      c("blank", "solid", "dashed", "dotted", "dotdash", "longdash", "twodash"))
+        }
+      }
+    }
+    pars
+  }
+  # saving background info
+  plot.meta$panel_background <- get_bg(theme.pars$panel.background)
+  plot.meta$panel_border <- get_bg(theme.pars$panel.border)
+  
+  ### function to extract grid info from theme.pars
+  get_grid <- function(pars) {
+    # convert colour to RGB if necessary
+    if(!is.rgb(pars$colour)) pars$colour <- toRGB(pars$colour)
+    # if size is null, set it to 1
+    if(is.null(pars$size)) pars$size <- 1
+    # if linetype is null, set it to solid
+    if(is.null(pars$linetype)) pars$linetype <- "solid"
+    # pretty sure I don't care about lineend
+    
+    pars
+  }
+  # extract major grid lines styles
+  plot.meta$grid_major <- get_grid(theme.pars$panel.grid.major)
+  # extract minor grid lines styles
+  plot.meta$grid_minor <- get_grid(theme.pars$panel.grid.minor)
+  # extract locations of major grid lines
+  plot.meta$grid_major$loc$x <- meta$built$panel$ranges[[1]]$x.major
+  plot.meta$grid_major$loc$y <- meta$built$panel$ranges[[1]]$y.major
+  # extract locations of minor grid lines
+  plot.meta$grid_minor$loc$x <- meta$built$panel$ranges[[1]]$x.minor
+  plot.meta$grid_minor$loc$y <- meta$built$panel$ranges[[1]]$y.minor
+  # remove minor lines when major lines are already drawn
+  plot.meta$grid_minor$loc$x <- plot.meta$grid_minor$loc$x[
+    !(plot.meta$grid_minor$loc$x %in% plot.meta$grid_major$loc$x)
+    ]
+  plot.meta$grid_minor$loc$y <- plot.meta$grid_minor$loc$y[
+    !(plot.meta$grid_minor$loc$y %in% plot.meta$grid_major$loc$y)
+    ]
   
   ## Flip labels if coords are flipped - transform does not take care
   ## of this. Do this BEFORE checking if it is blank or not, so that
@@ -1028,7 +1096,11 @@ servr::httd("', normalizePath( out.dir,winslash="/" ), '")')
 #' @return True/False value
 #' @export
 is.rgb <- function(x){
-  grepl("NULL", x) | (grepl("#", x) & nchar(x)==7)
+  if(is.null(x)) {
+    TRUE
+  } else {
+    (grepl("#", x) & nchar(x)==7)
+  }
 }
 
 #' Convert R colors to RGB hexadecimal color values

@@ -8,53 +8,57 @@ var animint = function (to_select, json_file) {
 
   var linetypesize2dasharray = function (lt, size) {
     var isInt = function(n) { return typeof n === 'number' && parseFloat(n) == parseInt(n, 10) && !isNaN(n); }
-    if(isInt(lt)){ // R integer line types.
-      if(lt == 1){
-	return null;
+    if(lt == null) {
+      return null;
+    } else {
+      if(isInt(lt)){ // R integer line types.
+        if(lt == 1){
+  	return null;
+        }
+        var o = {
+  	0: size * 0 + "," + size * 10,
+  	2: size * 4 + "," + size * 4,
+  	3: size + "," + size * 2,
+  	4: size + "," + size * 2 + "," + size * 4 + "," + size * 2,
+  	5: size * 8 + "," + size * 4,
+  	6: size * 2 + "," + size * 2 + "," + size * 6 + "," + size * 2
+        };
+      } else { //R defined line types
+        if(lt == "solid"){
+  	return null;
+        }
+        var o = {
+  	"blank": size * 0 + "," + size * 10,
+  	"none": size * 0 + "," + size * 10,
+  	"dashed": size * 4 + "," + size * 4,
+  	"dotted": size + "," + size * 2,
+  	"dotdash": size + "," + size * 2 + "," + size * 4 + "," + size * 2,
+  	"longdash": size * 8 + "," + size * 4,
+  	"twodash": size * 2 + "," + size * 2 + "," + size * 6 + "," + size * 2,
+  	"22": size * 2 + "," + size * 2,
+  	"42": size * 4 + "," + size * 2,
+  	"44": size * 4 + "," + size * 4,
+  	"13": size + "," + size * 3,
+  	"1343": size + "," + size * 3 + "," + size * 4 + "," + size * 3,
+  	"73": size * 7 + "," + size * 3,
+  	"2262": size * 2 + "," + size * 2 + "," + size * 6 + "," + size * 2,
+  	"12223242": size + "," + size * 2 + "," + size * 2 + "," + size * 2 + "," + size * 3 + "," + size * 2 + "," + size * 4 + "," + size * 2,
+  	"F282": size * 15 + "," + size * 2 + "," + size * 8 + "," + size * 2,
+  	"F4448444": size * 15 + "," + size * 4 + "," + size * 4 + "," + size * 4 + "," + size * 8 + "," + size * 4 + "," + size * 4 + "," + size * 4,
+  	"224282F2": size * 2 + "," + size * 2 + "," + size * 4 + "," + size * 2 + "," + size * 8 + "," + size * 2 + "," + size * 16 + "," + size * 2,
+  	"F1": size * 16 + "," + size
+        };
       }
-      var o = {
-	0: size * 0 + "," + size * 10,
-	2: size * 4 + "," + size * 4,
-	3: size + "," + size * 2,
-	4: size + "," + size * 2 + "," + size * 4 + "," + size * 2,
-	5: size * 8 + "," + size * 4,
-	6: size * 2 + "," + size * 2 + "," + size * 6 + "," + size * 2
-      };
-    } else { //R defined line types
-      if(lt == "solid"){
-	return null;
-      }
-      var o = {
-	"blank": size * 0 + "," + size * 10,
-	"none": size * 0 + "," + size * 10,
-	"dashed": size * 4 + "," + size * 4,
-	"dotted": size + "," + size * 2,
-	"dotdash": size + "," + size * 2 + "," + size * 4 + "," + size * 2,
-	"longdash": size * 8 + "," + size * 4,
-	"twodash": size * 2 + "," + size * 2 + "," + size * 6 + "," + size * 2,
-	"22": size * 2 + "," + size * 2,
-	"42": size * 4 + "," + size * 2,
-	"44": size * 4 + "," + size * 4,
-	"13": size + "," + size * 3,
-	"1343": size + "," + size * 3 + "," + size * 4 + "," + size * 3,
-	"73": size * 7 + "," + size * 3,
-	"2262": size * 2 + "," + size * 2 + "," + size * 6 + "," + size * 2,
-	"12223242": size + "," + size * 2 + "," + size * 2 + "," + size * 2 + "," + size * 3 + "," + size * 2 + "," + size * 4 + "," + size * 2,
-	"F282": size * 15 + "," + size * 2 + "," + size * 8 + "," + size * 2,
-	"F4448444": size * 15 + "," + size * 4 + "," + size * 4 + "," + size * 4 + "," + size * 8 + "," + size * 4 + "," + size * 4 + "," + size * 4,
-	"224282F2": size * 2 + "," + size * 2 + "," + size * 4 + "," + size * 2 + "," + size * 8 + "," + size * 2 + "," + size * 16 + "," + size * 2,
-	"F1": size * 16 + "," + size
-      };
-    }
 
-    if (lt in o){
-      return o[lt];
-    } else{ // manually specified line types
-      str = lt.split("");
-      strnum = str.map(function (d) {
-	return size * parseInt(d, 16);
-      });
-      return strnum;
+      if (lt in o){
+        return o[lt];
+      } else{ // manually specified line types
+        str = lt.split("");
+        strnum = str.map(function (d) {
+  	return size * parseInt(d, 16);
+        });
+        return strnum;
+      }
     }
   }
 
@@ -112,7 +116,7 @@ var animint = function (to_select, json_file) {
   var styles = [".axis path{fill: none;stroke: black;shape-rendering: crispEdges;}",
             ".axis line{fill: none;stroke: black;shape-rendering: crispEdges;}",
             ".axis text {font-family: sans-serif;font-size: 11px;}"];
-
+            
   // 'margins' are fixed across panels and do not
   // include title/axis/label padding (since these are not
   // fixed across panels). They do, however, account for
@@ -173,7 +177,7 @@ var animint = function (to_select, json_file) {
     Geoms[g_name] = g_info;
     update_geom(g_name, null);
   }
-  var add_plot = function (p_name, p_info) {
+  var add_plot = function (p_name, p_info) {  
     // Each plot may have one or more legends. To make space for the
     // legends, we put each plot in a table with one row and two
     // columns: tdLeft and tdRight.
@@ -505,6 +509,84 @@ var animint = function (to_select, json_file) {
     	if(!axis.yticks) {
     	  styles.push("#"+p_name+" #yaxis .tick"+" line{stroke:none;}");
     	}
+      
+      // drawing border
+      // uses insert to draw it right before the #plottitle
+      svg.insert("rect", "#plottitle")
+        .attr("x", plotdim.xstart)
+        .attr("y", plotdim.ystart)
+        .attr("width", plotdim.xend - plotdim.xstart)
+        .attr("height", plotdim.yend - plotdim.ystart)
+        .attr("class", "border_rect")
+        .style("fill", p_info.panel_border.fill)
+        .style("stroke", p_info.panel_border.colour)
+        .style("stroke-dasharray", function() {
+          return linetypesize2dasharray(p_info.panel_border.linetype,
+                                        p_info.panel_border.size);
+        });
+        
+      // drawing background
+      svg.insert("rect", "#plottitle")
+        .attr("x", plotdim.xstart)
+        .attr("y", plotdim.ystart)
+        .attr("width", plotdim.xend - plotdim.xstart)
+        .attr("height", plotdim.yend - plotdim.ystart)
+        .attr("class", "background_rect")
+        .style("fill", p_info.panel_background.fill)
+        .style("stroke", p_info.panel_background.colour)
+        .style("stroke-dasharray", function() {
+          return linetypesize2dasharray(p_info.panel_background.linetype,
+                                        p_info.panel_background.size);
+        });
+      
+      // function to draw the grid lines when supplied with one of the elements
+      var grid_line = function(grid_background, grid_class) {
+        var col = grid_background.colour;
+        var lt = grid_background.linetype;
+        var size = grid_background.size;
+        var cap = grid_background.lineend;
+
+        // draw horizontal grid lines if they are defined
+        if(typeof grid_background.loc.y != "undefined") {
+          var draw_hor_line = function(element) {
+            svg.insert("line", "#plottitle")
+              .attr("x1", plotdim.xstart)
+              .attr("x2", plotdim.xend)
+              .attr("y1", function() { return scales[panel_i].y(element); })
+              .attr("y2", function() { return scales[panel_i].y(element); })
+              .attr("class", function() { return "grid " + grid_class; })
+              .style("stroke", col)
+              .style("stroke-linecap", cap)
+              .style("stroke-width", size)
+              .style("stroke-dasharray", function() {
+                return linetypesize2dasharray(lt, size);
+              });
+          }
+          grid_background.loc.y.forEach(draw_hor_line);
+        }
+
+        // draw vertical grid lines if they are defined
+        if(typeof grid_background.loc.x != "undefined") {
+          var draw_vert_line = function(element) {
+            svg.insert("line", "#plottitle")
+              .attr("y1", plotdim.ystart)
+              .attr("y2", plotdim.yend)
+              .attr("x1", function() { return scales[panel_i].x(element); })
+              .attr("x2", function() { return scales[panel_i].x(element); })
+              .attr("class", function() { return "grid " + grid_class; })
+              .style("stroke", col)
+              .style("stroke-linecap", cap)
+              .style("stroke-width", size)
+              .style("stroke-dasharray", function() {
+                return linetypesize2dasharray(lt, size);
+              });
+          }
+          grid_background.loc.x.forEach(draw_vert_line);
+        }
+      }
+      // drawing the grid lines
+      grid_line(p_info.grid_minor, "grid_minor");
+      grid_line(p_info.grid_major, "grid_major");
 
     } //end of for loop
 
