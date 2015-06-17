@@ -51,7 +51,7 @@ test_that("clicking sepal.width legend does nothing", {
   expect_equal(length(get_circles("petal")), 150)
 })
 
-test_that("clicking Sepal point works properly", {
+test_that("clicking Sepal point doesn't affect sepal plot", {
   clickID("thecircleiwanttoclick")
   expect_equal(length(get_circles("petal")), 100)
   expect_equal(length(get_circles("sepal")), 150)
