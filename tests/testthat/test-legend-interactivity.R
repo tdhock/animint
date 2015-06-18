@@ -18,7 +18,7 @@ viz <- list(sepal = p1,
 info <- animint2HTML(viz)
 
 test_that("compiler adds aesthetics, selector.types, and first", {
-  expect_true("showSelectedcolour" %in% names(info$geoms$geom1_point_sepal$aes))
+  expect_true("showSelectedlegendcolour" %in% names(info$geoms$geom1_point_sepal$aes))
   expect_match(info$selector.types, "multiple")
   expect_true(all(info$first$Species %in% c("setosa", "virginica", "versicolor")))
 })
