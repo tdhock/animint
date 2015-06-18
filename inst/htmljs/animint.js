@@ -1441,7 +1441,7 @@ var animint = function (to_select, json_file) {
       eActions(elements); // Set the attributes of all elements (enter/exit/stay)
     }
   }
-  var update_selector = function (v_name, value) {
+  var update_selector = function (v_name, value, geom) {
     var s_info = Selectors[v_name];
     value = value + "";
     if(s_info.type == "single"){
