@@ -54,7 +54,7 @@ parsePlot <- function(meta){
       if(plyr::is.discrete(var)) {
         # adding a showSelected aesthetic for each legend entry
         for(i in legend_type) {
-          temp_name <- paste0("showSelected", i)
+          temp_name <- paste0("showSelectedlegend", i)
           L$mapping[[temp_name]] <- as.symbol(var_name)
         }
         # if first is not specified, add all to first
