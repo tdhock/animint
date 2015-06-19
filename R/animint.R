@@ -62,10 +62,8 @@ parsePlot <- function(meta){
   
   ## extract panel backgrounds from theme.pars
   get_bg <- function(pars) {
-    # if no border specified 
-    if(length(pars) == 0) {
-      pars <- list(fill = NULL, colour = NULL, size = NULL, linetype = NULL)
-    } else {
+    # if pars is not an empty list
+    if(length(pars) > 0) {
       # convert fill to RGB if necessary
       if(!(is.rgb(pars$fill))) { 
         pars$fill <- toRGB(pars$fill)
@@ -93,13 +91,16 @@ parsePlot <- function(meta){
   
   ### function to extract grid info from theme.pars
   get_grid <- function(pars) {
-    # convert colour to RGB if necessary
-    if(!is.rgb(pars$colour)) pars$colour <- toRGB(pars$colour)
-    # if size is null, set it to 1
-    if(is.null(pars$size)) pars$size <- 1
-    # if linetype is null, set it to solid
-    if(is.null(pars$linetype)) pars$linetype <- "solid"
-    # pretty sure I don't care about lineend
+    # if pars is not an empty list
+    if(length(pars) == 0) {
+      # convert colour to RGB if necessary
+      if(!is.rgb(pars$colour)) pars$colour <- toRGB(pars$colour)
+      # if size is null, set it to 1
+      if(is.null(pars$size)) pars$size <- 1
+      # if linetype is null, set it to solid
+      if(is.null(pars$linetype)) pars$linetype <- "solid"
+      # pretty sure I don't care about lineend
+    }
     
     pars
   }
