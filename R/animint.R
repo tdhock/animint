@@ -69,7 +69,7 @@ parsePlot <- function(meta){
         pars$fill <- toRGB(pars$fill)
       }
       # if border color is specified
-      if(!is.na(pars$colour)) {
+      if(!is.null(pars$colour)) {
         # convert color to RGB if necessary
         if(!(is.rgb(pars$colour))) { 
           pars$colour <- toRGB(pars$colour)
