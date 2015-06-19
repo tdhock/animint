@@ -969,7 +969,10 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
       meta$plot.name <- list.name
       parsePlot(meta) # calls ggplot_build.
     }else if(is.list(p)){ ## for options.
-      meta[[list.name]] <- p
+      ## combine the current option with p
+      # necessary because legends create their own list of selectors and first
+      # have to be careful not to overwrite these
+      meta[[list.name]] <- c(meta[[list.name]], p)
     }else{
       stop("list items must be ggplots or option lists, problem: ", list.name)
     }
