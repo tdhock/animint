@@ -5,8 +5,7 @@ context("save separate chunks")
 # under animint/data directory
 # library(cdcfluview)
 # state_flu <- get_state_data(2008:2014)
-# save(state_flu, file = "~/Documents/R/packages/animint/data/FluView.RData", 
-#      compress = "xz")
+# save(state_flu, file = "path/to/animint/data/FluView.RData", compress = "xz")
 data(FluView)
 
 # data clean
@@ -20,9 +19,6 @@ state_flu <- subset(state_flu, WEEKEND <= as.Date("2015-05-23") &
                                         "Puerto Rico", "Alaska", "Hawaii"))
 
 # visualize CDC FluView data
-library(animint)
-library(plyr)
-
 # activity level heatmap
 level.heatmap <- ggplot() + 
   geom_tile(data = state_flu, aes(x = WEEKEND, y = STATENAME, fill = level, 
@@ -178,15 +174,8 @@ ts=ggplot()+
                 clickSelects=country),
             data=WorldBank, size=4, alpha=3/5)
 
-bar=ggplot()+
-  theme_animint(height=2400)+
-  geom_bar(aes(country, life.expectancy, fill=region,
-               showSelected=year, clickSelects=country),
-           data=WorldBank, stat="identity", position="identity")+
-  coord_flip()
-
 test_that("save separate chunks for non-spatial geoms with repetitive field and multiple vars selected", {
-  viz <- list(scatter = scatter, ts = ts, bar = bar, time=list(variable="year", ms=3000),
+  viz <- list(scatter = scatter, ts = ts, time=list(variable="year", ms=3000),
          duration=list(year=1000), first=list(year=1975, country="United States"),
          title="World Bank data (multiple selections)")
   out.dir <- file.path(getwd(), "WorldBank-all")
@@ -205,10 +194,9 @@ test_that("save separate chunks for non-spatial geoms with repetitive field and 
   idx <- sample(no.chunks, 1)
   varied.data <- read.csv(varied.chunks[idx], sep = "\t")
   expect_equal(nrow(varied.data), nrow(WorldBank) / length(unique(WorldBank$year)) / length(unique(WorldBank$country)))
-  expect_true(all(c("x", "y",	"label",	"key") %in% names(varied.data)))
+  expect_true(all(c("x", "y", "label", "key") %in% names(varied.data)))
   
   ## single var selected
-  ## geom6_bar_bar_chunks are very similar to geom1_point_scatter_chunks and won't be tested.
   common.chunk <- list.files(path = out.dir, pattern = "geom.+point.+chunk_common.tsv", 
                              full.names = TRUE)
   varied.chunks <- list.files(path = out.dir, pattern = "geom.+point.+chunk[0-9]+.tsv", 
