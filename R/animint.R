@@ -92,7 +92,7 @@ parsePlot <- function(meta){
   ### function to extract grid info from theme.pars
   get_grid <- function(pars) {
     # if pars is not an empty list
-    if(length(pars) == 0) {
+    if(length(pars) > 0) {
       # convert colour to RGB if necessary
       if(!is.rgb(pars$colour)) pars$colour <- toRGB(pars$colour)
       # if size is null, set it to 1
