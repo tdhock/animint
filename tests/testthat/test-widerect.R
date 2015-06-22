@@ -21,7 +21,7 @@ wb.facets <-
                      data=TS(years), alpha=1/2)+
        theme_animint(width=1000, height=800)+
        geom_line(aes(year, life.expectancy, group=country, colour=region,
-                     clickSelects=country),
+                     clickSelects=country, id = country),
                  data=TS(not.na), size=4, alpha=3/5)+
        geom_point(aes(year, life.expectancy, color=region, size=population,
                       showSelected=country, clickSelects=country),
@@ -146,6 +146,18 @@ test_that("play restarts animation (second time)", {
   new.year <- getYear()
   expect_true(old.year != new.year)
 })
+
+# test_that("clicking legend removes/adds countries", {
+#   nodes1 <- getNodeSet(info, '//svg[@id="ts"]//g[@class="geom3_point_ts"]//g[@class="PANEL4"]//circle')
+#   
+#   clickID("North America")
+#   nodes2 <- getNodeSet(info, '//svg[@id="ts"]//g[@class="geom3_point_ts"]//g[@class="PANEL4"]//circle')
+#   expect_true(length(nodes1) > length(nodes2))
+# 
+#   clickID("North America")
+#   nodes3 <- getNodeSet(info, '//svg[@id="ts"]//g[@class="geom3_point_ts"]//g[@class="PANEL4"]//circle')
+#   expect_true(length(nodes1) == length(nodes3))
+# })
 
 # skip these tests if the browser is phantomjs 
 # (version 1.9.8 seems to stall on some machines)
