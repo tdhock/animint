@@ -1,8 +1,9 @@
 context("Interactive Legends")
 
+iris$id <- 1:nrow(iris)
 p1 <- ggplot() + 
   geom_point(aes(Sepal.Length, Sepal.Width, colour = Species, 
-                 size = Petal.Width, clickSelects = Species), 
+                 size = Petal.Width, clickSelects = Species, id = id), 
              data = iris) + 
   facet_wrap(~Species, nrow = 2) + 
   ggtitle("Sepal Data")
@@ -52,7 +53,7 @@ test_that("clicking sepal.width legend does nothing", {
 })
 
 test_that("clicking Sepal point doesn't affect sepal plot", {
-#   clickID("thecircleiwanttoclick")
-#   expect_equal(length(get_circles("petal")), 100)
-#   expect_equal(length(get_circles("sepal")), 150)
+  clickID("51")
+  expect_equal(length(get_circles("petal")), 100)
+  expect_equal(length(get_circles("sepal")), 150)
 })
