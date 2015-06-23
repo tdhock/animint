@@ -147,18 +147,21 @@ test_that("play restarts animation (second time)", {
   expect_true(old.year != new.year)
 })
 
-test_that("clicking legend removes/adds countries", {
-  
-  # Remove NA points
-  clickID("North America")
-  Sys.sleep(2)
-  nodes1 <- getNodeSet(info$html, '//svg[@id="ts"]//g[@class="geom3_point_ts"]//g[@class="PANEL4"]//circle//title[contains(text(), "country United States")]')
-  expect_equal(length(nodes1), 0)
+getUSrects <- function(){
+  getNodeSet(getHTML(), '//rect[@id="United States"]')
+}
 
-  clickHTML(id = "North America")
-  Sys.sleep(2)
-  nodes2 <- getNodeSet(info$html, '//svg[@id="ts"]//g[@class="geom3_point_ts"]//g[@class="PANEL4"]//circle')
-  expect_equal(length(nodes2), 52)
+test_that("clicking legend removes/adds countries", {
+  before.USnodes <- getUSrects()
+  expect_equal(length(before.USnodes), 1)
+  
+  clickID("North America")
+  oneclick.USnodes <- getUSrects()
+  expect_equal(length(oneclick.USnodes), 0)
+
+  clickID("North America")
+  twoclicks.USnodes <- getUSrects()
+  expect_equal(length(twoclicks.USnodes), 1)
 })
 
 # skip these tests if the browser is phantomjs 
