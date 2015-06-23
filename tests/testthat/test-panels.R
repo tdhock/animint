@@ -110,23 +110,31 @@ test_that("grid lines are drawn correctly", {
   expect_equal(length(grid_minor_petal), 9)
 })
 
+data(tips, package = "reshape2")
+tips$sex_smoker <- with(tips, interaction(sex, smoker))
+ss.viz <- list(
+  p1 = ggplot() + theme(legend.position = "none") +
+    geom_point(data = tips, position = "jitter", 
+               aes(x = sex, y = smoker, colour = sex_smoker,
+                   clickSelects = sex_smoker)), 
+  p2 = ggplot() +
+    geom_point(data = tips,
+               aes(x = total_bill, y = tip, colour = sex_smoker,
+                   showSelected = sex_smoker))
+  )
+
 test_that("renderer can handle no grid lines", {
-  # plot
-  data(tips, package = "reshape2")
-  tips$sex_smoker <- with(tips, interaction(sex, smoker))
-  info <- animint2HTML(list(
-    p1 = ggplot() + theme(legend.position = "none") +
-      geom_point(data = tips, position = "jitter", 
-                 aes(x = sex, y = smoker, colour = sex_smoker,
-                     clickSelects = sex_smoker)), 
-    p2 = ggplot() +
-      geom_point(data = tips,
-                 aes(x = total_bill, y = tip, colour = sex_smoker,
-                     showSelected = sex_smoker))
-    ))
+  info <- animint2HTML(ss.viz)
   # extract grids
   grid_major_p1 <- getNodeSet(info$html, '//svg[@id="p1"]//line[@class="grid grid_major"]')
   grid_minor_p1 <- getNodeSet(info$html, '//svg[@id="p1"]//line[@class="grid grid_minor"]')
   expect_equal(length(grid_major_p1), 4)
   expect_equal(length(grid_minor_p1), 0)
 })
+
+test_that("multiple selection sex_smoker plot", {
+  ss.viz$selector.types$sex_smoker <- "multiple"
+  info <- animint2HTML(ss.viz)
+  expect_equal(length(info$first$sex_smoker), 4)
+})
+
