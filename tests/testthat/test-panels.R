@@ -15,8 +15,14 @@ p2 <- ggplot() +
                  colour = Species, size = Species), data = iris) +
   ggtitle("Petal Data") +
   theme_bw()
+p3 <- ggplot() + 
+  geom_point(aes(Petal.Length, Petal.Width, 
+                 colour = Species, size = Species), data = iris) + 
+  theme(panel.background = element_blank(), 
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank())
 
-info <- animint2HTML(list(sepal = p1, petal = p2))
+info <- animint2HTML(list(sepal = p1, petal = p2, blank = p3))
 
 # background rectangle for each panel
 background_sepal <- getNodeSet(info$html, '//svg[@id="sepal"]//rect[@class="background_rect"]')
@@ -24,6 +30,8 @@ attr_back_sepal <- sapply(background_sepal, xmlAttrs)
 
 background_petal <- getNodeSet(info$html, '//svg[@id="petal"]//rect[@class="background_rect"]')
 attr_back_petal <- sapply(background_petal, xmlAttrs)
+
+blank_petal <- getNodeSet(info$html, '//svg[@id="blank"]//rect[@class="background_rect"]')
 
 # border rectangle for each panel
 border_sepal <- getNodeSet(info$html, '//svg[@id="sepal"]//rect[@class="border_rect"]')
@@ -39,12 +47,16 @@ attr_major_sepal <- sapply(grid_major_sepal, xmlAttrs)
 grid_major_petal <- getNodeSet(info$html, '//svg[@id="petal"]//line[@class="grid grid_major"]')
 attr_major_petal <- sapply(grid_major_petal, xmlAttrs)
 
+grid_major_blank <- getNodeSet(info$html, '//svg[@id="blank"]//line[@class="grid grid_major"]')
+
 # minor grid lines
 grid_minor_sepal <- getNodeSet(info$html, '//svg[@id="sepal"]//line[@class="grid grid_minor"]')
 attr_minor_sepal <- sapply(grid_minor_sepal, xmlAttrs)
 
 grid_minor_petal <- getNodeSet(info$html, '//svg[@id="petal"]//line[@class="grid grid_minor"]')
 attr_minor_petal <- sapply(grid_minor_petal, xmlAttrs)
+
+grid_minor_blank <- getNodeSet(info$html, '//svg[@id="blank"]//line[@class="grid grid_minor"]')
 
 # different patterns to access
 fillPattern <-
@@ -85,6 +97,9 @@ test_that("panel backgrounds render correctly", {
   match_petal <- str_match_perl(attr_back_petal["style",], fillPattern)
   value_petal <- match_petal[, "value"]
   test_color(value_petal[1], "white")
+  
+  # test that there is no rectangle for element_blank()
+  expect_equal(length(blank_petal), 0)
 })
 
 test_that("panel borders render correctly", {
@@ -108,6 +123,8 @@ test_that("grid lines are drawn correctly", {
   expect_equal(length(grid_major_petal), 9)
   expect_equal(length(grid_minor_sepal), 27)
   expect_equal(length(grid_minor_petal), 9)
+  expect_equal(length(grid_major_blank), 0)
+  expect_equal(length(grid_minor_blank), 0)
 })
 
 test_that("renderer can handle no grid lines", {
