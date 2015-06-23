@@ -57,13 +57,24 @@ parsePlot <- function(meta){
           temp_name <- paste0("showSelectedlegend", i)
           L$mapping[[temp_name]] <- as.symbol(var_name)
         }
-        # if first is not specified, add all to first
-        if(is.null(meta$first[[var_name]])) {
-          meta$first[[var_name]] <- unique(var)
-        }
-        # if selectortypes is not specified, set it to multiple
+        # if selector.types is not specified, set it to multiple
         if(is.null(meta$selector.types[[var_name]])) {
           meta$selector.types[[var_name]] <- "multiple"
+        }
+        # if first is not specified, add all to first
+        if(is.null(meta$first[[var_name]])) {
+          u.vals <- unique(var)
+          s.type <- if(var_name %in% names(meta$selectors)){
+            ## Selector has already been created.
+            meta$selectors[[var_name]]$type
+          }else{
+            meta$selector.types[[var_name]]
+          }
+          meta$first[[var_name]] <- if(s.type == "multiple"){
+            u.vals
+          }else{
+            u.vals[[1]]
+          }
         }
       }
     }
