@@ -509,10 +509,15 @@ var animint = function (to_select, json_file) {
     	if(!axis.yticks) {
     	  styles.push("#"+p_name+" #yaxis .tick"+" line{stroke:none;}");
     	}
+      
+      // creating g element for background, grid lines, and border
+      // uses insert to draw it right before plot title
+      var background = svg.insert("g", "#plottitle")
+        .attr("class", "background");
         
       // drawing background
       if(Object.keys(p_info.panel_background).length > 1) {
-        svg.insert("rect", "#plottitle")
+        background.append("rect")
           .attr("x", plotdim.xstart)
           .attr("y", plotdim.ystart)
           .attr("width", plotdim.xend - plotdim.xstart)
@@ -537,7 +542,7 @@ var animint = function (to_select, json_file) {
           // draw horizontal grid lines if they are defined
           if(typeof grid_background.loc.y != "undefined") {
             var draw_hor_line = function(element) {
-              svg.insert("line", "#plottitle")
+              background.append("rect")
                 .attr("x1", plotdim.xstart)
                 .attr("x2", plotdim.xend)
                 .attr("y1", function() { return scales[panel_i].y(element); })
@@ -556,7 +561,7 @@ var animint = function (to_select, json_file) {
           // draw vertical grid lines if they are defined
           if(typeof grid_background.loc.x != "undefined") {
             var draw_vert_line = function(element) {
-              svg.insert("line", "#plottitle")
+              background.append("rect")
                 .attr("y1", plotdim.ystart)
                 .attr("y2", plotdim.yend)
                 .attr("x1", function() { return scales[panel_i].x(element); })
@@ -580,7 +585,7 @@ var animint = function (to_select, json_file) {
       // drawing border
       // uses insert to draw it right before the #plottitle
       if(Object.keys(p_info.panel_border).length > 1) {
-        svg.insert("rect", "#plottitle")
+        background.append("rect")
           .attr("x", plotdim.xstart)
           .attr("y", plotdim.ystart)
           .attr("width", plotdim.xend - plotdim.xstart)
