@@ -509,23 +509,6 @@ var animint = function (to_select, json_file) {
     	if(!axis.yticks) {
     	  styles.push("#"+p_name+" #yaxis .tick"+" line{stroke:none;}");
     	}
-      
-      // drawing border
-      // uses insert to draw it right before the #plottitle
-      if(Object.keys(p_info.panel_border).length > 1) {
-        svg.insert("rect", "#plottitle")
-          .attr("x", plotdim.xstart)
-          .attr("y", plotdim.ystart)
-          .attr("width", plotdim.xend - plotdim.xstart)
-          .attr("height", plotdim.yend - plotdim.ystart)
-          .attr("class", "border_rect")
-          .style("fill", p_info.panel_border.fill)
-          .style("stroke", p_info.panel_border.colour)
-          .style("stroke-dasharray", function() {
-            return linetypesize2dasharray(p_info.panel_border.linetype,
-                                          p_info.panel_border.size);
-          });
-      }
         
       // drawing background
       if(Object.keys(p_info.panel_background).length > 1) {
@@ -593,6 +576,23 @@ var animint = function (to_select, json_file) {
       // drawing the grid lines
       grid_line(p_info.grid_minor, "grid_minor");
       grid_line(p_info.grid_major, "grid_major");
+      
+      // drawing border
+      // uses insert to draw it right before the #plottitle
+      if(Object.keys(p_info.panel_border).length > 1) {
+        svg.insert("rect", "#plottitle")
+          .attr("x", plotdim.xstart)
+          .attr("y", plotdim.ystart)
+          .attr("width", plotdim.xend - plotdim.xstart)
+          .attr("height", plotdim.yend - plotdim.ystart)
+          .attr("class", "border_rect")
+          .style("fill", p_info.panel_border.fill)
+          .style("stroke", p_info.panel_border.colour)
+          .style("stroke-dasharray", function() {
+            return linetypesize2dasharray(p_info.panel_border.linetype,
+                                          p_info.panel_border.size);
+          });
+      }
 
     } //end of for loop
 
