@@ -50,12 +50,19 @@ parsePlot <- function(meta){
       var_name <- plot.meta$legend[[legend.i]]$vars
       # the actual values for that variable
       var <- L$data[[var_name]]
-      # checking if it is a discrete variable
+      ## checking if it is a discrete variable.
       if(plyr::is.discrete(var)) {
-        # adding a showSelected aesthetic for each legend entry
-        for(i in legend_type) {
-          temp_name <- paste0("showSelectedlegend", i)
-          L$mapping[[temp_name]] <- as.symbol(var_name)
+        is.interactive.aes <-
+          grepl("showSelected|clickSelects", names(L$mapping))
+        is.legend.var <- L$mapping == var_name
+        ## If var_name is used with another interactive aes, then do
+        ## not add any showSelected aesthetic for it.
+        var.is.interactive <- any(is.interactive.aes & is.legend.var)
+        if(!var.is.interactive){
+          for(i in legend_type) {
+            temp_name <- paste0("showSelectedlegend", i)
+            L$mapping[[temp_name]] <- as.symbol(var_name)
+          }
         }
         # if selector.types is not specified, set it to multiple
         if(is.null(meta$selector.types[[var_name]])) {
@@ -1060,7 +1067,8 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
   ## The first selection:
   for(selector.name in names(meta$first)){
     first <- as.character(meta$first[[selector.name]])
-    if(meta$selectors[[selector.name]]$type == "single"){
+    s.type <- meta$selectors[[selector.name]]$type
+    if(!is.null(s.type) && s.type == "single"){
       stopifnot(length(first) == 1)
     }
     meta$selectors[[selector.name]]$selected <- first
