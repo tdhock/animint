@@ -1458,34 +1458,9 @@ var animint = function (to_select, json_file) {
 	s_info.selected.splice(i_value, 1);
       }
     }
-    // the geom is passed in on("click")
-    // so if update_selector is passed by clicking...
-    if(typeof geom != "undefined"){
-      // loop through each aesthetic
-      // this should be fixed - only loop through showSelected aesthetics
-      Object.keys(geom.aes).forEach(function(entry) {
-        // loop through each of the geoms to update
-        // also should be fixed 
-        s_info.update.forEach(function(g_name){
-          // for ones where it matches geom.classed, do next if statement
-          if(g_name == geom.classed) {
-            // only update the geom if there's a showSelected statement that doesn't come from the legend
-            if(!/legend/.test(entry) && /showSelected/.test(entry)) {
-              update_geom(g_name, v_name);
-            }
-          } else {
-          // otherwise just update the geom as normal
-            update_geom(g_name, v_name);
-          }
-        });
-      });
-    } else {
-      // just update the geom if it's not passed by clicking
-      s_info.update.forEach(function(g_name){
-        update_geom(g_name, v_name);
-      });
-    }
-
+    s_info.update.forEach(function(g_name){
+      update_geom(g_name, v_name);
+    });
   }
   var ifSelectedElse = function (d, v_name, selected, not_selected) {
     var is_selected;
