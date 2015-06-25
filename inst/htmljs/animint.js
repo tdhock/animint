@@ -1388,7 +1388,7 @@ var animint = function (to_select, json_file) {
 	  // something, we call update_selector with the clicked
 	  // value.
           var v_name = g_info.aes.clickSelects;
-          update_selector(v_name, d.clickSelects, g_info);
+          update_selector(v_name, d.clickSelects);
         })
       ;
     } else { //no clickSelects for this geom.
@@ -1441,7 +1441,7 @@ var animint = function (to_select, json_file) {
       eActions(elements); // Set the attributes of all elements (enter/exit/stay)
     }
   }
-  var update_selector = function (v_name, value, geom) {
+  var update_selector = function (v_name, value) {
     var s_info = Selectors[v_name];
     var legend_value_opacity, legend_other_opacity;
     value = value + "";
