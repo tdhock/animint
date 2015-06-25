@@ -147,21 +147,42 @@ test_that("play restarts animation (second time)", {
   expect_true(old.year != new.year)
 })
 
-getUSrects <- function(){
-  getNodeSet(getHTML(), '//rect[@id="United States"]')
+legend.td.xpath <- '//td[@id="North America" and @class="legend_entry_label"]'
+rects_and_legends <- function(){
+  html <- getHTML()
+  list(rects=getNodeSet(html, '//rect[@id="United States"]'),
+       legends=getNodeSet(html, legend.td.xpath))
+}
+
+opacityPattern <-
+  paste0("opacity:",
+         "(?<value>.*?)",
+         ";")
+
+expect_opacity <- function(node.list, expected.opacity){
+  style.strs <- sapply(node.list, function(x) xmlAttrs(x)["style"])
+  match.mat <- str_match_perl(style.strs, opacityPattern)
+  opacity.chr <- match.mat[, "value"]
+  opacity.num <- as.numeric(opacity.chr)
+  opacity.num[is.na(opacity.num)] <- 1 ## no transparency if not specified.
+  expected.vec <- rep(expected.opacity, l=length(opacity.num))
+  expect_equal(opacity.num, expected.vec)
 }
 
 test_that("clicking legend removes/adds countries", {
-  before.USnodes <- getUSrects()
-  expect_equal(length(before.USnodes), 1)
+  before <- rects_and_legends()
+  expect_equal(length(before$rects), 1)
+  expect_opacity(before$legends, 1)
   
   clickID("North America")
-  oneclick.USnodes <- getUSrects()
-  expect_equal(length(oneclick.USnodes), 0)
+  oneclick <- rects_and_legends()
+  expect_equal(length(oneclick$rects), 0)
+  expect_opacity(before$legends, 0.5)
 
   clickID("North America")
-  twoclicks.USnodes <- getUSrects()
-  expect_equal(length(twoclicks.USnodes), 1)
+  twoclicks <- rects_and_legends()
+  expect_equal(length(twoclicks$rects), 1)
+  expect_opacity(before$legends, 1)
 })
 
 # skip these tests if the browser is phantomjs 
