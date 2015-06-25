@@ -139,6 +139,49 @@ test_that("pause stops animation (second time)", {
   expect_true(old.year == new.year)
 })
 
+clickID("even")
+clickID("odd")
+html.no.rects <- getHTML()
+
+test_that("clicking status legend hides tallrects", {
+  for(rect.xpath in rect.xpaths){
+    node.set <- getNodeSet(html.no.rects, rect.xpath)
+    expect_equal(length(node.set), 0)
+  }
+})
+
+test_that("clicking status legend does not hide text", {
+  node.set <-
+    getNodeSet(html.no.rects,
+               '//g[@class="geom9_text_ts"]//text[@class="geom"]')
+  expect_equal(length(node.set), 1)
+})
+
+clickID("even")
+clickID("odd")
+html.with.rects <- getHTML()
+
+test_that("clicking status legend brings back tallrects", {
+  for(rect.xpath in rect.xpaths){
+    node.set <- getNodeSet(html.with.rects, rect.xpath)
+    expect_equal(length(node.set), nrow(years))
+    style.list <- list()
+    for(node.i in seq_along(node.set)){
+      node <- node.set[[node.i]]
+      a.vec <- xmlAttrs(node)
+      style.list[[node.i]] <- a.vec[["style"]]
+      sizes <- as.numeric(a.vec[c("height", "width")])
+      expect_true(all(sizes > 0))
+    }
+    style.vec <- do.call(c, style.list)
+    dash.mat <- str_match_perl(style.vec, dasharrayPattern)
+    ## Use paste() to treat NA as a value instead of ignoring it.
+    dash.table <- table(paste(dash.mat[, "value"]))
+    ## There should be 2 unique values of stoke-dasharray.
+    expect_equal(length(dash.table), 2)
+  }
+})
+
 test_that("play restarts animation (second time)", {
   old.year <- getYear()
   clickID("play_pause")
