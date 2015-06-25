@@ -1443,21 +1443,41 @@ var animint = function (to_select, json_file) {
   }
   var update_selector = function (v_name, value, geom) {
     var s_info = Selectors[v_name];
+    var legend_value_opacity, legend_other_opacity;
     value = value + "";
     if(s_info.type == "single"){
       // value is the new selection.
       s_info.selected = value;
+      legend_other_opacity = 0.5;
+      legend_value_opacity = 1;
     }else{
       // value should be added or removed from the selection.
       var i_value = s_info.selected.indexOf(value);
       if(i_value == -1){
 	// not found, add to selection.
 	s_info.selected.push(value);
+	legend_value_opacity = 1;
       }else{
 	// found, remove from selection.
 	s_info.selected.splice(i_value, 1);
+	legend_value_opacity = 0.5;
       }
+      legend_other_opacity = null;
     }
+    var legend_entries = 
+      d3.selectAll("tr#legend th."+v_name+" td.legend_entry_label");
+    legend_entries.style("opacity", function(d){
+      if(this.textContent == value){
+	return legend_value_opacity;
+      }else{
+	if(legend_other_opacity == null){
+	  return this.style.opacity;
+	}else{
+	  return legend_other_opacity;
+	}
+      }
+    })
+    ;
     s_info.update.forEach(function(g_name){
       update_geom(g_name, v_name);
     });
