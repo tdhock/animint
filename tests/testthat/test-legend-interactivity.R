@@ -8,8 +8,8 @@ p1 <- ggplot() +
   facet_wrap(~Species, nrow = 2) + 
   ggtitle("Sepal Data")
 p2 <- ggplot() + 
-  geom_point(aes(Sepal.Length, Sepal.Width, colour = Species, 
-                 size = Petal.Width, showSelected = Species), 
+  geom_point(aes(Petal.Length, Petal.Width, colour = Species, 
+                 size = Sepal.Width, showSelected = Species), 
              data = iris) + 
   ggtitle("Petal Data")
 
@@ -18,8 +18,7 @@ viz <- list(sepal = p1,
             title = "Different Panel Styles")
 info <- animint2HTML(viz)
 
-test_that("compiler adds aesthetics, selector.types, and first", {
-  expect_true("showSelectedlegendcolour" %in% names(info$geoms$geom1_point_sepal$aes))
+test_that("compiler adds selector.types and first", {
   expect_match(info$selector.types, "multiple")
   expect_true(all(info$first$Species %in% c("setosa", "virginica", "versicolor")))
 })
@@ -29,7 +28,7 @@ get_circles <- function(id) {
   getNodeSet(getHTML(), paste0("//svg[@id='", id, "']//circle"))
 }
 
-test_that("all points are initially draw", {
+test_that("all points are initially drawn", {
   expect_equal(length(get_circles("sepal")), 150)
   expect_equal(length(get_circles("petal")), 150)
 })
@@ -37,7 +36,7 @@ test_that("all points are initially draw", {
 test_that("clicking species legend adds and removes points", {
   # virginica points are removed
   clickID("virginica")
-  expect_equal(length(get_circles("sepal")), 100)
+  expect_equal(length(get_circles("sepal")), 150)
   expect_equal(length(get_circles("petal")), 100)
   
   # virginica points are added back
