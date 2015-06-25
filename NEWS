@@ -199,6 +199,10 @@ https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol_type
 
 RENDER: Determine why border of tiles in pirates example does not seem to be rendering.
 
+2015.06.25
+
+BUGFIX: Plots with only one grid line now render.
+
 2015.06.23
 
 BUGFIX: Panel backgrounds and borders can now handle rectangles of element_blank().
