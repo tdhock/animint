@@ -15,8 +15,14 @@ p2 <- ggplot() +
                  colour = Species, size = Species), data = iris) +
   ggtitle("Petal Data") +
   theme_bw()
+p3 <- ggplot() + 
+  geom_point(aes(Petal.Length, Petal.Width, 
+                 colour = Species, size = Species), data = iris) + 
+  theme(panel.background = element_blank(), 
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank())
 
-info <- animint2HTML(list(sepal = p1, petal = p2))
+info <- animint2HTML(list(sepal = p1, petal = p2, blank = p3))
 
 # background rectangle for each panel
 background_sepal <- getNodeSet(info$html, '//svg[@id="sepal"]//rect[@class="background_rect"]')
@@ -24,6 +30,8 @@ attr_back_sepal <- sapply(background_sepal, xmlAttrs)
 
 background_petal <- getNodeSet(info$html, '//svg[@id="petal"]//rect[@class="background_rect"]')
 attr_back_petal <- sapply(background_petal, xmlAttrs)
+
+blank_petal <- getNodeSet(info$html, '//svg[@id="blank"]//rect[@class="background_rect"]')
 
 # border rectangle for each panel
 border_sepal <- getNodeSet(info$html, '//svg[@id="sepal"]//rect[@class="border_rect"]')
@@ -33,18 +41,22 @@ border_petal <- getNodeSet(info$html, '//svg[@id="petal"]//rect[@class="border_r
 attr_border_petal <- sapply(border_petal, xmlAttrs)
 
 # major grid lines
-grid_major_sepal <- getNodeSet(info$html, '//svg[@id="sepal"]//line[@class="grid grid_major"]')
+grid_major_sepal <- getNodeSet(info$html, '//svg[@id="sepal"]//g[@class="grid_major"]//line')
 attr_major_sepal <- sapply(grid_major_sepal, xmlAttrs)
 
-grid_major_petal <- getNodeSet(info$html, '//svg[@id="petal"]//line[@class="grid grid_major"]')
+grid_major_petal <- getNodeSet(info$html, '//svg[@id="petal"]//g[@class="grid_major"]//line')
 attr_major_petal <- sapply(grid_major_petal, xmlAttrs)
 
+grid_major_blank <- getNodeSet(info$html, '//svg[@id="blank"]//g[@class="grid_major"]//line')
+
 # minor grid lines
-grid_minor_sepal <- getNodeSet(info$html, '//svg[@id="sepal"]//line[@class="grid grid_minor"]')
+grid_minor_sepal <- getNodeSet(info$html, '//svg[@id="sepal"]//g[@class="grid_minor"]//line')
 attr_minor_sepal <- sapply(grid_minor_sepal, xmlAttrs)
 
-grid_minor_petal <- getNodeSet(info$html, '//svg[@id="petal"]//line[@class="grid grid_minor"]')
+grid_minor_petal <- getNodeSet(info$html, '//svg[@id="petal"]//g[@class="grid_minor"]//line')
 attr_minor_petal <- sapply(grid_minor_petal, xmlAttrs)
+
+grid_minor_blank <- getNodeSet(info$html, '//svg[@id="blank"]//g[@class="grid_minor"]//line')
 
 # different patterns to access
 fillPattern <-
@@ -85,6 +97,9 @@ test_that("panel backgrounds render correctly", {
   match_petal <- str_match_perl(attr_back_petal["style",], fillPattern)
   value_petal <- match_petal[, "value"]
   test_color(value_petal[1], "white")
+  
+  # test that there is no rectangle for element_blank()
+  expect_equal(length(blank_petal), 0)
 })
 
 test_that("panel borders render correctly", {
@@ -108,6 +123,8 @@ test_that("grid lines are drawn correctly", {
   expect_equal(length(grid_major_petal), 9)
   expect_equal(length(grid_minor_sepal), 27)
   expect_equal(length(grid_minor_petal), 9)
+  expect_equal(length(grid_major_blank), 0)
+  expect_equal(length(grid_minor_blank), 0)
 })
 
 data(tips, package = "reshape2")
@@ -126,8 +143,8 @@ ss.viz <- list(
 test_that("renderer can handle no grid lines", {
   info <- animint2HTML(ss.viz)
   # extract grids
-  grid_major_p1 <- getNodeSet(info$html, '//svg[@id="p1"]//line[@class="grid grid_major"]')
-  grid_minor_p1 <- getNodeSet(info$html, '//svg[@id="p1"]//line[@class="grid grid_minor"]')
+  grid_major_p1 <- getNodeSet(info$html, '//svg[@id="p1"]//g[@class="grid_major"]//line')
+  grid_minor_p1 <- getNodeSet(info$html, '//svg[@id="p1"]//g[@class="grid_minor"]//line')
   expect_equal(length(grid_major_p1), 4)
   expect_equal(length(grid_minor_p1), 0)
 })
@@ -138,3 +155,13 @@ test_that("multiple selection sex_smoker plot", {
   expect_equal(length(info$first$sex_smoker), 4)
 })
 
+test_that("renderer can handle only one grid line", {
+  info <- animint2HTML(list(
+    petal = p2 + scale_y_log10()
+  ))
+  # extract grids
+  grid_minor_hor <- getNodeSet(info$html, '//svg//g[@class="grid_minor"]//g[@class="hor"]//line')
+  grid_minor_vert <- getNodeSet(info$html, '//svg//g[@class="grid_minor"]//g[@class="vert"]//line')
+  expect_equal(length(grid_minor_hor), 1)
+  expect_equal(length(grid_minor_vert), 4)
+})

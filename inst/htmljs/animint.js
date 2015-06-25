@@ -510,83 +510,108 @@ var animint = function (to_select, json_file) {
     	  styles.push("#"+p_name+" #yaxis .tick"+" line{stroke:none;}");
     	}
       
-      // drawing border
-      // uses insert to draw it right before the #plottitle
-      svg.insert("rect", "#plottitle")
-        .attr("x", plotdim.xstart)
-        .attr("y", plotdim.ystart)
-        .attr("width", plotdim.xend - plotdim.xstart)
-        .attr("height", plotdim.yend - plotdim.ystart)
-        .attr("class", "border_rect")
-        .style("fill", p_info.panel_border.fill)
-        .style("stroke", p_info.panel_border.colour)
-        .style("stroke-dasharray", function() {
-          return linetypesize2dasharray(p_info.panel_border.linetype,
-                                        p_info.panel_border.size);
-        });
+      // creating g element for background, grid lines, and border
+      // uses insert to draw it right before plot title
+      var background = svg.insert("g", "#plottitle")
+        .attr("class", "background");
         
       // drawing background
-      svg.insert("rect", "#plottitle")
-        .attr("x", plotdim.xstart)
-        .attr("y", plotdim.ystart)
-        .attr("width", plotdim.xend - plotdim.xstart)
-        .attr("height", plotdim.yend - plotdim.ystart)
-        .attr("class", "background_rect")
-        .style("fill", p_info.panel_background.fill)
-        .style("stroke", p_info.panel_background.colour)
-        .style("stroke-dasharray", function() {
-          return linetypesize2dasharray(p_info.panel_background.linetype,
-                                        p_info.panel_background.size);
-        });
+      if(Object.keys(p_info.panel_background).length > 1) {
+        background.append("rect")
+          .attr("x", plotdim.xstart)
+          .attr("y", plotdim.ystart)
+          .attr("width", plotdim.xend - plotdim.xstart)
+          .attr("height", plotdim.yend - plotdim.ystart)
+          .attr("class", "background_rect")
+          .style("fill", p_info.panel_background.fill)
+          .style("stroke", p_info.panel_background.colour)
+          .style("stroke-dasharray", function() {
+            return linetypesize2dasharray(p_info.panel_background.linetype,
+                                          p_info.panel_background.size);
+          });
+      }
       
-      // function to draw the grid lines when supplied with one of the elements
+      // function to draw major/minor grid lines 
       var grid_line = function(grid_background, grid_class) {
-        var col = grid_background.colour;
-        var lt = grid_background.linetype;
-        var size = grid_background.size;
-        var cap = grid_background.lineend;
+        // if grid lines are defined
+        if(Object.keys(grid_background).length > 1) {
+          var col = grid_background.colour;
+          var lt = grid_background.linetype;
+          var size = grid_background.size;
+          var cap = grid_background.lineend;
+        // group for grid lines
+        var grid = background.append("g")
+          .attr("class", grid_class);
 
-        // draw horizontal grid lines if they are defined
-        if(typeof grid_background.loc.y != "undefined") {
-          var draw_hor_line = function(element) {
-            svg.insert("line", "#plottitle")
+          // group for horizontal grid lines
+          var grid_hor = grid.append("g")
+            .attr("class", "hor");
+          // draw horizontal grid lines if they are defined
+          if(typeof grid_background.loc.y != "undefined") {
+            // coercing y lines to array if necessary
+            if(typeof grid_background.loc.y == "number") grid_background.loc.y = [grid_background.loc.y];
+            // drawing lines
+            grid_hor.selectAll("line")
+              .data(function() { return d3.values(grid_background.loc.y); })
+              .enter()
+              .append("line")
               .attr("x1", plotdim.xstart)
               .attr("x2", plotdim.xend)
-              .attr("y1", function() { return scales[panel_i].y(element); })
-              .attr("y2", function() { return scales[panel_i].y(element); })
-              .attr("class", function() { return "grid " + grid_class; })
+              .attr("y1", function(d) { return scales[panel_i].y(d); })
+              .attr("y2", function(d) { return scales[panel_i].y(d); })
               .style("stroke", col)
               .style("stroke-linecap", cap)
               .style("stroke-width", size)
               .style("stroke-dasharray", function() {
                 return linetypesize2dasharray(lt, size);
-              });
+              });;
           }
-          grid_background.loc.y.forEach(draw_hor_line);
-        }
 
-        // draw vertical grid lines if they are defined
-        if(typeof grid_background.loc.x != "undefined") {
-          var draw_vert_line = function(element) {
-            svg.insert("line", "#plottitle")
+          // group for vertical grid lines
+          var grid_vert = grid.append("g")
+            .attr("class", "vert");
+          // draw vertical grid lines if they are defined
+          if(typeof grid_background.loc.x != "undefined") {
+            // coercing x lines to array if necessary
+            if(typeof grid_background.loc.x == "number") grid_background.loc.x = [grid_background.loc.x];
+            // drawing lines
+            grid_vert.selectAll("line")
+              .data(function() { return d3.values(grid_background.loc.x); })
+              .enter()
+              .append("line")
+              .attr("x1", function(d) { return scales[panel_i].x(d); })
+              .attr("x2", function(d) { return scales[panel_i].x(d); })
               .attr("y1", plotdim.ystart)
               .attr("y2", plotdim.yend)
-              .attr("x1", function() { return scales[panel_i].x(element); })
-              .attr("x2", function() { return scales[panel_i].x(element); })
-              .attr("class", function() { return "grid " + grid_class; })
               .style("stroke", col)
               .style("stroke-linecap", cap)
               .style("stroke-width", size)
               .style("stroke-dasharray", function() {
                 return linetypesize2dasharray(lt, size);
-              });
+              });;
           }
-          grid_background.loc.x.forEach(draw_vert_line);
         }
       }
       // drawing the grid lines
       grid_line(p_info.grid_minor, "grid_minor");
       grid_line(p_info.grid_major, "grid_major");
+      
+      // drawing border
+      // uses insert to draw it right before the #plottitle
+      if(Object.keys(p_info.panel_border).length > 1) {
+        background.append("rect")
+          .attr("x", plotdim.xstart)
+          .attr("y", plotdim.ystart)
+          .attr("width", plotdim.xend - plotdim.xstart)
+          .attr("height", plotdim.yend - plotdim.ystart)
+          .attr("class", "border_rect")
+          .style("fill", p_info.panel_border.fill)
+          .style("stroke", p_info.panel_border.colour)
+          .style("stroke-dasharray", function() {
+            return linetypesize2dasharray(p_info.panel_border.linetype,
+                                          p_info.panel_border.size);
+          });
+      }
 
     } //end of for loop
 

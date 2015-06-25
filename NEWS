@@ -74,15 +74,15 @@ data=other.inserts, but they should both use the "insert" selection
 variable, in geom_point(aes(clickSelects=insert,
 showSelected=insert.show, data=other.inserts). See the example in
 https://github.com/tdhock/animint-examples/blob/master/examples/scaffolds.R#L65
-A better way to define this would be 
-aes(clickSelects=insert, 
+A better way to define this would be
+aes(clickSelects=insert,
     showSelected.variable="insert",
     showSelected.value=insert.show)
 Such a syntax would also be useful to avoid the use of for loops when
 defining a data viz with many selection variables, as in
 https://github.com/tdhock/animint-examples/blob/master/examples/PSJ.R
-For loops are bad for two reasons: 
-- more code to type (144 lines versus 122 lines), 
+For loops are bad for two reasons:
+- more code to type (144 lines versus 122 lines),
 - and slower construction of the data viz (30 seconds versus 1 second).
 
 DSL/RENDER: after clicking and changing the displayed data subset,
@@ -157,8 +157,8 @@ methods should we use to define hoverSelects interactivity?
 
 GGPLOT: theme(legend.position)
 
-DSL: how to specify the layout of SVG elements on the page? 
-- option list(layout=matrix of plot names) means 
+DSL: how to specify the layout of SVG elements on the page?
+- option list(layout=matrix of plot names) means
   render plots in an html table instead of in a line?
 - specifying newlines in the option list?
   list(timeSeries=ggplot(),
@@ -166,8 +166,6 @@ DSL: how to specify the layout of SVG elements on the page?
        scatter=ggplot())
   means that we should layout the plots in a <table> with
   2 rows and 1 column.
-
-EXAMPLE: pirates data: world map?
 
 EXAMPLE: US state population since 1790, compare w/ other countries?
 http://en.wikipedia.org/wiki/List_of_U.S._states_by_historical_population
@@ -198,6 +196,20 @@ does not respond to mouse clicks while the data is loading.
 
 DSL: Implement shape aesthetic with d3.svg.symbol()
 https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol_type
+
+RENDER: Determine why border of tiles in pirates example does not seem to be rendering.
+
+2015.06.25
+
+BUGFIX: Plots with only one grid line now render.
+
+2015.06.23
+
+BUGFIX: Panel backgrounds and borders can now handle rectangles of element_blank().
+
+2015.06.22
+
+EXAMPLE: Incorporate example with pirates data.
 
 2015.06.16
 
@@ -233,14 +245,14 @@ BUGFIX: aes(linetype) support for tall/wide rects.
 BUGFIX: facet_grid bugfix for when there is only 1 row or column.
 
 BUGFIX: R colors defined in parameters such as
-geom_line(colour="grey50") are now corrected translated to 
+geom_line(colour="grey50") are now corrected translated to
 rgb(127, 127, 127) in JSON.
 
 2015.05.11
 
 For complete details, see https://github.com/tdhock/animint/pull/62
 
-DSL: The url_prefix argument in animint2dir() was removed. Now the result will always be viewed at http://bl.ocks.org/:owner/raw/:id for better viewing. 
+DSL: The url_prefix argument in animint2dir() was removed. Now the result will always be viewed at http://bl.ocks.org/:owner/raw/:id for better viewing.
 BUGFIX: The animint.js file introduces only 1 thing (animint) into the global JavaScript environment.
 Added continuous integration with wercker and made several improvements to testing infrastructure.
 
