@@ -1610,27 +1610,21 @@ var animint = function (to_select, json_file) {
           .style("opacity", function(d){return d["pointalpha"]||1;});
       }
       legend_rows.append("td")
-	.attr("align", "left")
+	.attr("align", "left") // TODO: right for numbers?
 	.attr("class", "legend_entry_label")
+	.attr("id", function(d){ return d["label"]; })
 	.text(function(d){ return d["label"];})
       ;
     }
     
     // selecting points based on legend
-    var temp_select = function() {
-      d3.select("#plot").selectAll("#legend").selectAll("tr")
-        .on("click", function() { 
-          var row_id = d3.select(this).attr("id");
-          var selector_variable_string = this.parentElement.className;
-          var selector_variable = selector_variable_string.split(",");
-          var my_forEach = function(element) {
-            update_selector(element, row_id);
-          }
-          selector_variable.forEach(my_forEach);
-        })
-      ;
-    }
-    temp_select();
+    d3.select("#plot").selectAll("#legend").selectAll("tr")
+      .on("click", function() { 
+        var row_id = d3.select(this).attr("id");
+        var s_name = this.parentElement.className;
+        update_selector(s_name, row_id);
+      })
+    ;
   }
 
   // Download the main description of the interactive plot.
