@@ -7,7 +7,7 @@ before_install:
 install:
   # Dependencies for shiny/rmarkdown integration
   # Thanks RStudio! https://github.com/rstudio/rmarkdown/blob/master/.travis.yml
-  # Install binary pandoc from Rstudio 
+  # Install binary pandoc from Rstudio
   - mkdir -p $HOME/opt/pandoc
   - curl -O https://s3.amazonaws.com/rstudio-buildtools/pandoc-1.12.3.zip
   - unzip -j pandoc-1.12.3.zip pandoc-1.12.3/linux/debian/x86_64/pandoc
@@ -15,15 +15,16 @@ install:
   - chmod +x $HOME/opt/pandoc/pandoc*
   - rm pandoc-1.12.3.zip
   - $HOME/opt/pandoc/pandoc --version
-  # install uninstalled packages which this pkg depends on/links to/suggests. 
+  # install uninstalled packages which this pkg depends on/links to/suggests.
   - ./travis-tool.sh install_deps
   - ./travis-tool.sh install_github tdhock/ggplot2  jimhester/covr
-  
-script: 
+
+script:
   - Rscript -e "devtools::load_all(); setwd('tests'); source('testthat.R')"
 
 after_success:
   - Rscript -e "library(covr);coveralls()"
+  - ./.push_gh_pages.sh
 
 after_failure:
   - ./travis-tool.sh dump_logs
