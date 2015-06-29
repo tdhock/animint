@@ -3,6 +3,8 @@
 # no idea really
 [ "${TRAVIS_PULL_REQUEST}" != "false" ] && exit 0
 
+echo "Building tutorial"
+
 rm -rf tutorial || exit 0;
 mkdir tutorial;
 
@@ -32,5 +34,5 @@ git pull $FULL_REPO gh-pages
 R -e "knitr::knit2html('index.Rmd')"
 git add --all
 git commit -m "Re-build tutorial"
-git push --force --quiet $FULL_REPO master:gh-pages
+git push --quiet $FULL_REPO master:gh-pages
 
