@@ -70,12 +70,16 @@ breakpointError <-
                        clickSelects=bases.per.probe),
                    data=only.error, lwd=4))
 
-bytes.used <- function(file.vec, ...){
-  ## Note: the --apparent-size flag gives sizes that are consistent
+bytes.used <- function(file.vec, apparent.size = FALSE){
+  ## Note: the apparent.size flag gives sizes that are consistent
   ## with file.info, but those sizes actually under-estimate the
   ## actual amount of space used on disk.
   file.str <- paste(file.vec, collapse=" ")
-  cmd <- paste("du --block-size=1", ..., file.str)
+  if(apparent.size){
+    cmd <- paste("ls -l", file.str, "| awk '{print $5}'")
+  } else{
+    cmd <- paste("du -k", file.str, "| awk '{print $1 * 1024}'")
+  }
   tryCatch({
     du.lines <- system(cmd, intern=TRUE)
     as.integer(sub("\t.*", "", du.lines))
@@ -93,7 +97,7 @@ for(f in test.paths){
   cat("foo", file=f)
 }
 du.bytes <- bytes.used(test.paths)
-apparent.bytes <- bytes.used(test.paths, "--apparent-size")
+apparent.bytes <- bytes.used(test.paths, apparent.size = TRUE)
 byte.df <- data.frame(du.bytes, apparent.bytes,
                       file.size=file.size(test.paths),
                       test.paths)
@@ -105,7 +109,7 @@ test_that("default chunks are at least 4KB", {
   tsv.files <- Sys.glob(file.path(tdir, "*.tsv"))
   expect_equal(length(tsv.files), 0)
   animint2dir(breakpointError, tdir, open.browser=FALSE)
-  tsv.files <- Sys.glob(file.path(tdir, "*.tsv"))
+  tsv.files <- Sys.glob(file.path(tdir, ".+chunk[0-9]+.tsv"))  # exclude common tsv
   geom <- sub("_.*", "", basename(tsv.files))
   files.by.geom <- split(tsv.files, geom)
   for(files in files.by.geom){
