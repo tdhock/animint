@@ -60,8 +60,11 @@ parsePlot <- function(meta){
         var.is.interactive <- any(is.interactive.aes & is.legend.var)
         if(!var.is.interactive){
           for(i in legend_type) {
-            temp_name <- paste0("showSelectedlegend", i)
-            L$mapping[[temp_name]] <- as.symbol(var_name)
+            ## only adding showSelected aesthetic if the variable is used by the geom
+            if(!is.null(L$mapping[[i]])) {
+              temp_name <- paste0("showSelectedlegend", i)
+              L$mapping[[temp_name]] <- as.symbol(var_name)
+            }
           }
         }
         # if selector.types is not specified, set it to multiple
