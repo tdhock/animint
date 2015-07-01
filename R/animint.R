@@ -312,14 +312,7 @@ saveLayer <- function(l, d, meta){
     if(!"fill"%in%names(g.data) & "colour"%in%names(g.data)){
       g.data[["fill"]] <- g.data[["colour"]]
     }
-    ## group is meaningless for points, so delete it.
-    g.data <- g.data[names(g.data) != "group"]
-  } else if(g$geom=="segment"){
-    ## group is meaningless for segments, so delete it.
-    g.data <- g.data[names(g.data) != "group"]
   } else if(g$geom=="text"){
-    ## group is meaningless for text, so delete it.
-    g.data <- g.data[names(g.data) != "group"]
     ## check invalid hjust value
     if ("hjust" %in% names(g$params)) { #  hjust is parameter
       hjust <- g$params$hjust
@@ -329,9 +322,6 @@ saveLayer <- function(l, d, meta){
       hjust <- 0.5
     }
     anchor <- hjust2anchor(hjust)
-  } else if(g$geom=="rect"){
-    ## group is meaningless for rects, so delete it.
-    g.data <- g.data[names(g.data) != "group"]
   } else if(g$geom=="ribbon"){
     # Color set to match ggplot2 default of fill with no outside border.
     if("fill"%in%names(g.data) & !"colour"%in%names(g.data)){
@@ -641,8 +631,8 @@ saveLayer <- function(l, d, meta){
   ## Split into chunks and save tsv files.
   meta$classed <- g$classed
   meta$chunk.i <- 1L
-  g.data.vary <- saveCommonChunk(g.data, chunk.cols, meta)
-  g$chunks <- saveChunks(g.data.vary, meta)
+  g.data.varied <- saveCommonChunk(g.data, chunk.cols, meta)
+  g$chunks <- saveChunks(g.data.varied, meta)
   g$total <- length(unlist(g$chunks))
 
   ## Also add pointers to these chunks to the related selectors.
@@ -720,7 +710,8 @@ saveCommonChunk <- function(x, vars, meta){
       df.list <- plyr::llply(df.list, function(df){
         df <- df[, !names(df) %in% remove.cols, drop = FALSE]
         # remove duplicated rows to further reduce chunk file size
-        if("group" %in% common.cols) df <- df[!duplicated(df), ]
+        # if group has only one value, keep duplicated rows, e.g. geom_point
+        if("group" %in% common.cols & length(unique(df$group)) != 1) df <- df[!duplicated(df), ]
         df
       })
     }
