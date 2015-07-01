@@ -67,7 +67,11 @@ parsePlot <- function(meta){
             }
           }
         }
-        # if selector.types is not specified, set it to multiple
+        # if selector.types has not been specified, create it
+        if(is.null(meta$selector.types)) {
+          meta$selector.types <- list()
+        }
+        # if selector.types is not specified for this variable, set it to multiple
         if(is.null(meta$selector.types[[var_name]])) {
           meta$selector.types[[var_name]] <- "multiple"
         }
