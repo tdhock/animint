@@ -1221,7 +1221,7 @@ getLegendList <- function(plistextra){
     legend_type <- names(gdefs[[leg]]$key)
     legend_type <- legend_type[legend_type != ".label"]
     gdefs[[leg]]$legend_type <- legend_type
-    # something wrong here.  This should not just be [[1]]
+    # grabbing the name of the variable
     vars <- character()
     for(i in seq_along(plot$layers)) {
       temp <- sapply(legend_type, function(z) { 
