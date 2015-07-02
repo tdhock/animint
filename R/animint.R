@@ -4,6 +4,14 @@
 #' @export
 #' @import ggplot2
 parsePlot <- function(meta){
+  ## adding data and mapping to each layer from base plot, if necessary
+  for(layer.i in seq_along(meta$plot$layers)) {
+    ## if data is not specified, get it from plot
+    if(length(meta$plot$layers[[layer.i]]$data) == 0) meta$plot$layers[[layer.i]]$data <- meta$plot$data
+    ## if mapping is not specified, get it from plot
+    if(is.null(meta$plot$layers[[layer.i]]$mapping)) meta$plot$layers[[layer.i]]$mapping <- meta$plot$mapping
+  }
+  
   meta$built <- ggplot2::ggplot_build(meta$plot)
   plot.meta <- list()
   scaleFuns <-
