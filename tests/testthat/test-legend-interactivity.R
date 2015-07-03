@@ -7,15 +7,13 @@ p1 <- ggplot() +
              data = iris) + 
   facet_wrap(~Species, nrow = 2) + 
   ggtitle("Sepal Data")
-p2 <- ggplot() + 
-  geom_point(aes(Petal.Length, Petal.Width, colour = Species, 
-                 size = Sepal.Width, showSelected = Species), 
-             data = iris) + 
+p2 <- ggplot(iris, aes(Petal.Length, Petal.Width, colour = Species, 
+                       size = Sepal.Width, showSelected = Species)) + 
+  geom_point() + 
   ggtitle("Petal Data")
 
 viz <- list(sepal = p1, 
-            petal = p2, 
-            title = "Different Panel Styles")
+            petal = p2)
 info <- animint2HTML(viz)
 
 test_that("compiler adds selector.types and first", {
