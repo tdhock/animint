@@ -1644,6 +1644,9 @@ var animint = function (to_select, json_file) {
         var s_name = this.parentElement.className;
         update_selector(s_name, row_id);
       })
+      .attr("title", function() {
+        return "Toggle " + this.id;
+      })
     ;
   }
 
