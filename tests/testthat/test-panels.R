@@ -158,3 +158,21 @@ test_that("renderer can handle only one grid line", {
   expect_equal(length(grid_minor_hor), 1)
   expect_equal(length(grid_minor_vert), 4)
 })
+
+test_that("no minor grid lines is handed correctly", {
+  info <- animint2HTML(list(
+    g = ggplot() +  
+      geom_point(data = geyser, 
+                 aes(x = duration, y = waiting)) + 
+      geom_contour(data = geyser, 
+                   aes(x = duration, y = waiting), 
+                   colour = "blue", size = .5, stat = "density2d") + 
+      xlim(0.5, 6) + scale_y_log10(limits = c(40,110)) +
+      ggtitle("geom_contour 2d density")
+  ))
+  # extract grids
+  grid_major_hor <- getNodeSet(info$html, '//svg//g[@class="grid_major"]//g[@class="hor"]//line')
+  grid_minor_hor <- getNodeSet(info$html, '//svg//g[@class="grid_minor"]//g[@class="hor"]//line')
+  expect_equal(length(grid_major_hor), 1)
+  expect_equal(length(grid_minor_hor), 0)
+})
