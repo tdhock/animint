@@ -110,12 +110,12 @@ parsePlot <- function(meta){
   plot.meta$grid_minor <- get_grid(theme.pars$panel.grid.minor)
   # extract locations of major grid lines
   plot.meta$grid_major$loc <- list()
-  plot.meta$grid_major$loc$x <- meta$built$panel$ranges[[1]]$x.major
-  plot.meta$grid_major$loc$y <- meta$built$panel$ranges[[1]]$y.major
+  plot.meta$grid_major$loc$x <- as.list(meta$built$panel$ranges[[1]]$x.major)
+  plot.meta$grid_major$loc$y <- as.list(meta$built$panel$ranges[[1]]$y.major)
   # extract locations of minor grid lines
   plot.meta$grid_minor$loc <- list()
-  plot.meta$grid_minor$loc$x <- meta$built$panel$ranges[[1]]$x.minor
-  plot.meta$grid_minor$loc$y <- meta$built$panel$ranges[[1]]$y.minor
+  plot.meta$grid_minor$loc$x <- as.list(meta$built$panel$ranges[[1]]$x.minor)
+  plot.meta$grid_minor$loc$y <- as.list(meta$built$panel$ranges[[1]]$y.minor)
   # remove minor lines when major lines are already drawn
   plot.meta$grid_minor$loc$x <- plot.meta$grid_minor$loc$x[
     !(plot.meta$grid_minor$loc$x %in% plot.meta$grid_major$loc$x)
