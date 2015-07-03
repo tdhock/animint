@@ -160,6 +160,7 @@ test_that("renderer can handle only one grid line", {
 })
 
 test_that("no minor grid lines is handed correctly", {
+  data(geyser, package = "MASS")
   info <- animint2HTML(list(
     g = ggplot() +  
       geom_point(data = geyser, 
