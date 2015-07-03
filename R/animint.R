@@ -350,11 +350,14 @@ saveLayer <- function(l, d, meta){
   ## special cases of basic geoms. In ggplot2, this processing is done
   ## in the draw method of the geoms.
   if(g$geom=="abline"){
-    # "Trick" ggplot coord_transform into transforming the slope and intercept
-    g.data[,"x"] <- ranges$x.range[1]
-    g.data[,"xend"] <- ranges$x.range[2]
-    g.data[,"y"] <- g.data$slope*ranges$x.range[1]+g.data$intercept
-    g.data[,"yend"] <-  g.data$slope*ranges$x.range[2]+g.data$intercept
+    ## loop through each panel
+    for(i in seq_along(ranges)){
+      # "Trick" ggplot coord_transform into transforming the slope and intercept
+      g.data[i,"x"] <- ranges[[i]]$x.range[1]
+      g.data[i,"xend"] <- ranges[[i]]$x.range[2]
+      g.data[i,"y"] <- g.data$slope[i]*ranges[[i]]$x.range[1]+g.data$intercept[i]
+      g.data[i,"yend"] <-  g.data$slope[i]*ranges[[i]]$x.range[2]+g.data$intercept[i]
+    }
     g.data <- as.data.frame(g.data)
     if(g$aes[["group"]]=="1"){
       # ggplot2 defaults to adding a group attribute
