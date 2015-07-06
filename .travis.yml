@@ -21,7 +21,7 @@ install:
   - ./travis-tool.sh install_github tdhock/ggplot2  jimhester/covr
 
 script:
-  - Rscript -e "devtools::load_all(); setwd('tests'); source('testthat.R')"
+  - Rscript -e "devtools::install(); source('tests/testthat.R', chdir = TRUE)"
 
 after_success:
   - Rscript -e "library(covr);coveralls()"

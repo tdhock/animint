@@ -1,38 +1,21 @@
 #!/bin/bash
 
-# no idea really
+# only build tutorial when simulating merge with master -> http://docs.travis-ci.com/user/environment-variables/#Default-Environment-Variables
 [ "${TRAVIS_PULL_REQUEST}" != "false" ] && exit 0
 
 echo "Building tutorial"
 
-rm -rf tutorial || exit 0;
-mkdir tutorial;
+git config user.name "cpsievert"
+git config user.email "cpsievert1@gmail.com"
 
-GH_REPO="@github.com/tdhock/animint.git"
+FULL_REPO="https://$GH_TOKEN@github.com/tdhock/animint.git"
 
-FULL_REPO="https://$GH_TOKEN$GH_REPO"
-
-for files in '*.tar.gz'; do
-        tar xfz $files
-done
-
-# install package
-R -e "devtools::install('animint')"
-
-# initialize git repo
-cd tutorial
-git init
-# why do I need to do this git config stuff?
-git config user.name "kferris10"
-git config user.email "kferris10@gmail.com"
-
-# pull tutorial from GitHub
-### this is overkill - I only need to pull the index.Rmd file
-git pull $FULL_REPO gh-pages
+cd animint
+git checkout gh-pages
 
 # compile tutorial and push to gh-pages
 R -e "knitr::knit2html('index.Rmd')"
 git add --all
-git commit -m "Re-build tutorial"
+git commit -m "Pushed from -> https://travis-ci.org/ropensci/plotly/builds/$TRAVIS_BUILD_ID"
 git push --quiet $FULL_REPO master:gh-pages
 
