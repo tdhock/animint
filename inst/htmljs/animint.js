@@ -1772,24 +1772,15 @@ var animint = function (to_select, json_file) {
     ;
     var species_tr = species_loading
       .append("tr");
-    var my_button1 = species_tr
-      .append("button")
-      .text("setosa")
-      .on("click", function() {
-        update_selector("Species", this.textContent);
-      });
-    var my_button2 = species_tr
-      .append("button")
-      .text("versicolor")
-      .on("click", function() {
-        update_selector("Species", this.textContent);
-      });
-    var my_button3 = species_tr
-      .append("button")
-      .text("virginica")
-      .on("click", function() {
-        update_selector("Species", this.textContent);
-      });
+    response.selectors.Species.levels.forEach(function(element) {
+      species_tr
+        .append("button")
+        .text(element)
+        .on("click", function() {
+          update_selector("Species", this.textContent);
+          console.log(this.parentElement);
+        });
+    });
       
     // If this is an animation, then start downloading all the rest of
     // the data, and start the animation.
