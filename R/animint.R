@@ -322,8 +322,11 @@ saveLayer <- function(l, d, meta){
       stopifnot(length(selector.type)==1)
       stopifnot(selector.type %in% c("single", "multiple"))
       meta$selectors[[v.name]] <-
-        list(selected=as.character(value),
-             type=selector.type)
+        list(
+          selected=as.character(value),
+          type=selector.type, 
+          levels=as.character(unique(l$data[[v.name]]))
+        )
     }
     meta$selectors[[v.name]]$update <-
       c(meta$selectors[[v.name]]$update, as.list(g$classed))
