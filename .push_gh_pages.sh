@@ -11,7 +11,7 @@ git config user.email "cpsievert1@gmail.com"
 FULL_REPO="https://$GH_TOKEN@github.com/tdhock/animint.git"
 
 git fetch origin gh-pages
-git checkout gh-pages
+git checkout -b gh-pages
 
 # compile tutorial and push to gh-pages
 R -e "knitr::knit2html('index.Rmd')"
