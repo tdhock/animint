@@ -1755,6 +1755,8 @@ var animint = function (to_select, json_file) {
     // Species selector widget
     var species_selector = element.append("button")
       .text("Show Species selectors")
+      .attr("class", "selector_widget")
+      .attr("id", "Species")
     ;
     species_selector
       .on("click", function() {
