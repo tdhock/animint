@@ -1631,6 +1631,51 @@ var animint = function (to_select, json_file) {
     for (var s_name in response.selectors) {
       add_selector(s_name, response.selectors[s_name]);
     }
+    
+    ////////////////////////////////////////////
+    // Widgets at bottom of page
+    ////////////////////////////////////////////
+    
+    // Species selector widget
+    element.append("br");
+    var species_selector = element.append("button")
+      .text("Show Species selectors")
+    ;
+    species_selector
+      .on("click", function() {
+        if(this.textContent == "Show Species selectors") {
+          species_loading.style("display", "");
+          species_selector.text("Hide Species selectors");
+        } else {
+          species_loading.style("display", "none");
+          species_selector.text("Show Species selectors");
+        }
+      })
+    ;
+    var species_loading = element.append("table")
+      .style("display", "none")
+    ;
+    var species_tr = species_loading
+      .append("tr");
+    var my_button1 = species_tr
+      .append("button")
+      .text("setosa")
+      .on("click", function() {
+        update_selector("Species", this.textContent);
+      });
+    var my_button2 = species_tr
+      .append("button")
+      .text("versicolor")
+      .on("click", function() {
+        update_selector("Species", this.textContent);
+      });
+    var my_button3 = species_tr
+      .append("button")
+      .text("virginica")
+      .on("click", function() {
+        update_selector("Species", this.textContent);
+      });
+      
     // loading table.
     element.append("br");
     var show_hide_table = element.append("button")
