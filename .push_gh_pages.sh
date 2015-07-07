@@ -10,7 +10,7 @@ git config user.email "cpsievert1@gmail.com"
 
 FULL_REPO="https://$GH_TOKEN@github.com/tdhock/animint.git"
 
-cd animint
+git fetch origin gh-pages
 git checkout gh-pages
 
 # compile tutorial and push to gh-pages
