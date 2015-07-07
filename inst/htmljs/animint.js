@@ -1771,6 +1771,7 @@ var animint = function (to_select, json_file) {
     ;
     var species_loading = element.append("table")
       .style("display", "none")
+      .attr("class", "selector_table")
     ;
     var species_tr = species_loading
       .append("tr");
