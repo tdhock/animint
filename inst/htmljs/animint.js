@@ -1779,6 +1779,7 @@ var animint = function (to_select, json_file) {
       species_tr
         .append("button")
         .text(element)
+        .attr("id", element)
         .on("click", function() {
           update_selector("Species", this.textContent);
         });
