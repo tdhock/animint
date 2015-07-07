@@ -8,7 +8,7 @@ echo "Building tutorial"
 git config user.name "cpsievert"
 git config user.email "cpsievert1@gmail.com"
 
-FULL_REPO="https://$GH_TOKEN@github.com/tdhock/animint.git"
+FULL_REPO="https://$GITHUB_PAT@github.com/tdhock/animint.git"
 
 git fetch origin gh-pages
 git checkout -b gh-pages
