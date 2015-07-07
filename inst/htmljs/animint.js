@@ -1635,49 +1635,9 @@ var animint = function (to_select, json_file) {
     ////////////////////////////////////////////
     // Widgets at bottom of page
     ////////////////////////////////////////////
-    
-    // Species selector widget
     element.append("br");
-    var species_selector = element.append("button")
-      .text("Show Species selectors")
-    ;
-    species_selector
-      .on("click", function() {
-        if(this.textContent == "Show Species selectors") {
-          species_loading.style("display", "");
-          species_selector.text("Hide Species selectors");
-        } else {
-          species_loading.style("display", "none");
-          species_selector.text("Show Species selectors");
-        }
-      })
-    ;
-    var species_loading = element.append("table")
-      .style("display", "none")
-    ;
-    var species_tr = species_loading
-      .append("tr");
-    var my_button1 = species_tr
-      .append("button")
-      .text("setosa")
-      .on("click", function() {
-        update_selector("Species", this.textContent);
-      });
-    var my_button2 = species_tr
-      .append("button")
-      .text("versicolor")
-      .on("click", function() {
-        update_selector("Species", this.textContent);
-      });
-    var my_button3 = species_tr
-      .append("button")
-      .text("virginica")
-      .on("click", function() {
-        update_selector("Species", this.textContent);
-      });
       
     // loading table.
-    element.append("br");
     var show_hide_table = element.append("button")
       .text("Show download status table")
     ;
@@ -1702,10 +1662,12 @@ var animint = function (to_select, json_file) {
     tr.append("th").attr("class", "downloaded").text("downloaded");
     tr.append("th").attr("class", "total").text("total");
     tr.append("th").attr("class", "status").text("status");
+    
     // Add geoms and construct nest operators.
     for (var g_name in response.geoms) {
       add_geom(g_name, response.geoms[g_name]);
     }
+    
     // Animation control widgets.
     var show_message = "Show animation controls";
     var show_hide_animation_controls = element.append("button")
@@ -1789,6 +1751,46 @@ var animint = function (to_select, json_file) {
 	return Selectors[s_name].duration;
       })
     ;
+    
+    // Species selector widget
+    var species_selector = element.append("button")
+      .text("Show Species selectors")
+    ;
+    species_selector
+      .on("click", function() {
+        if(this.textContent == "Show Species selectors") {
+          species_loading.style("display", "");
+          species_selector.text("Hide Species selectors");
+        } else {
+          species_loading.style("display", "none");
+          species_selector.text("Show Species selectors");
+        }
+      })
+    ;
+    var species_loading = element.append("table")
+      .style("display", "none")
+    ;
+    var species_tr = species_loading
+      .append("tr");
+    var my_button1 = species_tr
+      .append("button")
+      .text("setosa")
+      .on("click", function() {
+        update_selector("Species", this.textContent);
+      });
+    var my_button2 = species_tr
+      .append("button")
+      .text("versicolor")
+      .on("click", function() {
+        update_selector("Species", this.textContent);
+      });
+    var my_button3 = species_tr
+      .append("button")
+      .text("virginica")
+      .on("click", function() {
+        update_selector("Species", this.textContent);
+      });
+      
     // If this is an animation, then start downloading all the rest of
     // the data, and start the animation.
     if (response.time) {
