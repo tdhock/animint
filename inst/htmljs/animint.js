@@ -1754,19 +1754,23 @@ var animint = function (to_select, json_file) {
     
     // selector widgets
     for(s_name in response.selectors) {
+      // create a widget for the selector
       var selector_widget = element.append("button")
         .text("Show " + s_name + " selectors")
         .attr("class", "selector_widget")
         .attr("id", s_name)
       ;
+      // create a table for the buttons to go in - initially hidden
       var selector_table = element.append("table")
         .style("display", "none")
         .attr("class", "selector_table")
         .attr("id", s_name)
       ;
+      // create a row in the table for the buttons
       var selector_tr = selector_table
         .append("tr")
         .attr("id", s_name);
+      // create buttons for each level of the selector
       response.selectors[s_name].levels.forEach(function(element) {
         selector_tr
           .append("button")
@@ -1776,21 +1780,20 @@ var animint = function (to_select, json_file) {
             update_selector(s_name, this.textContent);
           });
       });
-      // on click, update the selectors
+      // on click, show the selection inputs
       d3.selectAll(".selector_widget")
         .on("click", function() {
           if(this.textContent.includes("Show")) {
             selector_table.style("display", "");
             selector_widget
               .text("Hide " + this.id + " selectors");
-            //d3.selectAll(".selector_widget").select("#" + this.id)
           } else {
             selector_table.style("display", "none");
             selector_widget.text("Show " + this.id + " selectors");
           }
         })
       ;
-    }
+    }  // close selector widgets loops
       
     // If this is an animation, then start downloading all the rest of
     // the data, and start the animation.
