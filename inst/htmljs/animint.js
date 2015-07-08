@@ -1752,38 +1752,40 @@ var animint = function (to_select, json_file) {
       })
     ;
     
-    // Species selector widget
-    var species_selector = element.append("button")
-      .text("Show Species selectors")
-      .attr("class", "selector_widget")
-      .attr("id", "Species")
-    ;
-    species_selector
-      .on("click", function() {
-        if(this.textContent == "Show Species selectors") {
-          species_loading.style("display", "");
-          species_selector.text("Hide Species selectors");
-        } else {
-          species_loading.style("display", "none");
-          species_selector.text("Show Species selectors");
-        }
-      })
-    ;
-    var species_loading = element.append("table")
-      .style("display", "none")
-      .attr("class", "selector_table")
-    ;
-    var species_tr = species_loading
-      .append("tr");
-    response.selectors.Species.levels.forEach(function(element) {
-      species_tr
-        .append("button")
-        .text(element)
-        .attr("id", element)
+    // selector widgets
+    for(s_name in response.selectors) {
+      var selector_widget = element.append("button")
+        .text("Show " + s_name + " selectors")
+        .attr("class", "selector_widget")
+        .attr("id", s_name)
+      ;
+      selector_widget
         .on("click", function() {
-          update_selector("Species", this.textContent);
-        });
-    });
+          if(this.textContent == "Show " + s_name + " selectors") {
+            selector_table.style("display", "");
+            selector_widget.text("Hide " + s_name + " selectors");
+          } else {
+            selector_table.style("display", "none");
+            selector_widget.text("Show " + s_name + " selectors");
+          }
+        })
+      ;
+      var selector_table = element.append("table")
+        .style("display", "none")
+        .attr("class", "selector_table")
+      ;
+      var selector_tr = selector_table
+        .append("tr");
+      response.selectors[s_name].levels.forEach(function(element) {
+        selector_tr
+          .append("button")
+          .text(element)
+          .attr("id", element)
+          .on("click", function() {
+            update_selector(s_name, this.textContent);
+          });
+      });
+    }
       
     // If this is an animation, then start downloading all the rest of
     // the data, and start the animation.
