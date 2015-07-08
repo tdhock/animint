@@ -1759,23 +1759,14 @@ var animint = function (to_select, json_file) {
         .attr("class", "selector_widget")
         .attr("id", s_name)
       ;
-      selector_widget
-        .on("click", function() {
-          if(this.textContent == "Show " + s_name + " selectors") {
-            selector_table.style("display", "");
-            selector_widget.text("Hide " + s_name + " selectors");
-          } else {
-            selector_table.style("display", "none");
-            selector_widget.text("Show " + s_name + " selectors");
-          }
-        })
-      ;
       var selector_table = element.append("table")
         .style("display", "none")
         .attr("class", "selector_table")
+        .attr("id", s_name)
       ;
       var selector_tr = selector_table
-        .append("tr");
+        .append("tr")
+        .attr("id", s_name);
       response.selectors[s_name].levels.forEach(function(element) {
         selector_tr
           .append("button")
@@ -1785,6 +1776,20 @@ var animint = function (to_select, json_file) {
             update_selector(s_name, this.textContent);
           });
       });
+      // on click, update the selectors
+      d3.selectAll(".selector_widget")
+        .on("click", function() {
+          if(this.textContent.includes("Show")) {
+            selector_table.style("display", "");
+            selector_widget
+              .text("Hide " + this.id + " selectors");
+            //d3.selectAll(".selector_widget").select("#" + this.id)
+          } else {
+            selector_table.style("display", "none");
+            selector_widget.text("Show " + this.id + " selectors");
+          }
+        })
+      ;
     }
       
     // If this is an animation, then start downloading all the rest of
