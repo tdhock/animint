@@ -1780,16 +1780,21 @@ var animint = function (to_select, json_file) {
             update_selector(s_name, this.textContent);
           });
       });
-      // on click, show the selection inputs
+      // on click, show the different options for that selector
       d3.selectAll(".selector_widget")
         .on("click", function() {
           if(this.textContent.includes("Show")) {
-            selector_table.style("display", "");
-            selector_widget
-              .text("Hide " + this.id + " selectors");
+            // show table
+            d3.selectAll(".selector_table").select("#" + this.id)
+              .style("display", "");
+            // update widget text
+            this.innerHTML = "Hide " + this.id + " selectors";
           } else {
-            selector_table.style("display", "none");
-            selector_widget.text("Show " + this.id + " selectors");
+            // hide table
+            d3.selectAll(".selector_table").select("#" + this.id)
+              .style("display", "none");
+            // update widget text
+            this.innerHTML = "Show " + this.id + " selectors";
           }
         })
       ;
