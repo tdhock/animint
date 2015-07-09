@@ -1090,15 +1090,16 @@ getLegendList <- function(plistextra){
   theme <- ggplot2:::plot_theme(plot)
   position <- theme$legend.position
   # by default, guide boxes are vertically aligned
-  theme$legend.box <- if(is.null(theme$legend.box)) "vertical" else theme$legend.box
+  if(is.null(theme$legend.box)) theme$legend.box <- "vertical" else theme$legend.box
 
   # size of key (also used for bar in colorbar guide)
-  theme$legend.key.width <- if(is.null(theme$legend.key.width)) theme$legend.key.size
-  theme$legend.key.height <- if(is.null(theme$legend.key.height)) theme$legend.key.size
+  if(is.null(theme$legend.key.width)) theme$legend.key.width <- theme$legend.key.size
+  if(is.null(theme$legend.key.height)) theme$legend.key.height <- theme$legend.key.size
   # by default, direction of each guide depends on the position of the guide.
-  theme$legend.direction <- if(is.null(theme$legend.direction)){
-    if (length(position) == 1 && position %in% c("top", "bottom", "left", "right"))
-      switch(position[1], top =, bottom = "horizontal", left =, right = "vertical")
+  if(is.null(theme$legend.direction)){
+    theme$legend.direction <- 
+      if (length(position) == 1 && position %in% c("top", "bottom", "left", "right"))
+        switch(position[1], top =, bottom = "horizontal", left =, right = "vertical")
     else
       "vertical"
   }
