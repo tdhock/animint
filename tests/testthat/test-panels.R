@@ -147,7 +147,6 @@ test_that("grid lines are drawn correctly", {
   match_gg538 <- str_match_perl(attr_major_gg538["style",], strokePattern)
   value_gg538 <- match_gg538[, "value"]
   test_color(value_gg538[1], "#D2D2D2")
-  browser()
 })
 
 test_that("renderer can handle no grid lines", {
