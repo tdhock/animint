@@ -67,18 +67,17 @@ parsePlot <- function(meta){
       
       ## if elements are not specified, they inherit from theme.pars$rect
       for(i in 1:length(pars)) {
-        if(is.null(pars[[i]])) pars[[i]] <- theme.pars$rect[[i]]
+        if(is.null(pars[[i]])) pars[[i]] <- unname(theme.pars$rect[[i]])
       }
       
       # convert fill to RGB if necessary
-      if(!(is.rgb(pars$fill))) { 
-        pars$fill <- toRGB(pars$fill)
-      }
-      
+      if(!(is.rgb(pars$fill))) pars$fill <- unname(toRGB(pars$fill))
       # convert color to RGB if necessary
-      if(!(is.rgb(pars$colour))) { 
-        pars$colour <- toRGB(pars$colour)
-      }
+      if(!(is.rgb(pars$colour))) pars$colour <- unname(toRGB(pars$colour))
+      
+      # remove names (JSON file was getting confused)
+      pars <- lapply(pars, unname)
+      
     }
     pars
   }
@@ -96,13 +95,11 @@ parsePlot <- function(meta){
         if(is.null(pars[[i]])) pars[[i]] <- theme.pars$line[[i]]
       }
       # convert colour to RGB if necessary
-      if(!is.rgb(pars$colour)) pars$colour <- toRGB(pars$colour)
-      # if size is null, set it to 1
-      if(is.null(pars$size)) pars$size <- 1
-      # if linetype is null, set it to solid
-      if(is.null(pars$linetype)) pars$linetype <- "solid"
-      # if lineend is null, set to butt
-      if(is.null(pars$lineend)) pars$lineend <- "butt"
+      if(!is.rgb(pars$colour)) pars$colour <- unname(toRGB(pars$colour))
+      
+      # remove names (JSON file was getting confused)
+      pars <- lapply(pars, unname)
+      
     }
     
     ## x and y locations
@@ -1100,7 +1097,7 @@ getLegendList <- function(plistextra){
   theme$legend.key.width <- if(is.null(theme$legend.key.width)) theme$legend.key.size
   theme$legend.key.height <- if(is.null(theme$legend.key.height)) theme$legend.key.size
   # by default, direction of each guide depends on the position of the guide.
-  if(is.null(theme$legend.direction)){theme$legend.direction <- 
+  theme$legend.direction <- if(is.null(theme$legend.direction)){
     if (length(position) == 1 && position %in% c("top", "bottom", "left", "right"))
       switch(position[1], top =, bottom = "horizontal", left =, right = "vertical")
     else
