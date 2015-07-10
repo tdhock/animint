@@ -60,9 +60,9 @@ parsePlot <- function(meta){
   ## out of the box, with no additional d3 coding.
   theme.pars <- ggplot2:::plot_theme(meta$plot)
   
-  ## extract panel backgrounds from theme.pars
+  ## extract panel background and borders from theme.pars
   get_bg <- function(pars) {
-    # if pars is not an empty list
+    # if pars is not an empty list - occurs when using element_blank()
     if(length(pars) > 0) {
       # convert fill to RGB if necessary
       if(!(is.rgb(pars$fill))) { 
@@ -79,7 +79,7 @@ parsePlot <- function(meta){
           pars$linetype <- "solid"
         } else if(!is.numeric(pars$linetype)) {
           pars$linetype <- match.arg(pars$linetype, 
-                                      c("blank", "solid", "dashed", "dotted", "dotdash", "longdash", "twodash"))
+                                     c("blank", "solid", "dashed", "dotted", "dotdash", "longdash", "twodash"))
         }
       }
     }
@@ -91,7 +91,7 @@ parsePlot <- function(meta){
   
   ### function to extract grid info from theme.pars
   get_grid <- function(pars) {
-    # if pars is not an empty list
+    # if pars is not an empty list - occurs when using element_blank()
     if(length(pars) > 0) {
       # convert colour to RGB if necessary
       if(!is.rgb(pars$colour)) pars$colour <- toRGB(pars$colour)
