@@ -64,23 +64,20 @@ parsePlot <- function(meta){
   get_bg <- function(pars) {
     # if pars is not an empty list - occurs when using element_blank()
     if(length(pars) > 0) {
+      
+      ## if elements are not specified, they inherit from theme.pars$rect
+      for(i in 1:length(pars)) {
+        if(is.null(pars[[i]])) pars[[i]] <- theme.pars$rect[[i]]
+      }
+      
       # convert fill to RGB if necessary
       if(!(is.rgb(pars$fill))) { 
         pars$fill <- toRGB(pars$fill)
       }
-      # if border color is specified
-      if(!is.null(pars$colour)) {
-        # convert color to RGB if necessary
-        if(!(is.rgb(pars$colour))) { 
-          pars$colour <- toRGB(pars$colour)
-        }
-        # check if the user specified linetype for the border
-        if(is.null(pars$linetype)) {
-          pars$linetype <- "solid"
-        } else if(!is.numeric(pars$linetype)) {
-          pars$linetype <- match.arg(pars$linetype, 
-                                     c("blank", "solid", "dashed", "dotted", "dotdash", "longdash", "twodash"))
-        }
+      
+      # convert color to RGB if necessary
+      if(!(is.rgb(pars$colour))) { 
+        pars$colour <- toRGB(pars$colour)
       }
     }
     pars
@@ -1103,7 +1100,7 @@ getLegendList <- function(plistextra){
   theme$legend.key.width <- if(is.null(theme$legend.key.width)) theme$legend.key.size
   theme$legend.key.height <- if(is.null(theme$legend.key.height)) theme$legend.key.size
   # by default, direction of each guide depends on the position of the guide.
-  theme$legend.direction <- if(is.null(theme$legend.direction)){
+  if(is.null(theme$legend.direction)){theme$legend.direction <- 
     if (length(position) == 1 && position %in% c("top", "bottom", "left", "right"))
       switch(position[1], top =, bottom = "horizontal", left =, right = "vertical")
     else
