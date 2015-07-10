@@ -90,9 +90,15 @@ parsePlot <- function(meta){
     # if pars is not an empty list - occurs when using element_blank()
     if(length(pars) > 0) {
       
-      ## if elements are not specified, they inherit from theme.pars$line
+      ## if elements are not specified, they inherit from 
+      ##    theme.pars$panel.grid then from theme.pars$line
       for(i in 1:length(pars)) {
-        if(is.null(pars[[i]])) pars[[i]] <- theme.pars$line[[i]]
+        if(is.null(pars[[i]])) pars[[i]] <- 
+          if(!is.null(theme.pars$panel.grid[[i]])) {
+            theme.pars$panel.grid[[i]]
+          } else {
+            theme.pars$line[[i]]
+          }
       }
       # convert colour to RGB if necessary
       if(!is.rgb(pars$colour)) pars$colour <- unname(toRGB(pars$colour))
