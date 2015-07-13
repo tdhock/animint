@@ -11,5 +11,5 @@ GSoC application.txt
 *.synctex.gz
 .gitignore
 .RData
-.Rbuildignore
 .directory
+index_cache/
