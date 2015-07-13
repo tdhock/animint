@@ -184,18 +184,20 @@
 "xline": true,
 "xticks": true,
 "y": [
- 0.13638,
-0.36695,
-0.59753,
-0.8281 
+ 0.15094,
+0.3586,
+0.56625,
+0.77391,
+0.98157 
 ],
 "ylab": [
  "0",
 "5",
 "10",
-"15" 
+"15",
+"20" 
 ],
-"yrange": [ -2.9574, 18.728 ],
+"yrange": [ -3.6343, 20.444 ],
 "yline": true,
 "yticks": true 
 },
@@ -215,7 +217,8 @@
  "0",
 "5",
 "10",
-"15" 
+"15",
+"20" 
 ],
 "legend": {},
 "title": "Constant alpha",
@@ -269,10 +272,10 @@
 "xline": true,
 "xticks": true,
 "y": [
- 0.11275,
-0.35601,
-0.59928,
-0.84254 
+ 0.11738,
+0.39337,
+0.66937,
+0.94536 
 ],
 "ylab": [
  "0",
@@ -280,7 +283,7 @@
 "10",
 "15" 
 ],
-"yrange": [ -2.3174, 18.236 ],
+"yrange": [ -2.1265,  15.99 ],
 "yline": true,
 "yticks": true 
 },
@@ -354,10 +357,10 @@
 "xline": true,
 "xticks": true,
 "y": [
- 0.11275,
-0.35601,
-0.59928,
-0.84254 
+ 0.11738,
+0.39337,
+0.66937,
+0.94536 
 ],
 "ylab": [
  "0",
@@ -365,7 +368,7 @@
 "10",
 "15" 
 ],
-"yrange": [ -2.3174, 18.236 ],
+"yrange": [ -2.1265,  15.99 ],
 "yline": true,
 "yticks": true 
 },
@@ -413,32 +416,32 @@
 "title": "maxy",
 "entries": [
  {
- "pathalpha": 0.4656,
+ "pathalpha": 0.4944,
 "pathcolour": "#000000",
 "pathsize":    0.5,
 "pathlinetype":      1,
-"label": [ "16" ] 
+"label": [ "15" ] 
 },
 {
- "pathalpha": 0.3592,
+ "pathalpha": 0.3904,
 "pathcolour": "#000000",
 "pathsize":    0.5,
 "pathlinetype":      1,
 "label": [ "12" ] 
 },
 {
- "pathalpha": 0.2528,
+ "pathalpha": 0.2864,
 "pathcolour": "#000000",
 "pathsize":    0.5,
 "pathlinetype":      1,
-"label": [ "8" ] 
+"label": [ "9" ] 
 },
 {
- "pathalpha": 0.1472,
+ "pathalpha": 0.1824,
 "pathcolour": "#000000",
 "pathsize":    0.5,
 "pathlinetype":      1,
-"label": [ "4" ] 
+"label": [ "6" ] 
 } 
 ] 
 } 
@@ -494,18 +497,16 @@
 "xline": true,
 "xticks": true,
 "y": [
- 0.073022,
-0.36476,
-0.65651,
-0.94825 
+ 0.069246,
+0.38982,
+0.7104 
 ],
 "ylab": [
  "0",
-"4",
-"8",
-"12" 
+"5",
+"10" 
 ],
-"yrange": [ -1.0012,  12.71 ],
+"yrange": [  -1.08, 14.517 ],
 "yline": true,
 "yticks": true 
 },
@@ -523,9 +524,8 @@
 ],
 "ylabs": [
  "0",
-"4",
-"8",
-"12" 
+"5",
+"10" 
 ],
 "legend": {
  "Line Size": {
@@ -611,18 +611,20 @@
 "xline": true,
 "xticks": true,
 "y": [
- 0.13638,
-0.36695,
-0.59753,
-0.8281 
+ 0.15094,
+0.3586,
+0.56625,
+0.77391,
+0.98157 
 ],
 "ylab": [
  "0",
 "5",
 "10",
-"15" 
+"15",
+"20" 
 ],
-"yrange": [ -2.9574, 18.728 ],
+"yrange": [ -3.6343, 20.444 ],
 "yline": true,
 "yticks": true 
 },
@@ -642,7 +644,8 @@
  "0",
 "5",
 "10",
-"15" 
+"15",
+"20" 
 ],
 "legend": {
  "maxy": {
@@ -651,22 +654,28 @@
 "title": "maxy",
 "entries": [
  {
- "pathcolour": "#4997D4",
+ "pathcolour": "#4692CD",
 "pathsize":    0.5,
 "pathlinetype":      1,
-"label": [ "15" ] 
+"label": [ "16" ] 
 },
 {
- "pathcolour": "#326A97",
+ "pathcolour": "#346E9D",
 "pathsize":    0.5,
 "pathlinetype":      1,
-"label": [ "10" ] 
+"label": [ "12" ] 
 },
 {
- "pathcolour": "#1D405F",
+ "pathcolour": "#244C70",
 "pathsize":    0.5,
 "pathlinetype":      1,
-"label": [ "5" ] 
+"label": [ "8" ] 
+},
+{
+ "pathcolour": "#142D46",
+"pathsize":    0.5,
+"pathlinetype":      1,
+"label": [ "4" ] 
 } 
 ] 
 },
@@ -676,39 +685,32 @@
 "title": "miny",
 "entries": [
  {
- "pathalpha": 0.2684,
+ "pathalpha": 0.2676,
 "pathcolour": "#000000",
 "pathsize":    0.5,
 "pathlinetype":      1,
-"label": [ "3" ] 
+"label": [ "4" ] 
 },
 {
- "pathalpha": 0.2344,
+ "pathalpha": 0.2164,
 "pathcolour": "#000000",
 "pathsize":    0.5,
 "pathlinetype":      1,
 "label": [ "2" ] 
 },
 {
- "pathalpha": 0.2008,
-"pathcolour": "#000000",
-"pathsize":    0.5,
-"pathlinetype":      1,
-"label": [ "1" ] 
-},
-{
- "pathalpha": 0.1668,
+ "pathalpha": 0.1652,
 "pathcolour": "#000000",
 "pathsize":    0.5,
 "pathlinetype":      1,
 "label": [ "0" ] 
 },
 {
- "pathalpha": 0.1328,
+ "pathalpha":  0.114,
 "pathcolour": "#000000",
 "pathsize":    0.5,
 "pathlinetype":      1,
-"label": [ "-1" ] 
+"label": [ "-2" ] 
 } 
 ] 
 } 

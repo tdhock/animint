@@ -67,35 +67,33 @@
 ],
 "axis1": {
  "x": [
- 0.079125,
-0.41582,
-0.75253 
+ 0.09893,
+0.36631,
+0.63369,
+0.90107 
 ],
 "xlab": [
  "0",
+"5",
 "10",
-"20" 
+"15" 
 ],
-"xrange": [  -2.35,  27.35 ],
+"xrange": [  -1.85,  16.85 ],
 "xline": true,
 "xticks": true,
 "y": [
  0.045455,
-0.23485,
-0.42424,
-0.61364,
-0.80303,
-0.99242 
+0.29798,
+0.55051,
+0.80303 
 ],
 "ylab": [
  "0.0",
 "2.5",
 "5.0",
-"7.5",
-"10.0",
-"12.5" 
+"7.5" 
 ],
-"yrange": [   -0.6,   12.6 ],
+"yrange": [  -0.45,   9.45 ],
 "yline": true,
 "yticks": true 
 },
@@ -107,16 +105,15 @@
 "yangle":      0,
 "xlabs": [
  "0",
+"5",
 "10",
-"20" 
+"15" 
 ],
 "ylabs": [
  "0.0",
 "2.5",
 "5.0",
-"7.5",
-"10.0",
-"12.5" 
+"7.5" 
 ],
 "legend": {
  "count": {
@@ -125,39 +122,32 @@
 "title": "count",
 "entries": [
  {
- "polygonfill": "#55B1F7",
+ "polygonfill": "#4998D6",
 "polygonsize":    0.5,
 "polygonlinetype":      1,
 "polygonweight":      1,
-"label": [ "12" ] 
+"label": [ "7.5" ] 
 },
 {
- "polygonfill": "#448CC6",
+ "polygonfill": "#3671A2",
 "polygonsize":    0.5,
 "polygonlinetype":      1,
 "polygonweight":      1,
-"label": [ "9" ] 
+"label": [ "5.0" ] 
 },
 {
- "polygonfill": "#326A97",
+ "polygonfill": "#244C70",
 "polygonsize":    0.5,
 "polygonlinetype":      1,
 "polygonweight":      1,
-"label": [ "6" ] 
-},
-{
- "polygonfill": "#22496B",
-"polygonsize":    0.5,
-"polygonlinetype":      1,
-"polygonweight":      1,
-"label": [ "3" ] 
+"label": [ "2.5" ] 
 },
 {
  "polygonfill": "#132B43",
 "polygonsize":    0.5,
 "polygonlinetype":      1,
 "polygonweight":      1,
-"label": [ "0" ] 
+"label": [ "0.0" ] 
 } 
 ] 
 } 
