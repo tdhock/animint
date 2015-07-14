@@ -21,7 +21,7 @@ install:
   - ./travis-tool.sh install_github tdhock/ggplot2  jimhester/covr
 
 script:
-  - Rscript -e "devtools::load_all(); setwd('tests'); source('testthat.R')"
+  - Rscript -e "devtools::install(); source('tests/testthat.R', chdir = TRUE)"
 
 after_success:
   - Rscript -e "library(covr);coveralls()"
@@ -37,4 +37,4 @@ notifications:
 
 env:
   global:
-    secure: "Xj6RfiCqNhJtTMOYlYwQ2OG4iauisc/MEGSM3u6RxRMe377p7lAyObqJLmMPiRGYuj7ho/Rt8lnY4n6xhxfd+vXC1nUvcJX0261xJPk8q/tzmoosV8/VJKuZ1B77w022njieqvBPiGWNwASNwEUyp2arKNyaIQbjKifBXhTRtCA="
+    secure: "KBHQwH4LExvV/rXagTdBa89VKAfC8aYVNUANrklJ6KCoOWQ4Jh3qIWwSDM8ModcR9Oq8JR9I3N/ObatIN/finjgDdCNUndUQcWaT6YNfnbznTQhR0PgthoCmvb0NWJwC2nEYC13XB5hwBMvq65vEkXu4uwthIBDhl5l56RN2+Rc="
