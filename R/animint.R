@@ -94,7 +94,9 @@ parsePlot <- function(meta){
       ##    theme.pars$panel.grid then from theme.pars$line
       for(i in 1:length(pars)) {
         if(is.null(pars[[i]])) pars[[i]] <- 
-          if(!is.null(theme.pars$panel.grid[[i]])) {
+          if("element_blank" %in% class(theme.pars$panel.grid)) {
+            theme.pars$line[[i]]
+          } else if( !is.null(theme.pars$panel.grid[[i]]) ) {
             theme.pars$panel.grid[[i]]
           } else {
             theme.pars$line[[i]]
