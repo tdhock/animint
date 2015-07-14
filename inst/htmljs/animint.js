@@ -168,10 +168,33 @@ var animint = function (to_select, json_file) {
     g_info.tr.append("td").attr("class", "downloaded").text(0);
     g_info.tr.append("td").text(g_info.total);
     g_info.tr.append("td").attr("class", "status").text("initialized");
-    // Save this geom and load it!
+
+    // load chunk tsv
     g_info.data = {};
     g_info.download_status = {};
     Geoms[g_name] = g_info;
+    // Determine whether common chunk tsv exists
+    // If yes, load it
+    if (g_info.hasOwnProperty("columns") && g_info.columns.common){
+      var common_tsv = get_tsv(g_info, "_common");
+      // get the data if it has not yet been downloaded.
+      g_info.tr.select("td.chunk").text(common_tsv);
+      g_info.tr.select("td.status").text("downloading");
+      var svg = SVGs[g_name];
+      var loading = svg.append("text")
+        .attr("class", "loading" + common_tsv)
+        .text("Downloading "+ common_tsv + "...")
+        .attr("font-size", 9)
+        .attr("y", 10)
+        .style("fill", "red");
+      download_chunk(g_info, common_tsv, function(chunk){
+        loading.remove();
+      });
+    } else {
+      var common_tsv = null;
+    }
+
+    // Save this geom and load it!
     update_geom(g_name, null);
   };
   var add_plot = function (p_name, p_info) {
@@ -606,7 +629,7 @@ var animint = function (to_select, json_file) {
       return; // do not download twice.
     }
     g_info.download_status[tsv_name] = "downloading";
-    //prefix tsv file with appropriate path
+    // prefix tsv file with appropriate path
     var tsv_file = dirs.concat(tsv_name).join("/");
     function is_interactive_aes(v_name){
       if(v_name.indexOf("clickSelects") > -1){
