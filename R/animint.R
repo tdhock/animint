@@ -359,13 +359,25 @@ saveLayer <- function(l, d, meta){
   if(g$geom=="abline"){
     ## loop through each set of slopes/intercepts
     for(i in 1:nrow(g.data)) {
+      
       # "Trick" ggplot coord_transform into transforming the slope and intercept
       g.data[i, "x"] <- ranges[[ g.data$PANEL[i] ]]$x.range[1]
       g.data[i, "xend"] <- ranges[[ g.data$PANEL[i] ]]$x.range[2]
       g.data[i, "y"] <- g.data$slope[i] * g.data$x[i] + g.data$intercept[i]
       g.data[i, "yend"] <- g.data$slope[i] * g.data$xend[i] + g.data$intercept[i]
+      
+      # make sure that lines don't run off the graph
+      if(g.data$y[i] < ranges[[ g.data$PANEL[i] ]]$y.range[1] ) {
+        g.data$y[i] <- ranges[[ g.data$PANEL[i] ]]$y.range[1]
+        g.data$x[i] <- (g.data$y[i] - g.data$intercept[i]) / g.data$slope[i]
+      }
+      if(g.data$yend[i] > ranges[[ g.data$PANEL[i] ]]$y.range[2]) {
+        g.data$yend[i] <- ranges[[ g.data$PANEL[i] ]]$y.range[2]
+        g.data$xend[i] <- (g.data$yend[i] - g.data$intercept[i]) / g.data$slope[i]
+      }
     }
     g.data <- as.data.frame(g.data)
+    
     if(g$aes[["group"]]=="1"){
       # ggplot2 defaults to adding a group attribute
       # which misleads for situations where there are
