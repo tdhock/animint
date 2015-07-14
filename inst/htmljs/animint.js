@@ -531,7 +531,7 @@ var animint = function (to_select, json_file) {
     var chunk_id = g_info.chunks;
     g_info.chunk_order.forEach(function (v_name) {
       if(chunk_id == null){
-        return; //no data in a higher up chunk var.
+        return; // no data in a higher up chunk var.
       }
       var value = Selectors[v_name].selected;
       if(chunk_id.hasOwnProperty(value)){
@@ -630,16 +630,10 @@ var animint = function (to_select, json_file) {
               d[v_name] = parseInt(d[v_name]);
             } else if (r_type == "numeric") {
               d[v_name] = parseFloat(d[v_name]);
-            } else if (r_type == "factor") {
-              //keep it as a character.
-            } else if (r_type == "rgb") {
-              //keep it as a character.
-            } else if (r_type == "linetype") {
-              //keep it as a character.
-            } else if (r_type == "label") {
-              //keep it as a character
-            } else if (r_type == "character") {
-              //keep it as a character
+            } else if (r_type == "factor" || r_type == "rgb" 
+              || r_type == "linetype" || r_type == "label" 
+              || r_type == "character") {
+              // keep it as a character
             } else if (r_type == "character" & v_name == "outliers") {
               d[v_name] = parseFloat(d[v_name].split(" @ "));
             } else {
@@ -794,15 +788,12 @@ var animint = function (to_select, json_file) {
       if (d.hasOwnProperty("hjust")) {
         hjust = d["hjust"];
       }
-      if (hjust == 0) {
-        text_anchor = "start";
-      }
-      if (hjust == 0.5) {
-        text_anchor = "middle";
-      }
-      if (hjust == 1) {
-        text_anchor = "end";
-      }
+      var o = {
+        0: "start",
+        0.5: "middle",
+        1: "end"
+      };
+      text_anchor = o[hjust];
       return text_anchor;
     };
 
