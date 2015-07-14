@@ -140,28 +140,24 @@ parsePlot <- function(meta){
   ## out of the box, with no additional d3 coding.
   theme.pars <- ggplot2:::plot_theme(meta$plot)
   
-  ## extract panel backgrounds from theme.pars
+  ## extract panel background and borders from theme.pars
   get_bg <- function(pars) {
-    # if pars is not an empty list
+    # if pars is not an empty list - occurs when using element_blank()
     if(length(pars) > 0) {
+      
+      ## if elements are not specified, they inherit from theme.pars$rect
+      for(i in 1:length(pars)) {
+        if(is.null(pars[[i]])) pars[[i]] <- unname(theme.pars$rect[[i]])
+      }
+      
       # convert fill to RGB if necessary
-      if(!(is.rgb(pars$fill))) { 
-        pars$fill <- toRGB(pars$fill)
-      }
-      # if border color is specified
-      if(!is.null(pars$colour)) {
-        # convert color to RGB if necessary
-        if(!(is.rgb(pars$colour))) { 
-          pars$colour <- toRGB(pars$colour)
-        }
-        # check if the user specified linetype for the border
-        if(is.null(pars$linetype)) {
-          pars$linetype <- "solid"
-        } else if(!is.numeric(pars$linetype)) {
-          pars$linetype <- match.arg(pars$linetype, 
-                                      c("blank", "solid", "dashed", "dotted", "dotdash", "longdash", "twodash"))
-        }
-      }
+      if(!(is.rgb(pars$fill))) pars$fill <- unname(toRGB(pars$fill))
+      # convert color to RGB if necessary
+      if(!(is.rgb(pars$colour))) pars$colour <- unname(toRGB(pars$colour))
+      
+      # remove names (JSON file was getting confused)
+      pars <- lapply(pars, unname)
+      
     }
     pars
   }
@@ -169,40 +165,51 @@ parsePlot <- function(meta){
   plot.meta$panel_background <- get_bg(theme.pars$panel.background)
   plot.meta$panel_border <- get_bg(theme.pars$panel.border)
   
-  ### function to extract grid info from theme.pars
-  get_grid <- function(pars) {
-    # if pars is not an empty list
+  ### function to extract grid info
+  get_grid <- function(pars, major = T) {
+    # if pars is not an empty list - occurs when using element_blank()
     if(length(pars) > 0) {
+      
+      ## if elements are not specified, they inherit from 
+      ##    theme.pars$panel.grid then from theme.pars$line
+      for(i in 1:length(pars)) {
+        if(is.null(pars[[i]])) pars[[i]] <- 
+          if(!is.null(theme.pars$panel.grid[[i]])) {
+            theme.pars$panel.grid[[i]]
+          } else {
+            theme.pars$line[[i]]
+          }
+      }
       # convert colour to RGB if necessary
-      if(!is.rgb(pars$colour)) pars$colour <- toRGB(pars$colour)
-      # if size is null, set it to 1
-      if(is.null(pars$size)) pars$size <- 1
-      # if linetype is null, set it to solid
-      if(is.null(pars$linetype)) pars$linetype <- "solid"
-      # pretty sure I don't care about lineend
+      if(!is.rgb(pars$colour)) pars$colour <- unname(toRGB(pars$colour))
+      
+      # remove names (JSON file was getting confused)
+      pars <- lapply(pars, unname)
+      
+    }
+    
+    ## x and y locations
+    if(major) {
+      pars$loc$x <- as.list(meta$built$panel$ranges[[1]]$x.major)
+      pars$loc$y <- as.list(meta$built$panel$ranges[[1]]$y.major)
+    } else {
+      pars$loc$x <- as.list(meta$built$panel$ranges[[1]]$x.minor)
+      pars$loc$y <- as.list(meta$built$panel$ranges[[1]]$y.minor)
+      ## remove minor lines when major lines are already drawn
+      pars$loc$x <- pars$loc$x[
+        !(pars$loc$x %in% plot.meta$grid_major$loc$x)
+        ]
+      pars$loc$y <- pars$loc$y[
+        !(pars$loc$y %in% plot.meta$grid_major$loc$y)
+        ]
     }
     
     pars
   }
-  # extract major grid lines styles
+  # extract major grid lines
   plot.meta$grid_major <- get_grid(theme.pars$panel.grid.major)
-  # extract minor grid lines styles
-  plot.meta$grid_minor <- get_grid(theme.pars$panel.grid.minor)
-  # extract locations of major grid lines
-  plot.meta$grid_major$loc <- list()
-  plot.meta$grid_major$loc$x <- meta$built$panel$ranges[[1]]$x.major
-  plot.meta$grid_major$loc$y <- meta$built$panel$ranges[[1]]$y.major
-  # extract locations of minor grid lines
-  plot.meta$grid_minor$loc <- list()
-  plot.meta$grid_minor$loc$x <- meta$built$panel$ranges[[1]]$x.minor
-  plot.meta$grid_minor$loc$y <- meta$built$panel$ranges[[1]]$y.minor
-  # remove minor lines when major lines are already drawn
-  plot.meta$grid_minor$loc$x <- plot.meta$grid_minor$loc$x[
-    !(plot.meta$grid_minor$loc$x %in% plot.meta$grid_major$loc$x)
-    ]
-  plot.meta$grid_minor$loc$y <- plot.meta$grid_minor$loc$y[
-    !(plot.meta$grid_minor$loc$y %in% plot.meta$grid_major$loc$y)
-    ]
+  # extract minor grid lines
+  plot.meta$grid_minor <- get_grid(theme.pars$panel.grid.minor, major = F)
   
   ## Flip labels if coords are flipped - transform does not take care
   ## of this. Do this BEFORE checking if it is blank or not, so that
@@ -1171,15 +1178,16 @@ getLegendList <- function(plistextra){
   theme <- ggplot2:::plot_theme(plot)
   position <- theme$legend.position
   # by default, guide boxes are vertically aligned
-  theme$legend.box <- if(is.null(theme$legend.box)) "vertical" else theme$legend.box
+  if(is.null(theme$legend.box)) theme$legend.box <- "vertical" else theme$legend.box
 
   # size of key (also used for bar in colorbar guide)
-  theme$legend.key.width <- if(is.null(theme$legend.key.width)) theme$legend.key.size
-  theme$legend.key.height <- if(is.null(theme$legend.key.height)) theme$legend.key.size
+  if(is.null(theme$legend.key.width)) theme$legend.key.width <- theme$legend.key.size
+  if(is.null(theme$legend.key.height)) theme$legend.key.height <- theme$legend.key.size
   # by default, direction of each guide depends on the position of the guide.
-  theme$legend.direction <- if(is.null(theme$legend.direction)){
-    if (length(position) == 1 && position %in% c("top", "bottom", "left", "right"))
-      switch(position[1], top =, bottom = "horizontal", left =, right = "vertical")
+  if(is.null(theme$legend.direction)){
+    theme$legend.direction <- 
+      if (length(position) == 1 && position %in% c("top", "bottom", "left", "right"))
+        switch(position[1], top =, bottom = "horizontal", left =, right = "vertical")
     else
       "vertical"
   }
