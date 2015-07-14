@@ -199,6 +199,10 @@ https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol_type
 
 RENDER: Determine why border of tiles in pirates example does not seem to be rendering.
 
+2015.07.13
+
+Fix bug where plots without minor y grid lines were not rendering.  Update grid lines so that they inherit characteristics from default lines.
+
 2015.07.03
 
 Fix bug with geom_abline().  Automatically rebuild gh-pages tutorial when pushing to master.
