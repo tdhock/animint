@@ -56,8 +56,9 @@ parsePlot <- function(meta){
       legend_type <- plot.meta$legend[[legend.i]]$legend_type
       # the name of the variable used in this legend
       var_name <- plot.meta$legend[[legend.i]]$vars
-      # the actual values for that variable
-      var <- L$data[[var_name]]
+      # var_name can have length greater than one if an expression is used
+      var_name <- intersect(var_name, names(L$data))
+      var <- L$data[, var_name]
       ## checking if it is a discrete variable.
       if(plyr::is.discrete(var)) {
         is.interactive.aes <-

@@ -1,5 +1,17 @@
 context("Interactive Legends")
 
+## function to extract all circles from an HTML page
+get_circles <- function(id) {
+  getNodeSet(getHTML(), paste0("//svg[@id='", id, "']//circle"))
+}
+
+p <- qplot(data=mtcars, mpg, hp, color = factor(vs))
+
+test_that("A plot with no show/click aes and a legend should be clickable", {
+  expect_true(FALSE)
+})
+
+
 iris$id <- 1:nrow(iris)
 p1 <- ggplot() + 
   geom_point(aes(Sepal.Length, Sepal.Width, colour = Species, 
@@ -20,11 +32,6 @@ test_that("compiler adds selector.types and first", {
   expect_match(info$selector.types, "multiple")
   expect_true(all(info$first$Species %in% c("setosa", "virginica", "versicolor")))
 })
-
-## function to extract all circles from an HTML page
-get_circles <- function(id) {
-  getNodeSet(getHTML(), paste0("//svg[@id='", id, "']//circle"))
-}
 
 test_that("all points are initially drawn", {
   expect_equal(length(get_circles("sepal")), 150)
