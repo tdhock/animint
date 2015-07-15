@@ -20,7 +20,16 @@ p3 <- p2 +
   theme(panel.background = element_blank(), 
         panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank())
-p4 <- p2 + ggthemes::theme_fivethirtyeight()
+p4 <- p2 + 
+  ## recreating theme_fivethirtyeight from ggthemes package
+  theme(rect = element_rect(fill = "#F0F0F0", colour = NA, size = 0.5, linetype = 0), 
+        line = element_line(colour = "#D2D2D2", size = 0.5, linetype = 1, lineend = "butt"), 
+        text = element_text(family = "sans", face = "plain", colour = "#3C3C3C", 
+                            size = 12, hjust = 0.5, vjust = 0.5, angle = 0, lineheight = 0.9), 
+        panel.background = element_rect(), 
+        panel.grid = element_line(), 
+        panel.grid.major = element_line(), 
+        panel.grid.minor = element_blank(), complete = T)
 
 info <- animint2HTML(list(sepal = p1, petal = p2, blank = p3, gg538 = p4))
 

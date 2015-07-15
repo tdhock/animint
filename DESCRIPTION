@@ -28,5 +28,4 @@ Suggests:
     RSelenium,
     XML,
     devtools,
-    maps,
-    ggthemes
+    maps
