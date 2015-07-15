@@ -3,6 +3,7 @@ context("Panel background")
 p1 <- ggplot() +
   geom_point(aes(Sepal.Length, Sepal.Width,
                  colour = Species, size = Species), data = iris) +
+  theme_grey() + 
   theme(panel.background = element_rect(fill = "lightblue"),
         panel.border = element_rect(fill = NA,
                                     color = "black",
