@@ -189,13 +189,15 @@ var animint = function (to_select, json_file) {
         .style("fill", "red");
       download_chunk(g_info, common_tsv, function(chunk){
         loading.remove();
+        g_info.common_tsv = common_tsv;
+        // Save this geom and load it!
+        update_geom(g_name, null);
       });
     } else {
-      var common_tsv = null;
+      g_info.common_tsv = null;
+      // Save this geom and load it!
+      update_geom(g_name, null);
     }
-
-    // Save this geom and load it!
-    update_geom(g_name, null);
   };
   var add_plot = function (p_name, p_info) {
     // Each plot may have one or more legends. To make space for the
@@ -546,6 +548,47 @@ var animint = function (to_select, json_file) {
   var get_tsv = function(g_info, chunk_id){
     return g_info.classed + "_chunk" + chunk_id + ".tsv";
   };
+
+  /**
+   * clone json object without reference
+   * @param  {json object} object json object
+   * @return {json object}        a copy of input json object
+  */
+  var clone = function(object) {
+    var o = {};
+    for(var i in object){
+      o[i] = object[i];
+    }
+    return o;
+  };
+
+  /**
+   * copy common chunk tsv to varied chunk tsv
+   * @param  {json object} common_chunk   json object from common chunk tsv
+   * @param  {json object} varied_chunk   json object from varied chunk tsv
+   * @param  {string array} columns_common array of common column names
+   * @return {json object}                json object after merging common chunk tsv into varied chunk tsv
+  */
+  var copy_chunk = function(common_chunk, varied_chunk, columns_common) {
+    var new_varied_chunk = {};
+    var groups = d3.keys(common_chunk);
+    groups.forEach(function(g) {
+    common_obj = common_chunk[g];
+    varied_obj = varied_chunk[g];
+
+    var new_common_obj = [];
+    common_obj.forEach(function(part) { 
+      var new_part = clone(varied_obj[0]);
+      columns_common.forEach(function(col) {
+        new_part[col] = part[col];
+      });
+      new_common_obj.push(new_part);
+    });
+    new_varied_chunk[g] = new_common_obj;
+  });
+    return new_varied_chunk;
+  };
+
   // update_geom is called from add_geom and update_selector. It
   // downloads data if necessary, and then calls draw_geom.
   var update_geom = function (g_name, selector_name) {
@@ -583,6 +626,12 @@ var animint = function (to_select, json_file) {
         .attr("y", 10)
         .style("fill", "red");
       download_chunk(g_info, tsv_name, function(chunk){
+        // copy data from common tsv to varied tsv
+        if (g_info.common_tsv) {
+          var common_chunk = g_info.data[g_info.common_tsv];
+          chunk = copy_chunk(common_chunk, chunk, g_info.columns.common);
+          g_info.data[tsv_name] = chunk;
+        }
       	loading.remove();
 	      draw_panels(g_info, chunk, selector_name);
       });
