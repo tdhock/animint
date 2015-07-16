@@ -29,7 +29,8 @@ p4 <- p2 +
         panel.background = element_rect(), 
         panel.grid = element_line(), 
         panel.grid.major = element_line(), 
-        panel.grid.minor = element_blank(), complete = T)
+        panel.grid.minor = element_blank(), 
+        )
 
 info <- animint2HTML(list(sepal = p1, petal = p2, blank = p3, gg538 = p4))
 
