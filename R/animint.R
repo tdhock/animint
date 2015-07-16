@@ -6,11 +6,26 @@
 parsePlot <- function(meta){
   ## adding data and mapping to each layer from base plot, if necessary
   for(layer.i in seq_along(meta$plot$layers)) {
+    
     ## if data is not specified, get it from plot
     if(length(meta$plot$layers[[layer.i]]$data) == 0) meta$plot$layers[[layer.i]]$data <- meta$plot$data
+    
     ## if mapping is not specified, get it from plot
     if(is.null(meta$plot$layers[[layer.i]]$mapping)) meta$plot$layers[[layer.i]]$mapping <- meta$plot$mapping
+    
+    ## loop through each mapping
+    for(mapping_i in seq_along(meta$plot$layers[[layer.i]]$mapping)) {
+      mapping <- meta$plot$layers[[layer.i]]$mapping[mapping_i]
+      ## if there are any expressions in mapping, evaluate them and add to data
+      if(is.call(mapping[[1]])) {
+        meta$plot$layers[[layer.i]]$data[[
+          paste("show", names(mapping), sep = "_")
+          ]] <- eval(mapping[[1]], meta$plot$layers[[layer.i]]$data)
+      }
+    }
+    
   }
+  
   
   meta$built <- ggplot2::ggplot_build(meta$plot)
   plot.meta <- list()
@@ -1247,16 +1262,25 @@ getLegendList <- function(plistextra){
     gdefs[[leg]]$legend_type <- legend_type
     # grabbing the name of the variable
     vars <- character()
-    for(i in seq_along(plot$layers)) {
-      temp <- sapply(legend_type, function(z) { 
-        if(!is.null(plot$layers[[i]]$mapping[[z]])) {
-          as.character( plot$layers[[i]]$mapping[[z]] )
+    for(layer_i in plot$layers) {
+      temp <- sapply(legend_type, function(type) { 
+        if( !is.null(layer_i$mapping[[type]]) ) {
+          ## if the legend is evaluated, ex. colour = factor(var), use show_colour
+          if( is.call(layer_i$mapping[[type]]) ) {
+            paste("show", type, sep = "_")
+          } 
+          ## otherwise, just use the variable name
+          else {
+#             browser()
+            as.character( layer_i$mapping[[type]] )
+          }
         }
       })
       if(!is.null(unlist(temp))) {
         vars <- c(vars, temp)
       }
     }
+#     browser()
     if(length(vars) > 0) {
       gdefs[[leg]]$vars <- unique( setNames(vars, NULL))
     }
