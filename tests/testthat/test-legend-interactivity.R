@@ -5,13 +5,6 @@ get_circles <- function(id) {
   getNodeSet(getHTML(), paste0("//svg[@id='", id, "']//circle"))
 }
 
-p <- qplot(data=mtcars, mpg, hp, color = factor(vs))
-
-test_that("A plot with no show/click aes and a legend should be clickable", {
-  expect_true(FALSE)
-})
-
-
 iris$id <- 1:nrow(iris)
 p1 <- ggplot() + 
   geom_point(aes(Sepal.Length, Sepal.Width, colour = Species, 
@@ -60,4 +53,27 @@ test_that("clicking Sepal point doesn't affect sepal plot", {
   clickID("51")
   expect_equal(length(get_circles("petal")), 100)
   expect_equal(length(get_circles("sepal")), 150)
+})
+
+mtcars$am <- factor(mtcars$am)
+p <- qplot(data=mtcars, mpg, hp, color = am)
+info <- animint2HTML(list(p = p))
+
+test_that("A plot with no show/click aes and a legend should be clickable", {
+  expect_equal(length(get_circles("p")), 32)
+  clickID("0")
+  expect_equal(length(get_circles("p")), 13)
+  clickID("0")
+  expect_equal(length(get_circles("p")), 32)
+})
+
+p_factor <- qplot(data=mtcars, mpg, hp, color = factor(vs))
+info <- animint2HTML(list(p = p_factor))
+
+test_that("A plot with an expression should be clickable", {
+  expect_equal(length(get_circles("p")), 32)
+  clickID("0")
+  expect_equal(length(get_circles("p")), 14)
+  clickID("0")
+  expect_equal(length(get_circles("p")), 32)  
 })
