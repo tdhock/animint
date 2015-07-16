@@ -18,7 +18,8 @@ p2 <- ggplot() +
 p3 <- p2 + 
   theme(panel.background = element_blank(), 
         panel.grid.major = element_blank(), 
-        panel.grid.minor = element_blank())
+        panel.grid.minor = element_blank(), 
+        panel.grid = element_blank())
 p4 <- p2 + ggthemes::theme_fivethirtyeight()
 
 info <- animint2HTML(list(sepal = p1, petal = p2, blank = p3, gg538 = p4))
