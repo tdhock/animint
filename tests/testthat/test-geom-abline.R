@@ -1,16 +1,21 @@
 context("geom_abline")
 
 p <- qplot(wt, mpg, data = mtcars) + 
-  geom_abline(intercept = 20) + facet_wrap(~cyl)
+  geom_abline(intercept = c(20, 5), slope = c(1,4)) + 
+  facet_wrap(~cyl)
 info <- animint2HTML(list(p = p))
 ablines <- getNodeSet(info$html, '//svg//g[@class="geom2_abline_p"]//line')
 attr_ablines <- sapply(ablines, xmlAttrs)
+start_ends <- attr_ablines[3:6, ]
 
-test_that("All three ablines render", {
-  expect_equal(length(ablines), 3)
+test_that("All six ablines render", {
+  expect_equal(length(ablines), 6)
 })
 
 test_that("Start and end of ablines are not NA", {
-  start_ends <- attr_ablines[3:6, ]
-  expect_true(!any(start_ends == "NaN"))
+  expect_true(all(start_ends != "NaN"))
+})
+
+test_that("lines do not exceed ranges of plot", {
+  expect_true(all(as.numeric(start_ends[4, ]) >= 0))
 })
