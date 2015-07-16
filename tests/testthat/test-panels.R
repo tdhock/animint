@@ -29,8 +29,8 @@ p4 <- p2 +
         panel.background = element_rect(), 
         panel.grid = element_line(), 
         panel.grid.major = element_line(), 
-        panel.grid.minor = element_blank()
-        )
+        panel.grid.minor = element_blank(), 
+        complete = T)
 
 info <- animint2HTML(list(sepal = p1, petal = p2, blank = p3, gg538 = p4))
 
@@ -119,6 +119,7 @@ test_that("panel backgrounds render correctly", {
   match_gg538 <- str_match_perl(attr_gg538["style",], fillPattern)
   value_gg538 <- match_gg538[, "value"]
   test_color(value_gg538[1], "#F0F0F0")
+  browser()
 })
 
 test_that("panel borders render correctly", {
