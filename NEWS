@@ -199,6 +199,10 @@ https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol_type
 
 RENDER: Determine why border of tiles in pirates example does not seem to be rendering.
 
+2015.07.17
+
+RENDER: Legends are now interactive and can be used to clickSelect.  This means that aes(colour = variable) implies aes(showSelectedcolour = variable) for discrete variables.
+
 2015.07.16
 
 BUGFIX: geom_abline() stays on panel and theme(panel.grid = element_blank()) works.
