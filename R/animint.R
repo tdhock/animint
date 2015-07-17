@@ -1273,7 +1273,6 @@ getLegendList <- function(plistextra){
           } 
           ## otherwise, just use the variable name
           else {
-#             browser()
             as.character( layer_i$mapping[[type]] )
           }
         }
@@ -1282,7 +1281,6 @@ getLegendList <- function(plistextra){
         vars <- c(vars, temp)
       }
     }
-#     browser()
     if(length(vars) > 0) {
       gdefs[[leg]]$vars <- unique( setNames(vars, NULL))
     }

@@ -119,7 +119,6 @@ test_that("panel backgrounds render correctly", {
   match_gg538 <- str_match_perl(attr_gg538["style",], fillPattern)
   value_gg538 <- match_gg538[, "value"]
   test_color(value_gg538[1], "#F0F0F0")
-  browser()
 })
 
 test_that("panel borders render correctly", {
