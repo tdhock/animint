@@ -1647,7 +1647,7 @@ var animint = function (to_select, json_file) {
       .attr("title", function() {
         return "Toggle " + this.id;
       })
-    ;
+      .attr("style", "cursor:pointer");
   }
 
   // Download the main description of the interactive plot.
