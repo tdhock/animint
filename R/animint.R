@@ -13,9 +13,11 @@ parsePlot <- function(meta){
     ## if mapping is not specified, get it from plot
     if(is.null(meta$plot$layers[[layer.i]]$mapping)) meta$plot$layers[[layer.i]]$mapping <- meta$plot$mapping
     
-    ## loop through each mapping
-    for(mapping_i in seq_along(meta$plot$layers[[layer.i]]$mapping)) {
-      mapping <- meta$plot$layers[[layer.i]]$mapping[mapping_i]
+    ## loop through each mapping except for x and y
+    mappings <- meta$plot$layers[[layer.i]]$mapping
+    mappings <- mappings[!(names(mappings) %in% c("x", "y"))]
+    for(i in seq_along(mappings)) {
+      mapping <- mappings[i]
       ## if there are any expressions in mapping, evaluate them and add to data
       if(is.call(mapping[[1]])) {
         meta$plot$layers[[layer.i]]$data[[
