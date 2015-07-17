@@ -1468,21 +1468,41 @@ var animint = function (to_select, json_file) {
   }
   var update_selector = function (v_name, value) {
     var s_info = Selectors[v_name];
+    var legend_value_opacity, legend_other_opacity;
     value = value + "";
     if(s_info.type == "single"){
       // value is the new selection.
       s_info.selected = value;
+      legend_other_opacity = 0.5;
+      legend_value_opacity = 1;
     }else{
       // value should be added or removed from the selection.
       var i_value = s_info.selected.indexOf(value);
       if(i_value == -1){
 	// not found, add to selection.
 	s_info.selected.push(value);
+	legend_value_opacity = 1;
       }else{
 	// found, remove from selection.
 	s_info.selected.splice(i_value, 1);
+	legend_value_opacity = 0.5;
       }
+      legend_other_opacity = null;
     }
+    var legend_entries = 
+      d3.selectAll("tr#legend th."+v_name+" td.legend_entry_label");
+    legend_entries.style("opacity", function(d){
+      if(this.textContent == value){
+	return legend_value_opacity;
+      }else{
+	if(legend_other_opacity == null){
+	  return this.style.opacity;
+	}else{
+	  return legend_other_opacity;
+	}
+      }
+    })
+    ;
     s_info.update.forEach(function(g_name){
       update_geom(g_name, v_name);
     });
@@ -1529,9 +1549,11 @@ var animint = function (to_select, json_file) {
     var legendkeys = d3.keys(p_info.legend);
     for(var i=0; i<legendkeys.length; i++){
       // the table that contains one row for each legend element.
-      var legend_table = tdRight.append("table").append("tr")
+      var legend_table = tdRight.append("table")
+        .append("tr").attr("id", "legend")
         .append("th").attr("align", "left")
-        .text(p_info.legend[legendkeys[i]].title);
+        .text(p_info.legend[legendkeys[i]].title)
+        .attr("class", p_info.legend[legendkeys[i]].vars);
       var l_info = p_info.legend[legendkeys[i]];
       // the legend table with breaks/value/label.
       var legendgeoms = l_info.geoms;
@@ -1540,6 +1562,7 @@ var animint = function (to_select, json_file) {
 	.sort(function(d) {return d["order"];})
 	.enter()
 	.append("tr")
+        .attr("id", function(d) { return d["label"]; })
       ;
       var legend_svgs = legend_rows.append("td")
         .append("svg")
@@ -1607,11 +1630,24 @@ var animint = function (to_select, json_file) {
           .style("opacity", function(d){return d["pointalpha"]||1;});
       }
       legend_rows.append("td")
-	.attr("align", "left")
+	.attr("align", "left") // TODO: right for numbers?
 	.attr("class", "legend_entry_label")
+	.attr("id", function(d){ return d["label"]; })
 	.text(function(d){ return d["label"];})
       ;
     }
+    
+    // selecting points based on legend
+    d3.select("#plot").selectAll("#legend").selectAll("tr")
+      .on("click", function() { 
+        var row_id = d3.select(this).attr("id");
+        var s_name = this.parentElement.className;
+        update_selector(s_name, row_id);
+      })
+      .attr("title", function() {
+        return "Toggle " + this.id;
+      })
+      .attr("style", "cursor:pointer");
   }
 
   // Download the main description of the interactive plot.

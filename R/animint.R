@@ -4,6 +4,31 @@
 #' @export
 #' @import ggplot2
 parsePlot <- function(meta){
+  ## adding data and mapping to each layer from base plot, if necessary
+  for(layer.i in seq_along(meta$plot$layers)) {
+    
+    ## if data is not specified, get it from plot
+    if(length(meta$plot$layers[[layer.i]]$data) == 0) meta$plot$layers[[layer.i]]$data <- meta$plot$data
+    
+    ## if mapping is not specified, get it from plot
+    if(is.null(meta$plot$layers[[layer.i]]$mapping)) meta$plot$layers[[layer.i]]$mapping <- meta$plot$mapping
+    
+    ## loop through each mapping except for x and y
+    mappings <- meta$plot$layers[[layer.i]]$mapping
+    mappings <- mappings[!(names(mappings) %in% c("x", "y"))]
+    for(i in seq_along(mappings)) {
+      mapping <- mappings[i]
+      ## if there are any expressions in mapping, evaluate them and add to data
+      if(is.call(mapping[[1]])) {
+        meta$plot$layers[[layer.i]]$data[[
+          paste("show", names(mapping), sep = "_")
+          ]] <- eval(mapping[[1]], meta$plot$layers[[layer.i]]$data)
+      }
+    }
+    
+  }
+  
+  
   meta$built <- ggplot2::ggplot_build(meta$plot)
   plot.meta <- list()
   scaleFuns <-
@@ -22,11 +47,84 @@ parsePlot <- function(meta){
       plot.meta$scales[[sc$aesthetics]] <- makeScale(sc)
     }
   }
+  
+  ## Export axis specification as a combination of breaks and
+  ## labels, on the relevant axis scale (i.e. so that it can
+  ## be passed into d3 on the x axis scale instead of on the
+  ## grid 0-1 scale). This allows transformations to be used
+  ## out of the box, with no additional d3 coding.
+  theme.pars <- ggplot2:::plot_theme(meta$plot)
+  
+  ## No legend if theme(legend.postion="none").
+  plot.meta$legend <- if(theme.pars$legend.position != "none"){
+    getLegendList(meta$built)
+  }
+  
+  ## save each layer
   for(layer.i in seq_along(meta$plot$layers)){
     ##cat(sprintf("%4d / %4d layers\n", layer.i, length(meta$plot$layers)))
 
     ## This is the layer from the original ggplot object.
     L <- meta$plot$layers[[layer.i]]
+    
+    ## If any legends are specified, add showSelected aesthetic
+    for(legend.i in seq_along(plot.meta$legend)) {
+      # the type of legend: colour, fill, etc
+      legend_type <- plot.meta$legend[[legend.i]]$legend_type
+      # the name of the variable used in this legend
+      var_name <- plot.meta$legend[[legend.i]]$vars
+      # var_name can have length greater than one if an expression is used
+      var_name <- intersect(var_name, names(L$data))
+      var <- L$data[, var_name]
+      ## checking if it is a discrete variable.
+      if(plyr::is.discrete(var)) {
+        is.interactive.aes <-
+          grepl("showSelected|clickSelects", names(L$mapping))
+        is.legend.var <- L$mapping == var_name
+        ## If var_name is used with another interactive aes, then do
+        ## not add any showSelected aesthetic for it.
+        var.is.interactive <- any(is.interactive.aes & is.legend.var)
+        if(!var.is.interactive){
+          for(i in legend_type) {
+            ## only adding showSelected aesthetic if the variable is used by the geom
+            if(!is.null(L$mapping[[i]])) {
+              temp_name <- paste0("showSelectedlegend", i)
+              L$mapping[[temp_name]] <- as.symbol(var_name)
+            }
+          }
+        }
+        # if selector.types has not been specified, create it
+        if(is.null(meta$selector.types)) {
+          meta$selector.types <- list()
+        }
+        # if selector.types is not specified for this variable, set it to multiple
+        if(is.null(meta$selector.types[[var_name]])) {
+          meta$selector.types[[var_name]] <- "multiple"
+        }
+        # if first is not specified, add all to first
+        if(is.null(meta$first[[var_name]])) {
+          u.vals <- unique(var)
+          s.type <- if(var_name %in% names(meta$selectors)){
+            ## Selector has already been created.
+            meta$selectors[[var_name]]$type
+          }else{
+            meta$selector.types[[var_name]]
+          }
+          meta$first[[var_name]] <- if(s.type == "multiple"){
+            u.vals
+          }else{
+            u.vals[[1]]
+          }
+        }
+      }
+    }
+    ## need to call ggplot_build again because we've added to the plot
+    # I'm sure that there is a way around this, but not immediately sure how. 
+    # There's sort of a Catch-22 here because to create the interactivity, 
+    # we need to specify the variable corresponding to each legend. 
+    # To do this, we need to have the legend. 
+    # And to have the legend, I think that we need to use ggplot_build
+    meta$built <- ggplot2::ggplot_build(meta$plot)
 
     ## for each layer, there is a correpsonding data.frame which
     ## evaluates the aesthetic mapping.
@@ -208,13 +306,7 @@ parsePlot <- function(meta){
   # grab the unique axis labels (makes rendering simpler)
   axis.info <- plot.meta[grepl("^axis[0-9]+$", names(plot.meta))]
   plot.meta$xlabs <- as.list(unique(unlist(lapply(axis.info, "[", "xlab"))))
-  plot.meta$ylabs <- as.list(unique(unlist(lapply(axis.info, "[", "ylab"))))
-
-  
-  ## No legend if theme(legend.postion="none").
-  plot.meta$legend <- if(theme.pars$legend.position != "none"){
-    getLegendList(meta$built)
-  }
+  plot.meta$ylabs <- as.list(unique(unlist(lapply(axis.info, "[", "ylab"))))  
 
   if("element_blank"%in%attr(theme.pars$plot.title, "class")){
     plot.meta$title <- ""
@@ -323,8 +415,11 @@ saveLayer <- function(l, d, meta){
     col.name <- names(update.vars)[[sel.i]]
     if(!v.name %in% names(meta$selectors)){
       value <- g.data[[col.name]][1]
-      selector.type <- meta$selector.types[[v.name]]
-      if(is.null(selector.type))selector.type <- "single"
+      if(v.name %in% names(meta$selector.types)) {
+        selector.type <- meta$selector.types[[v.name]]
+      } else {
+        selector.type <- "single"
+      }
       stopifnot(is.character(selector.type))
       stopifnot(length(selector.type)==1)
       stopifnot(selector.type %in% c("single", "multiple"))
@@ -950,7 +1045,10 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
       meta$plot.name <- list.name
       parsePlot(meta) # calls ggplot_build.
     }else if(is.list(p)){ ## for options.
-      meta[[list.name]] <- p
+      ## combine the current option with p
+      # necessary because legends create their own list of selectors and first
+      # have to be careful not to overwrite these
+      meta[[list.name]] <- c(meta[[list.name]], p)
     }else{
       stop("list items must be ggplots or option lists, problem: ", list.name)
     }
@@ -1025,7 +1123,8 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
   ## The first selection:
   for(selector.name in names(meta$first)){
     first <- as.character(meta$first[[selector.name]])
-    if(meta$selectors[[selector.name]]$type == "single"){
+    s.type <- meta$selectors[[selector.name]]$type
+    if(!is.null(s.type) && s.type == "single"){
       stopifnot(length(first) == 1)
     }
     meta$selectors[[selector.name]]$selected <- first
@@ -1157,6 +1256,36 @@ getLegendList <- function(plistextra){
     gdefs <- ggplot2:::guides_geom(gdefs, layers, default_mapping)
   } else (ggplot2:::zeroGrob())
   names(gdefs) <- sapply(gdefs, function(i) i$title)
+  
+  ## adding the variable used to each LegendList
+  for(leg in seq_along(gdefs)) {
+    legend_type <- names(gdefs[[leg]]$key)
+    legend_type <- legend_type[legend_type != ".label"]
+    gdefs[[leg]]$legend_type <- legend_type
+    # grabbing the name of the variable
+    vars <- character()
+    for(layer_i in plot$layers) {
+      temp <- sapply(legend_type, function(type) { 
+        if( !is.null(layer_i$mapping[[type]]) ) {
+          ## if the legend is evaluated, ex. colour = factor(var), use show_colour
+          if( is.call(layer_i$mapping[[type]]) ) {
+            paste("show", type, sep = "_")
+          } 
+          ## otherwise, just use the variable name
+          else {
+            as.character( layer_i$mapping[[type]] )
+          }
+        }
+      })
+      if(!is.null(unlist(temp))) {
+        vars <- c(vars, temp)
+      }
+    }
+    if(length(vars) > 0) {
+      gdefs[[leg]]$vars <- unique( setNames(vars, NULL))
+    }
+  }
+  
   ## Add a flag to specify whether or not breaks was manually
   ## specified. If it was, then it should be respected. If not, and
   ## the legend shows a numeric variable, then it should be reversed.
@@ -1179,7 +1308,7 @@ getLegendList <- function(plistextra){
 getLegend <- function(mb){
   guidetype <- mb$name
   ## The main idea of legends:
-
+  
   ## 1. Here in getLegend I export the legend entries as a list of
   ## rows that can be used in a data() bind in D3.
 
@@ -1225,6 +1354,8 @@ getLegend <- function(mb){
     list(guide = guidetype,
          geoms = geoms,
          title = mb$title,
+         vars = mb$vars, 
+         legend_type = mb$legend_type, 
          entries = data)
   }
 }
