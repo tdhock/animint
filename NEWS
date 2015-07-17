@@ -108,11 +108,6 @@ like we can do in shiny+ggvis.
 RENDER/DSL: Multiple selection via rectangular brush and/or lasso
 https://github.com/skokenes/D3-Lasso-Plugin
 
-RENDER: Legends can be interactive: clicking a legend entry
-shows/hides that subset of data. For example, when we say
-aes(color=variable), this should imply aes(showSelectedColor=variable)
-on that geom, and selection=list(variable="multiple") on that plot.
-
 RENDER: Easy legend decoding: draw an arrow next to the legend entry
 for the value of the element that the mouse is hovering over, e.g.
 http://www.highcharts.com/maps/demo/map-drilldown/dark-unica
@@ -198,6 +193,10 @@ DSL: Implement shape aesthetic with d3.svg.symbol()
 https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol_type
 
 RENDER: Determine why border of tiles in pirates example does not seem to be rendering.
+
+2015.07.17
+
+RENDER: Legends are now interactive and can be used to clickSelect.  This means that aes(colour = variable) implies aes(showSelectedcolour = variable) for discrete variables.
 
 2015.07.16
 

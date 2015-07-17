@@ -3,6 +3,7 @@ context("Panel background")
 p1 <- ggplot() +
   geom_point(aes(Sepal.Length, Sepal.Width,
                  colour = Species, size = Species), data = iris) +
+  theme_grey() + 
   theme(panel.background = element_rect(fill = "lightblue"),
         panel.border = element_rect(fill = NA,
                                     color = "black",
@@ -18,9 +19,18 @@ p2 <- ggplot() +
 p3 <- p2 + 
   theme(panel.background = element_blank(), 
         panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank())
+p4 <- p2 + 
+  ## recreating theme_fivethirtyeight from ggthemes package
+  theme(rect = element_rect(fill = "#F0F0F0", colour = NA, size = 0.5, linetype = 0), 
+        line = element_line(colour = "#D2D2D2", size = 0.5, linetype = 1, lineend = "butt"), 
+        text = element_text(family = "sans", face = "plain", colour = "#3C3C3C", 
+                            size = 12, hjust = 0.5, vjust = 0.5, angle = 0, lineheight = 0.9), 
+        panel.background = element_rect(), 
+        panel.grid = element_line(), 
+        panel.grid.major = element_line(), 
         panel.grid.minor = element_blank(), 
-        panel.grid = element_blank())
-p4 <- p2 + ggthemes::theme_fivethirtyeight()
+        complete = T)
 
 info <- animint2HTML(list(sepal = p1, petal = p2, blank = p3, gg538 = p4))
 
@@ -150,25 +160,32 @@ test_that("grid lines are drawn correctly", {
   test_color(value_gg538[1], "#D2D2D2")
 })
 
+data(tips, package = "reshape2")
+tips$sex_smoker <- with(tips, interaction(sex, smoker))
+ss.viz <- list(
+  p1 = ggplot() + theme(legend.position = "none") +
+    geom_point(data = tips, position = "jitter", 
+               aes(x = sex, y = smoker, colour = sex_smoker,
+                   clickSelects = sex_smoker)), 
+  p2 = ggplot() +
+    geom_point(data = tips,
+               aes(x = total_bill, y = tip, colour = sex_smoker,
+                   showSelected = sex_smoker))
+  )
+
 test_that("renderer can handle no grid lines", {
-  # plot
-  data(tips, package = "reshape2")
-  tips$sex_smoker <- with(tips, interaction(sex, smoker))
-  info <- animint2HTML(list(
-    p1 = ggplot() + theme(legend.position = "none") +
-      geom_point(data = tips, position = "jitter", 
-                 aes(x = sex, y = smoker, colour = sex_smoker,
-                     clickSelects = sex_smoker)), 
-    p2 = ggplot() +
-      geom_point(data = tips,
-                 aes(x = total_bill, y = tip, colour = sex_smoker,
-                     showSelected = sex_smoker))
-    ))
+  info <- animint2HTML(ss.viz)
   # extract grids
   grid_major_p1 <- getNodeSet(info$html, '//svg[@id="p1"]//g[@class="grid_major"]//line')
   grid_minor_p1 <- getNodeSet(info$html, '//svg[@id="p1"]//g[@class="grid_minor"]//line')
   expect_equal(length(grid_major_p1), 4)
   expect_equal(length(grid_minor_p1), 0)
+})
+
+test_that("multiple selection sex_smoker plot", {
+  ss.viz$selector.types$sex_smoker <- "multiple"
+  info <- animint2HTML(ss.viz)
+  expect_equal(length(info$first$sex_smoker), 4)
 })
 
 test_that("renderer can handle only one grid line", {
