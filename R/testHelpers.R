@@ -101,12 +101,16 @@ tests_run <- function(dir = ".", filter = NULL) {
 tests_exit <- function() {
   res <- stop_binary()
   Sys.unsetenv("ANIMINT_BROWSER")
-  e <- try(readLines(pid_file(), warn = FALSE), silent = TRUE)
-  if (!inherits(e, "try-error")) {
-    pids <- as.integer(e)
-    res <- c(res, tools::pskill(pids))
+  f <- file.path(find_test_path(), "pids.txt")
+  if (file.exists(f)) {
+    e <- try(readLines(con <- file(f), warn = FALSE), silent = TRUE)
+    if (!inherits(e, "try-error")) {
+      pids <- as.integer(e)
+      res <- c(res, tools::pskill(pids))
+    }
+    close(con)
+    unlink(f)
   }
-  unlink(pid_file())
   invisible(all(res))
 }
 
@@ -122,8 +126,8 @@ run_servr <- function(directory = ".", port = 4848,
                       code = "servr::httd(dir='%s', port=%d)") {
   dir <- normalizePath(directory, winslash = "/", mustWork = TRUE)
   cmd <- sprintf(
-    paste("library(methods); write.table(Sys.getpid(), file='%s', append=T, row.name=F, col.names=F);", code),
-    pid_file(), dir, port
+    paste("write.table(Sys.getpid(), file='%s', append=T, row.name=F, col.names=F);", code),
+    file.path(find_test_path(), "pids.txt"), dir, port
   )
   system2("Rscript", c("-e", shQuote(cmd)), wait = FALSE)
 }
@@ -141,13 +145,6 @@ stop_binary <- function() {
     remDr$closeServer()
   }, silent = TRUE)
   TRUE
-}
-
-# file that will keep track of all processes were initiated during animint testing
-pid_file <- function() {
-  f <- file.path(find_test_path(), "pids.txt")
-  if (!file.exists(f)) file(f)
-  f
 }
 
 # find the path to animint's testthat directory

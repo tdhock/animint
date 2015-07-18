@@ -11,18 +11,17 @@ names. https://github.com/hadley/ggplot2/issues/938}
 theme_animint(...)
 }
 \arguments{
-  \item{...}{theme options such as width.}
+\item{...}{theme options such as width.}
 }
 \value{
 ggplot theme list with names such as animint.width.
 }
 \description{
-Theme without checks. This allows us to
-write theme_animint(width=500), instead of
-theme(animint.width=500) which gives an error in ggplot2
-because users should be informed if they mis-type standard
-theme element names. https://github.com/hadley/ggplot2/
-issues/938
+Theme without checks. This allows us to write
+theme_animint(width=500), instead of theme(animint.width=500)
+which gives an error in ggplot2 because users should be informed
+if they mis-type standard theme element
+names. https://github.com/hadley/ggplot2/issues/938
 }
 \author{
 Toby Dylan Hocking

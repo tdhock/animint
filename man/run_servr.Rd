@@ -5,18 +5,19 @@
 \title{Spawn a child R session that runs a 'blocking' command}
 \usage{
 run_servr(directory = ".", port = 4848,
-  code = "servr::httd(dir=\\"\%s\\", port=\%d, browser=FALSE)")
+  code = "servr::httd(dir='\%s', port=\%d)")
 }
 \arguments{
-  \item{directory}{path that the server should map to.}
-  \item{port}{port number to _attempt_ to run server on.}
-  \item{code}{R code to execute in a child session}
+\item{directory}{path that the  server should map to.}
+
+\item{port}{port number to _attempt_ to run server on.}
+
+\item{code}{R code to execute in a child session}
 }
 \value{
 port number of the successful attempt
 }
 \description{
-Run a blocking command in a child R session (for example a
-file server or shiny app)
+Run a blocking command in a child R session (for example a file server or shiny app)
 }
 

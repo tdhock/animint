@@ -7,11 +7,12 @@
 renderAnimint(expr, env = parent.frame(), quoted = FALSE)
 }
 \arguments{
-  \item{expr}{An expression that creates a list of ggplot
-  objects.} \item{env}{The environment in which to evaluate
-  \code{expr}.} \item{quoted}{Is expr a quoted expression
-  (with \code{quote()})? This is useful if you want to save
-  an expression in a variable.}
+\item{expr}{An expression that creates a list of ggplot objects.}
+
+\item{env}{The environment in which to evaluate \code{expr}.}
+
+\item{quoted}{Is expr a quoted expression (with \code{quote()})?
+This is useful if you want to save an expression in a variable.}
 }
 \description{
 Shiny server output function customized for animint plots

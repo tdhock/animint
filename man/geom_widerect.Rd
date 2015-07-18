@@ -8,17 +8,21 @@ geom_widerect(mapping = NULL, data = NULL, stat = "identity",
   position = "identity", ...)
 }
 \arguments{
-  \item{mapping}{aesthetic mapping} \item{data}{data set}
-  \item{stat}{statistic mapping, defaults to identity}
-  \item{position}{position mapping, defaults to identity}
-  \item{...}{other arguments}
+\item{mapping}{aesthetic mapping}
+
+\item{data}{data set}
+
+\item{stat}{statistic mapping, defaults to identity}
+
+\item{position}{position mapping, defaults to identity}
+
+\item{...}{other arguments}
 }
 \value{
 ggplot2 layer
 }
 \description{
-ggplot2 geom with ymin and ymax aesthetics that covers the
-entire x range, useful for clickSelects background elements.
+ggplot2 geom with ymin and ymax aesthetics that covers the entire x range, useful for clickSelects background elements.
 }
 \examples{
 \dontrun{

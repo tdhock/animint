@@ -632,6 +632,7 @@ saveLayer <- function(l, d, meta){
   meta$classed <- g$classed
   meta$chunk.i <- 1L
   g.data.varied <- saveCommonChunk(g.data, chunk.cols, meta)
+  g$columns <- meta$columns
   g$chunks <- saveChunks(g.data.varied, meta)
   g$total <- length(unlist(g$chunks))
 
@@ -694,6 +695,7 @@ saveCommonChunk <- function(x, vars, meta){
     })
     if(any(is.common)){
       common.cols <- cols[is.common]
+      meta$columns$common <- common.cols
       # save common data to chunk
       csv.name <- sprintf("%s_chunk_common.tsv", meta$classed)
       common.chunk <- file.path(meta$out.dir, csv.name)
@@ -707,8 +709,10 @@ saveCommonChunk <- function(x, vars, meta){
       } else{ # WorldBank example
         remove.cols <- common.cols
       }
+      varied.cols <- setdiff(names(df1), remove.cols)
+      meta$columns$varied <- varied.cols
       df.list <- plyr::llply(df.list, function(df){
-        df <- df[, !names(df) %in% remove.cols, drop = FALSE]
+        df <- df[, varied.cols, drop = FALSE]
         # remove duplicated rows to further reduce chunk file size
         # if group has only one value, keep duplicated rows, e.g. geom_point
         if("group" %in% common.cols & length(unique(df$group)) != 1) df <- df[!duplicated(df), ]

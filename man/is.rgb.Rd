@@ -7,7 +7,7 @@
 is.rgb(x)
 }
 \arguments{
-  \item{x}{character}
+\item{x}{character}
 }
 \value{
 True/False value

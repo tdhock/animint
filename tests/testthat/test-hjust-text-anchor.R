@@ -40,7 +40,7 @@ grad.desc <- function(
 dat <- grad.desc()
 contour <- dat$contour
 objective <- dat$objective
-objective <- ldply(objective$iteration, function(i) {
+objective <- plyr::ldply(objective$iteration, function(i) {
   df <- subset(objective, iteration <= i)
   cbind(df, iteration2 = i)
 })
@@ -75,14 +75,6 @@ grad.desc.viz <- function(hjust) {
   viz <- list(contour = contour.plot, objective = objective.plot, 
               time = list(variable = "iteration2", ms = 2000), 
               title = "Demonstration of Gradient Descent Algorithm")
-}
-
-getStyleValue <- function(html, xpath, style.name) {
-  nodes <- getNodeSet(html, xpath)
-  node.style <- xmlAttrs(nodes[[1]])["style"]
-  pattern <-paste0("(?<name>\\S+?)", ": *", "(?<value>.+?)", ";")
-  style.matrices <- str_match_all_perl(node.style, pattern)
-  style.value <- style.matrices[[1]][style.name, "value"]
 }
 
 test_that('geom_text(hjust=0) => <text style="text-anchor: start">', {

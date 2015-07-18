@@ -7,7 +7,7 @@
 is.clickSelects(x)
 }
 \arguments{
-  \item{x}{character vector.}
+\item{x}{character vector.}
 }
 \value{
 logical vector

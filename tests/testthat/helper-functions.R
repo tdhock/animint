@@ -129,6 +129,15 @@ str_match_all_perl <- function(string,pattern){
 }
 
 getTextValue <- function(tick)xmlValue(getNodeSet(tick, "text")[[1]])
+
+getStyleValue <- function(html, xpath, style.name) {
+  nodes <- getNodeSet(html, xpath)
+  node.style <- xmlAttrs(nodes[[1]])["style"]
+  pattern <-paste0("(?<name>\\S+?)", ": *", "(?<value>.+?)", ";")
+  style.matrices <- str_match_all_perl(node.style, pattern)
+  style.value <- style.matrices[[1]][style.name, "value"]
+}
+
 getTransform <- function(tick)xmlAttrs(tick)[["transform"]]
 # get difference between axis ticks in both pixels and on original data scale
 # @param doc rendered HTML document

@@ -67,6 +67,7 @@ test_that("save separate chunks for geom_polygon", {
   viz <- list(levelHeatmap = level.heatmap, stateMap = state.map, title = "FluView")
   out.dir <- file.path(getwd(), "FluView")
   animint2dir(viz, out.dir = out.dir, open.browser = FALSE)
+  # animint2gist(viz, out.dir = out.dir)
   common.chunk <- list.files(path = out.dir, pattern = "geom.+polygon.+chunk_common.tsv", 
                              full.names = TRUE)
   varied.chunks <- list.files(path = out.dir, pattern = "geom.+polygon.+chunk[0-9]+.tsv", 

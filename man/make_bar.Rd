@@ -8,17 +8,18 @@ created using stat_summary(geom="bar").}
 make_bar(data, x.name, alpha = 1)
 }
 \arguments{
-  \item{data}{data.frame to analyze for unique x.name
-  values.} \item{x.name}{variable to be used for x,
-  clickSelects.} \item{alpha}{transparency of selected bar,
-  default 1.}
+\item{data}{data.frame to analyze for unique x.name values.}
+
+\item{x.name}{variable to be used for x, clickSelects.}
+
+\item{alpha}{transparency of selected bar, default 1.}
 }
 \value{
 a geom_bar layer.
 }
 \description{
-Convenience function for an interactive bar that might
-otherwise be created using stat_summary(geom="bar").
+Convenience function for an interactive bar that might otherwise be
+created using stat_summary(geom="bar").
 }
 \author{
 Toby Dylan Hocking

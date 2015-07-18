@@ -7,11 +7,10 @@
 toRGB(x)
 }
 \arguments{
-  \item{x}{character}
+\item{x}{character}
 }
 \value{
-hexadecimal color value (if is.na(x), return "none" for
-compatibility with JavaScript)
+hexadecimal color value or "transparent" if is.na
 }
 \description{
 Convert R colors to RGB hexadecimal color values
