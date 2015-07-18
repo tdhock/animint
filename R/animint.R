@@ -618,8 +618,9 @@ saveLayer <- function(l, d, meta){
         nest.cols <- subset.vec
         chunk.cols <- NULL
       }
-    }#meta$selectors > 0
+    } # meta$selectors > 0
   }
+  
   # If there is only one PANEL, we don't need it anymore.
   plot.has.panels <- nrow(meta$built$panel$layout) > 1
   g$PANEL <- unique(g.data[["PANEL"]])
@@ -627,15 +628,7 @@ saveLayer <- function(l, d, meta){
   if(geom.has.one.panel && (!plot.has.panels)) {
     g.data <- g.data[names(g.data) != "PANEL"]
   }
-
-  ## Split into chunks and save tsv files.
-  meta$classed <- g$classed
-  meta$chunk.i <- 1L
-  g.data.varied <- saveCommonChunk(g.data, chunk.cols, meta)
-  g$columns <- meta$columns
-  g$chunks <- saveChunks(g.data.varied, meta)
-  g$total <- length(unlist(g$chunks))
-
+  
   ## Also add pointers to these chunks to the related selectors.
   if(length(chunk.cols)){
     selector.names <- as.character(g$aes[chunk.cols])
@@ -652,18 +645,26 @@ saveLayer <- function(l, d, meta){
   names(g$chunk_order) <- NULL
   names(g$nest_order) <- NULL
   g$subset_order <- g$nest_order
-
+  
   ## If this plot has more than one PANEL then add it to subset_order
   ## and nest_order.
   if(plot.has.panels){
     g$subset_order <- c(g$subset_order, "PANEL")
     g$nest_order <- c(g$nest_order, "PANEL")
   }
-
+  
   ## group should be the last thing in nest_order, if it is present.
   if("group" %in% names(g$aes)){
     g$nest_order <- c(g$nest_order, "group")
   }
+
+  ## Split into chunks and save tsv files.
+  meta$classed <- g$classed
+  meta$chunk.i <- 1L
+  g.data.varied <- saveCommonChunk(g.data, chunk.cols, g$nest_order, meta)
+  g$columns <- meta$columns
+  g$chunks <- saveChunks(g.data.varied, meta)
+  g$total <- length(unlist(g$chunks))
 
   ## Get unique values of time variable.
   if(length(time.col)){ # if this layer/geom is animated,
@@ -679,9 +680,10 @@ saveLayer <- function(l, d, meta){
 ##' Save the common columns for each tsv to one chunk
 ##' @param x data.frame.
 ##' @param vars character vector of variable names to split on.
+##' @param nest_order character vector of nest variable names.
 ##' @param meta environment.
 ##' @return a list of data.frames comprised of varied columns for each tsv.
-saveCommonChunk <- function(x, vars, meta){
+saveCommonChunk <- function(x, vars, nest_order, meta){
   if(length(vars) == 0){
     x
   } else{
@@ -702,20 +704,16 @@ saveCommonChunk <- function(x, vars, meta){
       common.data <- df1[common.cols]
       write.table(common.data, common.chunk, quote = FALSE, row.names = FALSE, 
                   sep = "\t")
-      # remove common data for df.list but keep 'group' field if it exists in case 
-      # of the need of recovering the data.frame in the future
-      if("group" %in% common.cols){
-        remove.cols <- common.cols[!common.cols %in% "group"]
-      } else{ # WorldBank example
-        remove.cols <- common.cols
-      }
+      # remove commond data for df.list but keep nest_order field in case of the
+      # need of recovering the data.frame in the renderer
+      remove.cols <- common.cols[!common.cols %in% nest_order]
       varied.cols <- setdiff(names(df1), remove.cols)
       meta$columns$varied <- varied.cols
       df.list <- plyr::llply(df.list, function(df){
         df <- df[, varied.cols, drop = FALSE]
         # remove duplicated rows to further reduce chunk file size
         # if group has only one value, keep duplicated rows, e.g. geom_point
-        if("group" %in% common.cols & length(unique(df$group)) != 1) df <- df[!duplicated(df), ]
+        if("group" %in% nest_order) df <- df[!duplicated(df), ]
         df
       })
     }

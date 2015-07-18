@@ -67,7 +67,6 @@ test_that("save separate chunks for geom_polygon", {
   viz <- list(levelHeatmap = level.heatmap, stateMap = state.map, title = "FluView")
   out.dir <- file.path(getwd(), "FluView")
   animint2dir(viz, out.dir = out.dir, open.browser = FALSE)
-  # animint2gist(viz, out.dir = out.dir)
   common.chunk <- list.files(path = out.dir, pattern = "geom.+polygon.+chunk_common.tsv", 
                              full.names = TRUE)
   varied.chunks <- list.files(path = out.dir, pattern = "geom.+polygon.+chunk[0-9]+.tsv", 
@@ -99,14 +98,14 @@ map_flu <- ldply(unique(state_flu$WEEKEND), function(we) {
   merge(USdots, df, by.x = "region", by.y = "state")
 })
 
-test_that("save separate chunks for geom_point without group", {
+test_that("save separate chunks for geom_point without specifying group", {
   # the compiler will not break a geom into chunks if any of the resulting 
   # chunk tsv files is estimated to be less than 4KB.
   state.map <- p + 
     geom_point(data = map_flu, aes(x = mean.long, y = mean.lat, fill = level, 
                                    showSelected = WEEKEND), color = "black", size = 10)
   viz <- list(levelHeatmap = level.heatmap, stateMap = state.map, title = "FluView")
-  out.dir <- file.path(getwd(), "FluView")
+  out.dir <- file.path(getwd(), "FluView-point")
   animint2dir(viz, out.dir = out.dir, open.browser = FALSE)
   
   common.chunk <- list.files(path = out.dir, pattern = "geom.+point.+chunk_common.tsv", 
@@ -119,7 +118,7 @@ test_that("save separate chunks for geom_point without group", {
   # test the only one varied.chunk
   varied.data <- read.csv(varied.chunks, sep = "\t")
   expect_equal(nrow(varied.data), nrow(map_flu))
-  expect_true(all(c("fill", "x", "y", "showSelected") %in% names(varied.data)))
+  expect_true(all(c("fill", "x", "y", "showSelected", "group") %in% names(varied.data)))
   
   unlink(out.dir, recursive = TRUE)
   
@@ -215,6 +214,59 @@ test_that("save separate chunks for non-spatial geoms with repetitive field and 
   varied.data <- read.csv(varied.chunks[idx], sep = "\t")
   expect_equal(nrow(varied.data), length(unique(WorldBank$country)))
   expect_true(all(c("size", "x",	"y",	"tooltip") %in% names(varied.data)))
+  
+  unlink(out.dir, recursive = TRUE)
+})
+
+
+### test case 4
+data(breakpoints)
+
+only.error <- subset(breakpoints$error, type=="E")
+only.segments <- subset(only.error, samples==samples[1])
+signal.colors <- c(estimate="#0adb0a", latent="#0098ef")
+
+signal=ggplot()+
+  geom_point(aes(position, signal, showSelected=samples),
+             data=breakpoints$signals)+
+  geom_line(aes(position, signal), colour=signal.colors[["latent"]],
+            data=breakpoints$imprecision)+
+  geom_segment(aes(first.base, mean, xend=last.base, yend=mean,
+                   showSelected=segments,
+                   showSelected2=samples),
+               colour=signal.colors[["estimate"]],
+               data=breakpoints$segments)+
+  geom_vline(aes(xintercept=base,
+                 showSelected=segments,
+                 showSelected2=samples),
+             colour=signal.colors[["estimate"]],
+             linetype="dashed",
+             data=breakpoints$breaks)
+
+test_that("save separate chunks for non-spatial geoms with nest_order not being group", {
+  viz <- list(signal = signal, title="breakpointError (select one model size)")
+  out.dir <- file.path(getwd(), "breakpointError-single")
+  animint2dir(viz, out.dir = out.dir, open.browser = FALSE)
+  
+  common.chunk <- list.files(path = out.dir, pattern = "geom.+segment.+chunk_common.tsv", 
+                             full.names = TRUE)
+  varied.chunks <- list.files(path = out.dir, pattern = "geom.+segment.+chunk[0-9]+.tsv", 
+                              full.names = TRUE)
+  # number of chunks
+  expect_equal(length(common.chunk), 1L)
+  no.chunks <- length(varied.chunks)
+  expect_equal(no.chunks, length(unique(breakpoints$segments$samples)))
+  # test common.chunk
+  common.data <- read.csv(common.chunk, sep = "\t")
+  expect_equal(nrow(common.data), nrow(breakpoints$segments) / 
+                 length(unique(breakpoints$segments$samples)))
+  expect_true(all(c("showSelected", "group") %in% names(common.data)))
+  # randomly choose an varied.chunk to test
+  idx <- sample(no.chunks, 1)
+  varied.data <- read.csv(varied.chunks[idx], sep = "\t")
+  expect_equal(nrow(varied.data), nrow(breakpoints$segments) / 
+                 length(unique(breakpoints$segments$samples)))
+  expect_true(all(c("x", "xend", "y", "yend", "showSelected") %in% names(varied.data)))
   
   unlink(out.dir, recursive = TRUE)
 })

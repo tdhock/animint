@@ -570,22 +570,36 @@ var animint = function (to_select, json_file) {
    * @return {json object}                json object after merging common chunk tsv into varied chunk tsv
   */
   var copy_chunk = function(common_chunk, varied_chunk, columns_common) {
-    var new_varied_chunk = {};
     var groups = d3.keys(common_chunk);
-    groups.forEach(function(g) {
-    common_obj = common_chunk[g];
-    varied_obj = varied_chunk[g];
 
-    var new_common_obj = [];
-    common_obj.forEach(function(part) { 
-      var new_part = clone(varied_obj[0]);
-      columns_common.forEach(function(col) {
-        new_part[col] = part[col];
+    if(Array.isArray(varied_chunk)){
+      var new_varied_chunk = [];
+      groups.forEach(function(g) {
+        common_obj = common_chunk[g];
+        varied_obj = varied_chunk[g];
+        var new_varied_obj = clone(varied_obj);
+        columns_common.forEach(function(col) {
+          new_varied_obj[col] = common_obj[col];
+        });
+        new_varied_chunk.push(new_varied_obj);
       });
-      new_common_obj.push(new_part);
-    });
-    new_varied_chunk[g] = new_common_obj;
-  });
+    }else{
+      var new_varied_chunk = {};
+      groups.forEach(function(g) {
+        common_obj = common_chunk[g];
+        varied_obj = varied_chunk[g];
+
+        var new_common_obj = [];
+        common_obj.forEach(function(part) { 
+          var new_part = clone(varied_obj[0]);
+          columns_common.forEach(function(col) {
+            new_part[col] = part[col];
+          });
+          new_common_obj.push(new_part);
+        });
+        new_varied_chunk[g] = new_common_obj;
+      });
+    }
     return new_varied_chunk;
   };
 
