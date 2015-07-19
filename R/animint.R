@@ -684,6 +684,9 @@ saveLayer <- function(l, d, meta){
 ##' @param meta environment.
 ##' @return a list of data.frames comprised of varied columns for each tsv.
 saveCommonChunk <- function(x, vars, nest_order, meta){
+  # remove default group column added by ggplot builder
+  if("group" %in% names(x) & (!"group" %in% nest_order)) x <- x[, !names(x) %in% "group"]
+  
   if(length(vars) == 0){
     x
   } else{
@@ -695,7 +698,9 @@ saveCommonChunk <- function(x, vars, nest_order, meta){
     is.common <- plyr::laply(cols, function(col){
       identical(df1[, col], df2[, col])
     })
-    if(any(is.common)){
+    # If the number of common columns is at least 2, it's meaningful to save them
+    # into separate chunk and reduce the output file size of chunk tsv.
+    if(sum(is.common) >= 2){
       common.cols <- cols[is.common]
       meta$columns$common <- common.cols
       # save common data to chunk
