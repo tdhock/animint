@@ -684,6 +684,7 @@ saveLayer <- function(l, d, meta){
 ##' @param meta environment.
 ##' @return a list of data.frames comprised of varied columns for each tsv.
 saveCommonChunk <- function(x, vars, nest_order, meta){
+  meta$columns <- NULL # initial value
   # remove default group column added by ggplot builder
   if("group" %in% names(x) & (!"group" %in% nest_order)) x <- x[, !names(x) %in% "group"]
   
