@@ -118,7 +118,7 @@ test_that("save separate chunks for geom_point without specifying group", {
   # test the only one varied.chunk
   varied.data <- read.csv(varied.chunks, sep = "\t")
   expect_equal(nrow(varied.data), nrow(map_flu))
-  expect_true(all(c("fill", "x", "y", "showSelected", "group") %in% names(varied.data)))
+  expect_true(all(c("fill", "x", "y", "showSelected") %in% names(varied.data)))
   
   unlink(out.dir, recursive = TRUE)
   
@@ -253,14 +253,9 @@ test_that("save separate chunks for non-spatial geoms with nest_order not being 
   varied.chunks <- list.files(path = out.dir, pattern = "geom.+segment.+chunk[0-9]+.tsv", 
                               full.names = TRUE)
   # number of chunks
-  expect_equal(length(common.chunk), 1L)
+  expect_equal(length(common.chunk), 0L)
   no.chunks <- length(varied.chunks)
   expect_equal(no.chunks, length(unique(breakpoints$segments$samples)))
-  # test common.chunk
-  common.data <- read.csv(common.chunk, sep = "\t")
-  expect_equal(nrow(common.data), nrow(breakpoints$segments) / 
-                 length(unique(breakpoints$segments$samples)))
-  expect_true(all(c("showSelected", "group") %in% names(common.data)))
   # randomly choose an varied.chunk to test
   idx <- sample(no.chunks, 1)
   varied.data <- read.csv(varied.chunks[idx], sep = "\t")

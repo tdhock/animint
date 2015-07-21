@@ -4,12 +4,14 @@
 \alias{saveCommonChunk}
 \title{Save the common columns for each tsv to one chunk}
 \usage{
-saveCommonChunk(x, vars, meta)
+saveCommonChunk(x, vars, nest_order, meta)
 }
 \arguments{
 \item{x}{data.frame.}
 
 \item{vars}{character vector of variable names to split on.}
+
+\item{nest_order}{character vector of nest variable names.}
 
 \item{meta}{environment.}
 }

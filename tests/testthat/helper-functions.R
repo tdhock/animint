@@ -83,14 +83,6 @@ expect_styles <- function(html, styles.expected){
   }
 }
 
-getStyleValue <- function(html, xpath, style.name) {
-  nodes <- getNodeSet(html, xpath)
-  node.style <- xmlAttrs(nodes[[1]])["style"]
-  pattern <-paste0("(?<name>\\S+?)", ": *", "(?<value>.+?)", ";")
-  style.matrices <- str_match_all_perl(node.style, pattern)
-  style.value <- style.matrices[[1]][style.name, "value"]
-}
-
 ## Parse the first occurance of pattern from each of several strings
 ## using (named) capturing regular expressions, returning a matrix
 ## (with column names).
