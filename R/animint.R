@@ -1322,9 +1322,12 @@ getLegendList <- function(plistextra){
     guides.args[[aes.name]] <- guide.type
   }
   guides.result <- do.call(ggplot2::guides, guides.args)
-  guides <- plyr::defaults(plot$guides, guides.result)
-  labels <- plot$labels
-  gdefs <- ggplot2:::guides_train(scales = scales, theme = theme, guides = guides, labels = labels)
+  guides.list <- plyr::defaults(plot$guides, guides.result)
+  gdefs <-
+    ggplot2:::guides_train(scales = scales,
+                           theme = theme,
+                           guides = guides.list,
+                           labels = plot$labels)
   if (length(gdefs) != 0) {
     gdefs <- ggplot2:::guides_merge(gdefs)
     gdefs <- ggplot2:::guides_geom(gdefs, layers, default_mapping)
@@ -1413,7 +1416,15 @@ getLegend <- function(mb){
   if(length(dataframes)>0) {
     data <- merge_recurse(dataframes)
   } else return(NULL)
-  data <- lapply(1:nrow(data), function(i) as.list(data[i,]))
+  label.num <- suppressWarnings({
+    as.numeric(data$label)
+  })
+  entry.order <- if(is.atomic(mb$breaks) || anyNA(label.num)){
+    1:nrow(data)
+  }else{
+    nrow(data):1
+  }
+  data <- lapply(entry.order, function(i) as.list(data[i,]))
   if(guidetype=="none"){
     NULL
   } else{
