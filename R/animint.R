@@ -974,6 +974,7 @@ saveChunks <- function(x, meta){
 ##' @author Toby Dylan Hocking
 ##' @export
 selector.aes <- function(a.vec){
+  if(is.null(a.vec))a.vec <- character()
   stopifnot(is.character(a.vec))
   cs.or.ss <- grepl("clickSelects|showSelected", a.vec)
   for(v in c("value", "variable")){
