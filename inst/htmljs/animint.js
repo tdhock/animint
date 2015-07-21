@@ -1789,6 +1789,44 @@ var animint = function (to_select, json_file) {
     ;
     
     // selector widgets
+        show_message2 = "Toggle selected variables";
+    var show_hide_selector_widgets = element.append("button")
+      .text(show_message2)
+      .attr("id", "show_hide_selector_widgets")
+      .on("click", function(){
+        if(this.textContent == show_message2){
+          selector_table.style("display", "");
+          show_hide_selector_widgets.text("Hide variable toggler");
+        }else{
+          selector_table.style("display", "none");
+          show_hide_selector_widgets.text(show_message2);
+        }
+      })
+    ;
+    // adding a table for selector widgets
+    var selector_table = element.append("table")
+      .style("display", "none")
+    ;
+    var selector_first_tr = selector_table.append("tr");
+    selector_first_tr
+      .append("th")
+      .text("Toggle selected value");
+    // adding a row for each selector
+    var selector_widget_rows = selector_table.selectAll("tr.selector_widget")
+      .data(selector_array)
+      .enter()
+      .append("tr")
+    ;
+    selector_widget_rows
+      .append("td")
+      .text(function(s_name){return s_name;})
+    ;
+    // adding an input for each selector
+    var selector_widget_tds = selector_widget_rows.append("td");
+    var selector_widget_inputs = selector_widget_tds
+      .append("input")
+    ;
+    
     /*
     for(s_name in response.selectors) {
       // create a widget for the selector
