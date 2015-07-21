@@ -1789,6 +1789,7 @@ var animint = function (to_select, json_file) {
     ;
     
     // selector widgets
+    /*
     for(s_name in response.selectors) {
       // create a widget for the selector
       var selector_widget = element.append("button")
@@ -1835,6 +1836,7 @@ var animint = function (to_select, json_file) {
         })
       ;
     }  // close selector widgets loops
+    */
       
     // If this is an animation, then start downloading all the rest of
     // the data, and start the animation.
