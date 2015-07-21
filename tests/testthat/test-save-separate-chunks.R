@@ -13,8 +13,8 @@ state_flu <- state_flu[, !names(state_flu) %in% c("URL", "WEBSITE")]
 state_flu$state <- tolower(state_flu$STATENAME)
 state_flu$level <- as.numeric(gsub("Level ", "", state_flu$ACTIVITY.LEVEL))
 state_flu$WEEKEND <- as.Date(state_flu$WEEKEND, format = "%b-%d-%Y")
-max(state_flu$WEEKEND)
-state_flu <- subset(state_flu, WEEKEND <= as.Date("2015-05-23") & 
+# use 2008-09 and 2009-10 seasons to test
+state_flu <- subset(state_flu, SEASON %in% c("2008-09", "2009-10") & 
                       !STATENAME %in% c("District of Columbia", "New York City", 
                                         "Puerto Rico", "Alaska", "Hawaii"))
 
