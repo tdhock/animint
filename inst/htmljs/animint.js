@@ -22,7 +22,7 @@ var animint = function (to_select, json_file) {
         5: size * 8 + "," + size * 4,
         6: size * 2 + "," + size * 2 + "," + size * 6 + "," + size * 2
       };
-    } else { //R defined line types
+    } else { // R defined line types
       if(lt == "solid"){
         return null;
       }
@@ -113,7 +113,7 @@ var animint = function (to_select, json_file) {
   var styles = [".axis path{fill: none;stroke: black;shape-rendering: crispEdges;}",
             ".axis line{fill: none;stroke: black;shape-rendering: crispEdges;}",
             ".axis text {font-family: sans-serif;font-size: 11px;}"];
-
+            
   // 'margins' are fixed across panels and do not
   // include title/axis/label padding (since these are not
   // fixed across panels). They do, however, account for
@@ -531,6 +531,109 @@ var animint = function (to_select, json_file) {
     	if(!axis.yticks) {
     	  styles.push("#"+p_name+" #yaxis .tick"+" line{stroke:none;}");
     	}
+      
+      // creating g element for background, grid lines, and border
+      // uses insert to draw it right before plot title
+      var background = svg.insert("g", "#plottitle")
+        .attr("class", "background");
+        
+      // drawing background
+      if(Object.keys(p_info.panel_background).length > 1) {
+        background.append("rect")
+          .attr("x", plotdim.xstart)
+          .attr("y", plotdim.ystart)
+          .attr("width", plotdim.xend - plotdim.xstart)
+          .attr("height", plotdim.yend - plotdim.ystart)
+          .attr("class", "background_rect")
+          .style("fill", p_info.panel_background.fill)
+          .style("stroke", p_info.panel_background.colour)
+          .style("stroke-dasharray", function() {
+            return linetypesize2dasharray(p_info.panel_background.linetype,
+                                          p_info.panel_background.size);
+          });
+      }
+      
+      // function to draw major/minor grid lines 
+      var grid_line = function(grid_background, grid_class) {
+        // if grid lines are defined
+        if(Object.keys(grid_background).length > 1) {
+          var col = grid_background.colour;
+          var lt = grid_background.linetype;
+          var size = grid_background.size;
+          var cap = grid_background.lineend;
+        // group for grid lines
+        var grid = background.append("g")
+          .attr("class", grid_class);
+
+          // group for horizontal grid lines
+          var grid_hor = grid.append("g")
+            .attr("class", "hor");
+          // draw horizontal grid lines if they are defined
+          if(typeof grid_background.loc.y != "undefined") {
+            // coercing y lines to array if necessary
+            if(typeof grid_background.loc.y == "number") grid_background.loc.y = [grid_background.loc.y];
+            // drawing lines
+            grid_hor.selectAll("line")
+              .data(function() { return d3.values(grid_background.loc.y); })
+              .enter()
+              .append("line")
+              .attr("x1", plotdim.xstart)
+              .attr("x2", plotdim.xend)
+              .attr("y1", function(d) { return scales[panel_i].y(d); })
+              .attr("y2", function(d) { return scales[panel_i].y(d); })
+              .style("stroke", col)
+              .style("stroke-linecap", cap)
+              .style("stroke-width", size)
+              .style("stroke-dasharray", function() {
+                return linetypesize2dasharray(lt, size);
+              });;
+          }
+
+          // group for vertical grid lines
+          var grid_vert = grid.append("g")
+            .attr("class", "vert");
+          // draw vertical grid lines if they are defined
+          if(typeof grid_background.loc.x != "undefined") {
+            // coercing x lines to array if necessary
+            if(typeof grid_background.loc.x == "number") grid_background.loc.x = [grid_background.loc.x];
+            // drawing lines
+            grid_vert.selectAll("line")
+              .data(function() { return d3.values(grid_background.loc.x); })
+              .enter()
+              .append("line")
+              .attr("x1", function(d) { return scales[panel_i].x(d); })
+              .attr("x2", function(d) { return scales[panel_i].x(d); })
+              .attr("y1", plotdim.ystart)
+              .attr("y2", plotdim.yend)
+              .style("stroke", col)
+              .style("stroke-linecap", cap)
+              .style("stroke-width", size)
+              .style("stroke-dasharray", function() {
+                return linetypesize2dasharray(lt, size);
+              });;
+          }
+        }
+      }
+      // drawing the grid lines
+      grid_line(p_info.grid_minor, "grid_minor");
+      grid_line(p_info.grid_major, "grid_major");
+      
+      // drawing border
+      // uses insert to draw it right before the #plottitle
+      if(Object.keys(p_info.panel_border).length > 1) {
+        background.append("rect")
+          .attr("x", plotdim.xstart)
+          .attr("y", plotdim.ystart)
+          .attr("width", plotdim.xend - plotdim.xstart)
+          .attr("height", plotdim.yend - plotdim.ystart)
+          .attr("class", "border_rect")
+          .style("fill", p_info.panel_border.fill)
+          .style("stroke", p_info.panel_border.colour)
+          .style("stroke-dasharray", function() {
+            return linetypesize2dasharray(p_info.panel_border.linetype,
+                                          p_info.panel_border.size);
+          });
+      }
 
     } //end of for loop
 
@@ -1427,25 +1530,44 @@ var animint = function (to_select, json_file) {
   };
   var update_selector = function (v_name, value) {
     var s_info = Selectors[v_name];
+    var legend_value_opacity, legend_other_opacity;
     value = value + "";
     if(s_info.type == "single"){
       // value is the new selection.
       s_info.selected = value;
+      legend_other_opacity = 0.5;
+      legend_value_opacity = 1;
     }else{
       // value should be added or removed from the selection.
       var i_value = s_info.selected.indexOf(value);
       if(i_value == -1){
         // not found, add to selection.
 	      s_info.selected.push(value);
+	      legend_value_opacity = 1;
       }else{
 	      // found, remove from selection.
 	      s_info.selected.splice(i_value, 1);
+	      legend_value_opacity = 0.5;
       }
+      legend_other_opacity = null;
     }
-    s_info.update.forEach(function(g_name){
-      update_geom(g_name, v_name);
-    });
-  };
+    var legend_entries = 
+      d3.selectAll("tr#legend th."+v_name+" td.legend_entry_label");
+      legend_entries.style("opacity", function(d){
+        if(this.textContent == value){
+          return legend_value_opacity;
+        }else{
+          if(legend_other_opacity == null){
+            return this.style.opacity;
+          }else{
+            return legend_other_opacity;
+          }
+        }
+      });
+      s_info.update.forEach(function(g_name){
+        update_geom(g_name, v_name);
+      });
+    };
   var ifSelectedElse = function (d, v_name, selected, not_selected) {
     var is_selected;
     var value = d.clickSelects + "";
@@ -1488,17 +1610,20 @@ var animint = function (to_select, json_file) {
     var legendkeys = d3.keys(p_info.legend);
     for(var i=0; i<legendkeys.length; i++){
       // the table that contains one row for each legend element.
-      var legend_table = tdRight.append("table").append("tr")
+      var legend_table = tdRight.append("table")
+        .append("tr").attr("id", "legend")
         .append("th").attr("align", "left")
-        .text(p_info.legend[legendkeys[i]].title);
+        .text(p_info.legend[legendkeys[i]].title)
+        .attr("class", p_info.legend[legendkeys[i]].vars);
       var l_info = p_info.legend[legendkeys[i]];
       // the legend table with breaks/value/label.
       var legendgeoms = l_info.geoms;
       var legend_rows = legend_table.selectAll("tr")
         .data(l_info.entries)
-	      .sort(function(d) {return d["order"];})
-	      .enter()
-	      .append("tr");
+        .sort(function(d) {return d["order"];})
+        .enter()
+        .append("tr")
+        .attr("id", function(d) { return d["label"]; });
       var legend_svgs = legend_rows.append("td")
         .append("svg")
   	    .attr("id", function(d){return "legend-"+d["label"];})
@@ -1561,11 +1686,24 @@ var animint = function (to_select, json_file) {
           .style("opacity", function(d){return d["pointalpha"]||1;});
       }
       legend_rows.append("td")
-	      .attr("align", "left")
-	      .attr("class", "legend_entry_label")
-        .text(function(d){ return d["label"];});
+      .attr("align", "left") // TODO: right for numbers?
+      .attr("class", "legend_entry_label")
+      .attr("id", function(d){ return d["label"]; })
+      .text(function(d){ return d["label"];});
     }
-  };
+    
+    // selecting points based on legend
+    d3.select("#plot").selectAll("#legend").selectAll("tr")
+      .on("click", function() { 
+        var row_id = d3.select(this).attr("id");
+        var s_name = this.parentElement.className;
+        update_selector(s_name, row_id);
+      })
+      .attr("title", function() {
+        return "Toggle " + this.id;
+      })
+      .attr("style", "cursor:pointer");
+  }
 
   // Download the main description of the interactive plot.
   d3.json(json_file, function (error, response) {

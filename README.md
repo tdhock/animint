@@ -58,13 +58,22 @@ repo](https://github.com/tdhock/animint-examples/tree/master/examples).
   [Yes](https://cpsievert.shinyapps.io/animintRmarkdown/)
   ([source](https://github.com/tdhock/animint/tree/master/inst/examples/rmarkdown)).
 
-## Animint paper
 
-Carson Sievert, Susan VanderPlas and Toby Dylan Hocking wrote an
+## Contribute to animint!
+
+#### Write tests to increase code coverage
+
+The easiest way to contribute to animint is by writing a new test that would increase the code coverage. First [check the coveralls status page and find a part of the code which is not tested](https://coveralls.io/github/tdhock/animint). Then fork animint and commit [a new test](https://github.com/tdhock/animint/tree/master/tests/testthat) that increases the coverage, and send us a Pull Request. It may be useful to read about [our testing framework](https://github.com/tdhock/animint/wiki/Testing).
+
+#### Learn about the design and theory of animint
+
+Before adding features to animint, you should first read about its design. There are two main components, which have separate wiki pages that explain their details:
+- The [compiler](https://github.com/tdhock/animint/wiki/Compiler%20details) is written in R code.
+- The [renderer](https://github.com/tdhock/animint/wiki/Renderer-details) is written in JavaScript code.
+
+It would also be useful to read some theory in the
 [academic paper describing
-Animint](https://github.com/tdhock/animint-paper/blob/master/HOCKING-animint.pdf?raw=true). If
-you would like to contribute code to animint, please read the paper
-first to get an overview of the package. It explains: 
+Animint](https://github.com/tdhock/animint-paper/blob/master/HOCKING-animint.pdf?raw=true). It explains: 
 
 - the purpose of animint: make it easy to design data visualizations
 which can be both animated and interactive.
@@ -75,30 +84,16 @@ interactive linked plots.
 - the advantages and disadvantages of animint compared to other
 interactive data viz libraries.
 
-## Related work
+It may also be useful to read our [short](https://github.com/tdhock/interactive-tutorial/tree/master/animation) and [long](https://github.com/tdhock/animint/blob/master/etc/references.org) tables of related work.
 
-We have compiled [short](https://github.com/tdhock/interactive-tutorial/tree/master/animation) and [long](https://github.com/tdhock/animint/blob/master/etc/references.org) tables of related work.
+#### TODO list of features to implement
 
-## Contribute to animint!
-
-#### Get acquainted
-
-Before contributing to animint, you should first read about its design. There are two main components, which have separate wiki pages that explain their details:
-- The [compiler](https://github.com/tdhock/animint/wiki/Compiler%20details) is written in R code.
-- The [renderer](https://github.com/tdhock/animint/wiki/Renderer-details) is written in JavaScript code.
-
-#### TODO items
-
-We keep a TODO list at top of the [NEWS](https://github.com/tdhock/animint/blob/master/NEWS) file. They are categorized as follows:
+We keep a TODO list at top of the [NEWS](https://github.com/tdhock/animint/blob/master/NEWS) file. Feel free to implement one and send us a PR. They are categorized as follows:
 
 - BUG: things which used to work but have stopped working. Tests should be added to prevent these. For example at one point in 2013, animint rendered the correct number of legend entries for the WorldBank viz, but in the beginning of 2014 animint rendered too many legend entries. 
 - GGPLOT: things which ggplot2 supports but animint does not yet support. For example facets, coord_equal.
 - DSL: changes to the animint domain-specific language (DSL) which would allow interactive/animated features. These involve changes to how we define the ggplots, and how the compiler works. For example custom alpha/color/etc for selected geoms, using selected.alpha/selected.color/etc aesthetics.
-- EXAMPLE: examples to show off animint features, which should affect neither the compiler nor renderer. For example the pirates data set.
+- EXAMPLE: examples to show off animint features, which should affect neither the compiler nor renderer. 
 - RENDER: changes to the JavaScript rendering code which would result in better interactive plots, without having to change the definition of the ggplots. For example rendering a selection widget for every selection variable.
 - OUTPUT: different output formats for viewing/sharing an interactive animation.
 - OPTIMIZATION: things which are currently supported, but with an implementation that could be improved in terms of render/compile speed, disk usage, memory, etc. Typically these optimizations are not really noticed for small data sets, but make it easier to visualize large data sets. For example, can we gzip the TSV plot data files to reduce disk space and download times?
-
-#### Submitting contributions
-
-We are open to pull requests. If your changes pass [our tests](https://github.com/tdhock/animint/wiki/Testing), then we are happy to merge them.

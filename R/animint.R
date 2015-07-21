@@ -4,6 +4,31 @@
 #' @export
 #' @import ggplot2 plyr
 parsePlot <- function(meta){
+  ## adding data and mapping to each layer from base plot, if necessary
+  for(layer.i in seq_along(meta$plot$layers)) {
+    
+    ## if data is not specified, get it from plot
+    if(length(meta$plot$layers[[layer.i]]$data) == 0) meta$plot$layers[[layer.i]]$data <- meta$plot$data
+    
+    ## if mapping is not specified, get it from plot
+    if(is.null(meta$plot$layers[[layer.i]]$mapping)) meta$plot$layers[[layer.i]]$mapping <- meta$plot$mapping
+    
+    ## loop through each mapping except for x and y
+    mappings <- meta$plot$layers[[layer.i]]$mapping
+    mappings <- mappings[!(names(mappings) %in% c("x", "y"))]
+    for(i in seq_along(mappings)) {
+      mapping <- mappings[i]
+      ## if there are any expressions in mapping, evaluate them and add to data
+      if(is.call(mapping[[1]])) {
+        meta$plot$layers[[layer.i]]$data[[
+          paste("show", names(mapping), sep = "_")
+          ]] <- eval(mapping[[1]], meta$plot$layers[[layer.i]]$data)
+      }
+    }
+    
+  }
+  
+  
   meta$built <- ggplot2::ggplot_build(meta$plot)
   plot.meta <- list()
   scaleFuns <-
@@ -22,11 +47,84 @@ parsePlot <- function(meta){
       plot.meta$scales[[sc$aesthetics]] <- makeScale(sc)
     }
   }
+  
+  ## Export axis specification as a combination of breaks and
+  ## labels, on the relevant axis scale (i.e. so that it can
+  ## be passed into d3 on the x axis scale instead of on the
+  ## grid 0-1 scale). This allows transformations to be used
+  ## out of the box, with no additional d3 coding.
+  theme.pars <- ggplot2:::plot_theme(meta$plot)
+  
+  ## No legend if theme(legend.postion="none").
+  plot.meta$legend <- if(theme.pars$legend.position != "none"){
+    getLegendList(meta$built)
+  }
+  
+  ## save each layer
   for(layer.i in seq_along(meta$plot$layers)){
     ##cat(sprintf("%4d / %4d layers\n", layer.i, length(meta$plot$layers)))
 
     ## This is the layer from the original ggplot object.
     L <- meta$plot$layers[[layer.i]]
+    
+    ## If any legends are specified, add showSelected aesthetic
+    for(legend.i in seq_along(plot.meta$legend)) {
+      # the type of legend: colour, fill, etc
+      legend_type <- plot.meta$legend[[legend.i]]$legend_type
+      # the name of the variable used in this legend
+      var_name <- plot.meta$legend[[legend.i]]$vars
+      # var_name can have length greater than one if an expression is used
+      var_name <- intersect(var_name, names(L$data))
+      var <- L$data[, var_name]
+      ## checking if it is a discrete variable.
+      if(plyr::is.discrete(var)) {
+        is.interactive.aes <-
+          grepl("showSelected|clickSelects", names(L$mapping))
+        is.legend.var <- L$mapping == var_name
+        ## If var_name is used with another interactive aes, then do
+        ## not add any showSelected aesthetic for it.
+        var.is.interactive <- any(is.interactive.aes & is.legend.var)
+        if(!var.is.interactive){
+          for(i in legend_type) {
+            ## only adding showSelected aesthetic if the variable is used by the geom
+            if(!is.null(L$mapping[[i]])) {
+              temp_name <- paste0("showSelectedlegend", i)
+              L$mapping[[temp_name]] <- as.symbol(var_name)
+            }
+          }
+        }
+        # if selector.types has not been specified, create it
+        if(is.null(meta$selector.types)) {
+          meta$selector.types <- list()
+        }
+        # if selector.types is not specified for this variable, set it to multiple
+        if(is.null(meta$selector.types[[var_name]])) {
+          meta$selector.types[[var_name]] <- "multiple"
+        }
+        # if first is not specified, add all to first
+        if(is.null(meta$first[[var_name]])) {
+          u.vals <- unique(var)
+          s.type <- if(var_name %in% names(meta$selectors)){
+            ## Selector has already been created.
+            meta$selectors[[var_name]]$type
+          }else{
+            meta$selector.types[[var_name]]
+          }
+          meta$first[[var_name]] <- if(s.type == "multiple"){
+            u.vals
+          }else{
+            u.vals[[1]]
+          }
+        }
+      }
+    }
+    ## need to call ggplot_build again because we've added to the plot
+    # I'm sure that there is a way around this, but not immediately sure how. 
+    # There's sort of a Catch-22 here because to create the interactivity, 
+    # we need to specify the variable corresponding to each legend. 
+    # To do this, we need to have the legend. 
+    # And to have the legend, I think that we need to use ggplot_build
+    meta$built <- ggplot2::ggplot_build(meta$plot)
 
     ## for each layer, there is a correpsonding data.frame which
     ## evaluates the aesthetic mapping.
@@ -59,7 +157,78 @@ parsePlot <- function(meta){
   ## grid 0-1 scale). This allows transformations to be used
   ## out of the box, with no additional d3 coding.
   theme.pars <- ggplot2:::plot_theme(meta$plot)
-
+  
+  ## extract panel background and borders from theme.pars
+  get_bg <- function(pars) {
+    # if pars is not an empty list - occurs when using element_blank()
+    if(length(pars) > 0) {
+      
+      ## if elements are not specified, they inherit from theme.pars$rect
+      for(i in 1:length(pars)) {
+        if(is.null(pars[[i]])) pars[[i]] <- unname(theme.pars$rect[[i]])
+      }
+      
+      # convert fill to RGB if necessary
+      if(!(is.rgb(pars$fill))) pars$fill <- unname(toRGB(pars$fill))
+      # convert color to RGB if necessary
+      if(!(is.rgb(pars$colour))) pars$colour <- unname(toRGB(pars$colour))
+      
+      # remove names (JSON file was getting confused)
+      pars <- lapply(pars, unname)
+      
+    }
+    pars
+  }
+  # saving background info
+  plot.meta$panel_background <- get_bg(theme.pars$panel.background)
+  plot.meta$panel_border <- get_bg(theme.pars$panel.border)
+  
+  ### function to extract grid info
+  get_grid <- function(pars, major = T) {
+    # if pars is not an empty list - occurs when using element_blank()
+    if(length(pars) > 0) {
+      
+      ## if elements are not specified, they inherit from 
+      ##    theme.pars$panel.grid then from theme.pars$line
+      for(i in names(pars)) {
+        if(is.null(pars[[i]])) pars[[i]] <- 
+          if(!is.null(theme.pars$panel.grid[[i]])) {
+            theme.pars$panel.grid[[i]]
+          } else {
+            theme.pars$line[[i]]
+          }
+      }
+      # convert colour to RGB if necessary
+      if(!is.rgb(pars$colour)) pars$colour <- unname(toRGB(pars$colour))
+      
+      # remove names (JSON file was getting confused)
+      pars <- lapply(pars, unname)
+      
+    }
+    
+    ## x and y locations
+    if(major) {
+      pars$loc$x <- as.list(meta$built$panel$ranges[[1]]$x.major)
+      pars$loc$y <- as.list(meta$built$panel$ranges[[1]]$y.major)
+    } else {
+      pars$loc$x <- as.list(meta$built$panel$ranges[[1]]$x.minor)
+      pars$loc$y <- as.list(meta$built$panel$ranges[[1]]$y.minor)
+      ## remove minor lines when major lines are already drawn
+      pars$loc$x <- pars$loc$x[
+        !(pars$loc$x %in% plot.meta$grid_major$loc$x)
+        ]
+      pars$loc$y <- pars$loc$y[
+        !(pars$loc$y %in% plot.meta$grid_major$loc$y)
+        ]
+    }
+    
+    pars
+  }
+  # extract major grid lines
+  plot.meta$grid_major <- get_grid(theme.pars$panel.grid.major)
+  # extract minor grid lines
+  plot.meta$grid_minor <- get_grid(theme.pars$panel.grid.minor, major = F)
+  
   ## Flip labels if coords are flipped - transform does not take care
   ## of this. Do this BEFORE checking if it is blank or not, so that
   ## individual axes can be hidden appropriately, e.g. #1.
@@ -138,17 +307,6 @@ parsePlot <- function(meta){
   axis.info <- plot.meta[grepl("^axis[0-9]+$", names(plot.meta))]
   plot.meta$xlabs <- as.list(unique(unlist(lapply(axis.info, "[", "xlab"))))
   plot.meta$ylabs <- as.list(unique(unlist(lapply(axis.info, "[", "ylab"))))
-
-  plot.meta$legend <- getLegendList(meta$built)
-  if(length(plot.meta$legend)>0){
-    plot.meta$legend <-
-      plot.meta$legend[which(sapply(plot.meta$legend, function(i) {
-        length(i)>0
-      }))]
-  }  # only pass out legends that have guide = "legend" or guide="colorbar"
-
-  # Remove legend if theme has no legend position
-  if(theme.pars$legend.position=="none") plot.meta$legend <- NULL
 
   if("element_blank"%in%attr(theme.pars$plot.title, "class")){
     plot.meta$title <- ""
@@ -257,8 +415,11 @@ saveLayer <- function(l, d, meta){
     col.name <- names(update.vars)[[sel.i]]
     if(!v.name %in% names(meta$selectors)){
       value <- g.data[[col.name]][1]
-      selector.type <- meta$selector.types[[v.name]]
-      if(is.null(selector.type))selector.type <- "single"
+      if(v.name %in% names(meta$selector.types)) {
+        selector.type <- meta$selector.types[[v.name]]
+      } else {
+        selector.type <- "single"
+      }
       stopifnot(is.character(selector.type))
       stopifnot(length(selector.type)==1)
       stopifnot(selector.type %in% c("single", "multiple"))
@@ -291,12 +452,27 @@ saveLayer <- function(l, d, meta){
   ## special cases of basic geoms. In ggplot2, this processing is done
   ## in the draw method of the geoms.
   if(g$geom=="abline"){
-    # "Trick" ggplot coord_transform into transforming the slope and intercept
-    g.data[,"x"] <- ranges$x.range[1]
-    g.data[,"xend"] <- ranges$x.range[2]
-    g.data[,"y"] <- g.data$slope*ranges$x.range[1]+g.data$intercept
-    g.data[,"yend"] <-  g.data$slope*ranges$x.range[2]+g.data$intercept
+    ## loop through each set of slopes/intercepts
+    for(i in 1:nrow(g.data)) {
+      
+      # "Trick" ggplot coord_transform into transforming the slope and intercept
+      g.data[i, "x"] <- ranges[[ g.data$PANEL[i] ]]$x.range[1]
+      g.data[i, "xend"] <- ranges[[ g.data$PANEL[i] ]]$x.range[2]
+      g.data[i, "y"] <- g.data$slope[i] * g.data$x[i] + g.data$intercept[i]
+      g.data[i, "yend"] <- g.data$slope[i] * g.data$xend[i] + g.data$intercept[i]
+      
+      # make sure that lines don't run off the graph
+      if(g.data$y[i] < ranges[[ g.data$PANEL[i] ]]$y.range[1] ) {
+        g.data$y[i] <- ranges[[ g.data$PANEL[i] ]]$y.range[1]
+        g.data$x[i] <- (g.data$y[i] - g.data$intercept[i]) / g.data$slope[i]
+      }
+      if(g.data$yend[i] > ranges[[ g.data$PANEL[i] ]]$y.range[2]) {
+        g.data$yend[i] <- ranges[[ g.data$PANEL[i] ]]$y.range[2]
+        g.data$xend[i] <- (g.data$yend[i] - g.data$intercept[i]) / g.data$slope[i]
+      }
+    }
     g.data <- as.data.frame(g.data)
+    
     if(g$aes[["group"]]=="1"){
       # ggplot2 defaults to adding a group attribute
       # which misleads for situations where there are
@@ -946,7 +1122,10 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
       meta$plot.name <- list.name
       parsePlot(meta) # calls ggplot_build.
     }else if(is.list(p)){ ## for options.
-      meta[[list.name]] <- p
+      ## combine the current option with p
+      # necessary because legends create their own list of selectors and first
+      # have to be careful not to overwrite these
+      meta[[list.name]] <- c(meta[[list.name]], p)
     }else{
       stop("list items must be ggplots or option lists, problem: ", list.name)
     }
@@ -1021,7 +1200,8 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
   ## The first selection:
   for(selector.name in names(meta$first)){
     first <- as.character(meta$first[[selector.name]])
-    if(meta$selectors[[selector.name]]$type == "single"){
+    s.type <- meta$selectors[[selector.name]]$type
+    if(!is.null(s.type) && s.type == "single"){
       stopifnot(length(first) == 1)
     }
     meta$selectors[[selector.name]]$selected <- first
@@ -1073,7 +1253,11 @@ servr::httd("', normalizePath( out.dir,winslash="/" ), '")')
 #' @return True/False value
 #' @export
 is.rgb <- function(x){
-  grepl("NULL", x) | (grepl("#", x) & nchar(x)==7)
+  if(is.null(x)) {
+    TRUE
+  } else {
+    (grepl("#", x) & nchar(x)==7)
+  }
 }
 
 #' Convert R colors to RGB hexadecimal color values
@@ -1101,15 +1285,16 @@ getLegendList <- function(plistextra){
   theme <- ggplot2:::plot_theme(plot)
   position <- theme$legend.position
   # by default, guide boxes are vertically aligned
-  theme$legend.box <- if(is.null(theme$legend.box)) "vertical" else theme$legend.box
+  if(is.null(theme$legend.box)) theme$legend.box <- "vertical" else theme$legend.box
 
   # size of key (also used for bar in colorbar guide)
-  theme$legend.key.width <- if(is.null(theme$legend.key.width)) theme$legend.key.size
-  theme$legend.key.height <- if(is.null(theme$legend.key.height)) theme$legend.key.size
+  if(is.null(theme$legend.key.width)) theme$legend.key.width <- theme$legend.key.size
+  if(is.null(theme$legend.key.height)) theme$legend.key.height <- theme$legend.key.size
   # by default, direction of each guide depends on the position of the guide.
-  theme$legend.direction <- if(is.null(theme$legend.direction)){
-    if (length(position) == 1 && position %in% c("top", "bottom", "left", "right"))
-      switch(position[1], top =, bottom = "horizontal", left =, right = "vertical")
+  if(is.null(theme$legend.direction)){
+    theme$legend.direction <- 
+      if (length(position) == 1 && position %in% c("top", "bottom", "left", "right"))
+        switch(position[1], top =, bottom = "horizontal", left =, right = "vertical")
     else
       "vertical"
   }
@@ -1145,7 +1330,50 @@ getLegendList <- function(plistextra){
     gdefs <- ggplot2:::guides_geom(gdefs, layers, default_mapping)
   } else (ggplot2:::zeroGrob())
   names(gdefs) <- sapply(gdefs, function(i) i$title)
-  lapply(gdefs, getLegend)
+  
+  ## adding the variable used to each LegendList
+  for(leg in seq_along(gdefs)) {
+    legend_type <- names(gdefs[[leg]]$key)
+    legend_type <- legend_type[legend_type != ".label"]
+    gdefs[[leg]]$legend_type <- legend_type
+    # grabbing the name of the variable
+    vars <- character()
+    for(layer_i in plot$layers) {
+      temp <- sapply(legend_type, function(type) { 
+        if( !is.null(layer_i$mapping[[type]]) ) {
+          ## if the legend is evaluated, ex. colour = factor(var), use show_colour
+          if( is.call(layer_i$mapping[[type]]) ) {
+            paste("show", type, sep = "_")
+          } 
+          ## otherwise, just use the variable name
+          else {
+            as.character( layer_i$mapping[[type]] )
+          }
+        }
+      })
+      if(!is.null(unlist(temp))) {
+        vars <- c(vars, temp)
+      }
+    }
+    if(length(vars) > 0) {
+      gdefs[[leg]]$vars <- unique( setNames(vars, NULL))
+    }
+  }
+  
+  ## Add a flag to specify whether or not breaks was manually
+  ## specified. If it was, then it should be respected. If not, and
+  ## the legend shows a numeric variable, then it should be reversed.
+  for(legend.name in names(gdefs)){
+    key.df <- gdefs[[legend.name]]$key
+    aes.name <- names(key.df)[1]
+    scale.i <- which(scales$find(aes.name))
+    if(length(scale.i) == 1){
+      sc <- scales$scales[[scale.i]]
+      gdefs[[legend.name]]$breaks <- sc$breaks
+    }
+  }
+  legend.list <- lapply(gdefs, getLegend)
+  legend.list[0 < sapply(legend.list, length)]
 }
 
 #' Function to get legend information for each scale
@@ -1154,7 +1382,7 @@ getLegendList <- function(plistextra){
 getLegend <- function(mb){
   guidetype <- mb$name
   ## The main idea of legends:
-
+  
   ## 1. Here in getLegend I export the legend entries as a list of
   ## rows that can be used in a data() bind in D3.
 
@@ -1192,6 +1420,8 @@ getLegend <- function(mb){
     list(guide = guidetype,
          geoms = geoms,
          title = mb$title,
+         vars = mb$vars, 
+         legend_type = mb$legend_type, 
          entries = data)
   }
 }

@@ -3,11 +3,12 @@ language: c
 before_install:
   - curl -OL http://raw.github.com/craigcitro/r-travis/master/scripts/travis-tool.sh
   - chmod 755 ./travis-tool.sh
+  - chmod 755 ./.push_gh_pages.sh
   - ./travis-tool.sh bootstrap
 install:
   # Dependencies for shiny/rmarkdown integration
   # Thanks RStudio! https://github.com/rstudio/rmarkdown/blob/master/.travis.yml
-  # Install binary pandoc from Rstudio 
+  # Install binary pandoc from Rstudio
   - mkdir -p $HOME/opt/pandoc
   - curl -O https://s3.amazonaws.com/rstudio-buildtools/pandoc-1.12.3.zip
   - unzip -j pandoc-1.12.3.zip pandoc-1.12.3/linux/debian/x86_64/pandoc
@@ -15,12 +16,16 @@ install:
   - chmod +x $HOME/opt/pandoc/pandoc*
   - rm pandoc-1.12.3.zip
   - $HOME/opt/pandoc/pandoc --version
-  # install uninstalled packages which this pkg depends on/links to/suggests. 
+  # install uninstalled packages which this pkg depends on/links to/suggests.
   - ./travis-tool.sh install_deps
-  - ./travis-tool.sh install_github tdhock/ggplot2
-  
-script: 
-  - Rscript -e "devtools::load_all(); setwd('tests'); source('testthat.R')"
+  - ./travis-tool.sh install_github tdhock/ggplot2  jimhester/covr
+
+script:
+  - Rscript -e "devtools::install(); source('tests/testthat.R', chdir = TRUE)"
+
+after_success:
+  - Rscript -e "library(covr);coveralls()"
+  - ./.push_gh_pages.sh
 
 after_failure:
   - ./travis-tool.sh dump_logs
@@ -32,4 +37,4 @@ notifications:
 
 env:
   global:
-    secure: "Xj6RfiCqNhJtTMOYlYwQ2OG4iauisc/MEGSM3u6RxRMe377p7lAyObqJLmMPiRGYuj7ho/Rt8lnY4n6xhxfd+vXC1nUvcJX0261xJPk8q/tzmoosV8/VJKuZ1B77w022njieqvBPiGWNwASNwEUyp2arKNyaIQbjKifBXhTRtCA="
+    secure: "KBHQwH4LExvV/rXagTdBa89VKAfC8aYVNUANrklJ6KCoOWQ4Jh3qIWwSDM8ModcR9Oq8JR9I3N/ObatIN/finjgDdCNUndUQcWaT6YNfnbznTQhR0PgthoCmvb0NWJwC2nEYC13XB5hwBMvq65vEkXu4uwthIBDhl5l56RN2+Rc="
