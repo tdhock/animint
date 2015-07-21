@@ -1822,9 +1822,21 @@ var animint = function (to_select, json_file) {
       .text(function(s_name){return s_name;})
     ;
     // adding an input for each selector
+    // adding an input for each selector
     var selector_widget_tds = selector_widget_rows.append("td");
-    var selector_widget_inputs = selector_widget_tds
+    var selector_widget_inputs = selector_widget_tds.selectAll("input")
+      .data(selector_array)
+      .enter()
       .append("input")
+      .attr("value", function(d) { return "setosa,versicolor,virginica"; })
+      .attr("id", function(s_name) { return s_name + "_input"; })
+    ;
+    $('#Species_input')
+      .selectize({
+          persist: false,
+          createOnBlur: true,
+          create: true
+        })
     ;
     
     /*
