@@ -1561,7 +1561,8 @@ var animint = function (to_select, json_file) {
           .style("opacity", function(d){return d["pointalpha"]||1;});
       }
       legend_rows.append("td")
-	      .attr("align", "left")
+        .attr("align", "left")
+        .attr("class", "legend_entry_label")
         .text(function(d){ return d["label"];});
     }
   };
