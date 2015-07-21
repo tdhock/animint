@@ -402,33 +402,55 @@ saveLayer <- function(l, d, meta){
   ## currently selected values of these variables are stored in
   ## plot.Selectors.
 
-  is.ss <- is.showSelected(names(g$aes))
-  show.vars <- g$aes[is.ss]
-  g$subset_order <- as.list(names(show.vars))
+  s.aes <- selector.aes(names(g$aes))
 
-  is.cs <- is.clickSelects(names(g$aes))
+  is.ss <- names(g$aes) %in% s.aes$showSelected$one
+  show.vars <- g$aes[is.ss]
+  pre.subset.order <- as.list(names(show.vars))
+
+  is.cs <- names(g$aes) %in% s.aes$clickSelects$one
   update.vars <- g$aes[is.ss | is.cs]
 
+  update.var.names <- if(0 < length(update.vars)){
+    data.frame(variable=names(update.vars), value=NA)
+  }else{
+    ##browser()
+  }
+  interactive.aes <- with(s.aes, {
+    rbind(clickSelects$several, showSelected$several,
+          update.var.names)
+  })
+
   ## Construct the selector.
-  for(sel.i in seq_along(update.vars)){
-    v.name <- update.vars[[sel.i]]
-    col.name <- names(update.vars)[[sel.i]]
-    if(!v.name %in% names(meta$selectors)){
-      value <- g.data[[col.name]][1]
-      if(v.name %in% names(meta$selector.types)) {
-        selector.type <- meta$selector.types[[v.name]]
-      } else {
-        selector.type <- "single"
-      }
-      stopifnot(is.character(selector.type))
-      stopifnot(length(selector.type)==1)
-      stopifnot(selector.type %in% c("single", "multiple"))
-      meta$selectors[[v.name]] <-
-        list(selected=as.character(value),
-             type=selector.type)
+  for(row.i in seq_along(interactive.aes$variable)){
+    aes.row <- interactive.aes[row.i, ]
+    selector.df <- if(is.na(aes.row$value)){
+      value.col <- paste(aes.row$variable)
+      data.frame(value.col,
+                 selector.name=update.vars[[value.col]])
+    }else{
+      selector.vec <- g.data[[paste(aes.row$variable)]]
+      data.frame(value.col=aes.row$value,
+                 selector.name=unique(paste(selector.vec)))
     }
-    meta$selectors[[v.name]]$update <-
-      c(meta$selectors[[v.name]]$update, as.list(g$classed))
+    for(row.i in 1:nrow(selector.df)){
+      sel.row <- selector.df[row.i,]
+      value.col <- paste(sel.row$value.col)
+      selector.name <- paste(sel.row$selector.name)
+      if(!selector.name %in% names(meta$selectors)){
+        value <- g.data[[value.col]][1]
+        selector.type <- meta$selector.types[[selector.name]]
+        if(is.null(selector.type))selector.type <- "single"
+        stopifnot(is.character(selector.type))
+        stopifnot(length(selector.type)==1)
+        stopifnot(selector.type %in% c("single", "multiple"))
+        meta$selectors[[selector.name]] <-
+          list(selected=as.character(value),
+               type=selector.type)
+      }
+      meta$selectors[[selector.name]]$update <-
+        c(meta$selectors[[selector.name]]$update, as.list(g$classed))
+    }
   }
 
   ## Warn if stat_bin is used with animint aes. geom_bar + stat_bin
@@ -687,7 +709,11 @@ saveLayer <- function(l, d, meta){
     names(g$aes)[g$aes==meta$time$var & click.or.show]
   }
   if(length(time.col)){
-    g$subset_order <- g$subset_order[order(g$subset_order != time.col)]
+    pre.subset.order <- pre.subset.order[order(pre.subset.order != time.col)]
+  }
+  ## Get unique values of time variable.
+  if(length(time.col)){ # if this layer/geom is animated,
+    g$timeValues <- unique(g.data[[time.col]])
   }
 
   ## Determine which showSelected values to use for breaking the data
@@ -696,7 +722,7 @@ saveLayer <- function(l, d, meta){
   ## when year is clicked, we may need to download some new data for
   ## this geom.
 
-  subset.vec <- unlist(g$subset_order)
+  subset.vec <- unlist(pre.subset.order)
   if("chunk_vars" %in% names(g$params)){ #designer-specified chunk vars.
     designer.chunks <- g$params$chunk_vars
     if(!is.character(designer.chunks)){
@@ -805,7 +831,7 @@ saveLayer <- function(l, d, meta){
     g.data <- g.data[names(g.data) != "PANEL"]
   }
   
-  ## Also add pointers to these chunks to the related selectors.
+  ## Also add pointers to these chunks from the related selectors.
   if(length(chunk.cols)){
     selector.names <- as.character(g$aes[chunk.cols])
     chunk.name <- paste(selector.names, collapse="_")
@@ -817,6 +843,13 @@ saveLayer <- function(l, d, meta){
   }else{
     g$chunk_order <- list()
   }
+
+  ## If this plot has more than one PANEL then add it to subset_order
+  ## and nest_order.
+  if(plot.has.panels){
+    nest.cols <- c(nest.cols, "PANEL")
+  }
+
   g$nest_order <- as.list(nest.cols)
   names(g$chunk_order) <- NULL
   names(g$nest_order) <- NULL
@@ -828,7 +861,17 @@ saveLayer <- function(l, d, meta){
     g$subset_order <- c(g$subset_order, "PANEL")
     g$nest_order <- c(g$nest_order, "PANEL")
   }
-  
+
+  ## nest_order should contain both .variable .value aesthetics, but
+  ## subset_order should contain only .variable.
+  if(0 < nrow(s.aes$showSelected$several)){
+    g$nest_order <- with(s.aes$showSelected$several, {
+      c(g$nest_order, paste(variable), paste(value))
+    })
+    g$subset_order <-
+      c(g$subset_order, paste(s.aes$showSelected$several$variable))
+  }
+    
   ## group should be the last thing in nest_order, if it is present.
   if("group" %in% names(g$aes)){
     g$nest_order <- c(g$nest_order, "group")
@@ -924,26 +967,43 @@ saveChunks <- function(x, meta){
   }
 }
 
-##' Test if aesthetics are showSelected.
-##' @param x character vector.
-##' @return logical vector
-##' @export
+##' Parse selectors from aes names.
+##' @title Parse selectors from aes names.
+##' @param a.vec character vector of aes names.
+##' @return list of selector info.
 ##' @author Toby Dylan Hocking
-is.showSelected <- function(x){
-  if(length(x) == 0)return(logical())
-  stopifnot(is.character(x))
-  grepl("showSelected", x)
-}
-
-##' Test if aesthetics are clickSelects.
-##' @param x character vector.
-##' @return logical vector
 ##' @export
-##' @author Susan VanderPlas
-is.clickSelects <- function(x){
-  if(length(x) == 0)return(logical())
-  stopifnot(is.character(x))
-  grepl("clickSelects", x)
+selector.aes <- function(a.vec){
+  stopifnot(is.character(a.vec))
+  cs.or.ss <- grepl("clickSelects|showSelected", a.vec)
+  for(v in c("value", "variable")){
+    regex <- paste0("[.]", v, "$")
+    is.v <- grepl(regex, a.vec)
+    if(any(is.v)){
+      a <- a.vec[is.v & cs.or.ss]
+      other.v <- if(v=="value")"variable" else "value"
+      other.a <- sub(paste0(v, "$"), other.v, a)
+      not.found <- ! other.a %in% a.vec
+      if(any(not.found)){
+        print(list(present=a, missing=other.a[not.found]))
+        stop(".variable or .value aes not found")
+      }
+    }
+  }
+  aes.list <- list()
+  for(a in c("clickSelects", "showSelected")){
+    is.a <- grepl(a, a.vec)
+    is.value <- grepl("[.]value$", a.vec)
+    is.variable <- grepl("[.]variable$", a.vec)
+    var.or.val <- is.variable | is.value
+    a.value <- a.vec[is.a & is.value]
+    a.variable <- sub("value$", "variable", a.value)
+    single <- a.vec[is.a & (!var.or.val)]
+    aes.list[[a]] <-
+      list(several=data.frame(variable=a.variable, value=a.value),
+           one=single)
+  }
+  aes.list
 }
 
 ##' Deprecated alias for animint2dir.
@@ -1102,9 +1162,9 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
         ## This code assumes that the layer has the complete aesthetic
         ## mapping and data. TODO: Do we need to copy any global
         ## values to this layer?
-        is.ss <- is.showSelected(names(L$mapping))
-        is.cs <- is.clickSelects(names(L$mapping))
-        update.vars <- L$mapping[is.ss | is.cs]
+        iaes <- selector.aes(names(L$mapping))
+        one.names <- with(iaes, c(clickSelects$one, showSelected$one))
+        update.vars <- L$mapping[one.names]
         has.var <- update.vars %in% names(L$data)
         if(!all(has.var)){
           print(L)
@@ -1112,7 +1172,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
                      data.variables=names(L$data)))
           stop("data does not have interactive variables")
         }
-        has.cs <- any(is.cs)
+        has.cs <- 0 < with(iaes$clickSelects, nrow(several) + length(one))
         has.href <- "href" %in% names(L$mapping)
         if(has.cs && has.href){
           stop("aes(clickSelects) can not be used with aes(href)")
@@ -1200,11 +1260,17 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
   ## The first selection:
   for(selector.name in names(meta$first)){
     first <- as.character(meta$first[[selector.name]])
-    s.type <- meta$selectors[[selector.name]]$type
-    if(!is.null(s.type) && s.type == "single"){
-      stopifnot(length(first) == 1)
+    if(selector.name %in% names(meta$selectors)){
+      s.type <- meta$selectors[[selector.name]]$type
+      if(s.type == "single"){
+        stopifnot(length(first) == 1)
+      }
+      meta$selectors[[selector.name]]$selected <- first
+    }else{
+      print(list(selectors=names(meta$selectors),
+                 missing.first=selector.name))
+      stop("missing first selector variable")
     }
-    meta$selectors[[selector.name]]$selected <- first
   }
 
   ## Finally, copy html/js/json files to out.dir.

@@ -1,4 +1,5 @@
 context("save separate chunks")
+library(plyr)
 
 ### test case 1
 # retrieve state-level data from the CDC's FluView Portal and save as FluView.RData

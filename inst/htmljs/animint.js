@@ -855,30 +855,47 @@ var animint = function (to_select, json_file) {
     var scales = Plots[p_name].scales[PANEL];
     var selected_arrays = [ [] ]; //double array necessary.
     g_info.subset_order.forEach(function (aes_name) {
-      var selected, values, old_array, value, new_array;
-      //if (aes_name != "group") { // why do we need this?
-  	  if(aes_name == "PANEL"){
-  	    selected = PANEL;
-  	  }else{
-        var v_name = g_info.aes[aes_name];
-        selected = Selectors[v_name].selected;
+      var selected, values;
+      var new_arrays = [];
+      if(0 < aes_name.indexOf(".variable")){ 
+	selected_arrays.forEach(function(old_array){
+	  var some_data = chunk;
+	  old_array.forEach(function(value){
+            if(some_data.hasOwnProperty(value)) {
+              some_data = some_data[value];
+            } else {
+              some_data = {};
+            }
+	  })
+	  values = d3.keys(some_data);
+	  values.forEach(function(s_name){
+	    var selected = Selectors[s_name].selected;
+	    var new_array = old_array.concat(s_name).concat(selected);
+	    new_arrays.push(new_array);
+	  })
+	})
+      }else{//not .variable aes:
+	if(aes_name == "PANEL"){
+	  selected = PANEL;
+	}else{
+          var s_name = g_info.aes[aes_name];
+          selected = Selectors[s_name].selected;
+	}
+	if(isArray(selected)){ 
+	  values = selected; //multiple selection.
+	}else{
+	  values = [selected]; //single selection.
+	}
+	values.forEach(function(value){
+	  selected_arrays.forEach(function(old_array){
+	    var new_array = old_array.concat(value);
+	    new_arrays.push(new_array);
+	  })
+	})
       }
-      if(isArray(selected)){
-        values = selected;
-      }else{
-        values = [selected];
-      }
-  	  var new_arrays = [];
-	    values.forEach(function(value){
-        selected_arrays.forEach(function(old_array){
-          new_array = old_array.concat(value);
-          new_arrays.push(new_array);
-        });
-      });
       selected_arrays = new_arrays;
-      //}
     });
-    var data = [];
+    var data = []
     selected_arrays.forEach(function(value_array){
       var some_data = chunk;
       value_array.forEach(function(value){
@@ -1404,26 +1421,44 @@ var animint = function (to_select, json_file) {
 	      .attr("class", "geom");
     }
     var has_clickSelects = g_info.aes.hasOwnProperty("clickSelects");
-    if (has_clickSelects) {
+    var has_clickSelects_variable =
+      g_info.aes.hasOwnProperty("clickSelects.variable");
+    if (has_clickSelects || has_clickSelects_variable) {
       var selected_funs = {
-        "opacity":{
-          "mouseout":function (d) {
-            return ifSelectedElse(d, g_info.aes.clickSelects, 
-              get_alpha(d), get_alpha(d) - 1/2);
-          },
-          "mouseover":function (d) {
+	"opacity":{
+	  "mouseout":function (d) {
+	    var alpha_on = get_alpha(d);
+	    var alpha_off = get_alpha(d) - 0.5;
+	    if(has_clickSelects){
+              return ifSelectedElse(d.clickSelects, g_info.aes.clickSelects,
+				    alpha_on, alpha_off);
+	    }else{
+	      return ifSelectedElse(d["clickSelects.value"],
+				    d["clickSelects.variable"],
+				    alpha_on, alpha_off);
+	    }
+	  },
+	  "mouseover":function (d) {
             return get_alpha(d);
-          }
-        },
-        "stroke":{
-          "mouseout":function(d){
-            return ifSelectedElse(d, g_info.aes.clickSelects,
-              "black", "transparent");
-          },
-          "mouseover":function(d){
-            return "black";
-          }
-        }
+	  }
+	},
+	"stroke":{
+	  "mouseout":function(d){
+	    var stroke_on = "black";
+	    var stroke_off = "transparent";
+	    if(has_clickSelects){
+	      return ifSelectedElse(d.clickSelects, g_info.aes.clickSelects,
+				    stroke_on, stroke_off);
+	    }else{
+	      return ifSelectedElse(d["clickSelects.value"],
+				    d["clickSelects.variable"],
+				    stroke_on, stroke_off);
+	    }
+	  },
+	  "mouseover":function(d){
+	    return "black";
+	  }
+	}
       };
       // My original design for clicking/interactivity/transparency:
       // Basically I wanted a really simple way to show which element
@@ -1474,13 +1509,19 @@ var animint = function (to_select, json_file) {
           d3.select(this).call(out_fun);
         })
         .on("click", function (d) {
-	         // The main idea of how clickSelects works: when we click
-	         // something, we call update_selector with the clicked
-	         // value.
-          var v_name = g_info.aes.clickSelects;
-          update_selector(v_name, d.clickSelects);
-        });
-    } else { // no clickSelects for this geom.
+	  // The main idea of how clickSelects works: when we click
+	  // something, we call update_selector with the clicked
+	  // value.
+	  if(has_clickSelects){
+            var s_name = g_info.aes.clickSelects;
+            update_selector(s_name, d.clickSelects);
+	  }else{
+	    var s_name = d["clickSelects.variable"];
+	    var s_value = d["clickSelects.value"];
+	    update_selector(s_name, s_value);
+	  }
+        })
+      ;
       // Assign opacity. treat lines and ribbons (groups of points)
       // specially.
       if (g_info.geom == "line" || g_info.geom == "ribbon") {
@@ -1564,18 +1605,17 @@ var animint = function (to_select, json_file) {
           }
         }
       });
-      s_info.update.forEach(function(g_name){
-        update_geom(g_name, v_name);
-      });
-    };
-  var ifSelectedElse = function (d, v_name, selected, not_selected) {
+    s_info.update.forEach(function(g_name){
+      update_geom(g_name, v_name);
+    });
+  };
+  var ifSelectedElse = function (s_value, s_name, selected, not_selected) {
     var is_selected;
-    var value = d.clickSelects + "";
-    var s_info = Selectors[v_name];
+    var s_info = Selectors[s_name];
     if(s_info.type == "single"){
-      is_selected = value == s_info.selected;
+      is_selected = s_value == s_info.selected;
     }else{
-      is_selected = s_info.selected.indexOf(value) != -1;
+      is_selected = s_info.selected.indexOf(s_value) != -1;
     }
     if(is_selected){
       return selected;

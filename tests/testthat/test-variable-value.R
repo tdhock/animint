@@ -1,5 +1,32 @@
 context("variable value")
 
+test_that("selector.aes errors when no matching variable for value", {
+  a.list <-
+    list(c("clickSelects.variable", "clickSelects2.variable",
+           "clickSelects2.value"),
+         c("clickSelects.variable", "clickSelects2.variable",
+           "clickSelects.value"),
+         c("showSelected.variable", "showSelected2.variable",
+           "showSelected2.value"),
+         c("showSelected.variable", "showSelected2.variable",
+           "showSelected.value"),
+         c("clickSelects.variable", "showSelected2.variable",
+           "clickSelects.value"),
+         "showSelected.variable",
+         "showSelected2.variable",
+         "clickSelects.variable",
+         "clickSelects2.variable",
+         "showSelected.value",
+         "showSelected2.value",
+         "clickSelects.value",
+         "clickSelects2.value")
+  for(a.vec in a.list){
+    expect_error({
+      selector.aes(a.vec)
+    }, ".variable or .value aes not found")
+  }
+})
+
 problems <-
   data.frame(problemStart=c(100, 200, 100, 150, 200, 250),
              problemEnd=c(200, 300, 150, 200, 250, 300),
@@ -50,6 +77,7 @@ viz <-
                       data=data.frame(peak.problems, sample.id="problems"),
                       size=10,
                       color="deepskyblue")+
+         ## TODO: yend=y=0 as params not aes?
          geom_segment(aes(peakStart, 0,
                           showSelected.variable=paste0(problem.name, "peaks"),
                           showSelected.value=peaks,
@@ -75,6 +103,7 @@ viz <-
        peaks=ggplot()+
          ggtitle("select number of peaks")+
          geom_point(aes(peaks, peaks,
+                        id=peaks,
                         showSelected=problem.name,
                         clickSelects.variable=paste0(problem.name, "peaks"),
                         clickSelects.value=peaks),
@@ -85,14 +114,36 @@ viz <-
                        showSelected=problem.name),
                    data=problems))
 
+##info <- animint2dir(viz, "variable-value")
+
 test_that(".variable and .value makes compiler create selectors", {
   info <- animint2HTML(viz)
   selector.names <- sort(names(info$selectors))
+  problem.selectors <- paste0(problems$problem.name, "peaks")
   expected.names <-
     sort(c("problem.name",
-           paste0(problems$problem.name, "peaks"),
+           problem.selectors,
            "bases.per.problem"))
   expect_identical(selector.names, expected.names)
+  selected <- sapply(info$selectors[problem.selectors], "[[", "selected")
+  expect_true(all(selected == "1"))
+
+  node.list <-
+    getNodeSet(info$html, '//g[@class="geom4_segment_problems"]//line')
+  expect_equal(length(node.list), 2)
+
+  no.peaks.html <- clickHTML(id=0)
+  node.list <-
+    getNodeSet(no.peaks.html, '//g[@class="geom4_segment_problems"]//line')
+  expect_equal(length(node.list), 1)
+
+  more.peaks.html <- clickHTML(id=2)
+  node.list <-
+    getNodeSet(more.peaks.html, '//g[@class="geom4_segment_problems"]//line')
+  expect_equal(length(node.list), 3)
+
+  ## TODO: test for //g[@class="geom6_point_peaks"]//circle//title
+  ## (tooltip that indicates the number of peaks).
 })
 
 viz.for <-
