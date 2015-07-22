@@ -843,13 +843,6 @@ saveLayer <- function(l, d, meta){
   }else{
     g$chunk_order <- list()
   }
-
-  ## If this plot has more than one PANEL then add it to subset_order
-  ## and nest_order.
-  if(plot.has.panels){
-    nest.cols <- c(nest.cols, "PANEL")
-  }
-
   g$nest_order <- as.list(nest.cols)
   names(g$chunk_order) <- NULL
   names(g$nest_order) <- NULL
