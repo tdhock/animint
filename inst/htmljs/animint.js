@@ -999,7 +999,9 @@ var animint = function (to_select, json_file) {
         0.5: "middle",
         1: "end"
       };
-      text_anchor = o[hjust];
+      if (typeof hjust != "undefined") {
+        text_anchor = o[hjust];
+      }
       return text_anchor;
     };
 
