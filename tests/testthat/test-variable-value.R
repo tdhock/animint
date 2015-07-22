@@ -193,6 +193,7 @@ for(problem.name in names(p.list)){
   p$bases.per.problem <- pp$bases.per.problem[1]
   viz.for$problems <- viz.for$problems+
     geom_segment(aes_string("peakStart", "problem.i",
+                            id="problem.name",
                             showSelected=s.name,
                             clickSelects="problem.name",
                             showSelected2="bases.per.problem",
@@ -217,13 +218,24 @@ for(problem.name in names(p.list)){
                     data=p)
 }
 
-##animint2dir(viz.for, "problem-peaks-for")
+info <- animint2HTML(viz.for)
 
-test_that("some chunks are not downloaded", {
-  info <- animint2HTML(viz.for)
+chunk.counts <- function(html=getHTML()){
   node.set <-
-    getNodeSet(info$html, '//td[@class="downloaded"]')
+    getNodeSet(html, '//td[@class="downloaded"]')
   value.vec <- sapply(node.set, xmlValue)
-  expect_true("0" %in% value.vec)
-  expect_match(value.vec,  "[01]")
+  table(value.vec)
+}
+
+test_that("counts of chunks downloaded or not at first", {
+  value.tab <- chunk.counts()
+  expect_equal(value.tab[["0"]], 13)
+  expect_equal(value.tab[["1"]], 9)
+})
+
+test_that("changing problem downloads one chunk", {
+  clickID('size100problem2')
+  value.tab <- chunk.counts()
+  expect_equal(value.tab[["0"]], 12)
+  expect_equal(value.tab[["1"]], 10)
 })
