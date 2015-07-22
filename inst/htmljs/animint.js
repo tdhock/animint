@@ -1522,17 +1522,6 @@ var animint = function (to_select, json_file) {
 	  }
         })
       ;
-      // Assign opacity. treat lines and ribbons (groups of points)
-      // specially.
-      if (g_info.geom == "line" || g_info.geom == "ribbon") {
-        enter.style("opacity", function (group_info) {
-          var one_group = data[group_info.value];
-          var one_row = one_group[0]; // take aesthetic for first value in the group
-          return get_alpha(one_row);
-        });
-      } else {
-        enter.style("opacity", get_alpha);
-      }
     }
     var has_tooltip = g_info.aes.hasOwnProperty("tooltip");
     if(has_clickSelects || has_tooltip){
