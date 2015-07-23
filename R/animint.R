@@ -873,8 +873,9 @@ saveLayer <- function(l, d, meta){
   ## Split into chunks and save tsv files.
   meta$classed <- g$classed
   meta$chunk.i <- 1L
-  g.data.varied <- saveCommonChunk(g.data, chunk.cols, g$nest_order, meta)
-  g$columns <- meta$columns
+  meta$g <- g
+  g.data.varied <- saveCommonChunk(g.data, chunk.cols, meta)
+  g <- meta$g
   g$chunks <- saveChunks(g.data.varied, meta)
   g$total <- length(unlist(g$chunks))
 
@@ -892,13 +893,15 @@ saveLayer <- function(l, d, meta){
 ##' Save the common columns for each tsv to one chunk
 ##' @param x data.frame.
 ##' @param vars character vector of variable names to split on.
-##' @param nest_order character vector of nest variable names.
 ##' @param meta environment.
 ##' @return a list of data.frames comprised of varied columns for each tsv.
-saveCommonChunk <- function(x, vars, nest_order, meta){
-  meta$columns <- NULL # initial value
+saveCommonChunk <- function(x, vars, meta){
+  meta$g$columns <- NULL # initial value
   # remove default group column added by ggplot builder
-  if("group" %in% names(x) & (!"group" %in% nest_order)) x <- x[, !names(x) %in% "group"]
+  if("group" %in% names(x) & (!"group" %in% meta$g$nest_order)){
+    x <- x[, !names(x) %in% "group"]
+    meta$g$types <- meta$g$types[!names(meta$g$types) %in% "group"]
+  }
   
   if(length(vars) == 0){
     x
@@ -915,8 +918,7 @@ saveCommonChunk <- function(x, vars, nest_order, meta){
     # If the number of common columns is at least 2, it's meaningful to save them
     # into separate chunk and reduce the output file size of chunk tsv.
     if(sum(is.common) >= 2){
-      common.cols <- cols[is.common]
-      meta$columns$common <- common.cols
+      meta$g$columns$common <- common.cols <- cols[is.common]
       # save common data to chunk
       csv.name <- sprintf("%s_chunk_common.tsv", meta$classed)
       common.chunk <- file.path(meta$out.dir, csv.name)
@@ -925,14 +927,13 @@ saveCommonChunk <- function(x, vars, nest_order, meta){
                   sep = "\t")
       # remove commond data for df.list but keep nest_order field in case of the
       # need of recovering the data.frame in the renderer
-      remove.cols <- common.cols[!common.cols %in% nest_order]
-      varied.cols <- setdiff(names(df1), remove.cols)
-      meta$columns$varied <- varied.cols
+      remove.cols <- common.cols[!common.cols %in% meta$g$nest_order]
+      meta$g$columns$varied <- varied.cols <- setdiff(names(df1), remove.cols)
       df.list <- plyr::llply(df.list, function(df){
         df <- df[, varied.cols, drop = FALSE]
         # remove duplicated rows to further reduce chunk file size
         # if group has only one value, keep duplicated rows, e.g. geom_point
-        if("group" %in% nest_order) df <- df[!duplicated(df), ]
+        if("group" %in% meta$g$nest_order) df <- df[!duplicated(df), ]
         df
       })
     }
