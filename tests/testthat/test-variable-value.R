@@ -227,19 +227,24 @@ info <- animint2HTML(viz.for)
 chunk.counts <- function(html=getHTML()){
   node.set <-
     getNodeSet(html, '//td[@class="downloaded"]')
-  value.vec <- sapply(node.set, xmlValue)
-  table(value.vec)
+  as.integer(sapply(node.set, xmlValue))
 }
 
 test_that("counts of chunks downloaded or not at first", {
-  value.tab <- chunk.counts()
-  expect_equal(value.tab[["0"]], 13)
-  expect_equal(value.tab[["1"]], 9)
+  value.vec <- chunk.counts()
+  expect_equal(value.vec,
+               c(1, 1, 1, 1, 1, 1,
+                 0, 0, 0, 0, 0, 0, 0, 0,
+                 1, 1, 1,
+                 0, 0, 0, 0, 0))
 })
 
 test_that("changing problem downloads one chunk", {
   clickID('size100problem2')
-  value.tab <- chunk.counts()
-  expect_equal(value.tab[["0"]], 12)
-  expect_equal(value.tab[["1"]], 10)
+  value.vec <- chunk.counts()
+  expect_equal(value.vec,
+               c(1, 1, 1, 1, 1, 1,
+                 0, 0, 0, 0, 0, 0, 0, 0,
+                 1, 1, 1, 1,
+                 0, 0, 0, 0))
 })
