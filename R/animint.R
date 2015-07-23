@@ -908,7 +908,7 @@ saveCommonChunk <- function(x, vars, meta){
   } else{
     # compare the first and the last data.frames to determine common columns
     df.list <- split(x[!names(x) %in% vars], x[, vars], drop = TRUE)
-    if(length(df.list) == 1) return(x)
+    if(length(df.list) == 1) return(df.list)
     df1 <- df.list[[1]]
     df2 <- df.list[[length(df.list)]]
     cols <- names(df1)
