@@ -1821,9 +1821,20 @@ var animint = function (to_select, json_file) {
       .append("td")
       .text(function(s_name){return s_name;})
     ;
-    // adding an input for each selector
-    // adding an input for each selector
-    var selector_widget_tds = selector_widget_rows.append("td");
+        // adding the selector
+    var selector_widget_select = selector_widget_rows
+      .append("td")
+      .append("select")
+      .attr("id", function(s_name) { return s_name + "_input"; })
+      .attr("placeholder", "Toggle Species");
+    // adding an option for each level of the variable
+    var selector_widget_options = selector_widget_select.selectAll("option")
+      .data(selector_array)
+      .enter()
+      .append("option")
+      .attr("value", 1)
+      .text("update");
+    /*
     var selector_widget_inputs = selector_widget_tds.selectAll("input")
       .data(selector_array)
       .enter()
@@ -1838,6 +1849,7 @@ var animint = function (to_select, json_file) {
           create: true
         })
     ;
+    */
     
     /*
     for(s_name in response.selectors) {
