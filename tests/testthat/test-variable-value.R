@@ -114,10 +114,9 @@ viz <-
                        showSelected=problem.name),
                    data=problems))
 
-##info <- animint2dir(viz, "variable-value")
+info <- animint2HTML(viz)
 
 test_that(".variable and .value makes compiler create selectors", {
-  info <- animint2HTML(viz)
   selector.names <- sort(names(info$selectors))
   problem.selectors <- paste0(problems$problem.name, "peaks")
   expected.names <-
@@ -127,21 +126,26 @@ test_that(".variable and .value makes compiler create selectors", {
   expect_identical(selector.names, expected.names)
   selected <- sapply(info$selectors[problem.selectors], "[[", "selected")
   expect_true(all(selected == "1"))
+})
 
+test_that(".variable and .value renders correctly at first", {
   node.list <-
     getNodeSet(info$html, '//g[@class="geom4_segment_problems"]//line')
   expect_equal(length(node.list), 2)
+})
 
+test_that("clicking reduces the number of peaks", {
   no.peaks.html <- clickHTML(id=0)
   node.list <-
     getNodeSet(no.peaks.html, '//g[@class="geom4_segment_problems"]//line')
   expect_equal(length(node.list), 1)
+})
 
+test_that("clicking increases the number of peaks", {
   more.peaks.html <- clickHTML(id=2)
   node.list <-
     getNodeSet(more.peaks.html, '//g[@class="geom4_segment_problems"]//line')
   expect_equal(length(node.list), 3)
-
   ## TODO: test for //g[@class="geom6_point_peaks"]//circle//title
   ## (tooltip that indicates the number of peaks).
 })
