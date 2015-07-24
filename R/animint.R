@@ -896,48 +896,61 @@ saveLayer <- function(l, d, meta){
 ##' @param meta environment.
 ##' @return a list of data.frames comprised of varied columns for each tsv.
 saveCommonChunk <- function(x, vars, meta){
-  meta$g$columns <- NULL # initial value
-  # remove default group column added by ggplot builder
-  if("group" %in% names(x) & (!"group" %in% meta$g$nest_order)){
-    x <- x[, !names(x) %in% "group"]
-    meta$g$types <- meta$g$types[!names(meta$g$types) %in% "group"]
-  }
-  
-  if(length(vars) == 0){
-    x
-  } else{
-    # compare the first and the last data.frames to determine common columns
-    df.list <- split(x[!names(x) %in% vars], x[, vars], drop = TRUE)
-    if(length(df.list) == 1) return(df.list)
-    df1 <- df.list[[1]]
-    df2 <- df.list[[length(df.list)]]
-    cols <- names(df1)
-    is.common <- plyr::laply(cols, function(col){
-      identical(df1[, col], df2[, col])
-    })
-    # If the number of common columns is at least 2, it's meaningful to save them
-    # into separate chunk and reduce the output file size of chunk tsv.
-    if(sum(is.common) >= 2){
-      meta$g$columns$common <- common.cols <- cols[is.common]
-      # save common data to chunk
-      csv.name <- sprintf("%s_chunk_common.tsv", meta$classed)
-      common.chunk <- file.path(meta$out.dir, csv.name)
-      common.data <- df1[common.cols]
-      write.table(common.data, common.chunk, quote = FALSE, row.names = FALSE, 
-                  sep = "\t")
-      # remove commond data for df.list but keep nest_order field in case of the
-      # need of recovering the data.frame in the renderer
-      remove.cols <- common.cols[!common.cols %in% meta$g$nest_order]
-      meta$g$columns$varied <- varied.cols <- setdiff(names(df1), remove.cols)
-      df.list <- plyr::llply(df.list, function(df){
-        df <- df[, varied.cols, drop = FALSE]
-        # remove duplicated rows to further reduce chunk file size
-        # if group has only one value, keep duplicated rows, e.g. geom_point
-        if("group" %in% meta$g$nest_order) df <- df[!duplicated(df), ]
-        df
-      })
+  if(is.data.frame(x)){
+    meta$g$columns <- NULL # initial value
+    # remove default group column added by ggplot builder
+    if("group" %in% names(x) & (!"group" %in% meta$g$nest_order)){
+      x <- x[, !names(x) %in% "group"]
+      meta$g$types <- meta$g$types[!names(meta$g$types) %in% "group"]
     }
-    df.list
+    
+    if(length(vars) == 0){
+      x
+    } else if(length(vars) == 1){
+      # compare the first and the last data.frames to determine common columns
+      df.list <- split(x[names(x) != vars], x[vars], drop = TRUE)
+      if(length(df.list) == 1) return(df.list)
+      df1 <- df.list[[1]]
+      df2 <- df.list[[length(df.list)]]
+      cols <- names(df1)
+      is.common <- plyr::laply(cols, function(col){
+        identical(df1[, col], df2[, col])
+      })
+      # If the number of common columns is at least 2, it's meaningful to save them
+      # into separate chunk and reduce the output file size of chunk tsv.
+      if(sum(is.common) >= 2){
+        meta$g$columns$common <- common.cols <- cols[is.common]
+        # save common data to chunk
+        csv.name <- sprintf("%s_chunk_common.tsv", meta$classed)
+        common.chunk <- file.path(meta$out.dir, csv.name)
+        common.data <- df1[common.cols]
+        write.table(common.data, common.chunk, quote = FALSE, row.names = FALSE, 
+                    sep = "\t")
+        # remove commond data for df.list but keep nest_order field in case of the
+        # need of recovering the data.frame in the renderer
+        remove.cols <- common.cols[!common.cols %in% meta$g$nest_order]
+        meta$g$columns$varied <- varied.cols <- setdiff(names(df1), remove.cols)
+        df.list <- plyr::llply(df.list, function(df){
+          df <- df[, varied.cols, drop = FALSE]
+          # remove duplicated rows to further reduce chunk file size
+          # if group has only one value, keep duplicated rows, e.g. geom_point
+          if("group" %in% meta$g$nest_order) df <- df[!duplicated(df), ]
+          df
+        })
+      }
+      df.list
+    } else{
+      use <- vars[1]
+      rest <- vars[-1]
+      vec <- x[use]
+      df.list <- split(x[names(x) != use], vec, drop = TRUE)
+      saveCommonChunk(df.list, rest, meta)
+    }
+  } else if(is.list(x)){
+    lapply(x, saveCommonChunk, vars, meta)
+  } else{
+    str(x)
+    stop("unknown object")
   }
 }
 
