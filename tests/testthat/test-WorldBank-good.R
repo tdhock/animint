@@ -1,7 +1,5 @@
-library(testthat)
 context("WorldBank-good")
 
-library(animint)
 data(WorldBank)
 
 not.na <- subset(WorldBank, !(is.na(life.expectancy) | is.na(fertility.rate)))
@@ -39,24 +37,17 @@ good <-
        first=list(year=1975, country="United States"),
        title="World Bank data (single selection)")
 
-info <- animint2HTML(good)
-
-test_that("bars render", {
-  node.set <-
-    getNodeSet(info$html, '//g[@class="geom6_bar_bar"]//rect')
-
-  expect_true(0 < length(node.set))
-
-  at.mat <- sapply(node.set, xmlAttrs)
-
-  num.vec <- as.numeric(at.mat[c("x", "width", "y", "height"), ])
-
-  expect_true(all(is.finite(num.vec)))
-})
-
-test_that("unspecified hjust means text-anchor: middle", {
-  style.value <-
-    getStyleValue(info$html, '//g[@class="geom2_text_scatter"]//text', 
-                  "text-anchor")
-  expect_match(style.value, "middle")
-})  
+ info <- animint2HTML(good)
+ 
+ test_that("bars render", {
+   node.set <-
+     getNodeSet(info$html, '//g[@class="geom6_bar_bar"]//rect')
+ 
+   expect_true(0 < length(node.set))
+ 
+   at.mat <- sapply(node.set, xmlAttrs)
+ 
+   num.vec <- as.numeric(at.mat[c("x", "width", "y", "height"), ])
+ 
+   expect_true(all(is.finite(num.vec)))
+ })

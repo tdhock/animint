@@ -164,7 +164,7 @@ scatter=ggplot()+
              data=WorldBank)+
   geom_text(aes(life.expectancy, fertility.rate, label=country,
                 showSelected=country, showSelected2=year,
-                key=country), #also use key here!
+                key=country), # also use key here!
             data=WorldBank, chunk_vars=c("year", "country"))+
   scale_size_animint(breaks=10^(5:9))+
   make_text(WorldBank, 55, 9, "year")
