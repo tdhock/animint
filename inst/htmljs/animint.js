@@ -693,8 +693,12 @@ var animint = function (to_select, json_file) {
         varied_obj = varied_chunk[g];
 
         var new_common_obj = [];
-        common_obj.forEach(function(part) { 
-          var new_part = clone(varied_obj[0]);
+        common_obj.forEach(function(part, i) {
+          if(varied_obj.length == common_obj.length){
+            var new_part = clone(varied_obj[i]);
+          } else {
+            var new_part = clone(varied_obj[0]);
+          }
           columns_common.forEach(function(col) {
             new_part[col] = part[col];
           });
