@@ -1,10 +1,6 @@
-context("WorldBank-good")
+context("WorldBank-NA")
 
 data(WorldBank)
-
-not.na <- subset(WorldBank, !(is.na(life.expectancy) | is.na(fertility.rate)))
-subset(not.na, is.na(not.na$population))
-not.na[not.na$country=="Kuwait", "population"] <- 1700000
 
 ## This example is good because it uses constancy
 ## http://bost.ocks.org/mike/constancy/
@@ -14,11 +10,11 @@ no.time <-
                       showSelected=year, colour=region, size=population,
                       tooltip=paste(country, "population", population),
                       key=country), # key aesthetic for animated transitions!
-                  data=not.na)+
+                  data=WorldBank)+
        geom_text(aes(life.expectancy, fertility.rate, label=country,
                      showSelected=country, showSelected2=year,
                      key=country), #also use key here!
-                 data=not.na)+
+                 data=WorldBank)+
        scale_size_animint(breaks=10^(5:9))+
        make_text(WorldBank, 55, 9, "year"),
        
@@ -48,6 +44,36 @@ bar.attributes <- function(html){
 }
 
 info <- animint2HTML(no.time)
+
+chunk1.tsv <- file.path("animint-htmltest", "geom6_bar_bar_chunk1.tsv")
+chunk1 <- read.table(chunk1.tsv, sep="\t", header=TRUE,
+                     comment.char="", quote="")
+
+test_that("chunk1 contains expected columns", {
+  expect_identical(names(chunk1), c("xmax", "group"))
+})
+
+test_that("chunk1 does not contain NA", {
+  not.missing <- !is.na(chunk1)
+  expect_true(all(not.missing))
+})
+
+common.tsv <- file.path("animint-htmltest", "geom6_bar_bar_chunk_common.tsv")
+common <- read.table(common.tsv, sep="\t", header=TRUE,
+                     comment.char="", quote="")
+
+test_that("common chunk contains expected columns", {
+  expected.cols <-
+    c("ymin", "ymax",
+      "clickSelects", "showSelectedlegendfill",
+      "fill")
+  expect_identical(sort(names(common)), sort(expected.cols))
+})
+
+test_that("common chunk does not contain NA", {
+  not.missing <- !is.na(common)
+  expect_true(all(not.missing))
+})
 
 test_that("bars render without time", {
   at.mat <- bar.attributes(info$html)
