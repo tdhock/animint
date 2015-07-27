@@ -872,6 +872,10 @@ saveLayer <- function(l, d, meta){
     g$nest_order <- c(g$nest_order, "group")
   }
 
+  ## rows with NA should not be saved.
+  not.na <- apply(!is.na(g.data), 1, all)
+  g.data <- g.data[not.na, ]
+
   ## Split into chunks and save tsv files.
   meta$classed <- g$classed
   meta$chunk.i <- 1L
