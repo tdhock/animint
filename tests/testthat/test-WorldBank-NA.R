@@ -27,6 +27,7 @@ no.time <-
        bar=ggplot()+
        theme_animint(height=2400)+
        geom_bar(aes(country, life.expectancy, fill=region,
+                    key=country,
                     showSelected=year, clickSelects=country),
                 data=WorldBank, stat="identity", position="identity")+
        coord_flip(),
