@@ -536,6 +536,8 @@ saveLayer <- function(l, d, meta){
     }
     g$geom <- "rect"
   } else if(g$geom=="bar"){
+    is.xy <- names(g.data) %in% c("x", "y")
+    g.data <- g.data[!is.xy]
     g$geom <- "rect"
   } else if(g$geom=="bin2d"){
     stop("bin2d is not supported in animint. Try using geom_tile() and binning the data yourself.")
