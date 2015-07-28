@@ -1811,6 +1811,8 @@ var animint = function (to_select, json_file) {
     selector_first_tr
       .append("th")
       .text("Toggle selected value");
+    /*
+    AN ATTEMPT TO DO THIS WITH D3's Data-binds.  Will come back later
     // adding a row for each selector
     var selector_widget_rows = selector_table.selectAll("tr.selector_widget")
       .data(selector_array)
@@ -1834,7 +1836,6 @@ var animint = function (to_select, json_file) {
       .append("option")
       .attr("value", 1)
       .text("update");
-    /*
     var selector_widget_inputs = selector_widget_tds.selectAll("input")
       .data(selector_array)
       .enter()
