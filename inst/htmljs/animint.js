@@ -1836,18 +1836,18 @@ var animint = function (to_select, json_file) {
         .insert("option")
         .attr("value", "")
         .text(function() { return "Toggle " + s_name; });
+      // calling selectize
+      $('#' + s_name + "_input")
+        .selectize({
+            persist: false,
+            createOnBlur: true,
+            create: true, 
+            onChange: function(value) { 
+              update_selector("Species", value); 
+            }
+          })
+       ;
     }
-    // calling selectize
-    $('#Species_input')
-      .selectize({
-          persist: false,
-          createOnBlur: true,
-          create: true, 
-          onChange: function(value) { 
-            update_selector("Species", value); 
-          }
-        })
-    ;
     
     /*
     AN ATTEMPT TO DO THIS WITH D3's Data-binds.  Will come back later
