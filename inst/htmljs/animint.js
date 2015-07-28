@@ -1837,6 +1837,14 @@ var animint = function (to_select, json_file) {
         .attr("value", "")
         .text(function() { return "Toggle " + s_name; });
     }
+    // calling selectize
+    $('#Species_input')
+      .selectize({
+          persist: false,
+          createOnBlur: true,
+          create: true
+        })
+    ;
     
     /*
     AN ATTEMPT TO DO THIS WITH D3's Data-binds.  Will come back later
@@ -1869,13 +1877,6 @@ var animint = function (to_select, json_file) {
       .append("input")
       .attr("value", function(d) { return "setosa,versicolor,virginica"; })
       .attr("id", function(s_name) { return s_name + "_input"; })
-    ;
-    $('#Species_input')
-      .selectize({
-          persist: false,
-          createOnBlur: true,
-          create: true
-        })
     ;
     */
     
