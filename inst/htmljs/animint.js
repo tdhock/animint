@@ -1843,7 +1843,7 @@ var animint = function (to_select, json_file) {
             createOnBlur: true,
             create: true, 
             onChange: function(value) { 
-              update_selector("Species", value); 
+              update_selector(s_name, value); 
             }
           })
        ;
