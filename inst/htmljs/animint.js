@@ -1811,6 +1811,33 @@ var animint = function (to_select, json_file) {
     selector_first_tr
       .append("th")
       .text("Toggle selected value");
+      
+     // looping through and adding a row for each selector
+    for(s_name in Selectors) {
+      s_info = Selectors[s_name];
+      // adding a row for each selector
+      selector_widget_row = selector_table.append("tr");
+      selector_widget_row.append("td").text(s_name);
+      // adding the selector
+      selector_widget_select = selector_widget_row
+        .append("td")
+        .append("select")
+        .attr("id", function() { return s_name + "_input"; })
+        .attr("placeholder", function() { return "Toggle " + s_name; });
+      // adding an option for each level of the variable
+      selector_widget_select.selectAll("option")
+        .data(s_info.levels)
+        .enter()
+        .append("option")
+        .attr("value", function(d) { return d; })
+        .text(function(d) { return d; });
+      // making sure that the first option is blank
+      selector_widget_select
+        .insert("option")
+        .attr("value", "")
+        .text(function() { return "Toggle " + s_name; });
+    }
+    
     /*
     AN ATTEMPT TO DO THIS WITH D3's Data-binds.  Will come back later
     // adding a row for each selector
