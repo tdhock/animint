@@ -1842,7 +1842,10 @@ var animint = function (to_select, json_file) {
       .selectize({
           persist: false,
           createOnBlur: true,
-          create: true
+          create: true, 
+          onChange: function(value) { 
+            update_selector("Species", value); 
+          }
         })
     ;
     
