@@ -1839,9 +1839,8 @@ var animint = function (to_select, json_file) {
       // calling selectize
       $('#' + s_name + "_input")
         .selectize({
-            persist: false,
-            createOnBlur: true,
-            create: true, 
+            create: false, 
+            allowEmptyOption: true, 
             onChange: function(value) { 
               update_selector(s_name, value); 
             }
