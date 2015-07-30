@@ -1854,18 +1854,13 @@ var animint = function (to_select, json_file) {
         $('#' + s_name + "_input")
           .selectize({
               create: false, 
-              maxItems: 1, 
+              maxItems: 1000, 
               allowEmptyOption: true, 
               onChange: function(value) { 
-                // if there are multiple values entered, update the selector for each
-                if(typeof value == "object") {
-                  value.forEach(function(element) {
-                    update_selector(s_name, element)
+                value.forEach(function(element) {
+                    update_selector(s_name, element);
                   })
-                } else {
-                  // otherwise, just update the selector for the 1 element
-                  update_selector(s_name, value); 
-                }
+                ;
               }
             })
         ;
