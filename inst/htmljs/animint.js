@@ -1706,6 +1706,7 @@ var animint = function (to_select, json_file) {
     
     // Animation control widgets.
     var show_message = "Show animation controls";
+    // add a button to view the animation widgets
     var show_hide_animation_controls = element.append("button")
       .text(show_message)
       .attr("id", "show_hide_animation_controls")
@@ -1719,11 +1720,13 @@ var animint = function (to_select, json_file) {
 	}
       })
     ;
+    // table of the animint widgets
     var time_table = element.append("table")
       .style("display", "none")
     ;
     var first_tr = time_table.append("tr");
     var first_th = first_tr.append("th");
+    // if there's a time variable, add a button to pause the animint
     if(response.time){
       Animation.next = {};
       Animation.ms = response.time.ms;
@@ -1836,10 +1839,11 @@ var animint = function (to_select, json_file) {
         .insert("option")
         .attr("value", "")
         .text(function() { return "Toggle " + s_name; });
-// determining if single or multiple selector
+      // determining if single or multiple selector
       selector_type = Selectors[s_name]["type"];
       // calling selectize
       if(selector_type == "single") {
+        // if single selection, only allow one item
         $('#' + s_name + "_input")
           .selectize({
               create: false, 
@@ -1851,6 +1855,7 @@ var animint = function (to_select, json_file) {
             })
          ;
       } else {
+        // otherwise, loop through all the inputs and update
         $('#' + s_name + "_input")
           .selectize({
               create: false, 
