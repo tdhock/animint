@@ -101,6 +101,10 @@ parsePlot <- function(meta){
         if(is.null(meta$selector.types[[var_name]])) {
           meta$selector.types[[var_name]] <- "multiple"
         }
+        # if first is not specified, create it
+        if(is.null(meta$first)) {
+          meta$first <- list()
+        }
         # if first is not specified, add all to first
         if(is.null(meta$first[[var_name]])) {
           u.vals <- unique(var)
