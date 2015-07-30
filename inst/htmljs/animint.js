@@ -1836,17 +1836,41 @@ var animint = function (to_select, json_file) {
         .insert("option")
         .attr("value", "")
         .text(function() { return "Toggle " + s_name; });
+// determining if single or multiple selector
+      selector_type = Selectors[s_name]["type"];
       // calling selectize
-      $('#' + s_name + "_input")
-        .selectize({
-            create: false, 
-            allowEmptyOption: true, 
-            onChange: function(value) { 
-              update_selector(s_name, value); 
-            }
-          })
-       ;
-    }
+      if(selector_type == "single") {
+        $('#' + s_name + "_input")
+          .selectize({
+              create: false, 
+              maxItems: 1, 
+              allowEmptyOption: true, 
+              onChange: function(value) { 
+                update_selector(s_name, value); 
+              }
+            })
+         ;
+      } else {
+        $('#' + s_name + "_input")
+          .selectize({
+              create: false, 
+              maxItems: 1, 
+              allowEmptyOption: true, 
+              onChange: function(value) { 
+                // if there are multiple values entered, update the selector for each
+                if(typeof value == "object") {
+                  value.forEach(function(element) {
+                    update_selector(s_name, element)
+                  })
+                } else {
+                  // otherwise, just update the selector for the 1 element
+                  update_selector(s_name, value); 
+                }
+              }
+            })
+        ;
+      }
+    } // close for loop through selector widgets
     
     /*
     AN ATTEMPT TO DO THIS WITH D3's Data-binds.  Will come back later
