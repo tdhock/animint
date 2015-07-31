@@ -1792,7 +1792,7 @@ var animint = function (to_select, json_file) {
     ;
     
     // selector widgets
-        show_message2 = "Toggle selected variables";
+    show_message2 = "Toggle selected variables";
     var show_hide_selector_widgets = element.append("button")
       .text(show_message2)
       .attr("id", "show_hide_selector_widgets")
