@@ -1866,10 +1866,35 @@ var animint = function (to_select, json_file) {
               maxItems: 1000, 
               allowEmptyOption: true, 
               onChange: function(value) { 
-                value.forEach(function(element) {
-                    update_selector(s_name, element);
-                  })
-                ;
+                // to FIX: I only need to do it for this selector
+                for(s_name in Selectors) {
+                  old_selections = Selectors[s_name].selected;
+                  // the levels that need to have selections turned on
+                  // strategy:
+                  // - find the options that the user has specified that are not turned on
+                  // - update the selector for each of them
+                  if(value != null) {
+                    value
+                      .filter(function(n) {
+                        return old_selections.indexOf(n) == -1;
+                      })
+                      .forEach(function(element) {
+                        update_selector(s_name, element);
+                      })
+                    ;
+                  }
+                  // the levels that need to be turned off
+                  // - same approach
+                  if(old_selections != null) {
+                  old_selections.filter(function(n) {
+                      return value.indexOf(n) == -1;
+                    })
+                    .forEach(function(element) {
+                      update_selector(s_name, element);
+                    })
+                  ;
+                }
+              }
               }
             })
         ;
