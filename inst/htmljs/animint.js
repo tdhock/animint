@@ -1862,7 +1862,7 @@ var animint = function (to_select, json_file) {
         $('#' + s_name + "_input")
           .selectize({
               create: false, 
-              items: Selectors[s_name]["selected"], 
+              items: Selectors[s_name].selected,
               maxItems: Selectos[s_name].levels.length, 
               allowEmptyOption: true, 
               onChange: function(value) { 
