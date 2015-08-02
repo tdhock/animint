@@ -1863,7 +1863,7 @@ var animint = function (to_select, json_file) {
           .selectize({
               create: false, 
               items: Selectors[s_name]["selected"], 
-              maxItems: 1000, 
+              maxItems: Selectos[s_name].levels.length, 
               allowEmptyOption: true, 
               onChange: function(value) { 
                 // to FIX: I only need to do it for this selector
