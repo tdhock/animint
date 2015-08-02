@@ -1866,7 +1866,11 @@ var animint = function (to_select, json_file) {
               maxItems: Selectors[s_name].levels.length, 
               allowEmptyOption: true, 
               onChange: function(value) { 
-                // to FIX: I only need to do it for this selector
+                // makes working with empty selections easier
+                if(value == null) {
+                  value = [];
+                }
+                // to FIX: I should only need to do this for the appropriate selector
                 for(s_name in Selectors) {
                   old_selections = Selectors[s_name].selected;
                   // the levels that need to have selections turned on
