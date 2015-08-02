@@ -1875,10 +1875,11 @@ var animint = function (to_select, json_file) {
                 for(s_name in Selectors) {
                   if(Selectors[s_name].type == "multiple") {
                     old_selections = Selectors[s_name].selected;
-                    // the levels that need to have selections turned on
                     // strategy:
                     // - find the options that the user has specified that are not turned on
                     // - update the selector for each of them
+                    
+                    // the levels that need to have selections turned on
                     value
                       .filter(function(n) {
                         return old_selections.indexOf(n) == -1;
@@ -1887,6 +1888,7 @@ var animint = function (to_select, json_file) {
                         update_selector(s_name, element);
                       })
                     ;
+                    
                     // the levels that need to be turned off
                     // - same approach
                     old_selections
