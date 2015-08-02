@@ -1873,20 +1873,18 @@ var animint = function (to_select, json_file) {
                   // strategy:
                   // - find the options that the user has specified that are not turned on
                   // - update the selector for each of them
-                  if(value != null) {
-                    value
-                      .filter(function(n) {
-                        return old_selections.indexOf(n) == -1;
-                      })
-                      .forEach(function(element) {
-                        update_selector(s_name, element);
-                      })
-                    ;
-                  }
+                  value
+                    .filter(function(n) {
+                      return old_selections.indexOf(n) == -1;
+                    })
+                    .forEach(function(element) {
+                      update_selector(s_name, element);
+                    })
+                  ;
                   // the levels that need to be turned off
                   // - same approach
-                  if(old_selections != null) {
-                  old_selections.filter(function(n) {
+                  old_selections
+                    .filter(function(n) {
                       return value.indexOf(n) == -1;
                     })
                     .forEach(function(element) {
@@ -1894,7 +1892,6 @@ var animint = function (to_select, json_file) {
                     })
                   ;
                 }
-              }
               }
             })
         ;
