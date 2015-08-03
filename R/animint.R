@@ -872,10 +872,6 @@ saveLayer <- function(l, d, meta){
     g$nest_order <- c(g$nest_order, "group")
   }
 
-  ## rows with NA should not be saved.
-  not.na <- apply(!is.na(g.data), 1, all)
-  g.data <- g.data[not.na, ]
-
   ## Split into chunks and save tsv files.
   meta$classed <- g$classed
   meta$chunk.i <- 1L
@@ -910,7 +906,9 @@ saveCommonChunk <- function(x, vars, meta){
   }
   
   if(length(vars) == 0){
-    x
+    # rows with NA should not be saved
+    not.na <- apply(!is.na(x), 1, all)
+    x <- x[not.na, ]
   } else {
     # return recursive list of data.frame
     r.df.list <- split.x(x, vars)
@@ -934,14 +932,14 @@ saveCommonChunk <- function(x, vars, meta){
       common.data <- df1[common.cols]
       write.table(common.data, common.chunk, quote = FALSE, row.names = FALSE, 
                   sep = "\t")
-      # remove commond data for df.list but keep nest_order field in case of the
+      # remove common data for df.list but keep nest_order field in case of the
       # need of recovering the data.frame in the renderer
-      remove.cols <- common.cols[!common.cols %in% meta$g$nest_order]
+      # keep key column for varied chunks for later joining by key in the renderer
+      remove.cols <- common.cols[!common.cols %in% c(meta$g$nest_order, "key")]
       meta$g$columns$varied <- varied.cols <- setdiff(names(df1), remove.cols)
       r.df.list <- plyr::llply(r.df.list, function(df){
         df <- df[, varied.cols, drop = FALSE]
         # remove duplicated rows to further reduce chunk file size
-        # if group has only one value, keep duplicated rows, e.g. geom_point
         if("group" %in% meta$g$nest_order) df <- df[!duplicated(df), ]
         df
       })
@@ -956,6 +954,10 @@ saveCommonChunk <- function(x, vars, meta){
 ##' @return recursive list of data.frame.
 split.x <- function(x, vars){
   if(is.data.frame(x)){
+    # rows with NA should not be saved
+    not.na <- apply(!is.na(x), 1, all)
+    x <- x[not.na, ]
+    
     if(length(vars) == 1){
       df.list <- split(x[names(x) != vars], x[vars], drop = TRUE)
     }else{
