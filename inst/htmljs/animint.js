@@ -190,14 +190,12 @@ var animint = function (to_select, json_file) {
       download_chunk(g_info, common_tsv, function(chunk){
         loading.remove();
         g_info.common_tsv = common_tsv;
-        // Save this geom and load it!
-        update_geom(g_name, null);
       });
     } else {
       g_info.common_tsv = null;
-      // Save this geom and load it!
-      update_geom(g_name, null);
     }
+    // Save this geom and load it!
+    update_geom(g_name, null);
   };
   var add_plot = function (p_name, p_info) {
     // Each plot may have one or more legends. To make space for the
@@ -747,12 +745,6 @@ var animint = function (to_select, json_file) {
         .attr("y", 10)
         .style("fill", "red");
       download_chunk(g_info, tsv_name, function(chunk){
-        // copy data from common tsv to varied tsv
-        if (g_info.common_tsv) {
-          var common_chunk = g_info.data[g_info.common_tsv];
-          chunk = copy_chunk(common_chunk, chunk, g_info.columns.common);
-          g_info.data[tsv_name] = chunk;
-        }
       	loading.remove();
 	      draw_panels(g_info, chunk, selector_name);
       });
@@ -842,6 +834,11 @@ var animint = function (to_select, json_file) {
         });
       });
       var chunk = nest.map(response);
+      // copy data from common tsv to varied tsv
+      if (g_info.common_tsv) {
+        var common_chunk = g_info.data[g_info.common_tsv];
+        chunk = copy_chunk(common_chunk, chunk, g_info.columns.common);
+      }
       g_info.data[tsv_name] = chunk;
       g_info.tr.select("td.downloaded").text(d3.keys(g_info.data).length);
       g_info.download_status[tsv_name] = "saved";

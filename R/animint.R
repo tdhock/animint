@@ -906,9 +906,7 @@ saveCommonChunk <- function(x, vars, meta){
   }
   
   if(length(vars) == 0){
-    # rows with NA should not be saved
-    not.na <- apply(!is.na(x), 1, all)
-    x <- x[not.na, ]
+    x
   } else {
     # return recursive list of data.frame
     r.df.list <- split.x(x, vars)
@@ -934,8 +932,7 @@ saveCommonChunk <- function(x, vars, meta){
                   sep = "\t")
       # remove common data for df.list but keep nest_order field in case of the
       # need of recovering the data.frame in the renderer
-      # keep key column for varied chunks for later joining by key in the renderer
-      remove.cols <- common.cols[!common.cols %in% c(meta$g$nest_order, "key")]
+      remove.cols <- common.cols[!common.cols %in% c(meta$g$nest_order)]
       meta$g$columns$varied <- varied.cols <- setdiff(names(df1), remove.cols)
       r.df.list <- plyr::llply(r.df.list, function(df){
         df <- df[, varied.cols, drop = FALSE]
@@ -954,10 +951,6 @@ saveCommonChunk <- function(x, vars, meta){
 ##' @return recursive list of data.frame.
 split.x <- function(x, vars){
   if(is.data.frame(x)){
-    # rows with NA should not be saved
-    not.na <- apply(!is.na(x), 1, all)
-    x <- x[not.na, ]
-    
     if(length(vars) == 1){
       df.list <- split(x[names(x) != vars], x[vars], drop = TRUE)
     }else{
