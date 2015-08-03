@@ -156,30 +156,76 @@ viz <-
 
 info <- animint2HTML(viz)
 
-clickID("none")
-
 style.pattern <-
   paste0("(?<name>\\S+?)",
          ": *",
          "(?<value>.+?)",
          ";")
 
-getCircle <- function(id.value){
-  xpath <- sprintf('//tr[@id="%s"]//circle', id.value)
-  node.set <- getNodeSet(info$html, xpath)
+get.style.vec <- function(xpath){
+  node.set <- getNodeSet(getHTML(), xpath)
   expect_equal(length(node.set), 1)
   node <- node.set[[1]]
-  style <- xmlAttrs(node)[["style"]]
-  style.mat <- str_match_all_perl(style, style.pattern)[[1]]
-  style.mat[, "value"]
+  attr.vec <- xmlAttrs(node)
+  if("style" %in% names(attr.vec)){
+    style <- attr.vec[["style"]]
+    style.mat <- str_match_all_perl(style, style.pattern)[[1]]
+    style.vec <- style.mat[, "value"]
+    names(style.vec) <- rownames(style.mat)
+    style.vec
+  }else{
+    character()
+  }
 }
 
+some <- get.style.vec('//tr[@id="some"]//circle')
+none <- get.style.vec('//tr[@id="none"]//circle')
+
 test_that("geom_point(aes(color)) legend shows as circle stroke", {
-  some <- getCircle("some")
-  none <- getCircle("none")
   expect_true(some[["stroke"]] != none[["stroke"]])
   expect_true(some[["fill"]] == none[["fill"]])
 })
+
+get.opacity <- function(xpath){
+  style.vec <- get.style.vec(xpath)
+  if("opacity" %in% names(style.vec)){
+    as.numeric(style.vec[["opacity"]])
+  }else{
+    1
+  }
+}
+
+intergenic.before <- get.opacity('//td[@id="INTERGENIC"]')
+
+test_that("INTERGENIC legend entry opacity 1 before clicking", {
+  expect_equal(intergenic.before, 1)
+})
+
+clickID("INTERGENIC")
+
+intergenic.after <- get.opacity('//td[@id="INTERGENIC"]')
+
+test_that("INTERGENIC legend entry opacity 0.5 after clicking", {
+  expect_equal(intergenic.after, 0.5)
+})
+
+none.before <- get.opacity('//td[@id="none"]')
+
+test_that("none legend entry opacity 1 before clicking", {
+  expect_equal(none.before, 1)
+})
+
+clickID("none")
+
+intergenic.after <- get.opacity('//td[@id="none"]')
+
+test_that("none legend entry opacity 0.5 after clicking", {
+  expect_equal(none.after, 0.5)
+})
+
+## TODO: test number of geoms rendered in chroms and variants plots,
+## before and after clicking.
+
 
 ## BUG: metric.name and highly.divergent.regions legend entries do not
 ## fade to opacity: 0.5 after clicking.
