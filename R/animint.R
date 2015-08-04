@@ -1303,26 +1303,29 @@ getLegendList <- function(plistextra){
   ## Add a flag to specify whether or not there is both a color and a
   ## fill legend to display. If so, we need to draw the interior of
   ## the points in the color legend as the same color.
-  aes.geom.list <- list()
-  for(legend.name in names(legend.list)){
-    L <- legend.list[[legend.name]]
-    aes.geom.list[[legend.name]] <-
-      data.frame(legend.name,
-                 geom=L$geom,
-                 aes=L$legend_type)
-  }
-  aes.geom <- do.call(rbind, aes.geom.list)
-  rownames(aes.geom) <- NULL
-  legends.by.geom <- split(aes.geom, aes.geom$geom)
-  for(g.name in names(legends.by.geom)){
-    one.geom <- legends.by.geom[[g.name]]
-    has.both <- all(c("colour", "fill") %in% one.geom$aes)
-    if(has.both){
-      colour.row <- which(one.geom$aes=="colour")
-      legend.name <- paste(one.geom$legend.name[[colour.row]])
-      fill.name <- paste0(g.name, "fill")
-      for(entry.i in seq_along(legend.list[[legend.name]]$entries)){
-        legend.list[[legend.name]]$entries[[entry.i]][[fill.name]] <- "#FFFFFF"
+  if(0 < length(legend.list)){
+    aes.geom.list <- list()
+    for(legend.name in names(legend.list)){
+      L <- legend.list[[legend.name]]
+      aes.geom.list[[legend.name]] <-
+        data.frame(legend.name,
+                   geom=L$geom,
+                   aes=L$legend_type)
+    }
+    aes.geom <- do.call(rbind, aes.geom.list)
+    rownames(aes.geom) <- NULL
+    legends.by.geom <- split(aes.geom, aes.geom$geom)
+    for(g.name in names(legends.by.geom)){
+      one.geom <- legends.by.geom[[g.name]]
+      has.both <- all(c("colour", "fill") %in% one.geom$aes)
+      if(has.both){
+        colour.row <- which(one.geom$aes=="colour")
+        legend.name <- paste(one.geom$legend.name[[colour.row]])
+        fill.name <- paste0(g.name, "fill")
+        for(entry.i in seq_along(legend.list[[legend.name]]$entries)){
+          legend.list[[legend.name]]$entries[[entry.i]][[fill.name]] <-
+            "#FFFFFF"
+        }
       }
     }
   }
