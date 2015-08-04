@@ -107,6 +107,7 @@ viz <-
                         fill=annotation,
                         clickSelects=LOCUS_ID),
                     size=5,
+                    pch=21,
                     data=malaria$amplicons)+
          scale_color_manual(values=c(none="white", some="black"))+
          scale_x_discrete("Malaria parasite yoelii yoelii chromosome",
