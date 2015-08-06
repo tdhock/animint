@@ -68,6 +68,7 @@ test_that("save separate chunks for geom_polygon", {
   viz <- list(levelHeatmap = level.heatmap, stateMap = state.map, title = "FluView")
   out.dir <- file.path(getwd(), "FluView")
   animint2dir(viz, out.dir = out.dir, open.browser = FALSE)
+
   common.chunk <- list.files(path = out.dir, pattern = "geom.+polygon.+chunk_common.tsv", 
                              full.names = TRUE)
   varied.chunks <- list.files(path = out.dir, pattern = "geom.+polygon.+chunk[0-9]+.tsv", 
@@ -142,12 +143,12 @@ test_that("save separate chunks for geom_point without specifying group", {
   # test common.chunk
   common.data <- read.csv(common.chunk, sep = "\t")
   expect_equal(nrow(common.data), nrow(USdots))
-  expect_true(all(c("x", "y") %in% names(common.data)))
+  expect_true(all(c("x", "y", "group") %in% names(common.data)))
   # randomly choose an varied.chunk to test
   idx <- sample(no.chunks, 1)
   varied.data <- read.csv(varied.chunks[idx], sep = "\t")
   expect_equal(nrow(varied.data), nrow(USdots))
-  expect_true(all(c("fill") %in% names(varied.data)))
+  expect_true(all(c("fill", "group") %in% names(varied.data)))
     
   unlink(out.dir, recursive = TRUE)
 })
@@ -175,7 +176,7 @@ ts=ggplot()+
                 clickSelects=country),
             data=WorldBank, size=4, alpha=3/5)
 
-test_that("save separate chunks for non-spatial geoms with repetitive field and multiple vars selected", {
+test_that("save separate chunks for non-spatial geoms with repetitive field, multiple vars selected, and NAs", {
   viz <- list(scatter = scatter, ts = ts, time=list(variable="year", ms=3000),
          duration=list(year=1000), first=list(year=1975, country="United States"),
          title="World Bank data (multiple selections)")
@@ -190,11 +191,10 @@ test_that("save separate chunks for non-spatial geoms with repetitive field and 
   # number of chunks
   expect_equal(length(common.chunk), 0L)
   no.chunks <- length(varied.chunks)
-  expect_equal(no.chunks, length(unique(WorldBank$year)) * length(unique(WorldBank$country)))
-  # randomly choose an varied.chunk to test
-  idx <- sample(no.chunks, 1)
-  varied.data <- read.csv(varied.chunks[idx], sep = "\t")
-  expect_equal(nrow(varied.data), nrow(WorldBank) / length(unique(WorldBank$year)) / length(unique(WorldBank$country)))
+  expect_equal(no.chunks, 9852)
+  # choose first varied.chunk to test
+  varied.data <- read.csv(varied.chunks[1], sep = "\t")
+  expect_equal(nrow(varied.data), 1)
   expect_true(all(c("x", "y", "label", "key") %in% names(varied.data)))
   
   ## single var selected
@@ -205,16 +205,15 @@ test_that("save separate chunks for non-spatial geoms with repetitive field and 
   # number of chunks
   expect_equal(length(common.chunk), 1L)
   no.chunks <- length(varied.chunks)
-  expect_equal(no.chunks, length(unique(WorldBank$year)))
+  expect_equal(no.chunks, 52)
   # test common.chunk
   common.data <- read.csv(common.chunk, sep = "\t")
-  expect_equal(nrow(common.data), length(unique(WorldBank$country)))
-  expect_true(all(c("colour", "clickSelects", "key", "fill") %in% names(common.data)))
-  # randomly choose an varied.chunk to test
-  idx <- sample(no.chunks, 1)
-  varied.data <- read.csv(varied.chunks[idx], sep = "\t")
-  expect_equal(nrow(varied.data), length(unique(WorldBank$country)))
-  expect_true(all(c("size", "x",	"y",	"tooltip") %in% names(varied.data)))
+  expect_equal(nrow(common.data), 214)
+  expect_true(all(c("colour", "clickSelects", "key", "fill", "group") %in% names(common.data)))
+  # choose first varied.chunk to test
+  varied.data <- read.csv(varied.chunks[1], sep = "\t")
+  expect_equal(nrow(varied.data), 186)
+  expect_true(all(c("size", "x",	"y",	"tooltip", "showSelectedlegendcolour", "group") %in% names(varied.data)))
   
   unlink(out.dir, recursive = TRUE)
 })

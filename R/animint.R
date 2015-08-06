@@ -906,23 +906,40 @@ saveCommonChunk <- function(x, vars, meta){
   }
   
   if(length(vars) == 0){
-    x
+    # rows with NA should not be saved
+    na.omit(x)
   } else {
+    raw.x <- x
+    # add group column for later joining by group in renderer
+    # if group column already exists, use the existing one
+    if(!"group" %in% meta$g$nest_order){
+      x <- ddply(x, vars, function(df){
+        data.frame(df[!names(df) %in% vars], group = 1:nrow(df))
+      })
+    }
     # return recursive list of data.frame
     r.df.list <- split.x(x, vars)
     # compare the first and the last data.frame from non-rescursive list of 
     # data.frame to determine common columns
     df.list <- split(x[!names(x) %in% vars], x[, vars], drop = TRUE)
-    if(length(df.list) == 1) return(r.df.list)
+    if(length(df.list) == 1) return(split.x(raw.x, vars))
     df1 <- df.list[[1]]
     df2 <- df.list[[length(df.list)]]
+    if(nrow(df1) == 1) return(split.x(raw.x, vars))
     cols <- names(df1)
     is.common <- plyr::laply(cols, function(col){
-      identical(df1[, col], df2[, col])
+      r <- identical(df1[, col], df2[, col])
+      x <- na.omit(unique(c(df1[, col], df2[, col])))
+      if(length(x) == 1){
+        r <- TRUE
+        df1[, col] <<- x
+      }
+      r
     })
-    # If the number of common columns is at least 2, it's meaningful to save them
-    # into separate chunk and reduce the output file size of chunk tsv.
-    if(sum(is.common) >= 2){
+    # If the number of common columns is at least 3 (an nest_order, group, and an 
+    # extra column), it's meaningful to save them into separate chunk and reduce 
+    # the output file size of chunk tsv.
+    if(sum(is.common) >= 3){
       meta$g$columns$common <- common.cols <- cols[is.common]
       # save common data to chunk
       csv.name <- sprintf("%s_chunk_common.tsv", meta$classed)
@@ -932,16 +949,35 @@ saveCommonChunk <- function(x, vars, meta){
                   sep = "\t")
       # remove common data for df.list but keep nest_order field in case of the
       # need of recovering the data.frame in the renderer
-      remove.cols <- common.cols[!common.cols %in% c(meta$g$nest_order)]
+      # keep group column for later joining by group in renderer
+      remove.cols <- common.cols[!common.cols %in% c(meta$g$nest_order, "group")]
       meta$g$columns$varied <- varied.cols <- setdiff(names(df1), remove.cols)
-      r.df.list <- plyr::llply(r.df.list, function(df){
-        df <- df[, varied.cols, drop = FALSE]
-        # remove duplicated rows to further reduce chunk file size
-        if("group" %in% meta$g$nest_order) df <- df[!duplicated(df), ]
-        df
-      })
+      r.df.list <- varied.chunk(r.df.list, varied.cols, meta$g$nest_order)
     }
     r.df.list
+  }
+}
+
+##' Depth of recursive list.
+##' @param this object.
+##' @return depth of this recursive list.
+depth <- function(this) ifelse(is.list(this), 1L + max(sapply(this, depth)), 0L)
+
+##' Extract subset for each data.frame in a list of data.frame
+##' @param df.list list of data.frame.
+##' @param cols cols that each data.frame would keep.
+##' @param nest_order columns used for d3 nest.
+##' @return list of data.frame.
+varied.chunk <- function(df.list, cols, nest_order){
+  if(depth(df.list) == 2){
+    llply(df.list, function(df){
+      df <- df[, cols, drop = FALSE]
+      # remove duplicated rows to further reduce chunk file size
+      if("group" %in% nest_order) df <- df[!duplicated(df), ]
+      df
+    })
+  } else{
+    lapply(df.list, varied.chunk, cols, nest_order)
   }
 }
 
@@ -951,6 +987,8 @@ saveCommonChunk <- function(x, vars, meta){
 ##' @return recursive list of data.frame.
 split.x <- function(x, vars){
   if(is.data.frame(x)){
+    # rows with NA should not be saved
+    x <- na.omit(x)
     if(length(vars) == 1){
       df.list <- split(x[names(x) != vars], x[vars], drop = TRUE)
     }else{

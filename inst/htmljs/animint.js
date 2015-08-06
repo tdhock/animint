@@ -651,6 +651,49 @@ var animint = function (to_select, json_file) {
   };
 
   /**
+   * join common chunk tsv into varied chunk tsv by group
+   * @param  {array} common_chunk   array of json objects from common chunk tsv
+   * @param  {array} varied_chunk   array of json objects from varied chunk tsv
+   * @param  {string array} columns_common array of common column names
+   * @param  {string} group         group column name
+   * @return {array}                array of json objects after joining common chunk tsv into varied chunk tsv
+  */
+  var joinChunkByGroup = function(common_chunk, varied_chunk, columns_common, group) {
+    var new_varied_chunk = [];
+    // join by group
+    var groups = varied_chunk.map(function(obj){
+      return obj[group];
+    });
+
+    groups.forEach(function(id){
+      var varied_obj = findObjectByKey(varied_chunk, group, id);
+      var common_obj = findObjectByKey(common_chunk, group, id);
+      var new_varied_obj = clone(varied_obj);
+      columns_common.forEach(function(col) {
+        new_varied_obj[col] = common_obj[col];
+      });
+      new_varied_chunk.push(new_varied_obj);
+    });
+    return new_varied_chunk;
+  }
+
+  /**
+   * find object matching a key of lookup value from an array of objects
+   * @param  {[type]} array array of objects to lookup
+   * @param  {[type]} key   the key of each objects in the array to lookup
+   * @param  {[type]} value the value of key to lookup
+   * @return {[type]}       object
+  */
+  var findObjectByKey = function(array, key, value) {
+    for (var i = 0; i < array.length; i++) {
+      if (array[i][key] === value) {
+        return array[i];
+      }
+    }
+    return null;
+  };
+
+  /**
    * clone json object without reference
    * @param  {json object} object json object
    * @return {json object}        a copy of input json object
@@ -671,41 +714,34 @@ var animint = function (to_select, json_file) {
    * @return {json object}                json object after merging common chunk tsv into varied chunk tsv
   */
   var copy_chunk = function(common_chunk, varied_chunk, columns_common) {
-    var groups = d3.keys(common_chunk);
+    if(columns_common.indexOf("group") != -1){
+      if(Array.isArray(varied_chunk)){
+        var new_varied_chunk = joinChunkByGroup(common_chunk, varied_chunk, columns_common, "group");
+      } else{
+        var new_varied_chunk = {};
 
-    if(Array.isArray(varied_chunk)){
-      var new_varied_chunk = [];
-      groups.forEach(function(g) {
-        common_obj = common_chunk[g];
-        varied_obj = varied_chunk[g];
-        var new_varied_obj = clone(varied_obj);
-        columns_common.forEach(function(col) {
-          new_varied_obj[col] = common_obj[col];
-        });
-        new_varied_chunk.push(new_varied_obj);
-      });
-    }else{
-      var new_varied_chunk = {};
-      groups.forEach(function(g) {
-        common_obj = common_chunk[g];
-        varied_obj = varied_chunk[g];
+        var keys = d3.keys(varied_chunk);
+        keys.forEach(function(k){
+          var g_varied_chunk = varied_chunk[k];
+          var g_common_chunk = common_chunk[k];
 
-        var new_common_obj = [];
-        common_obj.forEach(function(part, i) {
-          if(varied_obj.length == common_obj.length){
-            var new_part = clone(varied_obj[i]);
-          } else {
-            var new_part = clone(varied_obj[0]);
+          if(g_varied_chunk.length == 1){
+            var new_g_varied_chunk = [];
+            g_common_chunk.forEach(function(obj){
+              var new_varied_obj = clone(g_varied_chunk[0]);
+              columns_common.forEach(function(col) {
+                new_varied_obj[col] = obj[col];
+              });
+              new_g_varied_chunk.push(new_varied_obj);
+            });
+          } else{
+            var new_g_varied_chunk = joinChunkByGroup(g_common_chunk, g_varied_chunk, columns_common, "group");
           }
-          columns_common.forEach(function(col) {
-            new_part[col] = part[col];
-          });
-          new_common_obj.push(new_part);
+          new_varied_chunk[k] = new_g_varied_chunk;
         });
-        new_varied_chunk[g] = new_common_obj;
-      });
+      }
+      return new_varied_chunk;
     }
-    return new_varied_chunk;
   };
 
   // update_geom is called from add_geom and update_selector. It

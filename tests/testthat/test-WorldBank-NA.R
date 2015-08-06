@@ -13,7 +13,7 @@ no.time <-
                   data=WorldBank)+
        geom_text(aes(life.expectancy, fertility.rate, label=country,
                      showSelected=country, showSelected2=year,
-                     key=country), #also use key here!
+                     key=country), # also use key here!
                  data=WorldBank)+
        scale_size_animint(breaks=10^(5:9))+
        make_text(WorldBank, 55, 9, "year"),
@@ -51,7 +51,7 @@ chunk1 <- read.table(chunk1.tsv, sep="\t", header=TRUE,
                      comment.char="", quote="")
 
 test_that("chunk1 contains expected columns", {
-  expect_identical(names(chunk1), c("xmax", "group"))
+  expect_identical(names(chunk1), c("showSelectedlegendfill", "xmax", "group"))
 })
 
 test_that("chunk1 does not contain NA", {
@@ -93,4 +93,3 @@ test_that("bars render with time", {
   expect_true(0 < ncol(at.mat))
   expect_true(all(is.finite(num.vec)))
 })
-
