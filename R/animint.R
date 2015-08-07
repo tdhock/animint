@@ -413,9 +413,8 @@ saveLayer <- function(l, d, meta){
 
   update.var.names <- if(0 < length(update.vars)){
     data.frame(variable=names(update.vars), value=NA)
-  }else{
-    ##browser()
   }
+  
   interactive.aes <- with(s.aes, {
     rbind(clickSelects$several, showSelected$several,
           update.var.names)
@@ -873,7 +872,6 @@ saveLayer <- function(l, d, meta){
   }
 
   ## Split into chunks and save tsv files.
-  meta$classed <- g$classed
   meta$chunk.i <- 1L
   meta$g <- g
   g.data.varied <- saveCommonChunk(g.data, chunk.cols, meta)
@@ -942,7 +940,7 @@ saveCommonChunk <- function(x, vars, meta){
     if(sum(is.common) >= 3){
       meta$g$columns$common <- common.cols <- cols[is.common]
       # save common data to chunk
-      csv.name <- sprintf("%s_chunk_common.tsv", meta$classed)
+      csv.name <- sprintf("%s_chunk_common.tsv", meta$g$classed)
       common.chunk <- file.path(meta$out.dir, csv.name)
       common.data <- df1[common.cols]
       write.table(common.data, common.chunk, quote = FALSE, row.names = FALSE, 
@@ -1013,7 +1011,7 @@ split.x <- function(x, vars){
 saveChunks <- function(x, meta){
   if(is.data.frame(x)){
     this.i <- meta$chunk.i
-    csv.name <- sprintf("%s_chunk%d.tsv", meta$classed, this.i)
+    csv.name <- sprintf("%s_chunk%d.tsv", meta$g$classed, this.i)
     write.table(x, file.path(meta$out.dir, csv.name), quote=FALSE, 
                 row.names=FALSE, sep="\t")
     meta$chunk.i <- meta$chunk.i + 1L
