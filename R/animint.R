@@ -1043,7 +1043,6 @@ selector.aes <- function(a.vec){
       other.a <- sub(paste0(v, "$"), other.v, a)
       not.found <- ! other.a %in% a.vec
       if(any(not.found)){
-        print(list(present=a, missing=other.a[not.found]))
         stop(".variable or .value aes not found")
       }
     }
