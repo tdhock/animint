@@ -101,7 +101,6 @@ apparent.bytes <- bytes.used(test.paths, apparent.size = TRUE)
 byte.df <- data.frame(du.bytes, apparent.bytes,
                       file.size=file.size(test.paths),
                       test.paths)
-print(byte.df)
 
 test_that("default chunks are at least 4KB", {
   tdir <- tempfile()
