@@ -5,15 +5,17 @@ library(plyr)
 # retrieve state-level data from the CDC's FluView Portal and save as FluView.RData
 # under animint/data directory
 # library(cdcfluview)
-# state_flu <- get_state_data(2008:2014)
+# state_flu <- ldply(2008:2014, function(year){
+#   get_state_data(year)
+# })
+# # data clean
+# state_flu <- state_flu[, !names(state_flu) %in% c("URL", "WEBSITE")]
+# state_flu$state <- tolower(state_flu$STATENAME)
+# state_flu$level <- as.numeric(gsub("Level ", "", state_flu$ACTIVITY.LEVEL))
+# state_flu$WEEKEND <- as.Date(state_flu$WEEKEND, format = "%b-%d-%Y")
 # save(state_flu, file = "path/to/animint/data/FluView.RData", compress = "xz")
-data(FluView)
 
-# data clean
-state_flu <- state_flu[, !names(state_flu) %in% c("URL", "WEBSITE")]
-state_flu$state <- tolower(state_flu$STATENAME)
-state_flu$level <- as.numeric(gsub("Level ", "", state_flu$ACTIVITY.LEVEL))
-state_flu$WEEKEND <- as.Date(state_flu$WEEKEND, format = "%b-%d-%Y")
+data(FluView)
 # use 2008-09 and 2009-10 seasons to test
 state_flu <- subset(state_flu, SEASON %in% c("2008-09", "2009-10") & 
                       !STATENAME %in% c("District of Columbia", "New York City", 
@@ -59,6 +61,37 @@ p <- ggplot() +
   scale_fill_gradient2(low = "white", high = "red", breaks = 0:10, guide = "none") + 
   theme_opts + 
   theme_animint(width = 750, height= 500)
+
+test_that("save separate chunks for geom_polygon", {
+  state.map <- p + 
+    geom_polygon(data = map_flu, aes(x = long, y = lat, group = group, fill = level, 
+                                     showSelected = WEEKEND), 
+                 colour = "black", size = 1)
+  viz <- list(levelHeatmap = level.heatmap, stateMap = state.map, title = "FluView")
+  out.dir <- file.path(getwd(), "FluView")
+  animint2dir(viz, out.dir = out.dir, open.browser = FALSE)
+
+  common.chunk <- list.files(path = out.dir, pattern = "geom.+polygon.+chunk_common.tsv", 
+                             full.names = TRUE)
+  varied.chunks <- list.files(path = out.dir, pattern = "geom.+polygon.+chunk[0-9]+.tsv", 
+                              full.names = TRUE)
+  # number of chunks
+  expect_equal(length(common.chunk), 1L)
+  no.chunks <- length(varied.chunks)
+  expect_equal(no.chunks, length(unique(map_flu$WEEKEND)))
+  # test common.chunk
+  common.data <- read.csv(common.chunk, sep = "\t")
+  expect_equal(nrow(common.data), nrow(USpolygons))
+  expect_true(all(c("x", "y", "group") %in% names(common.data)))
+  # randomly choose an varied.chunk to test
+  idx <- sample(no.chunks, 1)
+  varied.data <- read.csv(varied.chunks[idx], sep = "\t")
+  expect_equal(nrow(varied.data), length(unique(USpolygons$group)))
+  expect_true(all(c("fill", "group") %in% names(varied.data)))
+  
+  unlink(out.dir, recursive = TRUE)
+})
+
 
 ### test case 2
 USdots <- ddply(USpolygons, .(region), summarise, mean.lat = mean(lat), 
