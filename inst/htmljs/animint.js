@@ -1906,8 +1906,8 @@ var animint = function (to_select, json_file) {
                       })
                     ;
                   }
-                }
-              }*/
+                }*/
+              }
             })
         ;
       }
