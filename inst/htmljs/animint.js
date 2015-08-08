@@ -1489,8 +1489,12 @@ var animint = function (to_select, json_file) {
       }
       legend_other_opacity = null;
     }
-    // update selected widgets
-    jquery_thingy_array[v_name].setValue(s_info.selected);
+    // update selected widgets, if necessary
+    if(s_info.type == "multiple" | 
+      jquery_thingy_array[v_name].getValue() != s_info.selected) {
+      jquery_thingy_array[v_name].setValue(s_info.selected);
+    }
+    // update legend opacity
     var legend_entries = 
       d3.selectAll("tr#legend th."+v_name+" td.legend_entry_label");
     legend_entries.style("opacity", function(d){
