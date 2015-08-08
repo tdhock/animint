@@ -1815,6 +1815,9 @@ var animint = function (to_select, json_file) {
       .append("th")
       .text("Toggle selected value");
       
+    //creating an array to contain the selectized items
+    jquery_thingy_array = [];
+      
      // looping through and adding a row for each selector
     for(s_name in Selectors) {
       s_info = Selectors[s_name];
@@ -1847,7 +1850,7 @@ var animint = function (to_select, json_file) {
       // calling selectize
       if(selector_type == "single") {
         // if single selection, only allow one item
-        $('#' + s_name + "_input")
+        $temp = $('#' + s_name + "_input")
           .selectize({
               create: false, 
               maxItems: 1, 
@@ -1859,7 +1862,7 @@ var animint = function (to_select, json_file) {
          ;
       } else {
         // otherwise, loop through all the inputs and update
-        $('#' + s_name + "_input")
+        $temp = $('#' + s_name + "_input")
           .selectize({
               create: false, 
               items: Selectors[s_name].selected,
@@ -1905,6 +1908,7 @@ var animint = function (to_select, json_file) {
             })
         ;
       }
+      jquery_thingy_array[s_name] = $temp[0].selectize;
     } // close for loop through selector widgets
     
     /*
