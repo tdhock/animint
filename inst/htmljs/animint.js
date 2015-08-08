@@ -1858,7 +1858,7 @@ var animint = function (to_select, json_file) {
               maxItems: 1, 
               allowEmptyOption: true, 
               onChange: function(value) { 
-                //update_selector(s_name, value); 
+                update_selector(s_name, value); 
               }
             })
          ;
@@ -1877,7 +1877,7 @@ var animint = function (to_select, json_file) {
                 }
                 // to FIX: should only need to do this for the appropriate selector
                 // then should be able to remove the `if(Selectors[s_name].type == "multiple")` condition
-                /*
+                
                 for(s_name in Selectors) {
                   if(Selectors[s_name].type == "multiple") {
                     old_selections = Selectors[s_name].selected;
@@ -1906,7 +1906,7 @@ var animint = function (to_select, json_file) {
                       })
                     ;
                   }
-                }*/
+                }
               }
             })
         ;
