@@ -5,21 +5,31 @@ library(plyr)
 # retrieve state-level data from the CDC's FluView Portal and save as FluView.RData
 # under animint/data directory
 # library(cdcfluview)
-# state_flu <- ldply(2008:2014, function(year){
-#   get_state_data(year)
-# })
+# state_flu <- get_state_data(2008:2014)
 # # data clean
 # state_flu <- state_flu[, !names(state_flu) %in% c("URL", "WEBSITE")]
+# state_flu <- subset(state_flu, !STATENAME %in% c("District of Columbia", 
+#                                                  "New York City", "Puerto Rico", 
+#                                                  "Alaska", "Hawaii"))
 # state_flu$state <- tolower(state_flu$STATENAME)
 # state_flu$level <- as.numeric(gsub("Level ", "", state_flu$ACTIVITY.LEVEL))
 # state_flu$WEEKEND <- as.Date(state_flu$WEEKEND, format = "%b-%d-%Y")
-# save(state_flu, file = "path/to/animint/data/FluView.RData", compress = "xz")
+# library(ggplot2)
+# USpolygons <- map_data("state")
+# USpolygons$subregion <- NULL
+# USpolygons <- subset(USpolygons, region != "district of columbia")
+# # add state flu
+# map_flu <- ldply(unique(state_flu$WEEKEND), function(we) {
+#   df <- subset(state_flu, WEEKEND == we)
+#   merge(USpolygons, df, by.x = "region", by.y = "state")
+# })
+# save(state_flu, USpolygons, map_flu, 
+#      file = "path/to/animint/data/FluView.RData", compress = "xz")
 
 data(FluView)
 # use 2008-09 and 2009-10 seasons to test
-state_flu <- subset(state_flu, SEASON %in% c("2008-09", "2009-10") & 
-                      !STATENAME %in% c("District of Columbia", "New York City", 
-                                        "Puerto Rico", "Alaska", "Hawaii"))
+state_flu <- subset(state_flu, SEASON %in% c("2008-09", "2009-10"))
+map_flu <- subset(map_flu, SEASON %in% c("2008-09", "2009-10"))
 
 # visualize CDC FluView data
 # activity level heatmap
@@ -45,16 +55,6 @@ theme_opts <- list(theme(panel.grid.minor = element_blank(),
                          axis.ticks = element_blank(), 
                          axis.title.x = element_blank(), 
                          axis.title.y = element_blank()))
-
-USpolygons <- map_data("state")
-USpolygons$subregion <- NULL
-USpolygons <- subset(USpolygons, region != "district of columbia")
-
-# add state flu
-map_flu <- ldply(unique(state_flu$WEEKEND), function(we) {
-  df <- subset(state_flu, WEEKEND == we)
-  merge(USpolygons, df, by.x = "region", by.y = "state")
-})
 
 p <- ggplot() + 
   make_text(map_flu, -100, 50, "WEEKEND", "CDC FluView in Lower 48 States ending %s") + 
