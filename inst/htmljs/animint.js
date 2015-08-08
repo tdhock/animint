@@ -1859,6 +1859,7 @@ var animint = function (to_select, json_file) {
         $temp = $('#' + s_name + "_input")
           .selectize({
               create: false, 
+              items: [Selectors[s_name].selected],
               maxItems: 1, 
               allowEmptyOption: true, 
               onChange: function(value) { 
