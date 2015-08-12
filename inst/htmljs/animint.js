@@ -1798,7 +1798,7 @@ var animint = function (to_select, json_file) {
     ;
     
     // selector widgets
-    show_message2 = "Toggle selected variables";
+    var show_message2 = "Toggle selected variables";
     var show_hide_selector_widgets = element.append("button")
       .text(show_message2)
       .attr("id", "show_hide_selector_widgets")
@@ -1822,16 +1822,16 @@ var animint = function (to_select, json_file) {
       .text("Toggle selected value");
       
     //creating an array to contain the selectized items
-    jquery_thingy_array = [];
+    var jquery_thingy_array = [];
       
      // looping through and adding a row for each selector
     for(s_name in Selectors) {
-      s_info = Selectors[s_name];
+      var s_info = Selectors[s_name];
       // adding a row for each selector
-      selector_widget_row = selector_table.append("tr");
+      var selector_widget_row = selector_table.append("tr");
       selector_widget_row.append("td").text(s_name);
       // adding the selector
-      selector_widget_select = selector_widget_row
+      var selector_widget_select = selector_widget_row
         .append("td")
         .append("select")
         .attr("id", function() { return s_name + "_input"; })
@@ -1852,11 +1852,11 @@ var animint = function (to_select, json_file) {
         .attr("value", "")
         .text(function() { return "Toggle " + s_name; });
       // determining if single or multiple selector
-      selector_type = Selectors[s_name]["type"];
+      var selector_type = Selectors[s_name]["type"];
       // calling selectize
       if(selector_type == "single") {
         // if single selection, only allow one item
-        $temp = $('#' + s_name + "_input")
+        var $temp = $('#' + s_name + "_input")
           .selectize({
               create: false, 
               items: [Selectors[s_name].selected],
@@ -1869,7 +1869,7 @@ var animint = function (to_select, json_file) {
          ;
       } else {
         // otherwise, loop through all the inputs and update
-        $temp = $('#' + s_name + "_input")
+        var $temp = $('#' + s_name + "_input")
           .selectize({
               create: false, 
               items: Selectors[s_name].selected,
