@@ -1489,8 +1489,9 @@ var animint = function (to_select, json_file) {
       }
       legend_other_opacity = null;
     }
+    var legend_entries_class = v_name.replace(/\./g,'_');
     var legend_entries = 
-      d3.selectAll("tr#legend th."+v_name+" td.legend_entry_label");
+      d3.selectAll("tr#legend th."+legend_entries_class+" td.legend_entry_label");
     legend_entries.style("opacity", function(d){
       if(this.textContent == value){
 	return legend_value_opacity;
