@@ -1553,7 +1553,13 @@ var animint = function (to_select, json_file) {
         .append("tr").attr("id", "legend")
         .append("th").attr("align", "left")
         .text(p_info.legend[legendkeys[i]].title)
-        .attr("class", p_info.legend[legendkeys[i]].vars);
+        .attr("class", function() {
+          // identifying the name of the variable
+          var_name = p_info.legend[legendkeys[i]].vars;
+          // replacing periods with underscores
+          var_name.replace(/\./g,'_');
+          return var_name;
+        });
       var l_info = p_info.legend[legendkeys[i]];
       // the legend table with breaks/value/label.
       var legendgeoms = l_info.geoms;
