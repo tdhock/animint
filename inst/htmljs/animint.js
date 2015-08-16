@@ -1558,7 +1558,7 @@ var animint = function (to_select, json_file) {
         .text(p_info.legend[legendkeys[i]].title)
         .attr("id", function() {
           // identifying the name of the variable
-          var_name = p_info.legend[legendkeys[i]].vars;
+          var var_name = p_info.legend[legendkeys[i]].vars;
           // replacing periods with underscores
           return var_name.replace(/\./g,'_');
         })
