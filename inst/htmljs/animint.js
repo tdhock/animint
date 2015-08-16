@@ -1815,6 +1815,7 @@ var animint = function (to_select, json_file) {
     // adding a table for selector widgets
     var selector_table = element.append("table")
       .style("display", "none")
+      .attr("id", "table_selector_widgets")
     ;
     var selector_first_tr = selector_table.append("tr");
     selector_first_tr
@@ -1822,13 +1823,17 @@ var animint = function (to_select, json_file) {
       .text("Toggle selected value");
       
     //creating an array to contain the selectized items
-    var jquery_thingy_array = [];
+    jquery_thingy_array = [];
       
      // looping through and adding a row for each selector
     for(s_name in Selectors) {
       var s_info = Selectors[s_name];
       // adding a row for each selector
-      var selector_widget_row = selector_table.append("tr");
+      var selector_widget_row = selector_table
+        .append("tr")
+        
+        .attr("id", function() { return s_name + "_selector_widget"; })
+      ;
       selector_widget_row.append("td").text(s_name);
       // adding the selector
       var selector_widget_select = selector_widget_row
