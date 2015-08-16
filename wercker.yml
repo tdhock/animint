@@ -1,4 +1,5 @@
 box: rocker/hadleyverse
+no-response-timeout: 20
 build:
   steps:
     - script:
