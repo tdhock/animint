@@ -1841,9 +1841,6 @@ var animint = function (to_select, json_file) {
         .append("select")
         .attr("id", function() { return s_name + "_input"; })
         .attr("placeholder", function() { return "Toggle " + s_name; });
-      // add a blank to the beginning of levels
-      // ensures that a blank option will be rendered first
-      s_info.levels.unshift("");
       // adding an option for each level of the variable
       selector_widget_select.selectAll("option")
         .data(s_info.levels)
