@@ -1908,6 +1908,17 @@ var animint = function (to_select, json_file) {
                 if(value == null) {
                   value = [];
                 }
+                
+                // grabbing the name of the selector from the selected value
+                var selector_name = value[0].split("___")[0];
+                // identifying the levels that should be selected
+                var specified_levels = [];
+                for(i in value) {
+                  specified_levels[i] = value[i].split("___")[1];
+                }
+                // the previously selected entries
+                old_selections = Selectors[s_name].selected;
+                
                 // to FIX: should only need to do this for the appropriate selector
                 // then should be able to remove the `if(Selectors[s_name].type == "multiple")` condition
                 
