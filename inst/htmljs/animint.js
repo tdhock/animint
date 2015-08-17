@@ -1868,15 +1868,14 @@ var animint = function (to_select, json_file) {
       if(s_info.type == "single") {
         // setting up array of selector and options
         var selector_values = [];
-        // setting up an array to contain the ids
-        var selector_ids = [];
         for(lev in Selectors[s_name].levels) {
-          selector_ids[lev] = s_name.concat("___", Selectors[s_name].levels[lev]);
           selector_values[lev] = {
-            id: selector_ids[lev], 
+            id: s_name.concat("___", Selectors[s_name].levels[lev]), 
             text: Selectors[s_name].levels[lev]
           };
         }
+        // the id of the first selector
+        var selected_id = s_name.concat("___", Selectors[s_name].selected);
 
         // if single selection, only allow one item
         var $temp = $('#' + s_name + "_input")
