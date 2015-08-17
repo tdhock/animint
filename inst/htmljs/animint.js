@@ -1931,40 +1931,40 @@ var animint = function (to_select, json_file) {
               maxItems: s_info.levels.length, 
               allowEmptyOption: true,
               onChange: function(value) { 
-                // makes working with empty selections easier
+                // if nothing is selected, remove what is currently selected
                 if(value == null) {
-                  value = [];
+                  //HOW(?)
+                } else {
+                  // grabbing the name of the selector from the selected value
+                  var selector_name = value[0].split("___")[0];
+                  // identifying the levels that should be selected
+                  var specified_levels = [];
+                  for(i in value) {
+                    specified_levels[i] = value[i].split("___")[1];
+                  }
+                  // the previously selected entries
+                  old_selections = Selectors[selector_name].selected;
+                  
+                  // the levels that need to have selections turned on
+                  specified_levels
+                    .filter(function(n) {
+                      return old_selections.indexOf(n) == -1;
+                    })
+                    .forEach(function(element) {
+                      update_selector(selector_name, element);
+                    })
+                  ;
+                  // the levels that need to be turned off
+                  // - same approach
+                  old_selections
+                    .filter(function(n) {
+                      return specified_levels.indexOf(n) == -1;
+                    })
+                    .forEach(function(element) {
+                      update_selector(selector_name, element);
+                    })
+                  ;
                 }
-                
-                // grabbing the name of the selector from the selected value
-                var selector_name = value[0].split("___")[0];
-                // identifying the levels that should be selected
-                var specified_levels = [];
-                for(i in value) {
-                  specified_levels[i] = value[i].split("___")[1];
-                }
-                // the previously selected entries
-                old_selections = Selectors[selector_name].selected;
-                
-                // the levels that need to have selections turned on
-                specified_levels
-                  .filter(function(n) {
-                    return old_selections.indexOf(n) == -1;
-                  })
-                  .forEach(function(element) {
-                    update_selector(selector_name, element);
-                  })
-                ;
-                // the levels that need to be turned off
-                // - same approach
-                old_selections
-                  .filter(function(n) {
-                    return specified_levels.indexOf(n) == -1;
-                  })
-                  .forEach(function(element) {
-                    update_selector(selector_name, element);
-                  })
-                ;
               }
             })
         ;
