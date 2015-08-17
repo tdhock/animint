@@ -1880,7 +1880,19 @@ var animint = function (to_select, json_file) {
             })
          ;
       } else {
-        // otherwise, loop through all the inputs and update
+        // setting up array of selector and options
+        var selector_values = [];
+        // setting up an array to contain the ids
+        var selector_ids = [];
+        for(lev in Selectors[s_name].levels) {
+          selector_ids[lev] = s_name.concat("___", Selectors[s_name].levels[lev]);
+          selector_values[lev] = {
+            id: selector_ids[lev], 
+            text: Selectors[s_name].levels[lev]
+          };
+        }
+        
+        // construct the selectize
         var $temp = $('#' + s_name + "_input")
           .selectize({
               create: false, 
