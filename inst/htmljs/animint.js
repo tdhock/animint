@@ -1842,7 +1842,6 @@ var animint = function (to_select, json_file) {
       // adding a row for each selector
       var selector_widget_row = selector_table
         .append("tr")
-        
         .attr("id", function() { return s_name + "_selector_widget"; })
       ;
       selector_widget_row.append("td").text(s_name);
