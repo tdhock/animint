@@ -62,7 +62,7 @@ p <- ggplot() +
   theme_opts + 
   theme_animint(width = 750, height= 500)
 
-if (Sys.getenv("TRAVIS") == "true") {
+if (Sys.getenv("TRAVIS") == "true" | Sys.getenv("WERCKER") == "true") {
   message("tests currently don't work on travis (but should someday)")
 } else {
   test_that("save separate chunks for geom_polygon", {
