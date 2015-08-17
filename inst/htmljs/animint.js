@@ -1900,14 +1900,23 @@ var animint = function (to_select, json_file) {
       } else {
         // setting up array of selector and options
         var selector_values = [];
-        // setting up an array to contain the ids
-        var selector_ids = [];
-        for(lev in Selectors[s_name].levels) {
-          selector_ids[lev] = s_name.concat("___", Selectors[s_name].levels[lev]);
-          selector_values[lev] = {
-            id: selector_ids[lev], 
-            text: Selectors[s_name].levels[lev]
+        if(typeof s_info.levels == "object") {
+          for(lev in s_info.levels) {
+            selector_values[lev] = {
+              id: s_name.concat("___", s_info.levels[lev]), 
+              text: s_info.levels[lev]
+            };
+          }
+        } else {
+          selector_values[0] = {
+            id: s_name.concat("___", s_info.levels), 
+              text: s_info.levels
           };
+        }
+        // setting up an array to contain the initally selected elements
+        var initial_selections = [];
+        for(i in s_info.selected) {
+          initial_selections[i] = s_name.concat("___", s_info.selected[i]);
         }
         
         // construct the selectize
@@ -1918,7 +1927,7 @@ var animint = function (to_select, json_file) {
               labelField: 'text',
               searchField: ['text'],
               options: selector_values, 
-              items: selector_ids,
+              items: initial_selections,
               maxItems: Selectors[s_name].levels.length, 
               allowEmptyOption: true,
               onChange: function(value) { 
