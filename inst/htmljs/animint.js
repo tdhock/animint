@@ -1868,13 +1868,29 @@ var animint = function (to_select, json_file) {
       var selector_type = Selectors[s_name]["type"];
       // calling selectize
       if(selector_type == "single") {
+        // setting up array of selector and options
+        var selector_values = [];
+        // setting up an array to contain the ids
+        var selector_ids = [];
+        for(lev in Selectors[s_name].levels) {
+          selector_ids[lev] = s_name.concat("___", Selectors[s_name].levels[lev]);
+          selector_values[lev] = {
+            id: selector_ids[lev], 
+            text: Selectors[s_name].levels[lev]
+          };
+        }
+
         // if single selection, only allow one item
         var $temp = $('#' + s_name + "_input")
           .selectize({
               create: false, 
-              items: [Selectors[s_name].selected],
+              valueField: 'id',
+              labelField: 'text',
+              searchField: ['text'],
+              options: selector_values, 
+              items: selector_ids,
               maxItems: 1, 
-              allowEmptyOption: true, 
+              allowEmptyOption: true,
               onChange: function(value) { 
                 // to FIX: should only need to do this for the appropriate selector
                 // then should be able to remove the `if(Selectors[s_name].type == "single")` condition
