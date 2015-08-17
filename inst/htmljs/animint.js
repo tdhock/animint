@@ -1868,14 +1868,14 @@ var animint = function (to_select, json_file) {
       if(s_info.type == "single") {
         // setting up array of selector and options
         var selector_values = [];
-        for(lev in Selectors[s_name].levels) {
+        for(lev in s_info.levels) {
           selector_values[lev] = {
-            id: s_name.concat("___", Selectors[s_name].levels[lev]), 
-            text: Selectors[s_name].levels[lev]
+            id: s_name.concat("___", s_info.levels[lev]), 
+            text: s_info.levels[lev]
           };
         }
         // the id of the first selector
-        var selected_id = s_name.concat("___", Selectors[s_name].selected);
+        var selected_id = s_name.concat("___", s_info.selected);
 
         // if single selection, only allow one item
         var $temp = $('#' + s_name + "_input")
@@ -1928,7 +1928,7 @@ var animint = function (to_select, json_file) {
               searchField: ['text'],
               options: selector_values, 
               items: initial_selections,
-              maxItems: Selectors[s_name].levels.length, 
+              maxItems: s_info.levels.length, 
               allowEmptyOption: true,
               onChange: function(value) { 
                 // makes working with empty selections easier
@@ -1944,8 +1944,8 @@ var animint = function (to_select, json_file) {
                   specified_levels[i] = value[i].split("___")[1];
                 }
                 // the previously selected entries
-                old_selections = Selectors[s_name].selected;
-                                
+                old_selections = Selectors[selector_name].selected;
+                
                 // the levels that need to have selections turned on
                 specified_levels
                   .filter(function(n) {
