@@ -1864,10 +1864,9 @@ var animint = function (to_select, json_file) {
         .insert("option")
         .attr("value", "")
         .text(function() { return "Toggle " + s_name; });
-      // determining if single or multiple selector
-      var selector_type = Selectors[s_name]["type"];
+        
       // calling selectize
-      if(selector_type == "single") {
+      if(s_info.type == "single") {
         // setting up array of selector and options
         var selector_values = [];
         // setting up an array to contain the ids
