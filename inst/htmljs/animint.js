@@ -1918,39 +1918,26 @@ var animint = function (to_select, json_file) {
                 }
                 // the previously selected entries
                 old_selections = Selectors[s_name].selected;
-                
-                // to FIX: should only need to do this for the appropriate selector
-                // then should be able to remove the `if(Selectors[s_name].type == "multiple")` condition
-                
-                for(s_name in Selectors) {
-                  if(Selectors[s_name].type == "multiple") {
-                    old_selections = Selectors[s_name].selected;
-                    // strategy:
-                    // - find the options that the user has specified that are not turned on
-                    // - update the selector for each of them
-                    
-                    // the levels that need to have selections turned on
-                    value
-                      .filter(function(n) {
-                        return old_selections.indexOf(n) == -1;
-                      })
-                      .forEach(function(element) {
-                        update_selector(s_name, element);
-                      })
-                    ;
-                    
-                    // the levels that need to be turned off
-                    // - same approach
-                    old_selections
-                      .filter(function(n) {
-                        return value.indexOf(n) == -1;
-                      })
-                      .forEach(function(element) {
-                        update_selector(s_name, element);
-                      })
-                    ;
-                  }
-                }
+                                
+                // the levels that need to have selections turned on
+                specified_levels
+                  .filter(function(n) {
+                    return old_selections.indexOf(n) == -1;
+                  })
+                  .forEach(function(element) {
+                    update_selector(selector_name, element);
+                  })
+                ;
+                // the levels that need to be turned off
+                // - same approach
+                old_selections
+                  .filter(function(n) {
+                    return specified_levels.indexOf(n) == -1;
+                  })
+                  .forEach(function(element) {
+                    update_selector(selector_name, element);
+                  })
+                ;
               }
             })
         ;
