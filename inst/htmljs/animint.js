@@ -1885,7 +1885,7 @@ var animint = function (to_select, json_file) {
               labelField: 'text',
               searchField: ['text'],
               options: selector_values, 
-              items: selector_ids,
+              items: [selected_id],
               maxItems: 1, 
               allowEmptyOption: true,
               onChange: function(value) {
