@@ -218,7 +218,7 @@ test_that("save separate chunks for non-spatial geoms with repetitive field, mul
   expect_true(all(c("colour", "clickSelects", "key", "fill", "group") %in% names(common.data)))
   # choose first varied.chunk to test
   varied.data <- read.csv(varied.chunks[1], sep = "\t")
-  if (Sys.getenv("TRAVIS") == "true") {
+  if (Sys.getenv("TRAVIS") == "true" | Sys.getenv("WERCKER") == "true") {
     message("tests currently don't work on travis (but should someday)")
   } else {
     expect_equal(nrow(varied.data), 186)

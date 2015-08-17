@@ -239,7 +239,7 @@ test_that("counts of chunks downloaded or not at first", {
                  0, 0, 0, 0, 0))
 })
 
-if (Sys.getenv("TRAVIS") == "true") {
+if (Sys.getenv("TRAVIS") == "true" | Sys.getenv("WERCKER") == "true") {
   message("tests currently don't work on travis (but should someday)")
 } else {
   test_that("changing problem downloads one chunk", {
