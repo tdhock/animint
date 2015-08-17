@@ -1489,6 +1489,16 @@ var animint = function (to_select, json_file) {
       }
       legend_other_opacity = null;
     }
+    
+    // the jquery ids
+    if(s_info.type == "single") {
+      var selected_ids = v_name.concat("___", value);
+    } else {
+      var selected_ids = [];
+      for(i in s_info.selected) {
+        selected_ids[i] = v_name.concat("___", s_info.selected[i]);
+      }
+    }
     // update selected widgets, if necessary
     if(s_info.type == "multiple" | 
       jquery_thingy_array[v_name].getValue() != s_info.selected) {
