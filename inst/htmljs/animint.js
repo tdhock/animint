@@ -1884,9 +1884,13 @@ var animint = function (to_select, json_file) {
         var $temp = $('#' + s_name + "_input")
           .selectize({
               create: false, 
-              items: Selectors[s_name].selected,
+              valueField: 'id',
+              labelField: 'text',
+              searchField: ['text'],
+              options: selector_values, 
+              items: selector_ids,
               maxItems: Selectors[s_name].levels.length, 
-              allowEmptyOption: true, 
+              allowEmptyOption: true,
               onChange: function(value) { 
                 // makes working with empty selections easier
                 if(value == null) {
