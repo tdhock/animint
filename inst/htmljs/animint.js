@@ -1889,18 +1889,12 @@ var animint = function (to_select, json_file) {
               items: selector_ids,
               maxItems: 1, 
               allowEmptyOption: true,
-              onChange: function(value) { 
-                // to FIX: should only need to do this for the appropriate selector
-                // then should be able to remove the `if(Selectors[s_name].type == "single")` condition
-                // but how to know which selector to call?!                
-                for(s_name in Selectors) {
-                  if(Selectors[s_name].type == "single") {
-                    old_selections = Selectors[s_name].selected;
-                    if($.inArray(value, Selectors[s_name].levels) > -1) {
-                      update_selector(s_name, value);                    
-                    }
-                  }
-                }
+              onChange: function(value) {
+                // extracting the name and the level to update
+                var selector_name = value.split("___")[0];
+                var selected_level = value.split("___")[1];
+                // updating the selector
+                update_selector(selector_name, selected_level);
               }
             })
          ;
