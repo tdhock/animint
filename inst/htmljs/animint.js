@@ -1501,9 +1501,10 @@ var animint = function (to_select, json_file) {
     }
     // update selected widgets, if necessary
     if(s_info.type == "multiple" | 
-      jquery_thingy_array[v_name].getValue() != s_info.selected) {
-      jquery_thingy_array[v_name].setValue(s_info.selected);
+      jquery_thingy_array[v_name].getValue() != selected_ids) {
+      jquery_thingy_array[v_name].setValue(selected_ids);
     }
+    
     // update legend opacity
     var legend_entries = 
       d3.selectAll("tr#legend th."+v_name+" td.legend_entry_label");
