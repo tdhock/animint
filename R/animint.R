@@ -75,8 +75,21 @@ parsePlot <- function(meta){
       var_name <- plot.meta$legend[[legend.i]]$vars
       # var_name can have length greater than one if an expression is used
       var_name <- intersect(var_name, names(L$data))
-      # making sure the variable is used in the mapping
-      var_name <- intersect(var_name, as.character(L$mapping[!(names(L$mapping) %in% c("x", "y", "group"))]))
+      
+      browser()
+      ### need to make sure the variable is used in the mapping
+      ### i.e. that it is used in this plot
+      if(any(var_name %in% L$mapping)) {
+        # if it is in mapping, then it should be in a legend aesthetic
+        var_name <- intersect(var_name, 
+                              as.character(L$mapping[ !(names(L$mapping) %in% c("x", "y", "group", "ymin", "ymax")) ]))
+      } else if(substr(var_name, 1, 4) == "show") {
+        # if the variable is called "show_..." then it should be evaluated
+        if( !is.call(L$mapping[[ substr(var_name, 6, nchar(var_name))]]) ) {
+          var_name <- character()
+        }
+      }
+      
       # grabbing the variable from the data
       var <- L$data[, var_name]
 
