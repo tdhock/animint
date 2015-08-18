@@ -1933,7 +1933,16 @@ var animint = function (to_select, json_file) {
               onChange: function(value) { 
                 // if nothing is selected, remove what is currently selected
                 if(value == null) {
-                  //HOW(?)
+                  // extracting the selector ids from the options
+                  var the_ids = Object.keys($(this)[0].options);
+                  // the name of the appropriate selector
+                  var selector_name = the_ids[0].split("___")[0];
+                  // the previously selected elements
+                  var old_selections = Selectors[selector_name].selected;
+                  // updating the selector for each of the old selections
+                  old_selections.forEach(function(element) {
+                    update_selector(selector_name, element);
+                  });
                 } else {
                   // grabbing the name of the selector from the selected value
                   var selector_name = value[0].split("___")[0];
