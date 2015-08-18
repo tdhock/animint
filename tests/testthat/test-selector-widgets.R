@@ -47,27 +47,10 @@ test_that("Widgets render", {
 })
 
 test_that("Updating cyl widget shows/hides points", {
-  browser()
-  e <- remDr$findElement("id", "cyl_input")
-  browser()
-  e$sendKeysToElement(list("3000", key="enter"))
-  buttons <- 
-    getNodeSet(getHTML(), '//table[@class="selector_table"]//button')
-  expect_equal(length(buttons), 3)
+  
 })
 
-# test_that("Clicking versicolor widget shows/hides points", {
-#   clickID("versicolor")
-#   points <- 
-#     getNodeSet(getHTML(), '//svg[@id="p2"]//circle')
-#   point_attr <- sapply(points, xmlAttrs)
-#   match_points <- str_match_perl(point_attr["style",], fillPattern)
-#   fill_values <- match_points[, "value"]
-# 
-#   # test versicolor points are selected
-#   test_fills(fill_values, "#00BA38", 50)
-#   # test setosa points are not selected
-#   test_fills(fill_values, "#F8766D", 0)
-#   
-# })
+test_that("Updating vs widget shows/hides points", {
+  
+})
 
