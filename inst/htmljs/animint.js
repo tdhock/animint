@@ -1868,10 +1868,10 @@ var animint = function (to_select, json_file) {
       if(s_info.type == "single") {
         // setting up array of selector and options
         var selector_values = [];
-        for(lev in s_info.levels) {
-          selector_values[lev] = {
-            id: s_name.concat("___", s_info.levels[lev]), 
-            text: s_info.levels[lev]
+        for(i in s_info.levels) {
+          selector_values[i] = {
+            id: s_name.concat("___", s_info.levels[i]), 
+            text: s_info.levels[i]
           };
         }
         // the id of the first selector
@@ -1901,10 +1901,10 @@ var animint = function (to_select, json_file) {
         // setting up array of selector and options
         var selector_values = [];
         if(typeof s_info.levels == "object") {
-          for(lev in s_info.levels) {
-            selector_values[lev] = {
-              id: s_name.concat("___", s_info.levels[lev]), 
-              text: s_info.levels[lev]
+          for(i in s_info.levels) {
+            selector_values[i] = {
+              id: s_name.concat("___", s_info.levels[i]), 
+              text: s_info.levels[i]
             };
           }
         } else {
