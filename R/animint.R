@@ -83,11 +83,13 @@ parsePlot <- function(meta){
           # if it is in mapping, then it should be in a legend aesthetic
           var_name <- intersect(var_name, 
                                 as.character(L$mapping[ !(names(L$mapping) %in% c("x", "y", "group", "ymin", "ymax")) ]))
-        } else if(substr(var_name, 1, 4) == "show") {
-          # if the variable is called "show_..." then it should be evaluated
-          if( !is.call(L$mapping[[ substr(var_name, 6, nchar(var_name))]]) ) {
-            var_name <- character()
-          }
+        } else if(substr(var_name, 1, 4) == "show" & 
+                    is.call(L$mapping[[ substr(var_name, 6, nchar(var_name))]])
+        ) {
+          # if the variable is called "show_..." and it is evaluated, that's okay
+          
+        } else {
+          var_name <- character()
         }
       }
       
