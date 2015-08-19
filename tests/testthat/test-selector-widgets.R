@@ -46,8 +46,15 @@ test_that("Widgets render", {
   expect_equal(length(cyl_widget), 1)
 })
 
-test_that("Updating cyl widget shows/hides points", {
-  
+test_that("Updating cyl widget shows/hides points", { 
+  remDr$executeScript("
+    // introduce the dropdown content of the 'vs' selector to the DOM
+    document.getElementsByClassName('selectize-input')[0].click();
+    // store the content
+    var con = document.getElementsByClassName('selectize-dropdown-content')[0];
+    // click on the value '1' (which happens to be the second node)
+    con.childNodes[1].click();
+                      ")
 })
 
 test_that("Updating vs widget shows/hides points", {
