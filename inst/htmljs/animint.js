@@ -626,6 +626,29 @@ var animint = function (to_select, json_file) {
 	s_info.selected = [s_info.selected];
       }
     }
+    // update opacity of legend entries
+    var legend_entries = 
+      d3.selectAll("tr#legend th."+s_name+" td.legend_entry_label");
+    legend_entries.style("opacity", function(d) {
+      var d_opacity;
+      if(s_info.type == "multiple") {
+        // if the entry is one of the selected objects set opacity to 1
+        if(s_info.selected.indexOf(this.textContent) > -1) {
+          d_opacity = 1;
+        } else {
+          // otherwise opacity is 0.5
+          d_opacity = 0.5;
+        }
+      } else {
+        // if single selection
+        if(this.textContent == s_info.selected) {
+          d_opacity = 1;
+        } else {
+          d_opacity = 0.5;
+        }
+      }
+      return d_opacity;
+    });
   }
   var get_tsv = function(g_info, chunk_id){
     return g_info.classed + "_chunk" + chunk_id + ".tsv";
