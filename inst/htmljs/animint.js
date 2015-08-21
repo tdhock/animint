@@ -111,6 +111,9 @@ var animint = function (to_select, json_file) {
   var all_geom_names = {};
   this.all_geom_names = all_geom_names;
 
+  //creating an array to contain the selectize widgets
+  var selectized_array = [];
+
   var css = document.createElement('style');
   css.type = 'text/css';
   var styles = [".axis path{fill: none;stroke: black;shape-rendering: crispEdges;}",
@@ -1524,8 +1527,8 @@ var animint = function (to_select, json_file) {
     }
     // update selected widgets, if necessary
     if(s_info.type == "multiple" | 
-      jquery_thingy_array[v_name].getValue() != selected_ids) {
-      jquery_thingy_array[v_name].setValue(selected_ids);
+      selectized_array[v_name].getValue() != selected_ids) {
+      selectized_array[v_name].setValue(selected_ids);
     }
     
     // update legend opacity
@@ -1856,9 +1859,6 @@ var animint = function (to_select, json_file) {
       .append("th")
       .text("Toggle selected value");
       
-    //creating an array to contain the selectized items
-    jquery_thingy_array = [];
-      
      // looping through and adding a row for each selector
     for(s_name in Selectors) {
       var s_info = Selectors[s_name];
@@ -2001,7 +2001,7 @@ var animint = function (to_select, json_file) {
             })
         ;
       }
-      jquery_thingy_array[s_name] = $temp[0].selectize;
+      selectized_array[s_name] = $temp[0].selectize;
     } // close for loop through selector widgets
       
     // If this is an animation, then start downloading all the rest of
