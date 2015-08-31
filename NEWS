@@ -194,6 +194,17 @@ https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol_type
 
 RENDER: Determine why border of tiles in pirates example does not seem to be rendering.
 
+2015.08.31
+
+BUGFIX: For geom_point(aes(fill=annotation,
+color=highly.divergent.regions)) the color legend now correctly shows
+a different stroke but the same fill for each <circle>.
+
+BUGFIX: interactive legends now work properly when selection/legend
+variable names contain dots (see test-malaria.R).
+
+BUGFIX: test-shiny.R works again thanks to remDr$switchToFrame.
+
 2015.07.17
 
 RENDER: Legends are now interactive and can be used to clickSelect.  This means that aes(colour = variable) implies aes(showSelectedcolour = variable) for discrete variables.
