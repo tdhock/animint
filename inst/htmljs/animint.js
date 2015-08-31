@@ -1515,7 +1515,6 @@ var animint = function (to_select, json_file) {
       }
       legend_other_opacity = null;
     }
-    
     // the jquery ids
     if(s_info.type == "single") {
       var selected_ids = v_name.concat("___", value);
@@ -1530,10 +1529,12 @@ var animint = function (to_select, json_file) {
       selectized_array[v_name].getValue() != selected_ids) {
       selectized_array[v_name].setValue(selected_ids);
     }
-    
     // update legend opacity
+    // replacing periods in variable with an underscore
+    // this makes sure that selector doesn't confuse . in name with id selector
+    var legend_entries_id = v_name.replace(/\./g,'_');
     var legend_entries = 
-      d3.selectAll("tr#legend th."+v_name+" td.legend_entry_label");
+      d3.selectAll("tr#legend th#"+legend_entries_id+" td.legend_entry_label");
     legend_entries.style("opacity", function(d){
       if(this.textContent == value){
 	return legend_value_opacity;
@@ -1596,6 +1597,13 @@ var animint = function (to_select, json_file) {
         .append("tr").attr("id", "legend")
         .append("th").attr("align", "left")
         .text(p_info.legend[legendkeys[i]].title)
+        .attr("id", function() {
+          // identifying the name of the variable
+          var var_name = p_info.legend[legendkeys[i]].vars;
+          // replacing periods with underscores
+          return var_name.replace(/\./g,'_');
+        })
+        // adding a class which doesn't have underscores in the name
         .attr("class", p_info.legend[legendkeys[i]].vars);
       var l_info = p_info.legend[legendkeys[i]];
       // the legend table with breaks/value/label.
