@@ -75,7 +75,27 @@ parsePlot <- function(meta){
       var_name <- plot.meta$legend[[legend.i]]$vars
       # var_name can have length greater than one if an expression is used
       var_name <- intersect(var_name, names(L$data))
+      
+      if(length(var_name) > 0) {
+        ### need to make sure the variable is used in the mapping
+        ### i.e. that it is used in this plot
+        if(any(var_name %in% L$mapping)) {
+          # if it is in mapping, then it should be in a legend aesthetic
+          var_name <- intersect(var_name, 
+                                as.character(L$mapping[ !(names(L$mapping) %in% c("x", "y", "group", "ymin", "ymax")) ]))
+        } else if(substr(var_name, 1, 4) == "show" & 
+                    is.call(L$mapping[[ substr(var_name, 6, nchar(var_name))]])
+        ) {
+          # if the variable is called "show_..." and it is evaluated, that's okay
+          
+        } else {
+          var_name <- character()
+        }
+      }
+      
+      # grabbing the variable from the data
       var <- L$data[, var_name]
+
       ## checking if it is a discrete variable.
       if(plyr::is.discrete(var)) {
         is.interactive.aes <-
@@ -1298,7 +1318,37 @@ getLegendList <- function(plistextra){
       gdefs[[legend.name]]$breaks <- sc$breaks
     }
   }
+
   legend.list <- lapply(gdefs, getLegend)
+  ## Add a flag to specify whether or not there is both a color and a
+  ## fill legend to display. If so, we need to draw the interior of
+  ## the points in the color legend as the same color.
+  if(0 < length(legend.list)){
+    aes.geom.list <- list()
+    for(legend.name in names(legend.list)){
+      L <- legend.list[[legend.name]]
+      aes.geom.list[[legend.name]] <-
+        data.frame(legend.name,
+                   geom=L$geom,
+                   aes=L$legend_type)
+    }
+    aes.geom <- do.call(rbind, aes.geom.list)
+    rownames(aes.geom) <- NULL
+    legends.by.geom <- split(aes.geom, aes.geom$geom)
+    for(g.name in names(legends.by.geom)){
+      one.geom <- legends.by.geom[[g.name]]
+      has.both <- all(c("colour", "fill") %in% one.geom$aes)
+      if(has.both){
+        colour.row <- which(one.geom$aes=="colour")
+        legend.name <- paste(one.geom$legend.name[[colour.row]])
+        fill.name <- paste0(g.name, "fill")
+        for(entry.i in seq_along(legend.list[[legend.name]]$entries)){
+          legend.list[[legend.name]]$entries[[entry.i]][[fill.name]] <-
+            "#FFFFFF"
+        }
+      }
+    }
+  }
   legend.list[0 < sapply(legend.list, length)]
 }
 
