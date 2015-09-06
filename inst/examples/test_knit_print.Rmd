@@ -12,7 +12,9 @@ knit_meta()
 ```{r plot1}
 library(ggplot2) 
 library(animint)
-q1 <- list(q = qplot(1:10, 1:10, xlab = "Worthless label 1"))
+dat <- data.frame(x = 1:10, y = 1:10, col = rep(c("a", "b"), 5))
+q1 <- list(q = qplot(x, y, data = dat, colour = col, 
+                     xlab = "Worthless label 1"))
 structure(q1, class = "animint")
 ```
 
