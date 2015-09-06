@@ -1648,7 +1648,7 @@ var animint = function (to_select, json_file) {
     }
     
     // selecting points based on legend
-    d3.select("#plot").selectAll("#legend").selectAll("tr")
+    d3.selectAll("#legend").selectAll("tr")
       .on("click", function() { 
         var row_id = d3.select(this).attr("id");
         var s_name = this.parentElement.className;
