@@ -1870,17 +1870,20 @@ var animint = function (to_select, json_file) {
      // looping through and adding a row for each selector
     for(s_name in Selectors) {
       var s_info = Selectors[s_name];
+      // removing "." from name so it can be used in ids
+      var s_name_id = s_name.replace(/\./g, '_');
+
       // adding a row for each selector
       var selector_widget_row = selector_table
         .append("tr")
-        .attr("id", function() { return s_name + "_selector_widget"; })
+        .attr("id", function() { return s_name_id + "_selector_widget"; })
       ;
       selector_widget_row.append("td").text(s_name);
       // adding the selector
       var selector_widget_select = selector_widget_row
         .append("td")
         .append("select")
-        .attr("id", function() { return s_name + "_input"; })
+        .attr("id", function() { return s_name_id + "_input"; })
         .attr("placeholder", function() { return "Toggle " + s_name; });
       // adding an option for each level of the variable
       selector_widget_select.selectAll("option")
@@ -1909,7 +1912,7 @@ var animint = function (to_select, json_file) {
         var selected_id = s_name.concat("___", s_info.selected);
 
         // if single selection, only allow one item
-        var $temp = $('#' + s_name + "_input")
+        var $temp = $('#' + s_name_id + "_input")
           .selectize({
               create: false, 
               valueField: 'id',
@@ -1951,7 +1954,7 @@ var animint = function (to_select, json_file) {
         }
         
         // construct the selectize
-        var $temp = $('#' + s_name + "_input")
+        var $temp = $('#' + s_name_id + "_input")
           .selectize({
               create: false, 
               valueField: 'id',
