@@ -20,19 +20,19 @@ test_that("knit_print.animint works as intended", {
 test_that("legend interactivity works in an Rmd document", {
   ## function to extract all circles from an HTML page
   get_circles <- function(id) {
-    getNodeSet(getHTML(), "//circle")
+    getNodeSet(getHTML(), "//circle[@class='geom']")
   }
   
-  # 10 circles on the plot plus two on the legend
-  expect_equal(length(get_circles()), 12)
+  # 10 circles on the plot
+  expect_equal(length(get_circles()), 10)
   
   # only 5 circles on the plot after clicking
-  clickID("a")
-  expect_equal(length(get_circles()), 7)
+  clickID("a178")
+  expect_equal(length(get_circles()), 5)
   
   # clicking again goes back to 10 plot circles
-  clickID("a")
-  expect_equal(length(get_circles()), 12)
+  clickID("a178")
+  expect_equal(length(get_circles()), 10)
   
 })
 
