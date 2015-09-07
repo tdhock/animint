@@ -1,4 +1,9 @@
-### My Rmd Document
+---
+title: "My Rmd Document"
+output: 
+  html_document:
+    self_contained: false
+---
   
 ```{r safety, echo = FALSE}
 library(knitr)
@@ -19,7 +24,7 @@ structure(q1, class = "animint")
 ```
 
 Some other text
-  
+
 ```{r plot2}
 q2 <- list(q = qplot(rnorm(100), xlab = "Worthless label 2"))
 structure(q2, class = "animint")
