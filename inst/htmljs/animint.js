@@ -111,6 +111,9 @@ var animint = function (to_select, json_file) {
   var all_geom_names = {};
   this.all_geom_names = all_geom_names;
 
+  //creating an array to contain the selectize widgets
+  var selectized_array = [];
+
   var css = document.createElement('style');
   css.type = 'text/css';
   var styles = [".axis path{fill: none;stroke: black;shape-rendering: crispEdges;}",
@@ -626,6 +629,29 @@ var animint = function (to_select, json_file) {
 	s_info.selected = [s_info.selected];
       }
     }
+    // update opacity of legend entries
+    var legend_entries = 
+      d3.selectAll("tr#legend th."+s_name+" td.legend_entry_label");
+    legend_entries.style("opacity", function(d) {
+      var d_opacity;
+      if(s_info.type == "multiple") {
+        // if the entry is one of the selected objects set opacity to 1
+        if(s_info.selected.indexOf(this.textContent) > -1) {
+          d_opacity = 1;
+        } else {
+          // otherwise opacity is 0.5
+          d_opacity = 0.5;
+        }
+      } else {
+        // if single selection
+        if(this.textContent == s_info.selected) {
+          d_opacity = 1;
+        } else {
+          d_opacity = 0.5;
+        }
+      }
+      return d_opacity;
+    });
   }
   var get_tsv = function(g_info, chunk_id){
     return g_info.classed + "_chunk" + chunk_id + ".tsv";
@@ -1489,6 +1515,21 @@ var animint = function (to_select, json_file) {
       }
       legend_other_opacity = null;
     }
+    // the jquery ids
+    if(s_info.type == "single") {
+      var selected_ids = v_name.concat("___", value);
+    } else {
+      var selected_ids = [];
+      for(i in s_info.selected) {
+        selected_ids[i] = v_name.concat("___", s_info.selected[i]);
+      }
+    }
+    // update selected widgets, if necessary
+    if(s_info.type == "multiple" | 
+      selectized_array[v_name].getValue() != selected_ids) {
+      selectized_array[v_name].setValue(selected_ids);
+    }
+    // update legend opacity
     // replacing periods in variable with an underscore
     // this makes sure that selector doesn't confuse . in name with id selector
     var legend_entries_id = v_name.replace(/\./g,'_');
@@ -1677,8 +1718,13 @@ var animint = function (to_select, json_file) {
     for (var s_name in response.selectors) {
       add_selector(s_name, response.selectors[s_name]);
     }
-    // loading table.
+    
+    ////////////////////////////////////////////
+    // Widgets at bottom of page
+    ////////////////////////////////////////////
     element.append("br");
+      
+    // loading table.
     var show_hide_table = element.append("button")
       .text("Show download status table")
     ;
@@ -1703,12 +1749,15 @@ var animint = function (to_select, json_file) {
     tr.append("th").attr("class", "downloaded").text("downloaded");
     tr.append("th").attr("class", "total").text("total");
     tr.append("th").attr("class", "status").text("status");
+    
     // Add geoms and construct nest operators.
     for (var g_name in response.geoms) {
       add_geom(g_name, response.geoms[g_name]);
     }
+    
     // Animation control widgets.
     var show_message = "Show animation controls";
+    // add a button to view the animation widgets
     var show_hide_animation_controls = element.append("button")
       .text(show_message)
       .attr("id", "show_hide_animation_controls")
@@ -1722,11 +1771,13 @@ var animint = function (to_select, json_file) {
 	}
       })
     ;
+    // table of the animint widgets
     var time_table = element.append("table")
       .style("display", "none")
     ;
     var first_tr = time_table.append("tr");
     var first_th = first_tr.append("th");
+    // if there's a time variable, add a button to pause the animint
     if(response.time){
       Animation.next = {};
       Animation.ms = response.time.ms;
@@ -1790,6 +1841,180 @@ var animint = function (to_select, json_file) {
 	return Selectors[s_name].duration;
       })
     ;
+    
+    // selector widgets
+    var show_message2 = "Toggle selected variables";
+    var show_hide_selector_widgets = element.append("button")
+      .text(show_message2)
+      .attr("id", "show_hide_selector_widgets")
+      .on("click", function(){
+        if(this.textContent == show_message2){
+          selector_table.style("display", "");
+          show_hide_selector_widgets.text("Hide variable toggler");
+        }else{
+          selector_table.style("display", "none");
+          show_hide_selector_widgets.text(show_message2);
+        }
+      })
+    ;
+    // adding a table for selector widgets
+    var selector_table = element.append("table")
+      .style("display", "none")
+      .attr("id", "table_selector_widgets")
+    ;
+    var selector_first_tr = selector_table.append("tr");
+    selector_first_tr
+      .append("th")
+      .text("Toggle selected value");
+      
+     // looping through and adding a row for each selector
+    for(s_name in Selectors) {
+      var s_info = Selectors[s_name];
+      // removing "." from name so it can be used in ids
+      var s_name_id = s_name.replace(/\./g, '_');
+
+      // adding a row for each selector
+      var selector_widget_row = selector_table
+        .append("tr")
+        .attr("id", function() { return s_name_id + "_selector_widget"; })
+      ;
+      selector_widget_row.append("td").text(s_name);
+      // adding the selector
+      var selector_widget_select = selector_widget_row
+        .append("td")
+        .append("select")
+        .attr("id", function() { return s_name_id + "_input"; })
+        .attr("placeholder", function() { return "Toggle " + s_name; });
+      // adding an option for each level of the variable
+      selector_widget_select.selectAll("option")
+        .data(s_info.levels)
+        .enter()
+        .append("option")
+        .attr("value", function(d) { return d; })
+        .text(function(d) { return d; });
+      // making sure that the first option is blank
+      selector_widget_select
+        .insert("option")
+        .attr("value", "")
+        .text(function() { return "Toggle " + s_name; });
+        
+      // calling selectize
+      if(s_info.type == "single") {
+        // setting up array of selector and options
+        var selector_values = [];
+        for(i in s_info.levels) {
+          selector_values[i] = {
+            id: s_name.concat("___", s_info.levels[i]), 
+            text: s_info.levels[i]
+          };
+        }
+        // the id of the first selector
+        var selected_id = s_name.concat("___", s_info.selected);
+
+        // if single selection, only allow one item
+        var $temp = $('#' + s_name_id + "_input")
+          .selectize({
+              create: false, 
+              valueField: 'id',
+              labelField: 'text',
+              searchField: ['text'],
+              options: selector_values, 
+              items: [selected_id],
+              maxItems: 1, 
+              allowEmptyOption: true,
+              onChange: function(value) {
+                // extracting the name and the level to update
+                var selector_name = value.split("___")[0];
+                var selected_level = value.split("___")[1];
+                // updating the selector
+                update_selector(selector_name, selected_level);
+              }
+            })
+         ;
+      } else {
+        // setting up array of selector and options
+        var selector_values = [];
+        if(typeof s_info.levels == "object") {
+          for(i in s_info.levels) {
+            selector_values[i] = {
+              id: s_name.concat("___", s_info.levels[i]), 
+              text: s_info.levels[i]
+            };
+          }
+        } else {
+          selector_values[0] = {
+            id: s_name.concat("___", s_info.levels), 
+              text: s_info.levels
+          };
+        }
+        // setting up an array to contain the initally selected elements
+        var initial_selections = [];
+        for(i in s_info.selected) {
+          initial_selections[i] = s_name.concat("___", s_info.selected[i]);
+        }
+        
+        // construct the selectize
+        var $temp = $('#' + s_name_id + "_input")
+          .selectize({
+              create: false, 
+              valueField: 'id',
+              labelField: 'text',
+              searchField: ['text'],
+              options: selector_values, 
+              items: initial_selections,
+              maxItems: s_info.levels.length, 
+              allowEmptyOption: true,
+              onChange: function(value) { 
+                // if nothing is selected, remove what is currently selected
+                if(value == null) {
+                  // extracting the selector ids from the options
+                  var the_ids = Object.keys($(this)[0].options);
+                  // the name of the appropriate selector
+                  var selector_name = the_ids[0].split("___")[0];
+                  // the previously selected elements
+                  var old_selections = Selectors[selector_name].selected;
+                  // updating the selector for each of the old selections
+                  old_selections.forEach(function(element) {
+                    update_selector(selector_name, element);
+                  });
+                } else {
+                  // grabbing the name of the selector from the selected value
+                  var selector_name = value[0].split("___")[0];
+                  // identifying the levels that should be selected
+                  var specified_levels = [];
+                  for(i in value) {
+                    specified_levels[i] = value[i].split("___")[1];
+                  }
+                  // the previously selected entries
+                  old_selections = Selectors[selector_name].selected;
+                  
+                  // the levels that need to have selections turned on
+                  specified_levels
+                    .filter(function(n) {
+                      return old_selections.indexOf(n) == -1;
+                    })
+                    .forEach(function(element) {
+                      update_selector(selector_name, element);
+                    })
+                  ;
+                  // the levels that need to be turned off
+                  // - same approach
+                  old_selections
+                    .filter(function(n) {
+                      return specified_levels.indexOf(n) == -1;
+                    })
+                    .forEach(function(element) {
+                      update_selector(selector_name, element);
+                    })
+                  ;
+                }
+              }
+            })
+        ;
+      }
+      selectized_array[s_name] = $temp[0].selectize;
+    } // close for loop through selector widgets
+      
     // If this is an animation, then start downloading all the rest of
     // the data, and start the animation.
     if (response.time) {

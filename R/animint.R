@@ -121,6 +121,10 @@ parsePlot <- function(meta){
         if(is.null(meta$selector.types[[var_name]])) {
           meta$selector.types[[var_name]] <- "multiple"
         }
+        # if first is not specified, create it
+        if(is.null(meta$first)) {
+          meta$first <- list()
+        }
         # if first is not specified, add all to first
         if(is.null(meta$first[[var_name]])) {
           u.vals <- unique(var)
@@ -444,8 +448,11 @@ saveLayer <- function(l, d, meta){
       stopifnot(length(selector.type)==1)
       stopifnot(selector.type %in% c("single", "multiple"))
       meta$selectors[[v.name]] <-
-        list(selected=as.character(value),
-             type=selector.type)
+        list(
+          selected=as.character(value),
+          type=selector.type, 
+          levels=as.character(unique(l$data[[v.name]]))
+        )
     }
     meta$selectors[[v.name]]$update <-
       c(meta$selectors[[v.name]]$update, as.list(g$classed))

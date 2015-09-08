@@ -15,7 +15,8 @@ getVariables <- function(){
   vars <- remDr$executeScript(myScript)[[1]]
   # ignore the "plot" variable -- 
   # https://github.com/tdhock/animint/pull/62#issuecomment-100008532
-  vars[!vars %in% "plot"]
+  # also ignore jQuery1238915281937 variable:
+  grep("plot|jQuery", vars, value=TRUE, invert=TRUE)
 }
 
 test_that("animint.js only defines 1 object, called animint", {
