@@ -112,24 +112,6 @@ RENDER: Easy legend decoding: draw an arrow next to the legend entry
 for the value of the element that the mouse is hovering over, e.g.
 http://www.highcharts.com/maps/demo/map-drilldown/dark-unica
 
-RENDER: For each selector variable, render a widget for selecting values:
-- single selection variable: <select> or <input type="radio">
-- multiple selection categorical variable: <input type="checkbox">
-- multiple selection numeric/datetime variable: crossfilter.js
-http://square.github.io/crossfilter/
-Currently, it is only possible to change the selection by clicking on
-data points/lines, not widgets. To implement that you would probably
-just have to add a few lines of JavaScript code to add the widgets,
-right after the plot meta-data is loaded, in add_selector
-https://github.com/tdhock/animint/blob/master/inst/htmljs/animint.js#L261. Also
-for an example of adding a button to the web page in JavaScript, see
-https://github.com/tdhock/animint/blob/master/inst/htmljs/animint.js#L1114.
-
-DSL: For each widget selector, should we show all available values,
-or just the values that are clickable onscreen? Or both? This may be
-specified by the designer using an option
-widgets=list(var1="onscreen", var2="all", var3="both").
-
 DSL: To accomplish interactivity like in this plot
 http://timelyportfolio.blogspot.ca/2014/05/pdf-chart-inkscape-svg-d3-interactive.html
 http://kbroman.github.io/qtlcharts/assets/chartexamples/iplotMScanone_example.html
@@ -193,6 +175,22 @@ DSL: Implement shape aesthetic with d3.svg.symbol()
 https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol_type
 
 RENDER: Determine why border of tiles in pirates example does not seem to be rendering.
+
+2015.09.08
+
+RENDER: For each selector variable, render a widget for selecting
+values using selectize.js
+
+2015.08.31
+
+BUGFIX: For geom_point(aes(fill=annotation,
+color=highly.divergent.regions)) the color legend now correctly shows
+a different stroke but the same fill for each <circle>.
+
+BUGFIX: interactive legends now work properly when selection/legend
+variable names contain dots (see test-malaria.R).
+
+BUGFIX: test-shiny.R works again thanks to remDr$switchToFrame.
 
 2015.07.17
 

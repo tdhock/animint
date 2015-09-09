@@ -1,7 +1,7 @@
 context("shiny")
 
 if (Sys.getenv("TRAVIS") == "true" | Sys.getenv("WERCKER") == "true") {
-  message("tests currently don't work on travis (but should someday)")
+  message("shiny tests don't work on travis/wercker (but should someday)")
 } else {
   # shiny tests require navigating to different ports, so remember where we are
   # and return when tests are done
@@ -32,11 +32,13 @@ if (Sys.getenv("TRAVIS") == "true" | Sys.getenv("WERCKER") == "true") {
     Sys.sleep(10) # give shiny a second to do it's thing
     remDr$navigate(address)
     Sys.sleep(10)
+    e <- remDr$findElement("class name", "shiny-frame")
+    remDr$switchToFrame(e)
     html <- getHTML()
     circles <- getNodeSet(html, "//svg//circle")
     expect_true(length(circles) >= 1)
   })
   
-  # go back to "normal" tests
+  # go back to non-shiny tests
   remDr$navigate(old_address)
 }

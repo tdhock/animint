@@ -132,7 +132,8 @@ test_that("wide/tallrect renders a <rect> for every year", {
 getYear <- function(){
   node.set <- getNodeSet(getHTML(), '//g[@class="geom9_text_ts"]//text')
   expect_equal(length(node.set), 1)
-  xmlValue(node.set[[1]])
+  value <- xmlValue(node.set[[1]])
+  sub("year = ", "", value)
 }
 
 test_that("animation updates", {
@@ -272,6 +273,62 @@ if (Sys.getenv("ANIMINT_BROWSER") != "phantomjs") {
     Sys.sleep(4)
     new.year <- getYear()
     expect_true(old.year == new.year)
+  })
+
+  clickID("show_hide_selector_widgets")
+
+  s.tr <- remDr$findElement("id", "year_selector_widget")
+  s.div <- s.tr$findChildElement("class name", "selectize-input")
+  s.div$clickElement()
+  remDr$sendKeysToActiveElement(list(key="backspace"))
+  remDr$sendKeysToActiveElement(list("1962", key="enter"))
+
+  test_that("typing into selectize widget changes year to 1962", {
+    current.year <- getYear()
+    expect_identical(current.year, "1962")
+  })
+  
+  s.div$clickElement()
+  remDr$sendKeysToActiveElement(list(key="down_arrow"))
+  remDr$sendKeysToActiveElement(list(key="enter"))
+  
+  test_that("down arrow key changes year to 1963", {
+    current.year <- getYear()
+    expect_identical(current.year, "1963")
+  })
+
+  getCountries <- function(){
+    country.labels <- getNodeSet(getHTML(), '//g[@class="geom8_text_ts"]//text')
+    sapply(country.labels, xmlValue)
+  }
+
+  test_that("initial countries same as first", {
+    country.vec <- getCountries()
+    expect_identical(sort(country.vec), sort(wb.facets$first$country))
+  })
+  
+  s.tr <- remDr$findElement("id", "country_selector_widget")
+  s.div <- s.tr$findChildElement("class name", "selectize-input")
+  s.div$clickElement()
+  remDr$sendKeysToActiveElement(list("Afg"))
+  remDr$sendKeysToActiveElement(list(key="enter"))
+
+  test_that("Afg autocompletes to Afghanistan", {
+    country.vec <- getCountries()
+    expected.countries <- c("United States", "Vietnam", "Afghanistan")
+    expect_identical(sort(country.vec), sort(expected.countries))
+  })
+  
+  div.list <- s.tr$findChildElements("class name", "item")
+  names(div.list) <- sapply(div.list, function(e)e$getElementText()[[1]])
+  us.div <- div.list[["United States"]]
+  us.div$clickElement()
+  remDr$sendKeysToActiveElement(list(key="backspace"))
+  
+  test_that("backspace removes US from selected countries", {
+    country.vec <- getCountries()
+    expected.countries <- c("Vietnam", "Afghanistan")
+    expect_identical(sort(country.vec), sort(expected.countries))
   })
   
   getWidth <- function(){
