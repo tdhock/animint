@@ -468,14 +468,6 @@ saveLayer <- function(l, d, meta){
         stopifnot(length(selector.type)==1)
         stopifnot(selector.type %in% c("single", "multiple"))
         meta$selectors[[selector.name]] <-
-          list(selected=as.character(value),
-               type=selector.type)
-      }
-      stopifnot(is.character(selector.type))
-      stopifnot(length(selector.type)==1)
-      stopifnot(selector.type %in% c("single", "multiple"))
-      if(! selector.name %in% names(meta$selectors)){
-        meta$selectors[[selector.name]] <-
           list(
             selected=as.character(value),
             type=selector.type, 
