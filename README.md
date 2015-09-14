@@ -23,10 +23,11 @@ library(animint)
 example(animint)
 ```
 
-NOTE: tdhock/ggplot2 is required in order to use `theme_animint` --
-there is a [pull request](https://github.com/hadley/ggplot2/pull/953)
-to merge [tdhock/ggplot2](https://github.com/tdhock/ggplot2) with the
-main ggplot2 repo.
+NOTE: tdhock/ggplot2 since
+[hadley/ggplot2](https://github.com/hadley/ggplot2) introduced some
+backwards-incompatible changes in Aug 2015. We would be more than
+willing to accept code contributions via a Pull Request that gets
+Animint working with the most recent version of ggplot2.
 
 ## Learning animint through examples
 
