@@ -23,9 +23,9 @@ library(animint)
 example(animint)
 ```
 
-NOTE: tdhock/ggplot2 since
-[hadley/ggplot2](https://github.com/hadley/ggplot2) introduced some
-backwards-incompatible changes in Aug 2015. We would be more than
+NOTE: [tdhock/ggplot2](https://github.com/tdhock/ggplot2) is required
+since [hadley/ggplot2](https://github.com/hadley/ggplot2) introduced
+some backwards-incompatible changes in Aug 2015. We would be more than
 willing to accept code contributions via a Pull Request that gets
 Animint working with the most recent version of ggplot2.
 
