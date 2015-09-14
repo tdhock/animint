@@ -6,6 +6,10 @@ animint - an R package for *anim*ated *int*eractive web graphics
 
 Interactive animations using [ggplot2](https://github.com/hadley/ggplot2)'s grammar of graphics implementation combined with clickSelects and showSelected aesthetics.
 
+[![WorldBank viz screenshot](screencast-WorldBank.gif)](http://bl.ocks.org/tdhock/raw/217823c39eb1fc7c5dc9/)
+
+Source: [WorldBank-facets in inst/examples/WorldBank.R](https://github.com/tdhock/animint/tree/master/inst/examples/WorldBank.R).
+
 ## Installation
 
 ```s
