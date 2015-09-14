@@ -45,6 +45,10 @@ repo](https://github.com/tdhock/animint-examples/tree/master/examples).
 
 ## Frequently asked questions (FAQ)
 
+- Is there a list of new features in Animint, with respect to standard
+  ggplot2?
+  [Yes](https://github.com/tdhock/animint/wiki/Advanced-features-present-animint-but-not-in-ggplot2).
+
 - Can I do brushing in Animint? If by "brushing" you mean "multiple
   selection," then yes the designer can use the
   [selector.types](https://github.com/tdhock/animint/wiki/Advanced-features-present-animint-but-not-in-ggplot2#multiple-selection)
