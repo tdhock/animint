@@ -8,9 +8,9 @@ Animint makes it possible to design multi-layer, multi-plot,
 interactive, and possibly animated data visualizations using just a
 few lines of R code. Animint adds clickSelects and showSelected
 aesthetics to [ggplot2](https://github.com/hadley/ggplot2), and
-renders using [D3](http://d3js.org/). For example, the visualization
-below of WorldBank data was defined using only [about 60 lines of R
-code](inst/examples/WorldBank-facets.R).
+renders using [D3](http://d3js.org/). For example, this multi-layer
+facetted interactive animation of WorldBank data was defined using
+only [about 60 lines of R code](inst/examples/WorldBank-facets.R).
 
 [![WorldBank viz screenshot](screencast-WorldBank.gif)](http://bl.ocks.org/tdhock/raw/217823c39eb1fc7c5dc9/)
 
