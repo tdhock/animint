@@ -4,11 +4,15 @@ animint - an R package for *anim*ated *int*eractive web graphics
 [![Build Status](https://travis-ci.org/tdhock/animint.png?branch=master)](https://travis-ci.org/tdhock/animint)
 [![Coverage Status](https://coveralls.io/repos/tdhock/animint/badge.svg?branch=master)](https://coveralls.io/r/tdhock/animint?branch=master)
 
-Interactive animations using [ggplot2](https://github.com/hadley/ggplot2)'s grammar of graphics implementation combined with clickSelects and showSelected aesthetics.
+Animint makes it possible to design multi-layer, multi-plot,
+interactive, and possibly animated data visualizations using just a
+few lines of R code. Animint adds clickSelects and showSelected
+aesthetics to [ggplot2](https://github.com/hadley/ggplot2), and
+renders using [D3](http://d3js.org/). For example, the visualization
+below of WorldBank data was defined using only [about 60 lines of R
+code](https://github.com/tdhock/animint/tree/master/inst/examples/WorldBank-facets.R).
 
 [![WorldBank viz screenshot](screencast-WorldBank.gif)](http://bl.ocks.org/tdhock/raw/217823c39eb1fc7c5dc9/)
-
-Source: [WorldBank-facets in inst/examples/WorldBank.R](https://github.com/tdhock/animint/tree/master/inst/examples/WorldBank.R).
 
 ## Installation
 
