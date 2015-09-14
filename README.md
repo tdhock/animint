@@ -10,7 +10,7 @@ few lines of R code. Animint adds clickSelects and showSelected
 aesthetics to [ggplot2](https://github.com/hadley/ggplot2), and
 renders using [D3](http://d3js.org/). For example, the visualization
 below of WorldBank data was defined using only [about 60 lines of R
-code](https://github.com/tdhock/animint/tree/master/inst/examples/WorldBank-facets.R).
+code](inst/examples/WorldBank-facets.R).
 
 [![WorldBank viz screenshot](screencast-WorldBank.gif)](http://bl.ocks.org/tdhock/raw/217823c39eb1fc7c5dc9/)
 
