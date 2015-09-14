@@ -51,9 +51,8 @@ repo](https://github.com/tdhock/animint-examples/tree/master/examples).
   option to declare a multiple selection variable, which means that
   users will be able to click plot elements to add/remove items from
   the multiple selection set. For example see the [WorldBank-facets
-  viz](http://bl.ocks.org/tdhock/raw/93a798530952338c87ac/) and
-  [source
-  code](https://github.com/tdhock/animint/blob/master/inst/examples/WorldBank.R).
+  viz](http://bl.ocks.org/tdhock/raw/217823c39eb1fc7c5dc9/) and
+  [source code](inst/examples/WorldBank-facets.R).
  
 - Can I use animint inside of a Shiny app?
   [Yes](https://cpsievert.shinyapps.io/animintShiny/).
