@@ -4,7 +4,15 @@ animint - an R package for *anim*ated *int*eractive web graphics
 [![Build Status](https://travis-ci.org/tdhock/animint.png?branch=master)](https://travis-ci.org/tdhock/animint)
 [![Coverage Status](https://coveralls.io/repos/tdhock/animint/badge.svg?branch=master)](https://coveralls.io/r/tdhock/animint?branch=master)
 
-Interactive animations using [ggplot2](https://github.com/hadley/ggplot2)'s grammar of graphics implementation combined with clickSelects and showSelected aesthetics.
+Animint makes it possible to design multi-layer, multi-plot,
+interactive, and possibly animated data visualizations using just a
+few lines of R code. Animint adds clickSelects and showSelected
+aesthetics to [ggplot2](https://github.com/hadley/ggplot2), and
+renders using [D3](http://d3js.org/). For example, this multi-layer
+facetted interactive animation of WorldBank data was defined using
+only [about 60 lines of R code](inst/examples/WorldBank-facets.R).
+
+[![WorldBank viz screenshot](screencast-WorldBank.gif)](http://bl.ocks.org/tdhock/raw/217823c39eb1fc7c5dc9/)
 
 ## Installation
 
@@ -15,10 +23,11 @@ library(animint)
 example(animint)
 ```
 
-NOTE: tdhock/ggplot2 is required in order to use `theme_animint` --
-there is a [pull request](https://github.com/hadley/ggplot2/pull/953)
-to merge [tdhock/ggplot2](https://github.com/tdhock/ggplot2) with the
-main ggplot2 repo.
+NOTE: [tdhock/ggplot2](https://github.com/tdhock/ggplot2) is required
+since [hadley/ggplot2](https://github.com/hadley/ggplot2) introduced
+some backwards-incompatible changes in Aug 2015. We would be more than
+willing to accept code contributions via a Pull Request that gets
+Animint working with the most recent version of ggplot2.
 
 ## Learning animint through examples
 
@@ -36,15 +45,18 @@ repo](https://github.com/tdhock/animint-examples/tree/master/examples).
 
 ## Frequently asked questions (FAQ)
 
+- Is there a list of new features in Animint, with respect to standard
+  ggplot2?
+  [Yes](https://github.com/tdhock/animint/wiki/Advanced-features-present-animint-but-not-in-ggplot2).
+
 - Can I do brushing in Animint? If by "brushing" you mean "multiple
   selection," then yes the designer can use the
   [selector.types](https://github.com/tdhock/animint/wiki/Advanced-features-present-animint-but-not-in-ggplot2#multiple-selection)
   option to declare a multiple selection variable, which means that
   users will be able to click plot elements to add/remove items from
   the multiple selection set. For example see the [WorldBank-facets
-  viz](http://bl.ocks.org/tdhock/raw/93a798530952338c87ac/) and
-  [source
-  code](https://github.com/tdhock/animint/blob/master/inst/examples/WorldBank.R).
+  viz](http://bl.ocks.org/tdhock/raw/217823c39eb1fc7c5dc9/) and
+  [source code](inst/examples/WorldBank-facets.R).
  
 - Can I use animint inside of a Shiny app?
   [Yes](https://cpsievert.shinyapps.io/animintShiny/).
