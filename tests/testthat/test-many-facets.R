@@ -65,5 +65,9 @@ test_that("right strips all at the same x position", {
   translate.vec <- sapply(text.list, function(x)xmlAttrs(x)[["transform"]])
   translate.mat <- str_match_perl(translate.vec, translatePattern)
   x.vec <- as.numeric(translate.mat[, "x"])
-  expect_true(all(x.vec[[1]] == x.vec))
+  expected.val <- x.vec[[1]]
+  expected.vec <- rep(expected.val, length(x.vec))
+  print(rbind(computed=x.vec,
+              expected=expected.vec))
+  expect_equal(x.vec, expected.vec)
 })
