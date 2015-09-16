@@ -240,10 +240,13 @@ var animint = function (to_select, json_file) {
     
     var strip_heights = p_info.strips.top.map(function(entry){ 
       return measureText(entry, 11).height;
-    })
+    });
     var strip_widths = p_info.strips.right.map(function(entry){ 
-      return measureText(entry, 11).height; 
-    })
+      return measureText(entry, 11).width; 
+    });
+    // Be conservative and use the max width/height for determining graph region
+    var strip_height = Math.max.apply(null, strip_heights);
+    var strip_width = Math.max.apply(null, strip_widths);
 
     // track the number of x/y axes to account for when calculating
     // height/width of graphing region
@@ -255,12 +258,12 @@ var animint = function (to_select, json_file) {
     }
 
     // the *entire graph* height/width
-    var graph_width = p_info.options.width - ncols * (margin.left + margin.right) -
-                      strip_widths[0] -
-                      n_yaxes * axispaddingy - ytitlepadding;
-    var graph_height = p_info.options.height - nrows * (margin.top + margin.bottom) -
-                        strip_heights[0] -
-                        titlepadding - n_xaxes * axispaddingx - xtitlepadding;
+    var graph_width = p_info.options.width - 
+        ncols * (margin.left + margin.right + strip_width) -
+        n_yaxes * axispaddingy - ytitlepadding;
+    var graph_height = p_info.options.height - 
+        nrows * (margin.top + margin.bottom + strip_height) -
+        titlepadding - n_xaxes * axispaddingx - xtitlepadding;
 
     // Impose the pixelated aspect ratio of the graph upon the width/height
     // proportions calculated by the compiler. This has to be done on the
