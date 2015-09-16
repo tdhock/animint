@@ -119,42 +119,6 @@ var animint = function (to_select, json_file) {
   var styles = [".axis path{fill: none;stroke: black;shape-rendering: crispEdges;}",
             ".axis line{fill: none;stroke: black;shape-rendering: crispEdges;}",
             ".axis text {font-family: sans-serif;font-size: 11px;}"];
-            
-  // 'margins' are fixed across panels and do not
-  // include title/axis/label padding (since these are not
-  // fixed across panels). They do, however, account for
-  // spacing between panels
-  var margin = {
-    left: 0,
-    right: 10,
-    top: 10,
-    bottom: 0
-  };
-  var plotdim = {
-    width: 0,
-    height: 0,
-    xstart: 0,
-    xend: 0,
-    ystart: 0,
-    yend: 0,
-    graph: {
-      width: 0,
-      height: 0
-    },
-    margin: margin,
-    xlab: {
-      x: 0,
-      y: 0
-    },
-    ylab: {
-      x: 0,
-      y: 0
-    },
-    title: {
-      x: 0,
-      y: 0
-    }
-  };
 
   var add_geom = function (g_name, g_info) {
     // Determine what style to use to show the selection for this
@@ -199,6 +163,47 @@ var animint = function (to_select, json_file) {
     var panel_names = p_info.layout.PANEL;
     var npanels = Math.max.apply(null, panel_names);
 
+    // Note axis names are "shared" across panels (just like the title)
+    var text_height_pixels = measureText(p_info["xtitle"], 11).height;
+    var xtitlepadding = 5 + text_height_pixels;
+    var ytitlepadding = 5 + measureText(p_info["ytitle"], 11).height;
+
+    // 'margins' are fixed across panels and do not
+    // include title/axis/label padding (since these are not
+    // fixed across panels). They do, however, account for
+    // spacing between panels
+    var margin = {
+      left: 0,
+      right: text_height_pixels * p_info.panel_margin_lines,
+      top: text_height_pixels * p_info.panel_margin_lines,
+      bottom: 0
+    };
+    var plotdim = {
+      width: 0,
+      height: 0,
+      xstart: 0,
+      xend: 0,
+      ystart: 0,
+      yend: 0,
+      graph: {
+	width: 0,
+	height: 0
+      },
+      margin: margin,
+      xlab: {
+	x: 0,
+	y: 0
+      },
+      ylab: {
+	x: 0,
+	y: 0
+      },
+      title: {
+	x: 0,
+	y: 0
+      }
+    };
+
     // Draw the title
     var titlepadding = measureText(p_info.title, 20).height + 10;
     // why are we giving the title padding if it is undefined?
@@ -211,13 +216,9 @@ var animint = function (to_select, json_file) {
       .attr("class", "title")
       .attr("font-family", "sans-serif")
       .attr("font-size", "20px")
-      .attr("transform", "translate(" + (plotdim.title.x) + "," + (
-        plotdim.title.y) + ")")
+      .attr("transform", "translate(" + plotdim.title.x + "," + 
+        plotdim.title.y + ")")
       .style("text-anchor", "middle");
-
-    // Note axis names are "shared" across panels (just like the title)
-    var xtitlepadding = 5 + measureText(p_info["xtitle"], 11).height;
-    var ytitlepadding = 5 + measureText(p_info["ytitle"], 11).height;
 
     // grab max text size over axis labels and facet strip labels
     var axispaddingy = 5;
@@ -233,12 +234,12 @@ var animint = function (to_select, json_file) {
 	     return measureText(entry, 11, p_info.xangle).height;
       }));
       // TODO: carefully calculating this gets complicated with rotating xlabs
-      margin.right += 5;
+      //margin.right += 5;
     }
     plotdim.margin = margin;
     
     var strip_heights = p_info.strips.top.map(function(entry){ 
-      return measureText(entry, 11).height; 
+      return measureText(entry, 11).height;
     })
     var strip_widths = p_info.strips.right.map(function(entry){ 
       return measureText(entry, 11).height; 
@@ -428,10 +429,10 @@ var animint = function (to_select, json_file) {
         }
         // assume right is top until it isn't
         var x = (plotdim.xstart + plotdim.xend) / 2;
-        var y = plotdim.ystart - strip_heights[layout_i] / 2;
+        var y = plotdim.ystart - strip_heights[layout_i] / 2 + 3;
         var rotate = 0;
         if (side == "right") {
-          x = plotdim.xend + strip_widths[layout_i] / 2;
+          x = plotdim.xend + strip_widths[layout_i] / 2 - 2;
           y = (plotdim.ystart + plotdim.yend) / 2;
           rotate = 90;
         }

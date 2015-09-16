@@ -16,6 +16,7 @@ viz <-
        vertical=gg+
          theme_animint(height=n.circles * 30 + 50)+
          facet_grid(facet ~ .))
+
 info <- animint2HTML(viz)
 
 test_that("points have positive positions", {
