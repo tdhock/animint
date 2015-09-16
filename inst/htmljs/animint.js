@@ -393,11 +393,11 @@ var animint = function (to_select, json_file) {
     // room for right strips should be distributed evenly across panels to preserve aspect ratio
     plotdim.xend = plotdim.xstart + plotdim.graph.width;
     // total height of strips drawn thus far
-    var strip_height = strip_heights.slice(0, current_row)
-                       .reduce(function(a, b) { return a + b; })
+    var strip_h = strip_heights.slice(0, current_row)
+        .reduce(function(a, b) { return a + b; })
     plotdim.ystart = current_row * plotdim.margin.top +
-                     (current_row - 1) * plotdim.margin.bottom +
-                     graph_height_cum + titlepadding + strip_height;
+        (current_row - 1) * plotdim.margin.bottom +
+        graph_height_cum + titlepadding + strip_h;
     // room for xaxis title should be distributed evenly across panels to preserve aspect ratio
     plotdim.yend = plotdim.ystart + plotdim.graph.height;
     // always add to the width (note it may have been reset earlier)
