@@ -70,6 +70,27 @@ wb.facets <-
 
 info <- animint2HTML(wb.facets)
 
+rect.list <-
+  getNodeSet(info$html, '//svg[@id="ts"]//rect[@class="border_rect"]')
+expect_equal(length(rect.list), 4)
+at.mat <- sapply(rect.list, xmlAttrs)
+
+test_that("no horizontal space between border_rects", {
+  left.vec <- as.numeric(at.mat["x", ])
+  width.vec <- as.numeric(at.mat["width", ])
+  right.vec <- left.vec + width.vec
+  x.values <- unique(c(left.vec, right.vec))
+  expect_equal(length(x.values), 3)
+})
+
+test_that("no vertical space between border_rects", {
+  top.vec <- as.numeric(at.mat["y", ])
+  height.vec <- as.numeric(at.mat["height", ])
+  bottom.vec <- top.vec + height.vec
+  y.values <- unique(c(top.vec, bottom.vec))
+  expect_equal(length(y.values), 3)
+})
+
 dasharrayPattern <-
   paste0("stroke-dasharray:",
          "(?<value>.*?)",
