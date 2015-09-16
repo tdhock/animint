@@ -304,16 +304,14 @@ var animint = function (to_select, json_file) {
       SVGs[g_name] = svg;
     });
 
-    // If we are to draw more than one panel,
-    // create a grouping for strip labels
-    if (npanels > 1) {
-      var topStrip = svg.append("g")
-        .attr("class", "strip")
-        .attr("id", "topStrip");
-      var rightStrip = svg.append("g")
-        .attr("class", "strip")
-        .attr("id", "rightStrip");
-    }
+    // create a grouping for strip labels (even if there are none).
+    var topStrip = svg.append("g")
+      .attr("class", "strip")
+      .attr("id", "topStrip");
+    var rightStrip = svg.append("g")
+      .attr("class", "strip")
+      .attr("id", "rightStrip");
+
     // this will hold x/y scales for each panel
     // eventually we inject this into Plots[p_name]
     var scales = {};
