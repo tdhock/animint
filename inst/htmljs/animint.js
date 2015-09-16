@@ -164,14 +164,14 @@ var animint = function (to_select, json_file) {
     var npanels = Math.max.apply(null, panel_names);
 
     // Note axis names are "shared" across panels (just like the title)
-    var text_height_pixels = measureText(p_info["xtitle"], 11).height;
-    var xtitlepadding = 5 + text_height_pixels;
+    var xtitlepadding = 5 + measureText(p_info["xtitle"], 11).height;
     var ytitlepadding = 5 + measureText(p_info["ytitle"], 11).height;
 
     // 'margins' are fixed across panels and do not
     // include title/axis/label padding (since these are not
     // fixed across panels). They do, however, account for
     // spacing between panels
+    var text_height_pixels = measureText("foo", 11).height;
     var margin = {
       left: 0,
       right: text_height_pixels * p_info.panel_margin_lines,
