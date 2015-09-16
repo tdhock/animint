@@ -242,7 +242,7 @@ var animint = function (to_select, json_file) {
       return measureText(entry, 11).height;
     });
     var strip_widths = p_info.strips.right.map(function(entry){ 
-      return measureText(entry, 11).width; 
+      return measureText(entry, 11).height; 
     });
     // Be conservative and use the max width/height for determining graph region
     var strip_height = Math.max.apply(null, strip_heights);
