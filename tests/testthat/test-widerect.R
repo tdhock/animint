@@ -20,6 +20,7 @@ wb.facets <-
                          clickSelects=year),
                      data=TS(years), alpha=1/2)+
        theme_animint(width=1000, height=800)+
+       theme(panel.margin=grid::unit(0, "lines"))+
        geom_line(aes(year, life.expectancy, group=country, colour=region,
                      clickSelects=country, id = country),
                  data=TS(not.na), size=4, alpha=3/5)+
