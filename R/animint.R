@@ -177,7 +177,7 @@ parsePlot <- function(meta){
       }
     meta$selectors[[selector.name]]$levels <- value.vec
     meta$selectors[[selector.name]]$update <-
-      unique(unlist(lapply(values.update, "[[", "update")))
+      as.list(unique(unlist(lapply(values.update, "[[", "update"))))
   }
 
   ## Export axis specification as a combination of breaks and
