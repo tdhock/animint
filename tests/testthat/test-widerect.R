@@ -77,7 +77,7 @@ rect.list <-
 expect_equal(length(rect.list), 4)
 at.mat <- sapply(rect.list, xmlAttrs)
 
-test_that("no horizontal space between border_rects", {
+test_that("three unique border_rect x values (no horiz space)", {
   left.vec <- as.numeric(at.mat["x", ])
   width.vec <- as.numeric(at.mat["width", ])
   right.vec <- left.vec + width.vec
@@ -85,7 +85,7 @@ test_that("no horizontal space between border_rects", {
   expect_equal(length(x.values), 3)
 })
 
-test_that("no vertical space between border_rects", {
+test_that("three unique border_rect y values (no vert space)", {
   top.vec <- as.numeric(at.mat["y", ])
   height.vec <- as.numeric(at.mat["height", ])
   bottom.vec <- top.vec + height.vec
