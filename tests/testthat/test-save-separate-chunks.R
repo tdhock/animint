@@ -235,7 +235,7 @@ test_that("save separate chunks for non-spatial geoms with repetitive field, mul
   expect_equal(nrow(varied.data), 186)
   varied.must.have <-
     c("size", "x", "y", "tooltip", "showSelectedlegendcolour", "group")
-  expect_true(all(must.have %in% names(varied.data)))
+  expect_true(all(varied.must.have %in% names(varied.data)))
   
   unlink(out.dir, recursive = TRUE)
 })
