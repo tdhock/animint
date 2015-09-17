@@ -154,7 +154,7 @@ test_that("two lines rendered in first plot", {
            ";")
   style.matrices <- str_match_all_perl(style.strs, pattern)
   size.vec <- sapply(style.matrices, function(m)m["stroke-width", "value"])
-  size.num <- as.numeric(size.vec)
+  size.num <- as.numeric(sub("px", "", size.vec))
   expect_equal(size.num, c(1, 2))
   color.vec <- sapply(style.matrices, function(m)m["stroke", "value"])
   expect_color(color.vec, c("red", "black"))
@@ -238,12 +238,15 @@ for(problem.name in names(p.list)){
   p[[s.name]] <- p$peaks
   pp <- pp.list[[problem.name]]
   pp[[s.name]] <- pp$peaks
+  ## need problem.underscore since a proper CSS id (as recognized by
+  ## phantomJS) does not have dots!
+  pp$problem.nodots <- gsub("[.]", "", pp$problem.name)
   s <- s.list[[problem.name]]
   s[[s.name]] <- s$peaks
   p$bases.per.problem <- pp$bases.per.problem[1]
   viz.for$problems <- viz.for$problems+
     geom_segment(aes_string("peakStart", "problem.i",
-                            id="problem.name",
+                            id="problem.nodots",
                             showSelected=s.name,
                             clickSelects="problem.name",
                             showSelected2="bases.per.problem",
@@ -286,7 +289,8 @@ test_that("counts of chunks downloaded or not at first", {
 })
 
 test_that("changing problem downloads one chunk", {
-  clickID('size.100.problem.2')
+  clickID('size100problem2')
+  Sys.sleep(1)
   value.vec <- chunk.counts()
   expect_equal(value.vec,
                c(1, 1, 1, 1, 1, 1,
