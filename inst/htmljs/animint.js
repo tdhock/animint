@@ -5,7 +5,9 @@
 // </script>
 // Constructor for animint Object.
 var animint = function (to_select, json_file) {
-
+  function safe_name(unsafe_name){
+    return unsafe_name.replace(/\./g, '_');
+  }
   var linetypesize2dasharray = function (lt, size) {
     var isInt = function(n) {
       return typeof n === 'number' && parseFloat(n) == parseInt(n, 10) && !isNaN(n);
@@ -683,7 +685,7 @@ var animint = function (to_select, json_file) {
     }
     // update opacity of legend entries
     var legend_entries = 
-      d3.selectAll("tr#legend th."+s_name+" td.legend_entry_label");
+      d3.selectAll("tr#legend th."+safe_name(s_name)+" td.legend_entry_label");
     legend_entries.style("opacity", function(d) {
       var d_opacity;
       if(s_info.type == "multiple") {
@@ -1531,7 +1533,7 @@ var animint = function (to_select, json_file) {
 	    if(has_clickSelects){
               return ifSelectedElse(d.clickSelects, g_info.aes.clickSelects,
 				    alpha_on, alpha_off);
-	    }else{
+	    }else if(has_clickSelects_variable){
 	      return ifSelectedElse(d["clickSelects.value"],
 				    d["clickSelects.variable"],
 				    alpha_on, alpha_off);
@@ -1558,7 +1560,7 @@ var animint = function (to_select, json_file) {
 	    return "black";
 	  }
 	}
-      };
+      }; //selected_funs.
       // My original design for clicking/interactivity/transparency:
       // Basically I wanted a really simple way to show which element
       // in a group of clickable geom elements is currently
@@ -1621,6 +1623,8 @@ var animint = function (to_select, json_file) {
 	  }
         })
       ;
+    }else{//has neither clickSelects nor clickSelects.variable.
+      elements.style("opacity", get_alpha);
     }
     var has_tooltip = g_info.aes.hasOwnProperty("tooltip");
     if(has_clickSelects || has_tooltip){
@@ -1697,7 +1701,7 @@ var animint = function (to_select, json_file) {
     // update legend opacity
     // replacing periods in variable with an underscore
     // this makes sure that selector doesn't confuse . in name with id selector
-    var legend_entries_id = v_name.replace(/\./g,'_');
+    var legend_entries_id = safe_name(v_name);
     var legend_entries = 
       d3.selectAll("tr#legend th#"+legend_entries_id+" td.legend_entry_label");
     legend_entries.style("opacity", function(d){
@@ -1764,7 +1768,7 @@ var animint = function (to_select, json_file) {
           // identifying the name of the variable
           var var_name = p_info.legend[legendkeys[i]].vars;
           // replacing periods with underscores
-          return var_name.replace(/\./g,'_');
+          return safe_name(var_name);
         })
         // adding a class which doesn't have underscores in the name
         .attr("class", p_info.legend[legendkeys[i]].vars);
@@ -2015,7 +2019,7 @@ var animint = function (to_select, json_file) {
     for(s_name in Selectors) {
       var s_info = Selectors[s_name];
       // removing "." from name so it can be used in ids
-      var s_name_id = s_name.replace(/\./g, '_');
+      var s_name_id = safe_name(s_name);
 
       // adding a row for each selector
       var selector_widget_row = selector_table
