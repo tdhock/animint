@@ -185,7 +185,8 @@ test_that("renderer can handle no grid lines", {
 test_that("multiple selection sex_smoker plot", {
   ss.viz$selector.types$sex_smoker <- "multiple"
   info <- animint2HTML(ss.viz)
-  expect_equal(length(info$first$sex_smoker), 4)
+  circle.list <- getNodeSet(info$html, '//svg[@id="p2"]//circle')
+  expect_equal(length(circle.list), nrow(tips))
 })
 
 test_that("renderer can handle only one grid line", {
