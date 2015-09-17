@@ -73,13 +73,10 @@ parsePlot <- function(meta){
     
     ## If any legends are specified, add showSelected aesthetic
     for(legend.i in seq_along(plot.meta$legend)) {
-      # the type of legend: colour, fill, etc
-      legend_type <- plot.meta$legend[[legend.i]]$legend_type
+      one.legend <- plot.meta$legend[[legend.i]]
       # the name of the variable used in this legend
-      var_name <- plot.meta$legend[[legend.i]]$vars
       # var_name can have length greater than one if an expression is used
-      var_name <- intersect(var_name, names(L$data))
-      
+      var_name <- intersect(one.legend$vars, names(L$data))
       if(length(var_name) > 0) {
         ### need to make sure the variable is used in the mapping
         ### i.e. that it is used in this plot
@@ -109,10 +106,10 @@ parsePlot <- function(meta){
         ## not add any showSelected aesthetic for it.
         var.is.interactive <- any(is.interactive.aes & is.legend.var)
         if(!var.is.interactive){
-          for(i in legend_type) {
+          for(legend_type in one.legend$legend_type) {
             ## only adding showSelected aesthetic if the variable is used by the geom
-            if(!is.null(L$mapping[[i]])) {
-              temp_name <- paste0("showSelectedlegend", i)
+            if(!is.null(L$mapping[[legend_type]])) {
+              temp_name <- paste0("showSelectedlegend", legend_type)
               L$mapping[[temp_name]] <- as.symbol(var_name)
             }
           }
@@ -471,6 +468,9 @@ saveLayer <- function(l, d, meta){
         stopifnot(is.character(selector.type))
         stopifnot(length(selector.type)==1)
         stopifnot(selector.type %in% c("single", "multiple"))
+        ## TODO: the definition of selected/levels below is NOT good
+        ## enough when there are multiple layers that have different
+        ## selector levels. How to determine all levels?
         meta$selectors[[selector.name]] <-
           list(
             selected=as.character(value),
