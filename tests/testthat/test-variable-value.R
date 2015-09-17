@@ -33,7 +33,7 @@ problems <-
              problem.i=c(1, 2, 1, 2, 3, 4),
              bases.per.problem=c(100, 100, 50, 50, 50, 50))
 problems$problem.name <- with(problems, {
-  sprintf("size%dproblem%d", bases.per.problem, problem.i)
+  sprintf("size%d.problem%d", bases.per.problem, problem.i)
 })
 
 sizes <- data.frame(bases.per.problem=c(50, 100),
@@ -248,7 +248,7 @@ test_that("counts of chunks downloaded or not at first", {
 })
 
 test_that("changing problem downloads one chunk", {
-  clickID('size100problem2')
+  clickID('size100.problem2')
   value.vec <- chunk.counts()
   expect_equal(value.vec,
                c(1, 1, 1, 1, 1, 1,
