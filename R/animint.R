@@ -129,17 +129,6 @@ parsePlot <- function(meta){
         # if first is not specified, add all to first
         if(is.null(meta$first[[var_name]])) {
           u.vals <- unique(var)
-          s.type <- if(var_name %in% names(meta$selectors)){
-            ## Selector has already been created.
-            meta$selectors[[var_name]]$type
-          }else{
-            meta$selector.types[[var_name]]
-          }
-          meta$first[[var_name]] <- if(s.type == "multiple"){
-            u.vals
-          }else{
-            u.vals[[1]]
-          }
         }
       }
     }
@@ -174,6 +163,21 @@ parsePlot <- function(meta){
       geom.next <- plot.meta$geoms[[geom.i + 1]]
       meta$geoms[[geom.prev]]$nextgeom <- meta$geoms[[geom.next]]$classed
     }
+  }
+  ## Selector levels and update were stored in saveLayer, so now
+  ## compute the unique values to store in meta$selectors.
+  for(selector.name in names(meta$selector.values)){
+    values.update <- meta$selector.values[[selector.name]]
+    value.vec <- unique(unlist(lapply(values.update, "[[", "values")))
+    meta$selectors[[selector.name]]$selected <-
+      if(meta$selectors[[selector.name]]$type=="single"){
+        value.vec[1]
+      }else{
+        value.vec
+      }
+    meta$selectors[[selector.name]]$levels <- value.vec
+    meta$selectors[[selector.name]]$update <-
+      unique(unlist(lapply(values.update, "[[", "update")))
   }
 
   ## Export axis specification as a combination of breaks and
@@ -457,29 +461,28 @@ saveLayer <- function(l, d, meta){
       data.frame(value.col=aes.row$value,
                  selector.name=unique(paste(selector.vec)))
     }
-    for(row.i in 1:nrow(selector.df)){
-      sel.row <- selector.df[row.i,]
+    for(sel.i in 1:nrow(selector.df)){
+      sel.row <- selector.df[sel.i,]
       value.col <- paste(sel.row$value.col)
       selector.name <- paste(sel.row$selector.name)
-      if(!selector.name %in% names(meta$selectors)){
-        value <- g.data[[value.col]][1]
+      ## If this selector has no defined type yet, we define it once
+      ## and for all here, so we can use it later for chunk
+      ## separation.
+      if(is.null(meta$selectors[[selector.name]]$type)){
         selector.type <- meta$selector.types[[selector.name]]
         if(is.null(selector.type))selector.type <- "single"
         stopifnot(is.character(selector.type))
         stopifnot(length(selector.type)==1)
         stopifnot(selector.type %in% c("single", "multiple"))
-        ## TODO: the definition of selected/levels below is NOT good
-        ## enough when there are multiple layers that have different
-        ## selector levels. How to determine all levels?
-        meta$selectors[[selector.name]] <-
-          list(
-            selected=as.character(value),
-            type=selector.type, 
-            levels=as.character(unique(l$data[[selector.name]]))
-            )
+        meta$selectors[[selector.name]]$type <- selector.type
       }
-      meta$selectors[[selector.name]]$update <-
-        c(meta$selectors[[selector.name]]$update, as.list(g$classed))
+      ## We also store all the values of this selector in this layer,
+      ## so we can accurate set levels after all geoms have been
+      ## compiled.
+      value.vec <- unique(g.data[[value.col]])
+      key <- paste(g$classed, row.i, sel.i)
+      meta$selector.values[[selector.name]][[key]] <-
+        list(values=paste(value.vec), update=g$classed)
     }
   }
 
@@ -942,7 +945,7 @@ saveCommonChunk <- function(x, vars, meta){
     # add group column for later joining by group in renderer
     # if group column already exists, use the existing one
     if(!"group" %in% meta$g$nest_order){
-      x <- ddply(x, vars, function(df){
+      x <- plyr::ddply(x, vars, function(df){
         data.frame(df[!names(df) %in% vars], group = 1:nrow(df))
       })
     }
