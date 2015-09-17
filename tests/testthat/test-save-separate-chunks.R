@@ -228,17 +228,17 @@ test_that("save separate chunks for non-spatial geoms with repetitive field, mul
   ## test common.chunk
   common.data <- read.csv(common.chunk, sep = "\t")
   expect_equal(nrow(common.data), 214)
-  expect_true(all(c("colour", "clickSelects", "key", "fill", "group") %in% names(common.data)))
+  common.must.have <- c("colour", "clickSelects", "key", "fill", "group")
+  expect_true(all(common.must.have %in% names(common.data)))
   ## choose first varied.chunk to test
   varied.data <- read.csv(varied.chunks[1], sep = "\t")
   expect_equal(nrow(varied.data), 186)
-  must.have <-
+  varied.must.have <-
     c("size", "x", "y", "tooltip", "showSelectedlegendcolour", "group")
   expect_true(all(must.have %in% names(varied.data)))
   
   unlink(out.dir, recursive = TRUE)
 })
-
 
 ### test case 4
 data(breakpoints)
