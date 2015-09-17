@@ -176,6 +176,16 @@ https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol_type
 
 RENDER: Determine why border of tiles in pirates example does not seem to be rendering.
 
+2015.09.17
+
+OPTIMIZATION: the compiler will not save any geom1_chunk123.tsv files
+less than 4KB, unless specifically asked to do so using chunk_vars.
+
+OPTIMIZATION: @caijun's GSOC2015 project allows even more disk space
+savings, by saving data which is the same in every tsv file in
+geom1_common.tsv. 
+http://kferris10.github.io/AnimintBlog/Optimization-of-Disk-Usage-for-animint/
+
 2015.09.16
 
 BUGFIX: data renders properly when there are many facet rows or
