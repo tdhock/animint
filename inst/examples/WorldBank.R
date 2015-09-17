@@ -194,6 +194,7 @@ wb.facets <-
                   data=SCATTER(not.na))+
        geom_text(aes(fertility.rate, life.expectancy, label=country,
                      showSelected=country, showSelected2=year,
+                     showSelected3=region,
                      clickSelects=country,
                      key=country), #also use key here!
                  data=SCATTER(not.na))+
@@ -214,3 +215,11 @@ wb.facets <-
        title="World Bank data (multiple selection, facets)")
 
 animint2dir(wb.facets, "WorldBank-facets")
+
+## Make a screencast to quickly show some animint features.
+
+## system("mplayer -ao null screencast.ogv -vo jpeg:outdir=screencast")
+## system("cp -r screencast screencast-small")
+## jpg.vec <- Sys.glob("screencast-small/*.jpg")
+## unlink(jpg.vec[seq_along(jpg.vec) %% 10 != 1])
+## system("convert -resize 728x536 screencast-small/*.jpg -set delay 25 -layers Optimize screencast.gif")

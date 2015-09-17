@@ -176,6 +176,15 @@ https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol_type
 
 RENDER: Determine why border of tiles in pirates example does not seem to be rendering.
 
+2015.09.16
+
+BUGFIX: data renders properly when there are many facet rows or
+columns (before, there was some problem with scales that was causing
+negative data values).
+
+RENDER: theme(panel.margin=grid::unit(0, "lines")) is interpreted to
+mean no space between facets. Useful to save space with theme_bw().
+
 2015.09.08
 
 RENDER: For each selector variable, render a widget for selecting

@@ -54,6 +54,10 @@ parsePlot <- function(meta){
   ## grid 0-1 scale). This allows transformations to be used
   ## out of the box, with no additional d3 coding.
   theme.pars <- ggplot2:::plot_theme(meta$plot)
+
+  ## Interpret panel.margin as the number of lines between facets
+  ## (ignoring whatever grid::unit such as cm that was specified).
+  plot.meta$panel_margin_lines <- as.numeric(theme.pars$panel.margin)
   
   ## No legend if theme(legend.postion="none").
   plot.meta$legend <- if(theme.pars$legend.position != "none"){

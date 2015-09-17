@@ -9,7 +9,7 @@ p1 <- ggplot() +
                                     color = "black",
                                     size = 2,
                                     linetype = "dashed"),
-        panel.margin = grid::unit(.1, "cm")) +
+        panel.margin = grid::unit(0.1, "cm")) +
   facet_wrap(~Species, nrow = 2)
 p2 <- ggplot() +
   geom_point(aes(Petal.Length, Petal.Width,
@@ -33,6 +33,19 @@ p4 <- p2 +
         complete = T)
 
 info <- animint2HTML(list(sepal = p1, petal = p2, blank = p3, gg538 = p4))
+
+rect.list <-
+  getNodeSet(info$html, '//svg[@id="sepal"]//rect[@class="border_rect"]')
+expect_equal(length(rect.list), 3)
+at.mat <- sapply(rect.list, xmlAttrs)
+
+test_that("four unique border_rect x values (some horiz space)", {
+  left.vec <- as.numeric(at.mat["x", ])
+  width.vec <- as.numeric(at.mat["width", ])
+  right.vec <- left.vec + width.vec
+  x.values <- unique(c(left.vec, right.vec))
+  expect_equal(length(x.values), 4)
+})
 
 # extracting html from plots --------------------------------------
 

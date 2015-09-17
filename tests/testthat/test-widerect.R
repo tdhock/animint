@@ -19,7 +19,9 @@ wb.facets <-
                          linetype=status,
                          clickSelects=year),
                      data=TS(years), alpha=1/2)+
+       theme_bw()+
        theme_animint(width=1000, height=800)+
+       theme(panel.margin=grid::unit(0, "lines"))+
        geom_line(aes(year, life.expectancy, group=country, colour=region,
                      clickSelects=country, id = country),
                  data=TS(not.na), size=4, alpha=3/5)+
@@ -98,6 +100,27 @@ if (Sys.getenv("TRAVIS") == "true" | Sys.getenv("WERCKER") == "true") {
     expect_true(all(unselected.opacity == 0.1))
   })
 }
+
+rect.list <-
+  getNodeSet(info$html, '//svg[@id="ts"]//rect[@class="border_rect"]')
+expect_equal(length(rect.list), 4)
+at.mat <- sapply(rect.list, xmlAttrs)
+
+test_that("three unique border_rect x values (no horiz space)", {
+  left.vec <- as.numeric(at.mat["x", ])
+  width.vec <- as.numeric(at.mat["width", ])
+  right.vec <- left.vec + width.vec
+  x.values <- unique(c(left.vec, right.vec))
+  expect_equal(length(x.values), 3)
+})
+
+test_that("three unique border_rect y values (no vert space)", {
+  top.vec <- as.numeric(at.mat["y", ])
+  height.vec <- as.numeric(at.mat["height", ])
+  bottom.vec <- top.vec + height.vec
+  y.values <- unique(c(top.vec, bottom.vec))
+  expect_equal(length(y.values), 3)
+})
 
 dasharrayPattern <-
   paste0("stroke-dasharray:",

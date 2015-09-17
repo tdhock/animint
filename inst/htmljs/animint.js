@@ -116,42 +116,6 @@ var animint = function (to_select, json_file) {
   var styles = [".axis path{fill: none;stroke: black;shape-rendering: crispEdges;}",
             ".axis line{fill: none;stroke: black;shape-rendering: crispEdges;}",
             ".axis text {font-family: sans-serif;font-size: 11px;}"];
-            
-  // 'margins' are fixed across panels and do not
-  // include title/axis/label padding (since these are not
-  // fixed across panels). They do, however, account for
-  // spacing between panels
-  var margin = {
-    left: 0,
-    right: 10,
-    top: 10,
-    bottom: 0
-  };
-  var plotdim = {
-    width: 0,
-    height: 0,
-    xstart: 0,
-    xend: 0,
-    ystart: 0,
-    yend: 0,
-    graph: {
-      width: 0,
-      height: 0
-    },
-    margin: margin,
-    xlab: {
-      x: 0,
-      y: 0
-    },
-    ylab: {
-      x: 0,
-      y: 0
-    },
-    title: {
-      x: 0,
-      y: 0
-    }
-  };
 
   var add_geom = function (g_name, g_info) {
     // Determine what style to use to show the selection for this
@@ -219,6 +183,47 @@ var animint = function (to_select, json_file) {
     var panel_names = p_info.layout.PANEL;
     var npanels = Math.max.apply(null, panel_names);
 
+    // Note axis names are "shared" across panels (just like the title)
+    var xtitlepadding = 5 + measureText(p_info["xtitle"], 11).height;
+    var ytitlepadding = 5 + measureText(p_info["ytitle"], 11).height;
+
+    // 'margins' are fixed across panels and do not
+    // include title/axis/label padding (since these are not
+    // fixed across panels). They do, however, account for
+    // spacing between panels
+    var text_height_pixels = measureText("foo", 11).height;
+    var margin = {
+      left: 0,
+      right: text_height_pixels * p_info.panel_margin_lines,
+      top: text_height_pixels * p_info.panel_margin_lines,
+      bottom: 0
+    };
+    var plotdim = {
+      width: 0,
+      height: 0,
+      xstart: 0,
+      xend: 0,
+      ystart: 0,
+      yend: 0,
+      graph: {
+	width: 0,
+	height: 0
+      },
+      margin: margin,
+      xlab: {
+	x: 0,
+	y: 0
+      },
+      ylab: {
+	x: 0,
+	y: 0
+      },
+      title: {
+	x: 0,
+	y: 0
+      }
+    };
+
     // Draw the title
     var titlepadding = measureText(p_info.title, 20).height + 10;
     // why are we giving the title padding if it is undefined?
@@ -231,13 +236,9 @@ var animint = function (to_select, json_file) {
       .attr("class", "title")
       .attr("font-family", "sans-serif")
       .attr("font-size", "20px")
-      .attr("transform", "translate(" + (plotdim.title.x) + "," + (
-        plotdim.title.y) + ")")
+      .attr("transform", "translate(" + plotdim.title.x + "," + 
+        plotdim.title.y + ")")
       .style("text-anchor", "middle");
-
-    // Note axis names are "shared" across panels (just like the title)
-    var xtitlepadding = 5 + measureText(p_info["xtitle"], 11).height;
-    var ytitlepadding = 5 + measureText(p_info["ytitle"], 11).height;
 
     // grab max text size over axis labels and facet strip labels
     var axispaddingy = 5;
@@ -253,33 +254,63 @@ var animint = function (to_select, json_file) {
 	     return measureText(entry, 11, p_info.xangle).height;
       }));
       // TODO: carefully calculating this gets complicated with rotating xlabs
-      margin.right += 5;
+      //margin.right += 5;
     }
     plotdim.margin = margin;
     
     var strip_heights = p_info.strips.top.map(function(entry){ 
-      return measureText(entry, 11).height; 
-    })
+      return measureText(entry, 11).height;
+    });
     var strip_widths = p_info.strips.right.map(function(entry){ 
       return measureText(entry, 11).height; 
-    })
+    });
 
-    // track the number of x/y axes to account for when calculating
-    // height/width of graphing region
+    // compute the number of x/y axes, max strip height per row, and
+    // max strip width per columns, for calculating height/width of
+    // graphing region.
+    var row_strip_heights = [];
+    var col_strip_widths = [];
     var n_xaxes = 0;
     var n_yaxes = 0;
+    var current_row, current_col;
     for (var layout_i = 0; layout_i < npanels; layout_i++) {
-      if (p_info.layout.COL[layout_i] == 1) n_xaxes += p_info.layout.AXIS_X[layout_i];
-      if (p_info.layout.ROW[layout_i] == 1) n_yaxes += p_info.layout.AXIS_Y[layout_i];
+      current_row = p_info.layout.ROW[layout_i] - 1;
+      current_col = p_info.layout.COL[layout_i] - 1;
+      if(row_strip_heights[current_row] === undefined){
+	row_strip_heights[current_row] = [];
+      }
+      if(col_strip_widths[current_col] === undefined){
+	col_strip_widths[current_col] = [];
+      }
+      row_strip_heights[current_row].push(strip_heights[layout_i]);
+      col_strip_widths[current_col].push(strip_widths[layout_i]);
+      if (p_info.layout.COL[layout_i] == 1) {
+	n_xaxes += p_info.layout.AXIS_X[layout_i];
+      }
+      if (p_info.layout.ROW[layout_i] == 1) {
+	n_yaxes += p_info.layout.AXIS_Y[layout_i];
+      }
     }
+    function cumsum_array(array_of_arrays){
+      var cumsum = [], max_value, cumsum_value = 0;
+      for(var i=0; i<array_of_arrays.length; i++){
+	cumsum_value += d3.max(array_of_arrays[i]);
+	cumsum[i] = cumsum_value;
+      }
+      return cumsum;
+    }
+    var cum_height_per_row = cumsum_array(row_strip_heights);
+    var cum_width_per_col = cumsum_array(col_strip_widths);
+    var strip_width = d3.max(cum_width_per_col);
+    var strip_height = d3.max(cum_height_per_row);
 
     // the *entire graph* height/width
-    var graph_width = p_info.options.width - ncols * (margin.left + margin.right) -
-                      strip_widths.reduce(function(a, b) { return a + b; }) -
-                      n_yaxes * axispaddingy - ytitlepadding;
-    var graph_height = p_info.options.height - nrows * (margin.top + margin.bottom) -
-                        strip_heights.reduce(function(a, b) { return a + b; }) -
-                        titlepadding - n_xaxes * axispaddingx - xtitlepadding;
+    var graph_width = p_info.options.width - 
+        ncols * (margin.left + margin.right + strip_width) -
+        n_yaxes * axispaddingy - ytitlepadding;
+    var graph_height = p_info.options.height - 
+        nrows * (margin.top + margin.bottom + strip_height) -
+        titlepadding - n_xaxes * axispaddingx - xtitlepadding;
 
     // Impose the pixelated aspect ratio of the graph upon the width/height
     // proportions calculated by the compiler. This has to be done on the
@@ -320,16 +351,14 @@ var animint = function (to_select, json_file) {
       SVGs[g_name] = svg;
     });
 
-    // If we are to draw more than one panel,
-    // create a grouping for strip labels
-    if (npanels > 1) {
-      svg.append("g")
-        .attr("class", "strip")
-        .attr("id", "topStrip");
-      svg.append("g")
-        .attr("class", "strip")
-        .attr("id", "rightStrip");
-    }
+    // create a grouping for strip labels (even if there are none).
+    var topStrip = svg.append("g")
+      .attr("class", "strip")
+      .attr("id", "topStrip");
+    var rightStrip = svg.append("g")
+      .attr("class", "strip")
+      .attr("id", "rightStrip");
+
     // this will hold x/y scales for each panel
     // eventually we inject this into Plots[p_name]
     var scales = {};
@@ -387,33 +416,32 @@ var animint = function (to_select, json_file) {
       plotdim.graph.height = graph_height * hp[layout_i];
       plotdim.graph.width = graph_width * wp[layout_i];
 
-      var current_row = p_info.layout.ROW[layout_i];
-      var current_col = p_info.layout.COL[layout_i];
+      current_row = p_info.layout.ROW[layout_i];
+      current_col = p_info.layout.COL[layout_i];
       var draw_x = p_info.layout.AXIS_X[layout_i];
       var draw_y = p_info.layout.AXIS_Y[layout_i];
       // panels are drawn using a "typewriter approach" (left to right & top to bottom)
       // if the carriage is returned (ie, there is a new row), change some parameters:
       var new_row = current_col <= p_info.layout.COL[layout_i - 1]
       if (new_row) {
-        n_yaxes = 0;
-        graph_width_cum = (graph_width_blank / 2) * graph_width;
-        graph_height_cum = graph_height_cum + plotdim.graph.height;
+	n_yaxes = 0;
+	graph_width_cum = (graph_width_blank / 2) * graph_width;
+	graph_height_cum = graph_height_cum + plotdim.graph.height;
       }
       n_xaxes = n_xaxes + draw_x;
       n_yaxes = n_yaxes + draw_y;
 
       // calculate panel specific locations to be used in placing axes, labels, etc.
       plotdim.xstart =  current_col * plotdim.margin.left +
-                        (current_col - 1) * plotdim.margin.right +
-                        graph_width_cum + n_yaxes * axispaddingy + ytitlepadding;
+        (current_col - 1) * plotdim.margin.right +
+        graph_width_cum + n_yaxes * axispaddingy + ytitlepadding;
       // room for right strips should be distributed evenly across panels to preserve aspect ratio
       plotdim.xend = plotdim.xstart + plotdim.graph.width;
       // total height of strips drawn thus far
-      var strip_height = strip_heights.slice(0, current_row)
-                        .reduce(function(a, b) { return a + b; })
+      var strip_h = cum_height_per_row[current_row-1];
       plotdim.ystart = current_row * plotdim.margin.top +
-                      (current_row - 1) * plotdim.margin.bottom +
-                      graph_height_cum + titlepadding + strip_height;
+        (current_row - 1) * plotdim.margin.bottom +
+        graph_height_cum + titlepadding + strip_h;
       // room for xaxis title should be distributed evenly across panels to preserve aspect ratio
       plotdim.yend = plotdim.ystart + plotdim.graph.height;
       // always add to the width (note it may have been reset earlier)
@@ -421,42 +449,46 @@ var animint = function (to_select, json_file) {
 
       // draw the y-axis title (and add padding) when drawing the first panel
       if (layout_i === 0) {
-        svg.append("text")
+	svg.append("text")
           .text(p_info["ytitle"])
           .attr("class", "label")
           .attr("id", "ytitle")
           .style("text-anchor", "middle")
           .style("font-size", "11px")
           .attr("transform", "translate(" + (plotdim.xstart - axispaddingy - ytitlepadding / 2)
-            + "," + (p_info.options.height / 2) + ")rotate(270)");
+		+ "," + (p_info.options.height / 2) + ")rotate(270)");
       }
       // draw the x-axis title when drawing the last panel
       if (layout_i === (npanels - 1)) {
-        svg.append("text")
+	svg.append("text")
           .text(p_info["xtitle"])
           .attr("class", "label")
           .attr("id", "xtitle")
           .style("text-anchor", "middle")
           .style("font-size", "11px")
           .attr("transform", "translate(" + plotdim.title.x
-            + "," + (plotdim.yend + axispaddingx) + ")");
+		+ "," + (plotdim.yend + axispaddingx) + ")");
       }
 
       var draw_strip = function(strip, side) {
         if (strip == "") {
           return(null);
         }
-        // assume right is top until it isn't
-        var x = (plotdim.xstart + plotdim.xend) / 2;
-        var y = plotdim.ystart - strip_heights[layout_i] / 2;
-        var rotate = 0;
+        var x, y, rotate, stripElement;
         if (side == "right") {
-          x = plotdim.xend + strip_widths[layout_i] / 2;
+          x = plotdim.xend + strip_widths[layout_i] / 2 - 2;
           y = (plotdim.ystart + plotdim.yend) / 2;
           rotate = 90;
-        }
-        //create a group
-        svg.select("#" + side + "Strip")
+	  stripElement = rightStrip;
+        }else{ //top
+	  x = (plotdim.xstart + plotdim.xend) / 2;
+          y = plotdim.ystart - strip_heights[layout_i] / 2 + 3;
+	  rotate = 0;
+	  stripElement = topStrip;
+	}
+	var trans_text = "translate(" + x + "," + y + ")";
+	var rot_text = "rotate(" + rotate + ")";
+	stripElement
           .selectAll("." + side + "Strips")
           .data(strip)
           .enter()
@@ -464,10 +496,11 @@ var animint = function (to_select, json_file) {
           .style("text-anchor", "middle")
           .style("font-size", "11px")
           .text(function(d) { return d; })
-          // NOTE: there could be multiple strips per panel
-          // TODO: is there a better way to manage spacing?
-          .attr("transform", "translate(" + x + "," + y + ")rotate(" + rotate + ")");
-      };
+        // NOTE: there could be multiple strips per panel
+        // TODO: is there a better way to manage spacing?
+          .attr("transform", trans_text + rot_text)
+	;
+      }
       draw_strip([p_info.strips.top[layout_i]], "top");
       draw_strip([p_info.strips.right[layout_i]], "right");
 
@@ -506,38 +539,38 @@ var animint = function (to_select, json_file) {
 	        .attr("transform", "rotate(" + p_info.xangle + " 0 9)");
       }
       if(draw_y){
-        var yaxis = d3.svg.axis()
+	var yaxis = d3.svg.axis()
           .scale(scales[panel_i].y)
           .tickValues(yaxisvals)
           .tickFormat(function (d) {
             return yaxislabs[yaxisvals.indexOf(d)].toString();
           })
           .orient("left");
-        svg.append("g")
+	svg.append("g")
           .attr("class", "axis")
           .attr("id", "yaxis")
           .attr("transform", "translate(" + (plotdim.xstart) + ",0)")
           .call(yaxis);
       }
 
-    	if(!axis.xline) {
-    	  styles.push("#"+p_name+" #xaxis"+" path{stroke:none;}");
-    	}
-    	if(!axis.xticks) {
-    	  styles.push("#"+p_name+" #xaxis .tick"+" line{stroke:none;}");
-    	}
-    	if(!axis.yline) {
-    	  styles.push("#"+p_name+" #yaxis"+" path{stroke:none;}");
-    	}
-    	if(!axis.yticks) {
-    	  styles.push("#"+p_name+" #yaxis .tick"+" line{stroke:none;}");
-    	}
+      if(!axis.xline) {
+    	styles.push("#"+p_name+" #xaxis"+" path{stroke:none;}");
+      }
+      if(!axis.xticks) {
+    	styles.push("#"+p_name+" #xaxis .tick"+" line{stroke:none;}");
+      }
+      if(!axis.yline) {
+    	styles.push("#"+p_name+" #yaxis"+" path{stroke:none;}");
+      }
+      if(!axis.yticks) {
+    	styles.push("#"+p_name+" #yaxis .tick"+" line{stroke:none;}");
+      }
       
       // creating g element for background, grid lines, and border
       // uses insert to draw it right before plot title
       var background = svg.insert("g", "#plottitle")
         .attr("class", "background");
-        
+      
       // drawing background
       if(Object.keys(p_info.panel_background).length > 1) {
         background.append("rect")
@@ -562,9 +595,9 @@ var animint = function (to_select, json_file) {
           var lt = grid_background.linetype;
           var size = grid_background.size;
           var cap = grid_background.lineend;
-        // group for grid lines
-        var grid = background.append("g")
-          .attr("class", grid_class);
+          // group for grid lines
+          var grid = background.append("g")
+            .attr("class", grid_class);
 
           // group for horizontal grid lines
           var grid_hor = grid.append("g")
@@ -636,7 +669,7 @@ var animint = function (to_select, json_file) {
           });
       }
 
-    } //end of for loop
+    } //end of for(layout_i
 
     Plots[p_name].scales = scales;
   }; //end of add_plot()
