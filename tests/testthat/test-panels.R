@@ -98,19 +98,6 @@ dasharrayPattern <- paste0("stroke-dasharray:",
                            "(?<value>.*?)",
                            ";")
 
-test_color <- function(value, expected) {
-  # convert R color to hexadecimal
-  expected_col <- toRGB(expected)
-
-  if(grepl("rgb", value)) {
-    expected_string <- paste0("rgb(", paste(col2rgb(expected_col), collapse = ", "), ")")
-  } else {
-    expected_string <- expected_col
-  }
-
-  expect_equal(toupper(value), toupper(expected_string))
-}
-
 # Testing -----------------------------------
 
 test_that("panel backgrounds render correctly", {
@@ -123,15 +110,15 @@ test_that("panel backgrounds render correctly", {
   # test background fills
   match_sepal <- str_match_perl(attr_back_sepal["style",], fillPattern)
   value_sepal <- match_sepal[, "value"]
-  test_color(value_sepal[1], "lightblue")
+  expect_color(value_sepal[1], "lightblue")
 
   match_petal <- str_match_perl(attr_back_petal["style",], fillPattern)
   value_petal <- match_petal[, "value"]
-  test_color(value_petal[1], "white")
+  expect_color(value_petal[1], "white")
   
   match_gg538 <- str_match_perl(attr_gg538["style",], fillPattern)
   value_gg538 <- match_gg538[, "value"]
-  test_color(value_gg538[1], "#F0F0F0")
+  expect_color(value_gg538[1], "#F0F0F0")
 })
 
 test_that("panel borders render correctly", {
@@ -142,11 +129,11 @@ test_that("panel borders render correctly", {
   # test border colors
   match_sepal <- str_match_perl(attr_border_sepal["style",], strokePattern)
   value_sepal <- match_sepal[, "value"]
-  test_color(value_sepal[1], "black")
+  expect_color(value_sepal[1], "black")
 
   match_petal <- str_match_perl(attr_border_petal["style",], strokePattern)
   value_petal <- match_petal[, "value"]
-  test_color(value_petal[1], "grey50")
+  expect_color(value_petal[1], "grey50")
 })
 
 test_that("grid lines are drawn correctly", {
@@ -162,15 +149,15 @@ test_that("grid lines are drawn correctly", {
   # correct color of grid lines
   match_sepal <- str_match_perl(attr_major_sepal["style",], strokePattern)
   value_sepal <- match_sepal[, "value"]
-  test_color(value_sepal[1], "white")
+  expect_color(value_sepal[1], "white")
   
   match_petal <- str_match_perl(attr_major_petal["style",], strokePattern)
   value_petal <- match_petal[, "value"]
-  test_color(value_petal[1], "grey90")
+  expect_color(value_petal[1], "grey90")
   
   match_gg538 <- str_match_perl(attr_major_gg538["style",], strokePattern)
   value_gg538 <- match_gg538[, "value"]
-  test_color(value_gg538[1], "#D2D2D2")
+  expect_color(value_gg538[1], "#D2D2D2")
 })
 
 data(tips, package = "reshape2")

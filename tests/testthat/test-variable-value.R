@@ -60,8 +60,27 @@ peak.problems <-
   rbind(data.frame(problems, peaks=1),
         data.frame(problems, peaks=2))
 
+one.error <-
+  data.frame(bases.per.problem=1:10,
+             errors=rnorm(10),
+             chunks="one")
+two.error <-
+  data.frame(bases.per.problem=1:10,
+             errors=rnorm(10),
+             chunks="two")
+
 viz <-
-  list(problems=ggplot()+
+  list(errorLines=ggplot()+
+         scale_color_manual(values=c(one="red", two="black"))+
+         scale_size_manual(values=c(one=1, two=2))+
+         geom_line(aes(bases.per.problem, errors,
+                       color=chunks, size=chunks),
+                   data=one.error)+
+         geom_line(aes(bases.per.problem, errors,
+                       color=chunks, size=chunks),
+                   data=two.error),
+
+    problems=ggplot()+
          ggtitle("select problem")+
          geom_segment(aes(problemStart, problem.i,
                           clickSelects=problem.name,
@@ -122,6 +141,24 @@ viz <-
                    data=problems))
 
 info <- animint2HTML(viz)
+
+test_that("two lines rendered in first plot", {
+  path.list <-
+    getNodeSet(info$html,
+               '//svg[@id="errorLines"]//g[@class="PANEL1"]//path')
+  style.strs <- sapply(path.list, function(x) xmlAttrs(x)["style"])
+  pattern <-
+    paste0("(?<name>\\S+?)",
+           ": *",
+           "(?<value>.+?)",
+           ";")
+  style.matrices <- str_match_all_perl(style.strs, pattern)
+  size.vec <- sapply(style.matrices, function(m)m["stroke-width", "value"])
+  size.num <- as.numeric(size.vec)
+  expect_equal(size.num, c(1, 2))
+  color.vec <- sapply(style.matrices, function(m)m["stroke", "value"])
+  expect_color(color.vec, c("red", "black"))
+})
 
 test_that(".variable and .value makes compiler create selectors", {
   selector.names <- sort(names(info$selectors))
@@ -256,3 +293,4 @@ test_that("changing problem downloads one chunk", {
                  1, 1, 1, 1,
                  0, 0, 0, 0))
 })
+

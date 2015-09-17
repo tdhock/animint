@@ -29,6 +29,23 @@ getHTML <- function(){
   XML::htmlParse(remDr$getPageSource(), asText = TRUE)
 }
 
+ensure_rgb <- function(color.vec){
+  is.rgb <- grepl("rgb", color.vec)
+  not.rgb <- color.vec
+  not.rgb[is.rgb] <- "black"
+  hex.vec <- toRGB(not.rgb)
+  rgb.mat <- col2rgb(hex.vec)
+  no.paren <- apply(rgb.mat, 2, function(x)paste(x, collapse=", "))
+  rgb.vec <- paste0("rgb(", no.paren, ")")
+  as.character(ifelse(is.rgb, color.vec, rgb.vec))
+}
+
+expect_color <- function(computed.vec, expected.vec) {
+  computed.rgb <- ensure_rgb(computed.vec)
+  expected.rgb <- ensure_rgb(expected.vec)
+  expect_identical(computed.rgb, expected.rgb)
+}
+
 expect_transform <- function(actual, expected, context = "translate", tolerance = 5) {
   # supports multiple contexts
   nocontext <- gsub(paste(context, collapse = "||"), "", actual)
