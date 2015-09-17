@@ -248,7 +248,7 @@ test_that("counts of chunks downloaded or not at first", {
 })
 
 test_that("changing problem downloads one chunk", {
-  clickID('size_100_problem_2')
+  clickID('size.100.problem.2')
   value.vec <- chunk.counts()
   expect_equal(value.vec,
                c(1, 1, 1, 1, 1, 1,
