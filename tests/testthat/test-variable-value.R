@@ -239,16 +239,12 @@ test_that("counts of chunks downloaded or not at first", {
                  0, 0, 0, 0, 0))
 })
 
-if (Sys.getenv("TRAVIS") == "true" | Sys.getenv("WERCKER") == "true") {
-  message("tests currently don't work on travis (but should someday)")
-} else {
-  test_that("changing problem downloads one chunk", {
-    clickID('size100problem2')
-    value.vec <- chunk.counts()
-    expect_equal(value.vec,
-                 c(1, 1, 1, 1, 1, 1,
-                   0, 0, 0, 0, 0, 0, 0, 0,
-                   1, 1, 1, 1,
-                   0, 0, 0, 0))
-  })
-}
+test_that("changing problem downloads one chunk", {
+  clickID('size100problem2')
+  value.vec <- chunk.counts()
+  expect_equal(value.vec,
+               c(1, 1, 1, 1, 1, 1,
+                 0, 0, 0, 0, 0, 0, 0, 0,
+                 1, 1, 1, 1,
+                 0, 0, 0, 0))
+})
