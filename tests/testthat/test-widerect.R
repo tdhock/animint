@@ -72,35 +72,6 @@ wb.facets <-
 
 info <- animint2HTML(wb.facets)
 
-line.xpath <- '//g[@class="geom2_line_ts"]//g[@class="PANEL4"]//path'
-opacityPattern <-
-  paste0("opacity:",
-         "(?<value>.*?)",
-         ";")
-
-if (Sys.getenv("TRAVIS") == "true" | Sys.getenv("WERCKER") == "true") {
-  message("tests currently don't work on travis (but should someday)")
-} else {
-  test_that("line opacity initially 0.1 or 0.6", {
-    node.set <- getNodeSet(info$html, line.xpath)
-    opacity.list <- list()
-    for(node.i in seq_along(node.set)){
-      node <- node.set[[node.i]]
-      a.vec <- xmlAttrs(node)
-      style.str <- a.vec[["style"]]
-      opacity.mat <- str_match_perl(style.str, opacityPattern)
-      node.id <- a.vec[["id"]]
-      opacity.list[[node.id]] <- as.numeric(opacity.mat[, "value"])
-    }
-    opacity.vec <- do.call(c, opacity.list)
-    selected.opacity <- opacity.vec[wb.facets$first$country]
-    expect_true(all(selected.opacity == 0.6))
-    unselected.opacity <-
-      opacity.vec[!names(opacity.vec) %in% wb.facets$first$country]
-    expect_true(all(unselected.opacity == 0.1))
-  })
-}
-
 rect.list <-
   getNodeSet(info$html, '//svg[@id="ts"]//rect[@class="border_rect"]')
 expect_equal(length(rect.list), 4)
@@ -120,6 +91,37 @@ test_that("three unique border_rect y values (no vert space)", {
   bottom.vec <- top.vec + height.vec
   y.values <- unique(c(top.vec, bottom.vec))
   expect_equal(length(y.values), 3)
+})
+
+line.xpath <- '//g[@class="geom2_line_ts"]//g[@class="PANEL4"]//path'
+opacityPattern <-
+  paste0("opacity:",
+         "(?<value>.*?)",
+         ";")
+
+test_that("line opacity initially 0.1 or 0.6", {
+
+  node.set <- getNodeSet(info$html, line.xpath)
+  opacity.list <- list()
+  for(node.i in seq_along(node.set)){
+    node <- node.set[[node.i]]
+    a.vec <- xmlAttrs(node)
+    style.str <- a.vec[["style"]]
+    opacity.mat <- str_match_perl(style.str, opacityPattern)
+    node.id <- a.vec[["id"]]
+    opacity.list[[node.id]] <- as.numeric(opacity.mat[, "value"])
+  }
+  opacity.vec <- do.call(c, opacity.list)
+
+  selected.computed <- as.numeric(opacity.vec[wb.facets$first$country])
+  selected.expected <- rep(0.6, length(selected.computed))
+  expect_equal(selected.computed, selected.expected)
+
+  unselected.computed <-
+    as.numeric(opacity.vec[!names(opacity.vec) %in% wb.facets$first$country])
+  unselected.expected <- rep(0.1, length(unselected.computed))
+  expect_equal(unselected.computed, unselected.expected)
+
 })
 
 dasharrayPattern <-
