@@ -50,6 +50,11 @@ samples <-
 peaks <-
   expand.grid(peaks=0:2, 
               problem.name=problems$problem.name)
+peaks$error.type <-
+  c("false positive", "false negative", "correct")
+rownames(problems) <- problems$problem.name
+peaks$bases.per.problem <-
+  problems[paste(peaks$problem.name), "bases.per.problem"]
 
 peak.problems <-
   rbind(data.frame(problems, peaks=1),
@@ -103,8 +108,10 @@ viz <-
        peaks=ggplot()+
          ggtitle("select number of peaks")+
          geom_point(aes(peaks, peaks,
+                        color=error.type,
                         id=peaks,
                         showSelected=problem.name,
+                        showSelected2=bases.per.problem,
                         clickSelects.variable=paste0(problem.name, "peaks"),
                         clickSelects.value=peaks),
                     size=10,
@@ -121,6 +128,7 @@ test_that(".variable and .value makes compiler create selectors", {
   problem.selectors <- paste0(problems$problem.name, "peaks")
   expected.names <-
     sort(c("problem.name",
+           "error.type",
            problem.selectors,
            "bases.per.problem"))
   expect_identical(selector.names, expected.names)
