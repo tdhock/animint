@@ -244,18 +244,45 @@ var animint = function (to_select, json_file) {
     var strip_widths = p_info.strips.right.map(function(entry){ 
       return measureText(entry, 11).height; 
     });
-    // Be conservative and use the max width/height for determining graph region
-    var strip_height = Math.max.apply(null, strip_heights);
-    var strip_width = Math.max.apply(null, strip_widths);
 
-    // track the number of x/y axes to account for when calculating
-    // height/width of graphing region
+    // compute the number of x/y axes, max strip height per row, and
+    // max strip width per columns, for calculating height/width of
+    // graphing region.
+    var row_strip_heights = [];
+    var col_strip_widths = [];
     var n_xaxes = 0;
     var n_yaxes = 0;
+    var current_row, current_col;
     for (var layout_i = 0; layout_i < npanels; layout_i++) {
-      if (p_info.layout.COL[layout_i] == 1) n_xaxes += p_info.layout.AXIS_X[layout_i];
-      if (p_info.layout.ROW[layout_i] == 1) n_yaxes += p_info.layout.AXIS_Y[layout_i];
+      current_row = p_info.layout.ROW[layout_i] - 1;
+      current_col = p_info.layout.COL[layout_i] - 1;
+      if(row_strip_heights[current_row] === undefined){
+	row_strip_heights[current_row] = [];
+      }
+      if(col_strip_widths[current_col] === undefined){
+	col_strip_widths[current_col] = [];
+      }
+      row_strip_heights[current_row].push(strip_heights[layout_i]);
+      col_strip_widths[current_col].push(strip_widths[layout_i]);
+      if (p_info.layout.COL[layout_i] == 1) {
+	n_xaxes += p_info.layout.AXIS_X[layout_i];
+      }
+      if (p_info.layout.ROW[layout_i] == 1) {
+	n_yaxes += p_info.layout.AXIS_Y[layout_i];
+      }
     }
+    function cumsum_array(array_of_arrays){
+      var cumsum = [], max_value, cumsum_value = 0;
+      for(var i=0; i<array_of_arrays.length; i++){
+	cumsum_value += d3.max(array_of_arrays[i]);
+	cumsum[i] = cumsum_value;
+      }
+      return cumsum;
+    }
+    var cum_height_per_row = cumsum_array(row_strip_heights);
+    var cum_width_per_col = cumsum_array(col_strip_widths);
+    var strip_width = d3.max(cum_width_per_col);
+    var strip_height = d3.max(cum_height_per_row);
 
     // the *entire graph* height/width
     var graph_width = p_info.options.width - 
@@ -369,8 +396,8 @@ var animint = function (to_select, json_file) {
       plotdim.graph.height = graph_height * hp[layout_i];
       plotdim.graph.width = graph_width * wp[layout_i];
 
-      var current_row = p_info.layout.ROW[layout_i];
-      var current_col = p_info.layout.COL[layout_i];
+      current_row = p_info.layout.ROW[layout_i];
+      current_col = p_info.layout.COL[layout_i];
       var draw_x = p_info.layout.AXIS_X[layout_i];
       var draw_y = p_info.layout.AXIS_Y[layout_i];
       // panels are drawn using a "typewriter approach" (left to right & top to bottom)
@@ -391,8 +418,7 @@ var animint = function (to_select, json_file) {
       // room for right strips should be distributed evenly across panels to preserve aspect ratio
       plotdim.xend = plotdim.xstart + plotdim.graph.width;
       // total height of strips drawn thus far
-      var strip_h = strip_heights.slice(0, current_row)
-        .reduce(function(a, b) { return a + b; })
+      var strip_h = cum_height_per_row[current_row-1];
       plotdim.ystart = current_row * plotdim.margin.top +
         (current_row - 1) * plotdim.margin.bottom +
         graph_height_cum + titlepadding + strip_h;
