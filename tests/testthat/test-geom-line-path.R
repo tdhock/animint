@@ -3,6 +3,10 @@ context("geom line")
 library(animint)
 
 data(intreg)
+min.logratio <- min(intreg$signals$logratio)-0.2
+max.logratio <- max(intreg$signals$logratio)
+intreg$breaks$min.logratio <- min.logratio
+intreg$breaks$max.logratio <- max.logratio
 signal.colors <- c(estimate="#0adb0a", latent="#0098ef")
 breakpoint.colors <- c("1breakpoint"="#ff7d7d", "0breakpoints"='#f6f4bf')
 models.by.signal <- with(intreg, split(segments, segments$signal))
@@ -41,11 +45,10 @@ for(signal.name in names(models.by.signal)){
     if(segments.str == "1"){
       sig.labels.list[[signal.name]] <- model.stats
     }
-    sig.seg <-
+    sig.seg.by.segments[[segments.str]] <-
       data.frame(signal=signal.name,
-                 segments,
+                 segments, min.logratio, max.logratio,
                  base=(min(signal$base)+max(signal$base))/2)
-    sig.seg.by.segments[[segments.str]] <- sig.seg
   }
   sig.seg.tall <- do.call(rbind, sig.seg.by.segments)
   sig.seg.names.list[[signal.name]] <- sig.seg.tall
@@ -120,7 +123,7 @@ mmir.selection <-
 
        first=list(signal="4.2", segments=4))
 
-animint2dir(mmir.selection, "intreg-selection")
+animint2dir(mmir.selection, "intreg-selection", open.browser=FALSE)
 
 all.increasing <- function(num.vec){
   stopifnot(is.numeric(num.vec))
