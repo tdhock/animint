@@ -643,6 +643,11 @@ saveLayer <- function(l, d, meta){
     g$geom
   }
 
+  ## Some geoms need their data sorted before saving to tsv.
+  if(g$geom %in% c("ribbon", "line")){
+    g.data <- g.data[order(g.data$x), ]
+  }
+
   ## Check g.data for color/fill - convert to hexadecimal so JS can parse correctly.
   for(color.var in c("colour", "color", "fill")){
     if(color.var %in% names(g.data)){
