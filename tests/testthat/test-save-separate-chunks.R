@@ -232,6 +232,7 @@ test_that("save separate chunks for non-spatial geoms with repetitive field, mul
   expect_true(all(common.must.have %in% names(common.data)))
   ## choose first varied.chunk to test
   varied.data <- read.csv(varied.chunks[1], sep = "\t")
+  print(varied.data)
   expect_equal(nrow(varied.data), 186)
   varied.must.have <-
     c("size", "x", "y", "tooltip", "showSelectedlegendcolour", "group")
