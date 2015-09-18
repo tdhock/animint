@@ -165,27 +165,55 @@ test_that("save separate chunks for geom_point without specifying group", {
   unlink(out.dir, recursive = TRUE)
 })
 
-### test case 3
+### test case 3: WorldBank data, without Israel. For some reason
+### Israel appears on travis/wercker but not on local computers, so we
+### just get rid of it for this test.
 data(WorldBank)
+
+no.israel <- subset(WorldBank, country != "Israel")
+
+## Local computer:
+
+## 77       Europe & Central Asia (all income levels)    85
+## 78                                      South Asia    88
+
+## wercker:
+
+## 77 Europe & Central Asia (all income levels) 85
+## 78 Middle East & North Africa (all income levels) 86
+## 79 South Asia 88
+
+## 77 Ireland population 2932650
+## 78 Israel population 2877000
+## 79 India population 542983934
+
+life.not.na <- !is.na(no.israel$life.expectancy)
+fert.not.na <- !is.na(no.israel$fertility.rate)
+pop.not.na <- !is.na(no.israel$population)
+text.not.na <- no.israel[life.not.na & fert.not.na, ]
+points.not.na <- no.israel[life.not.na & fert.not.na & pop.not.na, ]
+
+unique.year.vec <- unique(no.israel$year)
+unique.country.vec <- unique(no.israel$country)
 
 scatter <- ggplot()+
   geom_point(aes(life.expectancy, fertility.rate, clickSelects=country,
                  showSelected=year, colour=region, size=population,
                  tooltip=paste(country, "population", population),
                  key=country), # key aesthetic for animated transitions!
-             data=WorldBank)+
+             data=no.israel)+
   geom_text(aes(life.expectancy, fertility.rate, label=country,
                 showSelected=country, showSelected2=year,
                 key=country), # also use key here!
-            data=WorldBank, chunk_vars=c("year", "country"))+
+            data=no.israel, chunk_vars=c("year", "country"))+
   scale_size_animint(breaks=10^(5:9))+
-  make_text(WorldBank, 55, 9, "year")
+  make_text(no.israel, 55, 9, "year")
 
 ts <- ggplot()+
-  make_tallrect(WorldBank, "year")+
+  make_tallrect(no.israel, "year")+
   geom_line(aes(year, life.expectancy, group=country, colour=region,
                 clickSelects=country),
-            data=WorldBank, size=4, alpha=3/5)
+            data=no.israel, size=4, alpha=3/5)
 
 test_that("save separate chunks for non-spatial geoms with repetitive field, multiple vars selected, and NAs", {
   viz <-
@@ -196,7 +224,7 @@ test_that("save separate chunks for non-spatial geoms with repetitive field, mul
          first=list(year=1975, country="United States"),
          title="World Bank data (multiple selections)")
   out.dir <- file.path(getwd(), "WorldBank-all")
-  animint2dir(viz, out.dir = out.dir, open.browser = FALSE)
+  info <- animint2dir(viz, out.dir = out.dir, open.browser = FALSE)
   
   ## multiple vars selected
   common.chunk <-
@@ -207,8 +235,7 @@ test_that("save separate chunks for non-spatial geoms with repetitive field, mul
                full.names = TRUE)
   ## number of chunks
   expect_equal(length(common.chunk), 0L)
-  no.chunks <- length(varied.chunks)
-  expect_equal(no.chunks, 9852)
+  expect_equal(length(varied.chunks), nrow(text.not.na))
   ## choose first varied.chunk to test
   varied.data <- read.csv(varied.chunks[1], sep = "\t")
   expect_equal(nrow(varied.data), 1)
@@ -223,17 +250,23 @@ test_that("save separate chunks for non-spatial geoms with repetitive field, mul
                full.names = TRUE)
   ## number of chunks
   expect_equal(length(common.chunk), 1L)
-  no.chunks <- length(varied.chunks)
-  expect_equal(no.chunks, 52)
+  expect_equal(length(varied.chunks), length(unique.year.vec))
   ## test common.chunk
   common.data <- read.csv(common.chunk, sep = "\t")
-  expect_equal(nrow(common.data), 214)
+  expect_equal(nrow(common.data), length(unique.country.vec))
   common.must.have <- c("colour", "clickSelects", "key", "fill", "group")
   expect_true(all(common.must.have %in% names(common.data)))
   ## choose first varied.chunk to test
-  varied.data <- read.csv(varied.chunks[1], sep = "\t")
+  chunk.info <- info$geoms$geom1_point_scatter$chunks
+  year.str <- names(chunk.info)[[1]]
+  year.num <- as.numeric(year.str)
+  expected.data <- subset(points.not.na, year == year.num)
+  chunk.num <- chunk.info[[year.str]]
+  tsv.name <- sprintf("geom1_point_scatter_chunk%d.tsv", chunk.num)
+  tsv.path <- file.path(out.dir, tsv.name)
+  varied.data <- read.csv(tsv.path, sep = "\t")
   print(varied.data)
-  expect_equal(nrow(varied.data), 186)
+  expect_equal(nrow(varied.data), nrow(expected.data))
   varied.must.have <-
     c("size", "x", "y", "tooltip", "showSelectedlegendcolour", "group")
   expect_true(all(varied.must.have %in% names(varied.data)))
