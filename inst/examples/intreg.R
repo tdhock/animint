@@ -106,7 +106,9 @@ mmir.facet <-
                      data=data.frame(intreg$selection, what="segments"),
                      alpha=1/2)+
        ylab("")+
+       theme_bw()+
        theme_animint(height=500, width=800)+
+       theme(panel.margin=grid::unit(0, "lines"))+
        geom_segment(aes(min.L, feature, xend=max.L, yend=feature,
                         clickSelects=signal),
                     size=5,
@@ -200,6 +202,9 @@ intreg.errors <-
                   data=intreg$breaks),
        
        penalty=ggplot()+
+         theme_bw()+
+         theme_animint(height=500, width=800)+
+         theme(panel.margin=grid::unit(0, "cm"))+
        geom_tallrect(aes(xmin=min.L, xmax=max.L,
                          showSelected=signal,
                          clickSelects=segments),
@@ -208,7 +213,6 @@ intreg.errors <-
                                      ),
                      alpha=1/2)+
        ylab("")+
-       theme_animint(height=500, width=800)+
        geom_segment(aes(min.L, feature, xend=max.L, yend=feature,
                         clickSelects=signal),
                     size=5,
