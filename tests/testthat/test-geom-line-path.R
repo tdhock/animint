@@ -146,6 +146,9 @@ for(g.class in names(expected.list)){
   }
 }
 result <- do.call(rbind, result.list)
-with(result, {
-  expect_identical(computed, expected)
+
+test_that("line sorts tsv data by x value, path does not", {
+  with(result, {
+    expect_identical(computed, expected)
+  })
 })
