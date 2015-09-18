@@ -7,13 +7,14 @@
 saveLayer(l, d, meta)
 }
 \arguments{
-  \item{l}{one layer of the ggplot object.} \item{d}{one
-  layer of calculated data from ggplot2::ggplot_build(p).}
-  \item{meta}{environment of meta-data.}
+\item{l}{one layer of the ggplot object.}
+
+\item{d}{one layer of calculated data from ggplot2::ggplot_build(p).}
+
+\item{meta}{environment of meta-data.}
 }
 \value{
-list representing a layer, with corresponding aesthetics,
-ranges, and groups.
+list representing a layer, with corresponding aesthetics, ranges, and groups.
 }
 \description{
 Save a layer to disk, save and return meta-data.

@@ -29,6 +29,23 @@ getHTML <- function(){
   XML::htmlParse(remDr$getPageSource(), asText = TRUE)
 }
 
+ensure_rgb <- function(color.vec){
+  is.rgb <- grepl("rgb", color.vec)
+  not.rgb <- color.vec
+  not.rgb[is.rgb] <- "black"
+  hex.vec <- toRGB(not.rgb)
+  rgb.mat <- col2rgb(hex.vec)
+  no.paren <- apply(rgb.mat, 2, function(x)paste(x, collapse=", "))
+  rgb.vec <- paste0("rgb(", no.paren, ")")
+  as.character(ifelse(is.rgb, color.vec, rgb.vec))
+}
+
+expect_color <- function(computed.vec, expected.vec) {
+  computed.rgb <- ensure_rgb(computed.vec)
+  expected.rgb <- ensure_rgb(expected.vec)
+  expect_identical(computed.rgb, expected.rgb)
+}
+
 expect_transform <- function(actual, expected, context = "translate", tolerance = 5) {
   # supports multiple contexts
   nocontext <- gsub(paste(context, collapse = "||"), "", actual)
@@ -83,14 +100,6 @@ expect_styles <- function(html, styles.expected){
   }
 }
 
-getStyleValue <- function(html, xpath, style.name) {
-  nodes <- getNodeSet(html, xpath)
-  node.style <- xmlAttrs(nodes[[1]])["style"]
-  pattern <-paste0("(?<name>\\S+?)", ": *", "(?<value>.+?)", ";")
-  style.matrices <- str_match_all_perl(node.style, pattern)
-  style.value <- style.matrices[[1]][style.name, "value"]
-}
-
 ## Parse the first occurance of pattern from each of several strings
 ## using (named) capturing regular expressions, returning a matrix
 ## (with column names).
@@ -137,6 +146,15 @@ str_match_all_perl <- function(string,pattern){
 }
 
 getTextValue <- function(tick)xmlValue(getNodeSet(tick, "text")[[1]])
+
+getStyleValue <- function(html, xpath, style.name) {
+  nodes <- getNodeSet(html, xpath)
+  node.style <- xmlAttrs(nodes[[1]])["style"]
+  pattern <-paste0("(?<name>\\S+?)", ": *", "(?<value>.+?)", ";")
+  style.matrices <- str_match_all_perl(node.style, pattern)
+  style.value <- style.matrices[[1]][style.name, "value"]
+}
+
 getTransform <- function(tick)xmlAttrs(tick)[["transform"]]
 # get difference between axis ticks in both pixels and on original data scale
 # @param doc rendered HTML document

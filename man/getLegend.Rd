@@ -7,8 +7,7 @@
 getLegend(mb)
 }
 \arguments{
-  \item{mb}{single entry from ggplot2:::guides_merge() list
-  of legend data}
+\item{mb}{single entry from ggplot2:::guides_merge() list of legend data}
 }
 \value{
 list of legend information, NULL if guide=FALSE.

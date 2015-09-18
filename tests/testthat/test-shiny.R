@@ -1,7 +1,7 @@
 context("shiny")
 
-if (FALSE && Sys.getenv("TRAVIS") == "true") {
-  message("shiny tests currently don't work on travis (but should someday)")
+if (Sys.getenv("TRAVIS") == "true" | Sys.getenv("WERCKER") == "true") {
+  message("shiny tests don't work on travis/wercker (but should someday)")
 } else {
   # shiny tests require navigating to different ports, so remember where we are
   # and return when tests are done

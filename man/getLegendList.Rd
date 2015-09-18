@@ -7,7 +7,7 @@
 getLegendList(plistextra)
 }
 \arguments{
-  \item{plistextra}{output from ggplot2::ggplot_build(p)}
+\item{plistextra}{output from ggplot2::ggplot_build(p)}
 }
 \value{
 list containing information for each legend

@@ -9,19 +9,21 @@ case of selecting a particular x value.}
 make_tallrect(data, x.name, even = FALSE, alpha = 1/2)
 }
 \arguments{
-  \item{data}{data.frame to analyze for unique x.name
-  values.} \item{x.name}{variable to be used for x,
-  clickSelects.} \item{even}{Logical parameter, should
-  tallrects be of even width?} \item{alpha}{transparency of
-  a selected tallrect, default 1/2.}
+\item{data}{data.frame to analyze for unique x.name values.}
+
+\item{x.name}{variable to be used for x, clickSelects.}
+
+\item{even}{Logical parameter, should tallrects be of even width?}
+
+\item{alpha}{transparency of a selected tallrect, default 1/2.}
 }
 \value{
 a geom_tallrect layer.
 }
 \description{
-Make a clickSelects geom_tallrect that completely tiles the
-x range. This makes it easy to construct tallrects for the
-common case of selecting a particular x value.
+Make a clickSelects geom_tallrect that completely tiles the x
+range. This makes it easy to construct tallrects for the common
+case of selecting a particular x value.
 }
 \author{
 Toby Dylan Hocking

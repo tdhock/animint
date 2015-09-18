@@ -7,7 +7,7 @@
 gg2animint(...)
 }
 \arguments{
-  \item{...}{passed to animint2dir}
+\item{...}{passed to animint2dir}
 }
 \value{
 same as animint2dir

@@ -77,27 +77,54 @@ grad.desc.viz <- function(hjust) {
               title = "Demonstration of Gradient Descent Algorithm")
 }
 
+viz <- grad.desc.viz(hjust = 0)
+info <- animint2HTML(viz)
+
+test_that("unspecified hjust means text-anchor: middle (other hjust=0)", {
+  style.value <-
+    getStyleValue(info$html, '//g[@class="geom4_text_contour"]//text', 
+                  "text-anchor")
+  expect_match(style.value, "middle")
+})  
+
 test_that('geom_text(hjust=0) => <text style="text-anchor: start">', {
-  viz <- grad.desc.viz(hjust = 0)
-  info <- animint2HTML(viz)
-  style.value <- getStyleValue(info$html, '//g[@class="geom8_text_objective"]//text', 
-                               "text-anchor")
+  style.value <-
+    getStyleValue(info$html, '//g[@class="geom8_text_objective"]//text', 
+                  "text-anchor")
   expect_match(style.value, "start")
 })
 
+viz <- grad.desc.viz(hjust = 1)
+info <- animint2HTML(viz)
+
+test_that("unspecified hjust means text-anchor: middle (other hjust=1)", {
+  style.value <-
+    getStyleValue(info$html, '//g[@class="geom4_text_contour"]//text', 
+                  "text-anchor")
+  expect_match(style.value, "middle")
+})  
+
 test_that('geom_text(hjust=1) => <text style="text-anchor: end">', {
-  viz <- grad.desc.viz(hjust = 1)
-  info <- animint2HTML(viz)
-  style.value <- getStyleValue(info$html, '//g[@class="geom8_text_objective"]//text', 
-                               "text-anchor")
+  style.value <-
+    getStyleValue(info$html, '//g[@class="geom8_text_objective"]//text', 
+                  "text-anchor")
   expect_match(style.value, "end")
 })
 
+viz <- grad.desc.viz(hjust = 0.5)
+info <- animint2HTML(viz)
+
+test_that("unspecified hjust means text-anchor: middle (other hjust=0.5)", {
+  style.value <-
+    getStyleValue(info$html, '//g[@class="geom4_text_contour"]//text', 
+                  "text-anchor")
+  expect_match(style.value, "middle")
+})  
+
 test_that('geom_text(hjust=0.5) => <text style="text-anchor: middle">', {
-  viz <- grad.desc.viz(hjust = 0.5)
-  info <- animint2HTML(viz)
-  style.value <- getStyleValue(info$html, '//g[@class="geom8_text_objective"]//text', 
-                               "text-anchor")
+  style.value <-
+    getStyleValue(info$html, '//g[@class="geom8_text_objective"]//text', 
+                  "text-anchor")
   expect_match(style.value, "middle")
 })
 

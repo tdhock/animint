@@ -67,7 +67,7 @@ test_that("right strips all at the same x position", {
   x.vec <- as.numeric(translate.mat[, "x"])
   expected.val <- x.vec[[1]]
   expected.vec <- rep(expected.val, length(x.vec))
-  print(rbind(computed=x.vec,
-              expected=expected.vec))
+  ## print(rbind(computed=x.vec,
+  ##             expected=expected.vec))
   expect_equal(x.vec, expected.vec)
 })

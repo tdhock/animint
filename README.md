@@ -3,6 +3,7 @@ animint - an R package for *anim*ated *int*eractive web graphics
 
 [![Build Status](https://travis-ci.org/tdhock/animint.png?branch=master)](https://travis-ci.org/tdhock/animint)
 [![Coverage Status](https://coveralls.io/repos/tdhock/animint/badge.svg?branch=master)](https://coveralls.io/r/tdhock/animint?branch=master)
+[![wercker status](https://app.wercker.com/status/3e56e443fb24a5ce304b706425ba6987/s/master "wercker status")](https://app.wercker.com/project/bykey/3e56e443fb24a5ce304b706425ba6987)
 
 Animint makes it possible to design multi-layer, multi-plot,
 interactive, and possibly animated data visualizations using just a

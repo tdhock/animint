@@ -7,7 +7,7 @@
 makeDocs(doc.dir)
 }
 \arguments{
-  \item{doc.dir}{containing example subdirectories.}
+\item{doc.dir}{containing example subdirectories.}
 }
 \value{
 nothing.

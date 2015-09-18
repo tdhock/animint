@@ -7,12 +7,14 @@
 tests_init(browserName = "phantomjs", dir = ".", port = 4848, ...)
 }
 \arguments{
-  \item{browserName}{Name of the browser to use for testing.
-  See ?RSelenium::remoteDriver for details.} \item{dir}
-  {character string with the path to animint's source code.
-  Defaults to current directory} \item{port}{port number
-  used for local file server} \item{...}{list of additional
-  options passed onto RSelenium::remoteDriver}
+\item{browserName}{Name of the browser to use for testing.
+See ?RSelenium::remoteDriver for details.}
+
+\item{dir}{character string with the path to animint's source code. Defaults to current directory}
+
+\item{port}{port number used for local file server}
+
+\item{...}{list of additional options passed onto RSelenium::remoteDriver}
 }
 \value{
 invisible(TRUE)

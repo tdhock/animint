@@ -40,7 +40,6 @@ breakpointError <-
        first=list(samples=150, segments=4),
        title="breakpointError (select one model size)")
 
-##animint2dir(breakpointError, "breakpointError-single")
 info <- animint2HTML(breakpointError)
 
 dasharrayPattern <-
@@ -123,7 +122,6 @@ breakpointError$selector.types <-
 breakpointError$title <-
   "breakpointError (select several model sizes)"
 info <- animint2HTML(breakpointError)
-##animint2dir(breakpointError, "breakpointError-multiple")
 
 test_that("selector.types are converted to JSON", {
   selector.types <- lapply(info$selectors, "[[", "type")
@@ -230,4 +228,3 @@ test_that("clickSelects CA removes 1 <path> and 1 <text>", {
   nodes <- getNodeSet(html, '//g[@class="geom5_text_ts"]//text')
   expect_equal(length(nodes), 2)
 })
-
