@@ -11,7 +11,7 @@ model.selection.list <- list()
 sig.labels.list <- list()
 sig.seg.names.list <- list()
 sig.names.list <- list()
-for(signal.name in names(segments.by.signal)){
+for(signal.name in names(models.by.signal)){
   signal <- signals.by.signal[[signal.name]]
   signal.models <- models.by.signal[[signal.name]]
   models.by.segments <- split(signal.models, signal.models$segments)
@@ -44,8 +44,6 @@ for(signal.name in names(segments.by.signal)){
     sig.seg <-
       data.frame(signal=signal.name,
                  segments,
-                 min.logratio=min(intreg$signals$logratio)-0.2,
-                 max.logratio=max(intreg$signals$logratio),
                  base=(min(signal$base)+max(signal$base))/2)
     sig.seg.by.segments[[segments.str]] <- sig.seg
   }
@@ -103,8 +101,8 @@ mmir.selection <-
                         showSelected=signal,
                         showSelected2=segments),
                     data=intreg$seg, colour=signal.colors[["estimate"]])+
-       geom_segment(aes(base/1e6, min(sigs$logratio),
-                        xend=base/1e6, yend=max(sigs$logratio),
+       geom_segment(aes(base/1e6, min.logratio,
+                        xend=base/1e6, yend=max.logratio,
                         showSelected=signal,
                         showSelected2=segments),
                   colour=signal.colors[["estimate"]],
