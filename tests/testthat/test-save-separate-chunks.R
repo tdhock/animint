@@ -192,8 +192,7 @@ fert.not.na <- !is.na(no.israel$fertility.rate)
 pop.not.na <- !is.na(no.israel$population)
 text.not.na <- no.israel[life.not.na & fert.not.na, ]
 points.not.na <- no.israel[life.not.na & fert.not.na & pop.not.na, ]
-
-unique.year.vec <- unique(no.israel$year)
+unique.year.vec <- unique(points.not.na$year)
 unique.country.vec <- unique(no.israel$country)
 
 scatter <- ggplot()+
@@ -265,7 +264,7 @@ test_that("save separate chunks for non-spatial geoms with repetitive field, mul
   tsv.name <- sprintf("geom1_point_scatter_chunk%d.tsv", chunk.num)
   tsv.path <- file.path(out.dir, tsv.name)
   varied.data <- read.csv(tsv.path, sep = "\t")
-  print(varied.data)
+  ##print(varied.data)
   expect_equal(nrow(varied.data), nrow(expected.data))
   varied.must.have <-
     c("size", "x", "y", "tooltip", "showSelectedlegendcolour", "group")
@@ -281,7 +280,7 @@ only.error <- subset(breakpoints$error, type=="E")
 only.segments <- subset(only.error, samples==samples[1])
 signal.colors <- c(estimate="#0adb0a", latent="#0098ef")
 
-signal=ggplot()+
+signal <- ggplot()+
   geom_point(aes(position, signal, showSelected=samples),
              data=breakpoints$signals)+
   geom_line(aes(position, signal), colour=signal.colors[["latent"]],
