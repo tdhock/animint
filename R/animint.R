@@ -643,28 +643,10 @@ saveLayer <- function(l, d, meta){
     g$geom
   }
 
-  ##print("after pre-processing")
-
-  ## idea: if geom is calculated, group is not meaningful -
-  ## it has already been used in the calculation stage, and
-  ## will only confuse the issue later.
-  geom.aes.vars = g$aes[which(names(g$aes)%in%c("x", "y", "fill", "colour", "alpha", "size"))]
-  grpidx <- which(names(g$aes)=="group")
-  if(length(grpidx) > 0){
-    if(length(geom.aes.vars)>0 & nrow(g.data)!=nrow(l$data) &
-         !g$geom%in%c("ribbon","polygon","line", "path")){
-      ## need to exclude geom_ribbon and geom_violin, since they are
-      ## coded to allow group aesthetics because they use the d3 path
-      ## setup.
-      if(g$aes[grpidx]%in%geom.aes.vars){
-        ## if the group aesthetic is also mapped to another visual aesthetic,
-        ## then remove the group aesthetic
-        g$aes <- g$aes[-which(names(g$aes)=="group")]
-      }
-    }
+  ## Some geoms need their data sorted before saving to tsv.
+  if(g$geom %in% c("ribbon", "line")){
+    g.data <- g.data[order(g.data$x), ]
   }
-
-  ##print("after group block")
 
   ## Check g.data for color/fill - convert to hexadecimal so JS can parse correctly.
   for(color.var in c("colour", "color", "fill")){
@@ -1002,7 +984,7 @@ depth <- function(this) ifelse(is.list(this), 1L + max(sapply(this, depth)), 0L)
 ##' @return list of data.frame.
 varied.chunk <- function(df.list, cols, nest_order){
   if(depth(df.list) == 2){
-    llply(df.list, function(df){
+    plyr::llply(df.list, function(df){
       df <- df[, cols, drop = FALSE]
       # remove duplicated rows to further reduce chunk file size
       if("group" %in% nest_order) df <- df[!duplicated(df), ]
