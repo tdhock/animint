@@ -176,6 +176,11 @@ https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol_type
 
 RENDER: Determine why border of tiles in pirates example does not seem to be rendering.
 
+2015.09.22
+
+BUGFIX: geom_hline is now rendered properly. Test includes with and
+without the data= argument.
+
 2015.09.18
 
 BUGFIX: geom_line was not rendering properly when the x values were

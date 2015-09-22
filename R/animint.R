@@ -774,7 +774,7 @@ saveLayer <- function(l, d, meta){
       write.table(some.lines, tmp,
                   col.names=FALSE,
                   quote=FALSE, row.names=FALSE, sep="\t")
-      bytes <- file.size(tmp)
+      bytes <- file.info(tmp)$size
       bytes.per.line <- bytes/nrow(some.lines)
       bad.chunk <- function(){
         if(all(!can.chunk))return(NULL)
