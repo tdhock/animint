@@ -1332,8 +1332,8 @@ var animint = function (to_select, json_file) {
       eActions = function (e) {
         e.attr("y1", toXY("y", "yintercept"))
           .attr("y2", toXY("y", "yintercept"))
-          .attr("x1", scales.x.range()[0] + plotdim.margin.left)
-          .attr("x2", scales.x.range()[1] - plotdim.margin.right)
+          .attr("x1", scales.x.range()[0])
+          .attr("x2", scales.x.range()[1])
           .style("stroke-dasharray", get_dasharray)
           .style("stroke-width", get_size)
           .style("stroke", get_colour);
