@@ -153,7 +153,6 @@ test_that("clickSelects.variable tooltip/title", {
   expect_identical(title.vec, paste("size.100.problem.1peaks", 0:2))
 })
 
-
 test_that("two lines rendered in first plot", {
   path.list <-
     getNodeSet(info$html,
