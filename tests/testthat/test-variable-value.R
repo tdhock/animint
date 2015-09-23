@@ -142,6 +142,17 @@ viz <-
 
 info <- animint2HTML(viz)
 
+circle.xpath <- '//svg[@id="peaks"]//circle'
+title.xpath <- paste0(circle.xpath, '//title')
+
+test_that("clickSelects.variable tooltip/title", {
+  circle.list <- getNodeSet(info$html, circle.xpath)
+  expect_equal(length(circle.list), 3)
+  title.list <- getNodeSet(info$html, title.xpath)
+  title.vec <- sapply(title.list, xmlValue)
+  expect_identical(title.vec, paste("size.100.problem.1peaks", 0:2))
+})
+
 test_that("two lines rendered in first plot", {
   path.list <-
     getNodeSet(info$html,
@@ -192,8 +203,6 @@ test_that("clicking increases the number of peaks", {
   node.list <-
     getNodeSet(more.peaks.html, '//g[@class="geom6_segment_problems"]//line')
   expect_equal(length(node.list), 3)
-  ## TODO: test for //g[@class="geom6_point_peaks"]//circle//title
-  ## (tooltip that indicates the number of peaks).
 })
 
 viz.for <-
@@ -299,3 +308,10 @@ test_that("changing problem downloads one chunk", {
                  0, 0, 0, 0))
 })
 
+test_that("clickSelects tooltip/title", {
+  circle.list <- getNodeSet(info$html, circle.xpath)
+  expect_equal(length(circle.list), 3)
+  title.list <- getNodeSet(info$html, title.xpath)
+  title.vec <- sapply(title.list, xmlValue)
+  expect_identical(title.vec, paste("size.100.problem.1peaks", 0:2))
+})

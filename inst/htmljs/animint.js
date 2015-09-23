@@ -1627,16 +1627,18 @@ var animint = function (to_select, json_file) {
       elements.style("opacity", get_alpha);
     }
     var has_tooltip = g_info.aes.hasOwnProperty("tooltip");
-    if(has_clickSelects || has_tooltip){
+    if(has_clickSelects || has_tooltip || has_clickSelects_variable){
       elements.text("")
         .append("svg:title")
         .text(function (d) {
           if(has_tooltip){
             return d.tooltip;
-          }else{
+          }else if(has_clickSelects){
             var v_name = g_info.aes.clickSelects;
             return v_name + " " + d.clickSelects;
-          }
+          }else{ //clickSelects_variable
+	    return d["clickSelects.variable"] + " " + d["clickSelects.value"];
+	  }
         });
     }
     // Set attributes of only the entering elements. This is needed to
