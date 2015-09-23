@@ -1775,7 +1775,7 @@ var animint = function (to_select, json_file) {
 	})
 	.attr("style", "cursor:pointer")
       ;
-      var first_tr = legend_table.append("tr");
+      var first_tr = legend_table.insert("tr", "tr");
       var first_th = first_tr.append("th")
 	.attr("align", "left")
 	.attr("colspan", 2)
