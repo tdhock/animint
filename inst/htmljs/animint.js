@@ -5,66 +5,65 @@
 // </script>
 // Constructor for animint Object.
 var animint = function (to_select, json_file) {
-
-  var linetypesize2dasharray = function (lt, size) {
-    var isInt = function(n) { return typeof n === 'number' && parseFloat(n) == parseInt(n, 10) && !isNaN(n); }
-    if(lt == null) {
-      return null;
-    } else {
-      if(isInt(lt)){ // R integer line types.
-        if(lt == 1){
-  	return null;
-        }
-        var o = {
-  	0: size * 0 + "," + size * 10,
-  	2: size * 4 + "," + size * 4,
-  	3: size + "," + size * 2,
-  	4: size + "," + size * 2 + "," + size * 4 + "," + size * 2,
-  	5: size * 8 + "," + size * 4,
-  	6: size * 2 + "," + size * 2 + "," + size * 6 + "," + size * 2
-        };
-      } else { //R defined line types
-        if(lt == "solid"){
-  	return null;
-        }
-        var o = {
-  	"blank": size * 0 + "," + size * 10,
-  	"none": size * 0 + "," + size * 10,
-  	"dashed": size * 4 + "," + size * 4,
-  	"dotted": size + "," + size * 2,
-  	"dotdash": size + "," + size * 2 + "," + size * 4 + "," + size * 2,
-  	"longdash": size * 8 + "," + size * 4,
-  	"twodash": size * 2 + "," + size * 2 + "," + size * 6 + "," + size * 2,
-  	"22": size * 2 + "," + size * 2,
-  	"42": size * 4 + "," + size * 2,
-  	"44": size * 4 + "," + size * 4,
-  	"13": size + "," + size * 3,
-  	"1343": size + "," + size * 3 + "," + size * 4 + "," + size * 3,
-  	"73": size * 7 + "," + size * 3,
-  	"2262": size * 2 + "," + size * 2 + "," + size * 6 + "," + size * 2,
-  	"12223242": size + "," + size * 2 + "," + size * 2 + "," + size * 2 + "," + size * 3 + "," + size * 2 + "," + size * 4 + "," + size * 2,
-  	"F282": size * 15 + "," + size * 2 + "," + size * 8 + "," + size * 2,
-  	"F4448444": size * 15 + "," + size * 4 + "," + size * 4 + "," + size * 4 + "," + size * 8 + "," + size * 4 + "," + size * 4 + "," + size * 4,
-  	"224282F2": size * 2 + "," + size * 2 + "," + size * 4 + "," + size * 2 + "," + size * 8 + "," + size * 2 + "," + size * 16 + "," + size * 2,
-  	"F1": size * 16 + "," + size
-        };
-      }
-
-      if (lt in o){
-        return o[lt];
-      } else{ // manually specified line types
-        str = lt.split("");
-        strnum = str.map(function (d) {
-  	return size * parseInt(d, 16);
-        });
-        return strnum;
-      }
-    }
+  function safe_name(unsafe_name){
+    return unsafe_name.replace(/\./g, '_');
   }
+  var linetypesize2dasharray = function (lt, size) {
+    var isInt = function(n) {
+      return typeof n === 'number' && parseFloat(n) == parseInt(n, 10) && !isNaN(n);
+    };
+    if(isInt(lt)){ // R integer line types.
+      if(lt == 1){
+        return null;
+      }
+      var o = {
+        0: size * 0 + "," + size * 10,
+        2: size * 4 + "," + size * 4,
+        3: size + "," + size * 2,
+        4: size + "," + size * 2 + "," + size * 4 + "," + size * 2,
+        5: size * 8 + "," + size * 4,
+        6: size * 2 + "," + size * 2 + "," + size * 6 + "," + size * 2
+      };
+    } else { // R defined line types
+      if(lt == "solid"){
+        return null;
+      }
+      var o = {
+        "blank": size * 0 + "," + size * 10,
+        "none": size * 0 + "," + size * 10,
+        "dashed": size * 4 + "," + size * 4,
+        "dotted": size + "," + size * 2,
+        "dotdash": size + "," + size * 2 + "," + size * 4 + "," + size * 2,
+        "longdash": size * 8 + "," + size * 4,
+        "twodash": size * 2 + "," + size * 2 + "," + size * 6 + "," + size * 2,
+        "22": size * 2 + "," + size * 2,
+        "42": size * 4 + "," + size * 2,
+        "44": size * 4 + "," + size * 4,"13": size + "," + size * 3,
+        "1343": size + "," + size * 3 + "," + size * 4 + "," + size * 3,
+        "73": size * 7 + "," + size * 3,
+        "2262": size * 2 + "," + size * 2 + "," + size * 6 + "," + size * 2,
+        "12223242": size + "," + size * 2 + "," + size * 2 + "," + size * 2 + "," + size * 3 + "," + size * 2 + "," + size * 4 + "," + size * 2,
+        "F282": size * 15 + "," + size * 2 + "," + size * 8 + "," + size * 2,
+        "F4448444": size * 15 + "," + size * 4 + "," + size * 4 + "," + size * 4 + "," + size * 8 + "," + size * 4 + "," + size * 4 + "," + size * 4,
+        "224282F2": size * 2 + "," + size * 2 + "," + size * 4 + "," + size * 2 + "," + size * 8 + "," + size * 2 + "," + size * 16 + "," + size * 2,
+        "F1": size * 16 + "," + size
+      };
+    }
+
+    if (lt in o){
+      return o[lt];
+    } else{ // manually specified line types
+      str = lt.split("");
+      strnum = str.map(function (d) {
+        return size * parseInt(d, 16);
+      });
+      return strnum;
+    }
+  };
 
   var isArray = function(o) {
     return Object.prototype.toString.call(o) === '[object Array]';
-  }
+  };
 
   // create a dummy element, apply the appropriate classes,
   // and then measure the element
@@ -88,7 +87,7 @@ var animint = function (to_select, json_file) {
     container.remove();
 
     return {height: bbox.height, width: bbox.width};
-  }
+  };
 
   var dirs = json_file.split("/");
   dirs.pop(); //if a directory path exists, remove the JSON file from dirs
@@ -111,47 +110,14 @@ var animint = function (to_select, json_file) {
   var all_geom_names = {};
   this.all_geom_names = all_geom_names;
 
+  //creating an array to contain the selectize widgets
+  var selectized_array = [];
+
   var css = document.createElement('style');
   css.type = 'text/css';
   var styles = [".axis path{fill: none;stroke: black;shape-rendering: crispEdges;}",
             ".axis line{fill: none;stroke: black;shape-rendering: crispEdges;}",
             ".axis text {font-family: sans-serif;font-size: 11px;}"];
-            
-  // 'margins' are fixed across panels and do not
-  // include title/axis/label padding (since these are not
-  // fixed across panels). They do, however, account for
-  // spacing between panels
-  var margin = {
-    left: 0,
-    right: 10,
-    top: 10,
-    bottom: 0
-  };
-  var plotdim = {
-    width: 0,
-    height: 0,
-    xstart: 0,
-    xend: 0,
-    ystart: 0,
-    yend: 0,
-    graph: {
-      width: 0,
-      height: 0
-    },
-    margin: margin,
-    xlab: {
-      x: 0,
-      y: 0
-    },
-    ylab: {
-      x: 0,
-      y: 0
-    },
-    title: {
-      x: 0,
-      y: 0
-    }
-  };
 
   var add_geom = function (g_name, g_info) {
     // Determine what style to use to show the selection for this
@@ -171,13 +137,36 @@ var animint = function (to_select, json_file) {
     g_info.tr.append("td").attr("class", "downloaded").text(0);
     g_info.tr.append("td").text(g_info.total);
     g_info.tr.append("td").attr("class", "status").text("initialized");
-    // Save this geom and load it!
+
+    // load chunk tsv
     g_info.data = {};
     g_info.download_status = {};
     Geoms[g_name] = g_info;
+    // Determine whether common chunk tsv exists
+    // If yes, load it
+    if (g_info.hasOwnProperty("columns") && g_info.columns.common){
+      var common_tsv = get_tsv(g_info, "_common");
+      // get the data if it has not yet been downloaded.
+      g_info.tr.select("td.chunk").text(common_tsv);
+      g_info.tr.select("td.status").text("downloading");
+      var svg = SVGs[g_name];
+      var loading = svg.append("text")
+        .attr("class", "loading" + common_tsv)
+        .text("Downloading "+ common_tsv + "...")
+        .attr("font-size", 9)
+        .attr("y", 10)
+        .style("fill", "red");
+      download_chunk(g_info, common_tsv, function(chunk){
+        loading.remove();
+        g_info.common_tsv = common_tsv;
+      });
+    } else {
+      g_info.common_tsv = null;
+    }
+    // Save this geom and load it!
     update_geom(g_name, null);
-  }
-  var add_plot = function (p_name, p_info) {  
+  };
+  var add_plot = function (p_name, p_info) {
     // Each plot may have one or more legends. To make space for the
     // legends, we put each plot in a table with one row and two
     // columns: tdLeft and tdRight.
@@ -196,10 +185,51 @@ var animint = function (to_select, json_file) {
     var panel_names = p_info.layout.PANEL;
     var npanels = Math.max.apply(null, panel_names);
 
+    // Note axis names are "shared" across panels (just like the title)
+    var xtitlepadding = 5 + measureText(p_info["xtitle"], 11).height;
+    var ytitlepadding = 5 + measureText(p_info["ytitle"], 11).height;
+
+    // 'margins' are fixed across panels and do not
+    // include title/axis/label padding (since these are not
+    // fixed across panels). They do, however, account for
+    // spacing between panels
+    var text_height_pixels = measureText("foo", 11).height;
+    var margin = {
+      left: 0,
+      right: text_height_pixels * p_info.panel_margin_lines,
+      top: text_height_pixels * p_info.panel_margin_lines,
+      bottom: 0
+    };
+    var plotdim = {
+      width: 0,
+      height: 0,
+      xstart: 0,
+      xend: 0,
+      ystart: 0,
+      yend: 0,
+      graph: {
+	width: 0,
+	height: 0
+      },
+      margin: margin,
+      xlab: {
+	x: 0,
+	y: 0
+      },
+      ylab: {
+	x: 0,
+	y: 0
+      },
+      title: {
+	x: 0,
+	y: 0
+      }
+    };
+
     // Draw the title
     var titlepadding = measureText(p_info.title, 20).height + 10;
     // why are we giving the title padding if it is undefined?
-    if (p_info.title === undefined)  titlepadding = 0;
+    if (p_info.title === undefined) titlepadding = 0;
     plotdim.title.x = p_info.options.width / 2;
     plotdim.title.y = titlepadding / 2;
     svg.append("text")
@@ -208,13 +238,9 @@ var animint = function (to_select, json_file) {
       .attr("class", "title")
       .attr("font-family", "sans-serif")
       .attr("font-size", "20px")
-      .attr("transform", "translate(" + (plotdim.title.x) + "," + (
-        plotdim.title.y) + ")")
+      .attr("transform", "translate(" + plotdim.title.x + "," + 
+        plotdim.title.y + ")")
       .style("text-anchor", "middle");
-
-    // Note axis names are "shared" across panels (just like the title)
-    var xtitlepadding = 5 + measureText(p_info["xtitle"], 11).height;
-    var ytitlepadding = 5 + measureText(p_info["ytitle"], 11).height;
 
     // grab max text size over axis labels and facet strip labels
     var axispaddingy = 5;
@@ -230,33 +256,63 @@ var animint = function (to_select, json_file) {
 	     return measureText(entry, 11, p_info.xangle).height;
       }));
       // TODO: carefully calculating this gets complicated with rotating xlabs
-      margin.right += 5;
+      //margin.right += 5;
     }
     plotdim.margin = margin;
     
     var strip_heights = p_info.strips.top.map(function(entry){ 
-      return measureText(entry, 11).height; 
-    })
+      return measureText(entry, 11).height;
+    });
     var strip_widths = p_info.strips.right.map(function(entry){ 
       return measureText(entry, 11).height; 
-    })
+    });
 
-    // track the number of x/y axes to account for when calculating
-    // height/width of graphing region
+    // compute the number of x/y axes, max strip height per row, and
+    // max strip width per columns, for calculating height/width of
+    // graphing region.
+    var row_strip_heights = [];
+    var col_strip_widths = [];
     var n_xaxes = 0;
     var n_yaxes = 0;
+    var current_row, current_col;
     for (var layout_i = 0; layout_i < npanels; layout_i++) {
-      if (p_info.layout.COL[layout_i] == 1) n_xaxes += p_info.layout.AXIS_X[layout_i];
-      if (p_info.layout.ROW[layout_i] == 1) n_yaxes += p_info.layout.AXIS_Y[layout_i];
+      current_row = p_info.layout.ROW[layout_i] - 1;
+      current_col = p_info.layout.COL[layout_i] - 1;
+      if(row_strip_heights[current_row] === undefined){
+	row_strip_heights[current_row] = [];
+      }
+      if(col_strip_widths[current_col] === undefined){
+	col_strip_widths[current_col] = [];
+      }
+      row_strip_heights[current_row].push(strip_heights[layout_i]);
+      col_strip_widths[current_col].push(strip_widths[layout_i]);
+      if (p_info.layout.COL[layout_i] == 1) {
+	n_xaxes += p_info.layout.AXIS_X[layout_i];
+      }
+      if (p_info.layout.ROW[layout_i] == 1) {
+	n_yaxes += p_info.layout.AXIS_Y[layout_i];
+      }
     }
+    function cumsum_array(array_of_arrays){
+      var cumsum = [], max_value, cumsum_value = 0;
+      for(var i=0; i<array_of_arrays.length; i++){
+	cumsum_value += d3.max(array_of_arrays[i]);
+	cumsum[i] = cumsum_value;
+      }
+      return cumsum;
+    }
+    var cum_height_per_row = cumsum_array(row_strip_heights);
+    var cum_width_per_col = cumsum_array(col_strip_widths);
+    var strip_width = d3.max(cum_width_per_col);
+    var strip_height = d3.max(cum_height_per_row);
 
     // the *entire graph* height/width
-    var graph_width = p_info.options.width - ncols * (margin.left + margin.right) -
-                      strip_widths.reduce(function(a, b) { return a + b; }) -
-                      n_yaxes * axispaddingy - ytitlepadding;
-    var graph_height = p_info.options.height - nrows * (margin.top + margin.bottom) -
-                        strip_heights.reduce(function(a, b) { return a + b; }) -
-                        titlepadding - n_xaxes * axispaddingx - xtitlepadding;
+    var graph_width = p_info.options.width - 
+        ncols * (margin.left + margin.right + strip_width) -
+        n_yaxes * axispaddingy - ytitlepadding;
+    var graph_height = p_info.options.height - 
+        nrows * (margin.top + margin.bottom + strip_height) -
+        titlepadding - n_xaxes * axispaddingx - xtitlepadding;
 
     // Impose the pixelated aspect ratio of the graph upon the width/height
     // proportions calculated by the compiler. This has to be done on the
@@ -292,21 +348,19 @@ var animint = function (to_select, json_file) {
     p_info.geoms.forEach(function (g_name) {
       var layer_g_element = svg.append("g").attr("class", g_name);
       panel_names.forEach(function(PANEL){
-	     layer_g_element.append("g").attr("class", "PANEL" + PANEL);
+        layer_g_element.append("g").attr("class", "PANEL" + PANEL);
       });
       SVGs[g_name] = svg;
     });
 
-    // If we are to draw more than one panel,
-    // create a grouping for strip labels
-    if (npanels > 1) {
-      svg.append("g")
-        .attr("class", "strip")
-        .attr("id", "topStrip");
-      svg.append("g")
-        .attr("class", "strip")
-        .attr("id", "rightStrip");
-    }
+    // create a grouping for strip labels (even if there are none).
+    var topStrip = svg.append("g")
+      .attr("class", "strip")
+      .attr("id", "topStrip");
+    var rightStrip = svg.append("g")
+      .attr("class", "strip")
+      .attr("id", "rightStrip");
+
     // this will hold x/y scales for each panel
     // eventually we inject this into Plots[p_name]
     var scales = {};
@@ -355,96 +409,100 @@ var animint = function (to_select, json_file) {
             // if the specified label is null
           });
         }
+      };
+
+      axislabs(axis.x, axis.xlab, "x");
+      axislabs(axis.y, axis.ylab, "y");
+
+      // compute the current panel height/width
+      plotdim.graph.height = graph_height * hp[layout_i];
+      plotdim.graph.width = graph_width * wp[layout_i];
+
+      current_row = p_info.layout.ROW[layout_i];
+      current_col = p_info.layout.COL[layout_i];
+      var draw_x = p_info.layout.AXIS_X[layout_i];
+      var draw_y = p_info.layout.AXIS_Y[layout_i];
+      // panels are drawn using a "typewriter approach" (left to right & top to bottom)
+      // if the carriage is returned (ie, there is a new row), change some parameters:
+      var new_row = current_col <= p_info.layout.COL[layout_i - 1]
+      if (new_row) {
+	n_yaxes = 0;
+	graph_width_cum = (graph_width_blank / 2) * graph_width;
+	graph_height_cum = graph_height_cum + plotdim.graph.height;
       }
+      n_xaxes = n_xaxes + draw_x;
+      n_yaxes = n_yaxes + draw_y;
 
-    axislabs(axis.x, axis.xlab, "x");
-    axislabs(axis.y, axis.ylab, "y");
+      // calculate panel specific locations to be used in placing axes, labels, etc.
+      plotdim.xstart =  current_col * plotdim.margin.left +
+        (current_col - 1) * plotdim.margin.right +
+        graph_width_cum + n_yaxes * axispaddingy + ytitlepadding;
+      // room for right strips should be distributed evenly across panels to preserve aspect ratio
+      plotdim.xend = plotdim.xstart + plotdim.graph.width;
+      // total height of strips drawn thus far
+      var strip_h = cum_height_per_row[current_row-1];
+      plotdim.ystart = current_row * plotdim.margin.top +
+        (current_row - 1) * plotdim.margin.bottom +
+        graph_height_cum + titlepadding + strip_h;
+      // room for xaxis title should be distributed evenly across panels to preserve aspect ratio
+      plotdim.yend = plotdim.ystart + plotdim.graph.height;
+      // always add to the width (note it may have been reset earlier)
+      graph_width_cum = graph_width_cum + plotdim.graph.width;
 
-    // compute the current panel height/width
-    plotdim.graph.height = graph_height * hp[layout_i];
-    plotdim.graph.width = graph_width * wp[layout_i];
-
-    var current_row = p_info.layout.ROW[layout_i];
-    var current_col = p_info.layout.COL[layout_i];
-    var draw_x = p_info.layout.AXIS_X[layout_i];
-    var draw_y = p_info.layout.AXIS_Y[layout_i];
-    // panels are drawn using a "typewriter approach" (left to right & top to bottom)
-    // if the carriage is returned (ie, there is a new row), change some parameters:
-    var new_row = current_col <= p_info.layout.COL[layout_i - 1]
-    if (new_row) {
-      n_yaxes = 0;
-      graph_width_cum = (graph_width_blank / 2) * graph_width;
-      graph_height_cum = graph_height_cum + plotdim.graph.height;
-    }
-    n_xaxes = n_xaxes + draw_x;
-    n_yaxes = n_yaxes + draw_y;
-
-    // calculate panel specific locations to be used in placing axes, labels, etc.
-    plotdim.xstart =  current_col * plotdim.margin.left +
-                      (current_col - 1) * plotdim.margin.right +
-                      graph_width_cum + n_yaxes * axispaddingy + ytitlepadding;
-    // room for right strips should be distributed evenly across panels to preserve aspect ratio
-    plotdim.xend = plotdim.xstart + plotdim.graph.width;
-    // total height of strips drawn thus far
-    var strip_height = strip_heights.slice(0, current_row)
-                       .reduce(function(a, b) { return a + b; })
-    plotdim.ystart = current_row * plotdim.margin.top +
-                     (current_row - 1) * plotdim.margin.bottom +
-                     graph_height_cum + titlepadding + strip_height;
-    // room for xaxis title should be distributed evenly across panels to preserve aspect ratio
-    plotdim.yend = plotdim.ystart + plotdim.graph.height;
-    // always add to the width (note it may have been reset earlier)
-    graph_width_cum = graph_width_cum + plotdim.graph.width;
-
-    // draw the y-axis title (and add padding) when drawing the first panel
-    if (layout_i === 0) {
-      svg.append("text")
-        .text(p_info["ytitle"])
-        .attr("class", "label")
-        .attr("id", "ytitle")
-        .style("text-anchor", "middle")
-        .style("font-size", "11px")
-        .attr("transform", "translate(" + (plotdim.xstart - axispaddingy - ytitlepadding / 2)
-          + "," + (p_info.options.height / 2) + ")rotate(270)");
-    }
-    // draw the x-axis title when drawing the last panel
-    if (layout_i === (npanels - 1)) {
-      svg.append("text")
-        .text(p_info["xtitle"])
-        .attr("class", "label")
-        .attr("id", "xtitle")
-        .style("text-anchor", "middle")
-        .style("font-size", "11px")
-        .attr("transform", "translate(" + plotdim.title.x
-          + "," + (plotdim.yend + axispaddingx) + ")");
-    }
+      // draw the y-axis title (and add padding) when drawing the first panel
+      if (layout_i === 0) {
+	svg.append("text")
+          .text(p_info["ytitle"])
+          .attr("class", "label")
+          .attr("id", "ytitle")
+          .style("text-anchor", "middle")
+          .style("font-size", "11px")
+          .attr("transform", "translate(" + (plotdim.xstart - axispaddingy - ytitlepadding / 2)
+		+ "," + (p_info.options.height / 2) + ")rotate(270)");
+      }
+      // draw the x-axis title when drawing the last panel
+      if (layout_i === (npanels - 1)) {
+	svg.append("text")
+          .text(p_info["xtitle"])
+          .attr("class", "label")
+          .attr("id", "xtitle")
+          .style("text-anchor", "middle")
+          .style("font-size", "11px")
+          .attr("transform", "translate(" + plotdim.title.x
+		+ "," + (plotdim.yend + axispaddingx) + ")");
+      }
 
       var draw_strip = function(strip, side) {
         if (strip == "") {
           return(null);
         }
-        // assume right is top until it isn't
-        var x = (plotdim.xstart + plotdim.xend) / 2;
-        var y = plotdim.ystart - strip_heights[layout_i] / 2;
-        var rotate = 0;
+        var x, y, rotate, stripElement;
         if (side == "right") {
-          x = plotdim.xend + strip_widths[layout_i] / 2;
+          x = plotdim.xend + strip_widths[layout_i] / 2 - 2;
           y = (plotdim.ystart + plotdim.yend) / 2;
           rotate = 90;
-        }
-        //create a group
-        svg.select("#" + side + "Strip")
+	  stripElement = rightStrip;
+        }else{ //top
+	  x = (plotdim.xstart + plotdim.xend) / 2;
+          y = plotdim.ystart - strip_heights[layout_i] / 2 + 3;
+	  rotate = 0;
+	  stripElement = topStrip;
+	}
+	var trans_text = "translate(" + x + "," + y + ")";
+	var rot_text = "rotate(" + rotate + ")";
+	stripElement
           .selectAll("." + side + "Strips")
           .data(strip)
           .enter()
-            .append("text")
-            .style("text-anchor", "middle")
-            .style("font-size", "11px")
-            .text(function(d) { return d; })
-            // NOTE: there could be multiple strips per panel
-            // TODO: is there a better way to manage spacing?
-            .attr("transform", "translate(" + x + "," + y + ")rotate(" + rotate + ")");
-        }
+          .append("text")
+          .style("text-anchor", "middle")
+          .style("font-size", "11px")
+          .text(function(d) { return d; })
+        // NOTE: there could be multiple strips per panel
+        // TODO: is there a better way to manage spacing?
+          .attr("transform", trans_text + rot_text)
+	;
+      }
       draw_strip([p_info.strips.top[layout_i]], "top");
       draw_strip([p_info.strips.right[layout_i]], "right");
 
@@ -466,55 +524,55 @@ var animint = function (to_select, json_file) {
         .domain([axis.yrange[1], axis.yrange[0]])
         .range([plotdim.ystart, plotdim.yend]);
       if(draw_x){
-	var xaxis = d3.svg.axis()
+        var xaxis = d3.svg.axis()
           .scale(scales[panel_i].x)
           .tickValues(xaxisvals)
           .tickFormat(function (d) {
             return xaxislabs[xaxisvals.indexOf(d)].toString();
           })
           .orient("bottom");
-	var xaxis_g = svg.append("g")
+	      var xaxis_g = svg.append("g")
           .attr("class", "axis")
           .attr("id", "xaxis")
           .attr("transform", "translate(0," + plotdim.yend + ")")
           .call(xaxis);
-	xaxis_g.selectAll("text")
-	  .style("text-anchor", p_info.xanchor)
-	  .attr("transform", "rotate(" + p_info.xangle + " 0 9)");
+	      xaxis_g.selectAll("text")
+	        .style("text-anchor", p_info.xanchor)
+	        .attr("transform", "rotate(" + p_info.xangle + " 0 9)");
       }
       if(draw_y){
-	     var yaxis = d3.svg.axis()
+	var yaxis = d3.svg.axis()
           .scale(scales[panel_i].y)
           .tickValues(yaxisvals)
           .tickFormat(function (d) {
             return yaxislabs[yaxisvals.indexOf(d)].toString();
           })
           .orient("left");
-	     svg.append("g")
+	svg.append("g")
           .attr("class", "axis")
           .attr("id", "yaxis")
           .attr("transform", "translate(" + (plotdim.xstart) + ",0)")
           .call(yaxis);
       }
 
-    	if(!axis.xline) {
-    	  styles.push("#"+p_name+" #xaxis"+" path{stroke:none;}");
-    	}
-    	if(!axis.xticks) {
-    	  styles.push("#"+p_name+" #xaxis .tick"+" line{stroke:none;}");
-    	}
-    	if(!axis.yline) {
-    	  styles.push("#"+p_name+" #yaxis"+" path{stroke:none;}");
-    	}
-    	if(!axis.yticks) {
-    	  styles.push("#"+p_name+" #yaxis .tick"+" line{stroke:none;}");
-    	}
+      if(!axis.xline) {
+    	styles.push("#"+p_name+" #xaxis"+" path{stroke:none;}");
+      }
+      if(!axis.xticks) {
+    	styles.push("#"+p_name+" #xaxis .tick"+" line{stroke:none;}");
+      }
+      if(!axis.yline) {
+    	styles.push("#"+p_name+" #yaxis"+" path{stroke:none;}");
+      }
+      if(!axis.yticks) {
+    	styles.push("#"+p_name+" #yaxis .tick"+" line{stroke:none;}");
+      }
       
       // creating g element for background, grid lines, and border
       // uses insert to draw it right before plot title
       var background = svg.insert("g", "#plottitle")
         .attr("class", "background");
-        
+      
       // drawing background
       if(Object.keys(p_info.panel_background).length > 1) {
         background.append("rect")
@@ -539,9 +597,9 @@ var animint = function (to_select, json_file) {
           var lt = grid_background.linetype;
           var size = grid_background.size;
           var cap = grid_background.lineend;
-        // group for grid lines
-        var grid = background.append("g")
-          .attr("class", grid_class);
+          // group for grid lines
+          var grid = background.append("g")
+            .attr("class", grid_class);
 
           // group for horizontal grid lines
           var grid_hor = grid.append("g")
@@ -613,23 +671,141 @@ var animint = function (to_select, json_file) {
           });
       }
 
-    } //end of for loop
+    } //end of for(layout_i
 
     Plots[p_name].scales = scales;
-
-  } //end of add_plot()
+  }; //end of add_plot()
 
   var add_selector = function (s_name, s_info) {
     Selectors[s_name] = s_info;
     if(s_info.type == "multiple"){
       if(!isArray(s_info.selected)){
-	s_info.selected = [s_info.selected];
+        s_info.selected = [s_info.selected];
       }
     }
-  }
+    // update opacity of legend entries
+    var legend_entries = 
+      d3.selectAll("tr#legend th."+safe_name(s_name)+" td.legend_entry_label");
+    legend_entries.style("opacity", function(d) {
+      var d_opacity;
+      if(s_info.type == "multiple") {
+	// if the entry is one of the selected objects set opacity to 1
+	if(s_info.selected.indexOf(this.textContent) > -1) {
+          d_opacity = 1;
+	} else {
+          // otherwise opacity is 0.5
+          d_opacity = 0.5;
+	}
+      } else {
+	// if single selection
+	if(this.textContent == s_info.selected) {
+          d_opacity = 1;
+	} else {
+          d_opacity = 0.5;
+	}
+      }
+      return d_opacity;
+    });
+  }; //end of add_selector()
+
   var get_tsv = function(g_info, chunk_id){
     return g_info.classed + "_chunk" + chunk_id + ".tsv";
+  };
+
+  /**
+   * join common chunk tsv into varied chunk tsv by group
+   * @param  {array} common_chunk   array of json objects from common chunk tsv
+   * @param  {array} varied_chunk   array of json objects from varied chunk tsv
+   * @param  {string array} columns_common array of common column names
+   * @param  {string} group         group column name
+   * @return {array}                array of json objects after joining common chunk tsv into varied chunk tsv
+  */
+  var joinChunkByGroup = function(common_chunk, varied_chunk, columns_common, group) {
+    var new_varied_chunk = [];
+    // join by group
+    var groups = varied_chunk.map(function(obj){
+      return obj[group];
+    });
+
+    groups.forEach(function(id){
+      var varied_obj = findObjectByKey(varied_chunk, group, id);
+      var common_obj = findObjectByKey(common_chunk, group, id);
+      var new_varied_obj = clone(varied_obj);
+      columns_common.forEach(function(col) {
+        new_varied_obj[col] = common_obj[col];
+      });
+      new_varied_chunk.push(new_varied_obj);
+    });
+    return new_varied_chunk;
   }
+
+  /**
+   * find object matching a key of lookup value from an array of objects
+   * @param  {[type]} array array of objects to lookup
+   * @param  {[type]} key   the key of each objects in the array to lookup
+   * @param  {[type]} value the value of key to lookup
+   * @return {[type]}       object
+  */
+  var findObjectByKey = function(array, key, value) {
+    for (var i = 0; i < array.length; i++) {
+      if (array[i][key] === value) {
+        return array[i];
+      }
+    }
+    return null;
+  };
+
+  /**
+   * clone json object without reference
+   * @param  {json object} object json object
+   * @return {json object}        a copy of input json object
+  */
+  var clone = function(object) {
+    var o = {};
+    for(var i in object){
+      o[i] = object[i];
+    }
+    return o;
+  };
+
+  /**
+   * copy common chunk tsv to varied chunk tsv
+   * @param  {json object} common_chunk   json object from common chunk tsv
+   * @param  {json object} varied_chunk   json object from varied chunk tsv
+   * @param  {string array} columns_common array of common column names
+   * @return {json object}                json object after merging common chunk tsv into varied chunk tsv
+  */
+  var copy_chunk = function(common_chunk, varied_chunk, columns_common) {
+    if(columns_common.indexOf("group") != -1){
+      if(Array.isArray(varied_chunk)){
+        var new_varied_chunk = joinChunkByGroup(common_chunk, varied_chunk, columns_common, "group");
+      } else{
+        var new_varied_chunk = {};
+
+        var keys = d3.keys(varied_chunk);
+        keys.forEach(function(k){
+          var g_varied_chunk = varied_chunk[k];
+          var g_common_chunk = common_chunk[k];
+
+          if(g_varied_chunk.length == 1){
+            var new_g_varied_chunk = [];
+            g_common_chunk.forEach(function(obj){
+              var new_varied_obj = clone(g_varied_chunk[0]);
+              columns_common.forEach(function(col) {
+                new_varied_obj[col] = obj[col];
+              });
+              new_g_varied_chunk.push(new_varied_obj);
+            });
+          } else{
+            var new_g_varied_chunk = joinChunkByGroup(g_common_chunk, g_varied_chunk, columns_common, "group");
+          }
+          new_varied_chunk[k] = new_g_varied_chunk;
+        });
+      }
+      return new_varied_chunk;
+    }
+  };
+
   // update_geom is called from add_geom and update_selector. It
   // downloads data if necessary, and then calls draw_geom.
   var update_geom = function (g_name, selector_name) {
@@ -638,13 +814,13 @@ var animint = function (to_select, json_file) {
     var chunk_id = g_info.chunks;
     g_info.chunk_order.forEach(function (v_name) {
       if(chunk_id == null){
-	return; //no data in a higher up chunk var.
+        return; // no data in a higher up chunk var.
       }
       var value = Selectors[v_name].selected;
       if(chunk_id.hasOwnProperty(value)){
-	chunk_id = chunk_id[value];
+	       chunk_id = chunk_id[value];
       }else{
-	chunk_id = null; // no data to show in this subset.
+	       chunk_id = null; // no data to show in this subset.
       }
     });
     if(chunk_id == null){
@@ -660,19 +836,18 @@ var animint = function (to_select, json_file) {
       g_info.tr.select("td.status").text("downloading");
       var svg = SVGs[g_name];
       var loading = svg.append("text")
-	.attr("class", "loading"+tsv_name)
-	.text("Downloading "+tsv_name+"...")
-	.attr("font-size", 9)
-	.attr("y", 10)
-	.style("fill", "red")
-	//.attr("x", svg.attr("width")/2)
-      ;
+        .attr("class", "loading"+tsv_name)
+	      .text("Downloading "+tsv_name+"...")
+	      .attr("font-size", 9)
+	      //.attr("x", svg.attr("width")/2)
+        .attr("y", 10)
+        .style("fill", "red");
       download_chunk(g_info, tsv_name, function(chunk){
       	loading.remove();
-	draw_panels(g_info, chunk, selector_name);
+	      draw_panels(g_info, chunk, selector_name);
       });
     }
-  }
+  };
   var draw_panels = function(g_info, chunk, selector_name) {
     // derive the plot name from the geometry name
     var g_names = g_info.classed.split("_");
@@ -681,7 +856,7 @@ var animint = function (to_select, json_file) {
     panels.forEach(function(panel) {
       draw_geom(g_info, chunk, selector_name, panel);
     });
-  }
+  };
   var download_sequence = function(g_name, s_name, seq){
     var g_info = Geoms[g_name];
     var s_info = Selectors[s_name];
@@ -689,7 +864,7 @@ var animint = function (to_select, json_file) {
     g_info.seq_count = 0;
     g_info.seq = seq;
     download_next(g_name);
-  }
+  };
   var download_next = function(g_name){
     var g_info = Geoms[g_name];
     var selector_value = g_info.seq[g_info.seq_i];
@@ -706,7 +881,7 @@ var animint = function (to_select, json_file) {
     download_chunk(g_info, tsv_name, function(chunk){
       download_next(g_name);
     })
-  }
+  };
   // download_chunk is called from update_geom and download_sequence.
   var download_chunk = function(g_info, tsv_name, funAfter){
     if(g_info.download_status.hasOwnProperty(tsv_name)){
@@ -714,46 +889,40 @@ var animint = function (to_select, json_file) {
       return; // do not download twice.
     }
     g_info.download_status[tsv_name] = "downloading";
-    //prefix tsv file with appropriate path
+    // prefix tsv file with appropriate path
     var tsv_file = dirs.concat(tsv_name).join("/");
     function is_interactive_aes(v_name){
       if(v_name.indexOf("clickSelects") > -1){
-	return true;
+        return true;
       }
       if(v_name.indexOf("showSelected") > -1){
-	return true;
+        return true;
       }
       return false;
-    }
+    };
     d3.tsv(tsv_file, function (error, response) {
       // First convert to correct types.
       g_info.download_status[tsv_name] = "processing";
       response.forEach(function (d) {
         for (var v_name in g_info.types) {
-	  // interactive aesthetics (clickSelects, showSelected, etc)
-	  // stay as characters, others may be converted.
-	  if(!is_interactive_aes(v_name)){
+          // interactive aesthetics (clickSelects, showSelected, etc)
+    	    // stay as characters, others may be converted.
+      	  if(!is_interactive_aes(v_name)){
             var r_type = g_info.types[v_name];
             if (r_type == "integer") {
               d[v_name] = parseInt(d[v_name]);
             } else if (r_type == "numeric") {
               d[v_name] = parseFloat(d[v_name]);
-            } else if (r_type == "factor") {
-              //keep it as a character.
-            } else if (r_type == "rgb") {
-              //keep it as a character.
-            } else if (r_type == "linetype") {
-              //keep it as a character.
-            } else if (r_type == "label") {
-              //keep it as a character
-            } else if (r_type == "character") {
-              //keep it as a character
+            } else if (r_type == "factor" || r_type == "rgb" 
+              || r_type == "linetype" || r_type == "label" 
+              || r_type == "character") {
+              // keep it as a character
             } else if (r_type == "character" & v_name == "outliers") {
               d[v_name] = parseFloat(d[v_name].split(" @ "));
             } else {
               throw "unsupported R type " + r_type;
             }
-	  }
+      	  }
         }
       });
       var nest = d3.nest();
@@ -763,12 +932,17 @@ var animint = function (to_select, json_file) {
         });
       });
       var chunk = nest.map(response);
+      // copy data from common tsv to varied tsv
+      if (g_info.common_tsv) {
+        var common_chunk = g_info.data[g_info.common_tsv];
+        chunk = copy_chunk(common_chunk, chunk, g_info.columns.common);
+      }
       g_info.data[tsv_name] = chunk;
       g_info.tr.select("td.downloaded").text(d3.keys(g_info.data).length);
       g_info.download_status[tsv_name] = "saved";
       funAfter(chunk);
     });
-  }
+  };
   // update_geom is responsible for obtaining a chunk of downloaded
   // data, and then calling draw_geom to actually draw it.
   var draw_geom = function(g_info, chunk, selector_name, PANEL){
@@ -780,29 +954,46 @@ var animint = function (to_select, json_file) {
     var scales = Plots[p_name].scales[PANEL];
     var selected_arrays = [ [] ]; //double array necessary.
     g_info.subset_order.forEach(function (aes_name) {
-      var selected, values, old_array, value, new_array;
-      //if (aes_name != "group") { // why do we need this?
-	if(aes_name == "PANEL"){
-	  selected = PANEL;
-	}else{
-          var v_name = g_info.aes[aes_name];
-          selected = Selectors[v_name].selected;
-	}
-	if(isArray(selected)){
-	  values = selected;
-	}else{
-	  values = [selected];
-	}
-	var new_arrays = [];
-	values.forEach(function(value){
-	  selected_arrays.forEach(function(old_array){
-	    new_array = old_array.concat(value);
+      var selected, values;
+      var new_arrays = [];
+      if(0 < aes_name.indexOf(".variable")){ 
+	selected_arrays.forEach(function(old_array){
+	  var some_data = chunk;
+	  old_array.forEach(function(value){
+            if(some_data.hasOwnProperty(value)) {
+              some_data = some_data[value];
+            } else {
+              some_data = {};
+            }
+	  })
+	  values = d3.keys(some_data);
+	  values.forEach(function(s_name){
+	    var selected = Selectors[s_name].selected;
+	    var new_array = old_array.concat(s_name).concat(selected);
 	    new_arrays.push(new_array);
 	  })
 	})
-	selected_arrays = new_arrays;
-    //}
-    })
+      }else{//not .variable aes:
+	if(aes_name == "PANEL"){
+	  selected = PANEL;
+	}else{
+          var s_name = g_info.aes[aes_name];
+          selected = Selectors[s_name].selected;
+	}
+	if(isArray(selected)){ 
+	  values = selected; //multiple selection.
+	}else{
+	  values = [selected]; //single selection.
+	}
+	values.forEach(function(value){
+	  selected_arrays.forEach(function(old_array){
+	    var new_array = old_array.concat(value);
+	    new_arrays.push(new_array);
+	  })
+	})
+      }
+      selected_arrays = new_arrays;
+    });
     var data = []
     selected_arrays.forEach(function(value_array){
       var some_data = chunk;
@@ -812,24 +1003,24 @@ var animint = function (to_select, json_file) {
         } else {
           some_data = [];
         }
-      })
+      });
       if(isArray(some_data)){
-	data = data.concat(some_data);
+        data = data.concat(some_data);
       }else{
-	if(isArray(data)){
-	  data = {};
-	}
-	for(k in some_data){
-	  data[k] = some_data[k];
-	}
+        if(isArray(data)){
+          data = {};
+        }
+	      for(k in some_data){
+          data[k] = some_data[k];
+        }
       }
     });
     var aes = g_info.aes;
     var toXY = function (xy, a) {
       return function (d) {
         return scales[xy](d[a]);
-      }
-    }
+      };
+    };
     var layer_g_element = svg.select("g." + g_info.classed);
     var panel_g_element = layer_g_element.select("g.PANEL" + PANEL);
     var elements = panel_g_element.selectAll(".geom");
@@ -846,9 +1037,8 @@ var animint = function (to_select, json_file) {
       } else {
         a = base_opacity;
       }
-
       return a;
-    }
+    };
     var size = 2;
     if(g_info.geom == "text"){
       size = 12;
@@ -861,7 +1051,7 @@ var animint = function (to_select, json_file) {
         return d["size"];
       }
       return size;
-    }
+    };
 
     var linetype = "solid";
     if (g_info.params.linetype) {
@@ -874,7 +1064,7 @@ var animint = function (to_select, json_file) {
         lt = d["linetype"];
       }
       return linetypesize2dasharray(lt, get_size(d));
-    }
+    };
     var colour = "black";
     var fill = "black";
     var get_colour = function (d) {
@@ -882,13 +1072,13 @@ var animint = function (to_select, json_file) {
         return d["colour"]
       }
       return colour;
-    }
+    };
     var get_fill = function (d) {
       if (d.hasOwnProperty("fill")) {
         return d["fill"];
       }
       return fill;
-    }
+    };
     if (g_info.params.colour) {
       colour = g_info.params.colour;
     }
@@ -903,17 +1093,16 @@ var animint = function (to_select, json_file) {
       if (d.hasOwnProperty("hjust")) {
         hjust = d["hjust"];
       }
-      if (hjust == 0) {
-        text_anchor = "start";
-      }
-      if (hjust == 0.5) {
-        text_anchor = "middle";
-      }
-      if (hjust == 1) {
-        text_anchor = "end";
+      var o = {
+        0: "start",
+        0.5: "middle",
+        1: "end"
+      };
+      if (typeof hjust != "undefined") {
+        text_anchor = o[hjust];
       }
       return text_anchor;
-    }
+    };
 
     var eActions, eAppend;
     var key_fun = null;
@@ -978,9 +1167,9 @@ var animint = function (to_select, json_file) {
       //     return get_color(one_row);
       // }
 
-      //In order to get d3 lines to play nice, bind fake "data" (group
-      //id's) -- the kv variable. Then each separate object is plotted
-      //using path (case of only 1 thing and no groups).
+      // In order to get d3 lines to play nice, bind fake "data" (group
+      // id's) -- the kv variable. Then each separate object is plotted
+      // using path (case of only 1 thing and no groups).
       if (!aes.hasOwnProperty("group")) {
 	       // There is either 1 or 0 groups.
          if(data.length == 0){
@@ -1015,41 +1204,39 @@ var animint = function (to_select, json_file) {
         var lineThing = d3.svg.area()
           .x(toXY("x", "x"))
           .y(toXY("y", "ymax"))
-          .y0(toXY("y", "ymin"))
-	;
+          .y0(toXY("y", "ymin"));
       } else {
         var lineThing = d3.svg.line()
           .x(toXY("x", "x"))
-          .y(toXY("y", "y"))
-	;
+          .y(toXY("y", "y"));
       }
-      //select the correct group before returning anything.
+      // select the correct group before returning anything.
       if(key_fun != null){
-	key_fun = function(group_info){
-	  var one_group = data[group_info.value];
-	  var one_row = one_group[0];
-	  //take key from first value in the group.
-	  return one_row.key;
-	};
+        key_fun = function(group_info){
+          var one_group = data[group_info.value];
+	        var one_row = one_group[0];
+	        // take key from first value in the group.
+	        return one_row.key;
+        };
       }
       id_fun = function(group_info){
-	var one_group = data[group_info.value];
-	var one_row = one_group[0];
-	//take key from first value in the group.
-	return one_row.id;
+        var one_group = data[group_info.value];
+        var one_row = one_group[0];
+	      // take key from first value in the group.
+	      return one_row.id;
       };
       elements = elements.data(kv, key_fun);
       eActions = function (e) {
         e.attr("d", function (d) {
           var one_group = data[d.value];
-	  // filter NaN since they make the whole line disappear!
-	  var no_na = one_group.filter(function(d){
-	    if(g_info.geom == "ribbon"){
-	      return !isNaN(d.x) && !isNaN(d.ymin) && !isNaN(d.ymax);
-	    }else{
-	      return !isNaN(d.x) && !isNaN(d.y);
-	    }
-	  })
+          // filter NaN since they make the whole line disappear!
+	        var no_na = one_group.filter(function(d){
+            if(g_info.geom == "ribbon"){
+              return !isNaN(d.x) && !isNaN(d.ymin) && !isNaN(d.ymax);
+            }else{
+              return !isNaN(d.x) && !isNaN(d.y);
+            }
+          });
           return lineThing(no_na);
         })
           .style("fill", function (group_info) {
@@ -1058,34 +1245,34 @@ var animint = function (to_select, json_file) {
             }
             var one_group = data[group_info.value];
             var one_row = one_group[0];
-	    // take color for first value in the group
+            // take color for first value in the group
             return get_fill(one_row);
           })
           .style("stroke-width", function (group_info) {
             var one_group = data[group_info.value];
             var one_row = one_group[0];
-	    // take size for first value in the group
+  	        // take size for first value in the group
             return get_size(one_row);
           })
           .style("stroke", function (group_info) {
             var one_group = data[group_info.value];
             var one_row = one_group[0];
-	    // take color for first value in the group
+  	        // take color for first value in the group
             return get_colour(one_row);
           })
           .style("stroke-dasharray", function (group_info) {
             var one_group = data[group_info.value];
             var one_row = one_group[0];
-	    // take linetype for first value in the group
+  	        // take linetype for first value in the group
             return get_dasharray(one_row);
           })
           .style("stroke-width", function (group_info) {
             var one_group = data[group_info.value];
             var one_row = one_group[0];
-	    // take line size for first value in the group
+  	        // take line size for first value in the group
             return get_size(one_row);
           });
-      }
+      };
       eAppend = "path";
     } else if (g_info.geom == "segment") {
       elements = elements.data(data, key_fun);
@@ -1105,7 +1292,7 @@ var animint = function (to_select, json_file) {
           .style("stroke-dasharray", get_dasharray)
           .style("stroke-width", get_size)
           .style("stroke", get_colour);
-      }
+      };
       eAppend = "line";
     } else if (g_info.geom == "linerange") {
       elements = elements.data(data, key_fun);
@@ -1125,7 +1312,7 @@ var animint = function (to_select, json_file) {
           .style("stroke-dasharray", get_dasharray)
           .style("stroke-width", get_size)
           .style("stroke", get_colour);
-      }
+      };
       eAppend = "line";
     } else if (g_info.geom == "vline") {
       elements = elements.data(data, key_fun);
@@ -1137,20 +1324,20 @@ var animint = function (to_select, json_file) {
           .style("stroke-dasharray", get_dasharray)
           .style("stroke-width", get_size)
           .style("stroke", get_colour);
-      }
+      };
       eAppend = "line";
     } else if (g_info.geom == "hline") {
-      //pretty much a copy of geom_vline with obvious modifications
+      // pretty much a copy of geom_vline with obvious modifications
       elements = elements.data(data, key_fun);
       eActions = function (e) {
         e.attr("y1", toXY("y", "yintercept"))
           .attr("y2", toXY("y", "yintercept"))
-          .attr("x1", scales.x.range()[0] + plotdim.margin.left)
-          .attr("x2", scales.x.range()[1] - plotdim.margin.right)
+          .attr("x1", scales.x.range()[0])
+          .attr("x2", scales.x.range()[1])
           .style("stroke-dasharray", get_dasharray)
           .style("stroke-width", get_size)
           .style("stroke", get_colour);
-      }
+      };
       eAppend = "line";
     } else if (g_info.geom == "text") {
       elements = elements.data(data, key_fun);
@@ -1160,13 +1347,13 @@ var animint = function (to_select, json_file) {
       eActions = function (e) {
         e.attr("x", toXY("x", "x"))
           .attr("y", toXY("y", "y"))
-	  .style("fill", get_colour)
-	  .attr("font-size", get_size)
+          .style("fill", get_colour)
+          .attr("font-size", get_size)
           .style("text-anchor", get_text_anchor)
           .text(function (d) {
             return d.label;
           });
-      }
+      };
       eAppend = "text";
     } else if (g_info.geom == "point") {
       elements = elements.data(data, key_fun);
@@ -1176,7 +1363,7 @@ var animint = function (to_select, json_file) {
           .attr("r", get_size)
           .style("fill", get_fill)
           .style("stroke", get_colour);
-      }
+      };
       eAppend = "circle";
     } else if (g_info.geom == "jitter") {
       elements = elements.data(data, key_fun);
@@ -1186,7 +1373,7 @@ var animint = function (to_select, json_file) {
           .attr("r", get_size)
           .style("fill", get_fill)
           .style("stroke", get_colour);
-      }
+      };
       eAppend = "circle";
     } else if (g_info.geom == "tallrect") {
       elements = elements.data(data, key_fun);
@@ -1201,7 +1388,7 @@ var animint = function (to_select, json_file) {
           .style("stroke-dasharray", get_dasharray)
           .style("stroke-width", get_size)
           .style("stroke", get_colour);
-      }
+      };
       eAppend = "rect";
     } else if (g_info.geom == "widerect") {
       elements = elements.data(data, key_fun);
@@ -1216,7 +1403,7 @@ var animint = function (to_select, json_file) {
           .style("stroke-dasharray", get_dasharray)
           .style("stroke-width", get_size)
           .style("stroke", get_colour);
-      }
+      };
       eAppend = "rect";
     } else if (g_info.geom == "rect") {
       elements = elements.data(data, key_fun);
@@ -1232,10 +1419,10 @@ var animint = function (to_select, json_file) {
           .style("stroke-dasharray", get_dasharray)
           .style("stroke-width", get_size)
           .style("fill", get_fill);
-	if(g_info.select_style != "stroke"){
+	      if(g_info.select_style != "stroke"){
           e.style("stroke", get_colour);
-	}
-      }
+        }
+      };
       eAppend = "rect";
     } else if (g_info.geom == "boxplot") {
 
@@ -1316,35 +1503,41 @@ var animint = function (to_select, json_file) {
           .style("stroke-dasharray", get_dasharray)
           .style("stroke-width", get_size)
           .style("stroke", get_colour);
-      }
+      };
     } else {
       return "unsupported geom " + g_info.geom;
     }
     elements.exit().remove();
     var enter = elements.enter();
     var linkActions = function(a_elements){
-      a_elements
-	.attr("xlink:href", function(d){ return d.href; })
-	.attr("target", "_blank")
-	.attr("class", "geom")
-      ;
-    }
+      a_elements.attr("xlink:href", function(d){ return d.href; })
+        .attr("target", "_blank")
+        .attr("class", "geom");
+    };
     if(g_info.aes.hasOwnProperty("href")){
       enter = enter.append("svg:a")
-	.append("svg:"+eAppend)
-      ;
+        .append("svg:"+eAppend);
     }else{
       enter = enter.append(eAppend)
-	.attr("class", "geom")
-      ;
+	      .attr("class", "geom");
     }
     var has_clickSelects = g_info.aes.hasOwnProperty("clickSelects");
-    if (has_clickSelects) {
+    var has_clickSelects_variable =
+      g_info.aes.hasOwnProperty("clickSelects.variable");
+    if (has_clickSelects || has_clickSelects_variable) {
       var selected_funs = {
 	"opacity":{
 	  "mouseout":function (d) {
-            return ifSelectedElse(d, g_info.aes.clickSelects,
-				  get_alpha(d), get_alpha(d) - 1/2);
+	    var alpha_on = get_alpha(d);
+	    var alpha_off = get_alpha(d) - 0.5;
+	    if(has_clickSelects){
+              return ifSelectedElse(d.clickSelects, g_info.aes.clickSelects,
+				    alpha_on, alpha_off);
+	    }else if(has_clickSelects_variable){
+	      return ifSelectedElse(d["clickSelects.value"],
+				    d["clickSelects.variable"],
+				    alpha_on, alpha_off);
+	    }
 	  },
 	  "mouseover":function (d) {
             return get_alpha(d);
@@ -1352,14 +1545,22 @@ var animint = function (to_select, json_file) {
 	},
 	"stroke":{
 	  "mouseout":function(d){
-	    return ifSelectedElse(d, g_info.aes.clickSelects,
-				  "black", "transparent");
+	    var stroke_on = "black";
+	    var stroke_off = "transparent";
+	    if(has_clickSelects){
+	      return ifSelectedElse(d.clickSelects, g_info.aes.clickSelects,
+				    stroke_on, stroke_off);
+	    }else{
+	      return ifSelectedElse(d["clickSelects.value"],
+				    d["clickSelects.variable"],
+				    stroke_on, stroke_off);
+	    }
 	  },
 	  "mouseover":function(d){
 	    return "black";
 	  }
 	}
-      };
+      }; //selected_funs.
       // My original design for clicking/interactivity/transparency:
       // Basically I wanted a really simple way to show which element
       // in a group of clickable geom elements is currently
@@ -1396,11 +1597,11 @@ var animint = function (to_select, json_file) {
 
       var style_funs = selected_funs[g_info.select_style];
       var over_fun = function(e){
-	e.style(g_info.select_style, style_funs["mouseover"]);
-      }
+        e.style(g_info.select_style, style_funs["mouseover"]);
+      };
       var out_fun = function(e){
-	e.style(g_info.select_style, style_funs["mouseout"]);
-      }
+        e.style(g_info.select_style, style_funs["mouseout"]);
+      };
       elements.call(out_fun)
         .on("mouseover", function (d) {
           d3.select(this).call(over_fun);
@@ -1412,42 +1613,38 @@ var animint = function (to_select, json_file) {
 	  // The main idea of how clickSelects works: when we click
 	  // something, we call update_selector with the clicked
 	  // value.
-          var v_name = g_info.aes.clickSelects;
-          update_selector(v_name, d.clickSelects);
-        })
-      ;
-    } else { //no clickSelects for this geom.
-      // Assign opacity. treat lines and ribbons (groups of points)
-      // specially.
-      if (g_info.geom == "line" || g_info.geom == "ribbon") {
-        enter.style("opacity", function (group_info) {
-          var one_group = data[group_info.value];
-          var one_row = one_group[0]; // take aesthetic for first value in the group
-          return get_alpha(one_row);
-        })
-      } else {
-        enter.style("opacity", get_alpha);
-      }
-    }
-    var has_tooltip = g_info.aes.hasOwnProperty("tooltip");
-    if(has_clickSelects || has_tooltip){
-      elements
-        .text("")
-        .append("svg:title")
-        .text(function (d) {
-	  if(has_tooltip){
-	    return d.tooltip;
+	  if(has_clickSelects){
+            var s_name = g_info.aes.clickSelects;
+            update_selector(s_name, d.clickSelects);
 	  }else{
-            var v_name = g_info.aes.clickSelects;
-            return v_name + " " + d.clickSelects;
+	    var s_name = d["clickSelects.variable"];
+	    var s_value = d["clickSelects.value"];
+	    update_selector(s_name, s_value);
 	  }
         })
       ;
+    }else{//has neither clickSelects nor clickSelects.variable.
+      elements.style("opacity", get_alpha);
     }
-    //Set attributes of only the entering elements. This is needed to
-    //prevent things from flying around from the upper left when they
-    //enter the plot.
-    eActions(enter);  //DO NOT DELETE!
+    var has_tooltip = g_info.aes.hasOwnProperty("tooltip");
+    if(has_clickSelects || has_tooltip || has_clickSelects_variable){
+      elements.text("")
+        .append("svg:title")
+        .text(function (d) {
+          if(has_tooltip){
+            return d.tooltip;
+          }else if(has_clickSelects){
+            var v_name = g_info.aes.clickSelects;
+            return v_name + " " + d.clickSelects;
+          }else{ //clickSelects_variable
+	    return d["clickSelects.variable"] + " " + d["clickSelects.value"];
+	  }
+        });
+    }
+    // Set attributes of only the entering elements. This is needed to
+    // prevent things from flying around from the upper left when they
+    // enter the plot.
+    eActions(enter);  // DO NOT DELETE!
     if(Selectors.hasOwnProperty(selector_name)){
       var milliseconds = Selectors[selector_name].duration;
       elements = elements.transition().duration(milliseconds);
@@ -1458,14 +1655,14 @@ var animint = function (to_select, json_file) {
     if(g_info.aes.hasOwnProperty("href")){
       // elements are <a>, children are e.g. <circle>
       var linked_geoms = elements.select(eAppend);
-      //d3.select(linked_geoms).data(data, key_fun); // WHY did we need this?
+      // d3.select(linked_geoms).data(data, key_fun); // WHY did we need this?
       eActions(linked_geoms);
       linkActions(elements);
     }else{
       // elements are e.g. <circle>
       eActions(elements); // Set the attributes of all elements (enter/exit/stay)
     }
-  }
+  };
   var update_selector = function (v_name, value) {
     var s_info = Selectors[v_name];
     var legend_value_opacity, legend_other_opacity;
@@ -1479,19 +1676,34 @@ var animint = function (to_select, json_file) {
       // value should be added or removed from the selection.
       var i_value = s_info.selected.indexOf(value);
       if(i_value == -1){
-	// not found, add to selection.
-	s_info.selected.push(value);
-	legend_value_opacity = 1;
+        // not found, add to selection.
+	      s_info.selected.push(value);
+	      legend_value_opacity = 1;
       }else{
-	// found, remove from selection.
-	s_info.selected.splice(i_value, 1);
-	legend_value_opacity = 0.5;
+	      // found, remove from selection.
+	      s_info.selected.splice(i_value, 1);
+	      legend_value_opacity = 0.5;
       }
       legend_other_opacity = null;
     }
+    // the jquery ids
+    if(s_info.type == "single") {
+      var selected_ids = v_name.concat("___", value);
+    } else {
+      var selected_ids = [];
+      for(i in s_info.selected) {
+        selected_ids[i] = v_name.concat("___", s_info.selected[i]);
+      }
+    }
+    // update selected widgets, if necessary
+    if(s_info.type == "multiple" | 
+      selectized_array[v_name].getValue() != selected_ids) {
+      selectized_array[v_name].setValue(selected_ids);
+    }
+    // update legend opacity
     // replacing periods in variable with an underscore
     // this makes sure that selector doesn't confuse . in name with id selector
-    var legend_entries_id = v_name.replace(/\./g,'_');
+    var legend_entries_id = safe_name(v_name);
     var legend_entries = 
       d3.selectAll("tr#legend th#"+legend_entries_id+" td.legend_entry_label");
     legend_entries.style("opacity", function(d){
@@ -1504,27 +1716,25 @@ var animint = function (to_select, json_file) {
 	  return legend_other_opacity;
 	}
       }
-    })
-    ;
+    });
     s_info.update.forEach(function(g_name){
       update_geom(g_name, v_name);
     });
-  }
-  var ifSelectedElse = function (d, v_name, selected, not_selected) {
+  };
+  var ifSelectedElse = function (s_value, s_name, selected, not_selected) {
     var is_selected;
-    var value = d.clickSelects + "";
-    var s_info = Selectors[v_name];
+    var s_info = Selectors[s_name];
     if(s_info.type == "single"){
-      is_selected = value == s_info.selected;
+      is_selected = s_value == s_info.selected;
     }else{
-      is_selected = s_info.selected.indexOf(value) != -1;
+      is_selected = s_info.selected.indexOf(s_value) != -1;
     }
     if(is_selected){
       return selected;
     } else {
       return not_selected;
     }
-  }
+  };
   var animateIfLoaded = function () {
     var v_name = Animation.variable;
     var cur = Selectors[v_name].selected;
@@ -1537,9 +1747,9 @@ var animint = function (to_select, json_file) {
     if(all_geom_names.every(geomLoaded)){
       update_selector(v_name, next);
     }
-  }
+  };
 
-  //The main idea of how legends work:
+  // The main idea of how legends work:
 
   // 1. In getLegend in animint.R I export the legend entries as a
   // list of rows that can be used in a data() bind in D3.
@@ -1560,7 +1770,7 @@ var animint = function (to_select, json_file) {
           // identifying the name of the variable
           var var_name = p_info.legend[legendkeys[i]].vars;
           // replacing periods with underscores
-          return var_name.replace(/\./g,'_');
+          return safe_name(var_name);
         })
         // adding a class which doesn't have underscores in the name
         .attr("class", p_info.legend[legendkeys[i]].vars);
@@ -1569,17 +1779,15 @@ var animint = function (to_select, json_file) {
       var legendgeoms = l_info.geoms;
       var legend_rows = legend_table.selectAll("tr")
         .data(l_info.entries)
-	.sort(function(d) {return d["order"];})
-	.enter()
-	.append("tr")
-        .attr("id", function(d) { return d["label"]; })
-      ;
+        .sort(function(d) {return d["order"];})
+        .enter()
+        .append("tr")
+        .attr("id", function(d) { return d["label"]; });
       var legend_svgs = legend_rows.append("td")
         .append("svg")
-  	.attr("id", function(d){return "legend-"+d["label"];})
-  	.attr("height", 14)
-  	.attr("width", 20)
-      ;
+  	    .attr("id", function(d){return "legend-"+d["label"];})
+  	    .attr("height", 14)
+  	    .attr("width", 20);
       var pointscale = d3.scale.linear().domain([0,7]).range([1,4]);
       // scale points so they are visible in the legend. (does not
       // affect plot scaling)
@@ -1589,15 +1797,14 @@ var animint = function (to_select, json_file) {
       if(legendgeoms.indexOf("polygon")>-1){
         // aesthetics that would draw a rect
         legend_svgs.append("rect")
-	  .attr("x", 2)
-	  .attr("y", 2)
-	  .attr("width", 10)
-	  .attr("height", 10)
+          .attr("x", 2)
+	        .attr("y", 2)
+	        .attr("width", 10)
+	        .attr("height", 10)
           .style("stroke-width", function(d){return d["polygonsize"]||1;})
           .style("stroke-dasharray", function(d){
-	    return linetypesize2dasharray(d["polygonlinetype"],
-					  d["size"]||2);
-	  })
+            return linetypesize2dasharray(d["polygonlinetype"], d["size"]||2);
+          })
           .style("stroke", function(d){return d["polygoncolour"] || "#000000";})
           .style("fill", function(d){return d["polygonfill"] || "#FFFFFF";})
           .style("opacity", function(d){return d["polygonalpha"]||1;});
@@ -1605,46 +1812,43 @@ var animint = function (to_select, json_file) {
       if(legendgeoms.indexOf("text")>-1){
         // aesthetics that would draw a rect
         legend_svgs.append("text")
-	  .attr("x", 10)
-	  .attr("y", 14)
+	        .attr("x", 10)
+	        .attr("y", 14)
           .style("fill", function(d){return d["textcolour"]||1;})
-	  .style("text-anchor", "middle")
-	  .attr("font-size", function(d){return d["textsize"]||1;})
-	  .text("a")
-	;
+	        .style("text-anchor", "middle")
+	        .attr("font-size", function(d){return d["textsize"]||1;})
+	        .text("a");
       }
       if(legendgeoms.indexOf("path")>-1){
         // aesthetics that would draw a line
         legend_svgs.append("line")
           .attr("x1", 1).attr("x2", 19).attr("y1", 7).attr("y2", 7)
           .style("stroke-width", function(d){
-	    return linescale(d["pathsize"])||2;
-	  })
+            return linescale(d["pathsize"])||2;
+          })
           .style("stroke-dasharray", function(d){
-	    return linetypesize2dasharray(d["pathlinetype"],
-					  d["pathsize"] || 2);
-	  })
+            return linetypesize2dasharray(d["pathlinetype"], d["pathsize"] || 2);
+          })
           .style("stroke", function(d){return d["pathcolour"] || "#000000";})
           .style("opacity", function(d){return d["pathalpha"]||1;});
       }
       if(legendgeoms.indexOf("point")>-1){
         // aesthetics that would draw a point
         legend_svgs.append("circle")
-	  .attr("cx", 10)
-	  .attr("cy", 7)
+          .attr("cx", 10)
+          .attr("cy", 7)
           .attr("r", function(d){return pointscale(d["pointsize"])||4;})
           .style("stroke", function(d){return d["pointcolour"] || "#000000";})
           .style("fill", function(d){
-	    return d["pointfill"] || d["pointcolour"] || "#000000";
-	  })
+            return d["pointfill"] || d["pointcolour"] || "#000000";
+          })
           .style("opacity", function(d){return d["pointalpha"]||1;});
       }
       legend_rows.append("td")
-	.attr("align", "left") // TODO: right for numbers?
-	.attr("class", "legend_entry_label")
-	.attr("id", function(d){ return d["label"]; })
-	.text(function(d){ return d["label"];})
-      ;
+      .attr("align", "left") // TODO: right for numbers?
+      .attr("class", "legend_entry_label")
+      .attr("id", function(d){ return d["label"]; })
+      .text(function(d){ return d["label"];});
     }
     
     // selecting points based on legend
@@ -1677,25 +1881,27 @@ var animint = function (to_select, json_file) {
     for (var s_name in response.selectors) {
       add_selector(s_name, response.selectors[s_name]);
     }
-    // loading table.
+    
+    ////////////////////////////////////////////
+    // Widgets at bottom of page
+    ////////////////////////////////////////////
     element.append("br");
+      
+    // loading table.
     var show_hide_table = element.append("button")
-      .text("Show download status table")
-    ;
+      .text("Show download status table");
     show_hide_table
       .on("click", function(){
-	if(this.textContent == "Show download status table"){
-	  loading.style("display", "");
-	  show_hide_table.text("Hide download status table");
-	}else{
-	  loading.style("display", "none");
-	  show_hide_table.text("Show download status table");
-	}
-      })
-    ;
+        if(this.textContent == "Show download status table"){
+          loading.style("display", "");
+          show_hide_table.text("Hide download status table");
+        }else{
+          loading.style("display", "none");
+          show_hide_table.text("Show download status table");
+        }
+      });
     var loading = element.append("table")
-      .style("display", "none")
-    ;
+      .style("display", "none");
     Widgets["loading"] = loading;
     var tr = loading.append("tr");
     tr.append("th").text("geom");
@@ -1703,111 +1909,279 @@ var animint = function (to_select, json_file) {
     tr.append("th").attr("class", "downloaded").text("downloaded");
     tr.append("th").attr("class", "total").text("total");
     tr.append("th").attr("class", "status").text("status");
+    
     // Add geoms and construct nest operators.
     for (var g_name in response.geoms) {
       add_geom(g_name, response.geoms[g_name]);
     }
+    
     // Animation control widgets.
     var show_message = "Show animation controls";
+    // add a button to view the animation widgets
     var show_hide_animation_controls = element.append("button")
       .text(show_message)
       .attr("id", "show_hide_animation_controls")
       .on("click", function(){
-	if(this.textContent == show_message){
-	  time_table.style("display", "");
-	  show_hide_animation_controls.text("Hide animation controls");
-	}else{
-	  time_table.style("display", "none");
-	  show_hide_animation_controls.text(show_message);
-	}
-      })
-    ;
+        if(this.textContent == show_message){
+          time_table.style("display", "");
+          show_hide_animation_controls.text("Hide animation controls");
+        }else{
+          time_table.style("display", "none");
+          show_hide_animation_controls.text(show_message);
+        }
+      });
+    // table of the animint widgets
     var time_table = element.append("table")
-      .style("display", "none")
-    ;
+      .style("display", "none");
     var first_tr = time_table.append("tr");
     var first_th = first_tr.append("th");
+    // if there's a time variable, add a button to pause the animint
     if(response.time){
       Animation.next = {};
       Animation.ms = response.time.ms;
       Animation.variable = response.time.variable;
       Animation.sequence = response.time.sequence;
-      Widgets["play_pause"] = first_th
-	.append("button")
-	.attr("id", "play_pause")
-	.on("click", function(){
-	  if(this.textContent == "Play"){
-	    play();
-	  }else{
-	    pause(false);
-	  }
-	})
-      ;
+      Widgets["play_pause"] = first_th.append("button")
+        .attr("id", "play_pause")
+	      .on("click", function(){
+          if(this.textContent == "Play"){
+            play();
+          }else{
+            pause(false);
+          }
+        });
     }
     first_tr.append("th").text("milliseconds");
     if(response.time){
       var second_tr = time_table.append("tr");
       second_tr.append("td").text("updates");
-      second_tr.append("td")
-	.append("input")
-	.attr("id", "updates_ms")
-	.attr("type", "text")
-	.attr("value", Animation.ms)
-	.on("change", function(){
-	  Animation.pause(false);
-	  Animation.ms = this.value;
-	  Animation.play();
-	})
-      ;
+      second_tr.append("td").append("input")
+	      .attr("id", "updates_ms")
+	      .attr("type", "text")
+	      .attr("value", Animation.ms)
+	      .on("change", function(){
+          Animation.pause(false);
+          Animation.ms = this.value;
+          Animation.play();
+        });
     }
     for(s_name in Selectors){
       var s_info = Selectors[s_name];
       if(!s_info.hasOwnProperty("duration")){
-	s_info.duration = 0;
+        s_info.duration = 0;
       }
     }
     var selector_array = d3.keys(Selectors);
     var duration_rows = time_table.selectAll("tr.duration")
       .data(selector_array)
       .enter()
-      .append("tr")
-    ;
+      .append("tr");
     duration_rows
       .append("td")
-      .text(function(s_name){return s_name;})
-    ;
+      .text(function(s_name){return s_name;});
     var duration_tds = duration_rows.append("td");
     var duration_inputs = duration_tds
       .append("input")
       .attr("id", function(s_name){
-	return "duration_ms_" + s_name;
+        return "duration_ms_" + s_name;
       })
       .attr("type", "text")
       .on("change", function(s_name){
-	Selectors[s_name].duration = this.value;
+        Selectors[s_name].duration = this.value;
       })
       .attr("value", function(s_name){
-	return Selectors[s_name].duration;
+        return Selectors[s_name].duration;
+      });
+    // selector widgets
+    var show_message2 = "Toggle selected variables";
+    var show_hide_selector_widgets = element.append("button")
+      .text(show_message2)
+      .attr("id", "show_hide_selector_widgets")
+      .on("click", function(){
+        if(this.textContent == show_message2){
+          selector_table.style("display", "");
+          show_hide_selector_widgets.text("Hide variable toggler");
+        }else{
+          selector_table.style("display", "none");
+          show_hide_selector_widgets.text(show_message2);
+        }
       })
     ;
+    // adding a table for selector widgets
+    var selector_table = element.append("table")
+      .style("display", "none")
+      .attr("id", "table_selector_widgets")
+    ;
+    var selector_first_tr = selector_table.append("tr");
+    selector_first_tr
+      .append("th")
+      .text("Toggle selected value");
+      
+     // looping through and adding a row for each selector
+    for(s_name in Selectors) {
+      var s_info = Selectors[s_name];
+      // removing "." from name so it can be used in ids
+      var s_name_id = safe_name(s_name);
+
+      // adding a row for each selector
+      var selector_widget_row = selector_table
+        .append("tr")
+        .attr("id", function() { return s_name_id + "_selector_widget"; })
+      ;
+      selector_widget_row.append("td").text(s_name);
+      // adding the selector
+      var selector_widget_select = selector_widget_row
+        .append("td")
+        .append("select")
+        .attr("id", function() { return s_name_id + "_input"; })
+        .attr("placeholder", function() { return "Toggle " + s_name; });
+      // adding an option for each level of the variable
+      selector_widget_select.selectAll("option")
+        .data(s_info.levels)
+        .enter()
+        .append("option")
+        .attr("value", function(d) { return d; })
+        .text(function(d) { return d; });
+      // making sure that the first option is blank
+      selector_widget_select
+        .insert("option")
+        .attr("value", "")
+        .text(function() { return "Toggle " + s_name; });
+        
+      // calling selectize
+      if(s_info.type == "single") {
+        // setting up array of selector and options
+        var selector_values = [];
+        for(i in s_info.levels) {
+          selector_values[i] = {
+            id: s_name.concat("___", s_info.levels[i]), 
+            text: s_info.levels[i]
+          };
+        }
+        // the id of the first selector
+        var selected_id = s_name.concat("___", s_info.selected);
+
+        // if single selection, only allow one item
+        var $temp = $('#' + s_name_id + "_input")
+          .selectize({
+              create: false, 
+              valueField: 'id',
+              labelField: 'text',
+              searchField: ['text'],
+              options: selector_values, 
+              items: [selected_id],
+              maxItems: 1, 
+              allowEmptyOption: true,
+              onChange: function(value) {
+                // extracting the name and the level to update
+                var selector_name = value.split("___")[0];
+                var selected_level = value.split("___")[1];
+                // updating the selector
+                update_selector(selector_name, selected_level);
+              }
+            })
+         ;
+      } else {
+        // setting up array of selector and options
+        var selector_values = [];
+        if(typeof s_info.levels == "object") {
+          for(i in s_info.levels) {
+            selector_values[i] = {
+              id: s_name.concat("___", s_info.levels[i]), 
+              text: s_info.levels[i]
+            };
+          }
+        } else {
+          selector_values[0] = {
+            id: s_name.concat("___", s_info.levels), 
+              text: s_info.levels
+          };
+        }
+        // setting up an array to contain the initally selected elements
+        var initial_selections = [];
+        for(i in s_info.selected) {
+          initial_selections[i] = s_name.concat("___", s_info.selected[i]);
+        }
+        
+        // construct the selectize
+        var $temp = $('#' + s_name_id + "_input")
+          .selectize({
+              create: false, 
+              valueField: 'id',
+              labelField: 'text',
+              searchField: ['text'],
+              options: selector_values, 
+              items: initial_selections,
+              maxItems: s_info.levels.length, 
+              allowEmptyOption: true,
+              onChange: function(value) { 
+                // if nothing is selected, remove what is currently selected
+                if(value == null) {
+                  // extracting the selector ids from the options
+                  var the_ids = Object.keys($(this)[0].options);
+                  // the name of the appropriate selector
+                  var selector_name = the_ids[0].split("___")[0];
+                  // the previously selected elements
+                  var old_selections = Selectors[selector_name].selected;
+                  // updating the selector for each of the old selections
+                  old_selections.forEach(function(element) {
+                    update_selector(selector_name, element);
+                  });
+                } else {
+                  // grabbing the name of the selector from the selected value
+                  var selector_name = value[0].split("___")[0];
+                  // identifying the levels that should be selected
+                  var specified_levels = [];
+                  for(i in value) {
+                    specified_levels[i] = value[i].split("___")[1];
+                  }
+                  // the previously selected entries
+                  old_selections = Selectors[selector_name].selected;
+                  
+                  // the levels that need to have selections turned on
+                  specified_levels
+                    .filter(function(n) {
+                      return old_selections.indexOf(n) == -1;
+                    })
+                    .forEach(function(element) {
+                      update_selector(selector_name, element);
+                    })
+                  ;
+                  // the levels that need to be turned off
+                  // - same approach
+                  old_selections
+                    .filter(function(n) {
+                      return specified_levels.indexOf(n) == -1;
+                    })
+                    .forEach(function(element) {
+                      update_selector(selector_name, element);
+                    })
+                  ;
+                }
+              }
+            })
+        ;
+      }
+      selectized_array[s_name] = $temp[0].selectize;
+    } // close for loop through selector widgets
     // If this is an animation, then start downloading all the rest of
     // the data, and start the animation.
     if (response.time) {
       var i, prev, cur;
       Selectors[Animation.variable].update.forEach(function(g_name){
-	var g_info = Geoms[g_name];
-	// If there is only 1 chunk we don't need to download anything
-	// else.
-	if(g_info.chunk_order.length == 0){
-	  return;
-	}
-	if(g_info.chunk_order.length != 1){
-	  throw "do not know how to handle more than 1 chunk variable";
-	}
-	if(g_info.chunk_order[0] != Animation.variable){
-	  return; //ignore if this geom is chunked on a non-anim variable.
-	}
-	download_sequence(g_name, Animation.variable, Animation.sequence);
+        var g_info = Geoms[g_name];
+	      // If there is only 1 chunk we don't need to download anything
+	      // else.
+	      if(g_info.chunk_order.length == 0){
+          return;
+        }
+        if(g_info.chunk_order.length != 1){
+          throw "do not know how to handle more than 1 chunk variable";
+        }
+        if(g_info.chunk_order[0] != Animation.variable){
+          return; // ignore if this geom is chunked on a non-anim variable.
+        }
+        download_sequence(g_name, Animation.variable, Animation.sequence);
       });
       for (var i = 0; i < Animation.sequence.length; i++) {
         if (i == 0) {
@@ -1823,36 +2197,36 @@ var animint = function (to_select, json_file) {
       var timer;
       Animation.timer = timer;
       function play(){
-	// as shown on http://bl.ocks.org/mbostock/3808234
-	timer = setInterval(animateIfLoaded, Animation.ms);
-	Widgets["play_pause"].text("Pause");
-      }
+    	  // as shown on http://bl.ocks.org/mbostock/3808234
+    	  timer = setInterval(animateIfLoaded, Animation.ms);
+    	  Widgets["play_pause"].text("Pause");
+      };
       Animation.play = play;
       Animation.play_after_visible = false;
       function pause(play_after_visible){
-	Animation.play_after_visible = play_after_visible;
-	clearInterval(timer);
-	Widgets["play_pause"].text("Play");
-      }
+        Animation.play_after_visible = play_after_visible;
+        clearInterval(timer);
+        Widgets["play_pause"].text("Play");
+      };
       Animation.pause = pause;
 
       // This code starts/stops the animation timer when the page is
       // hidden, inspired by
       // http://stackoverflow.com/questions/1060008
       function onchange (evt) {
-	if(document.visibilityState == "visible"){
-	  if(Animation.play_after_visible){
-	    play();
-	  }
-	}else{
-	  if(Widgets["play_pause"].text() == "Pause"){
-	    pause(true);
-	  }
-	}
-      }
+        if(document.visibilityState == "visible"){
+          if(Animation.play_after_visible){
+            play();
+          }
+        }else{
+          if(Widgets["play_pause"].text() == "Pause"){
+            pause(true);
+          }
+        }
+      };
       document.addEventListener("visibilitychange", onchange);
 
       Animation.play();
     }
   });
-}
+};

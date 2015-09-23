@@ -19,7 +19,9 @@ wb.facets <-
                          linetype=status,
                          clickSelects=year),
                      data=TS(years), alpha=1/2)+
+       theme_bw()+
        theme_animint(width=1000, height=800)+
+       theme(panel.margin=grid::unit(0, "lines"))+
        geom_line(aes(year, life.expectancy, group=country, colour=region,
                      clickSelects=country, id = country),
                  data=TS(not.na), size=4, alpha=3/5)+
@@ -70,6 +72,58 @@ wb.facets <-
 
 info <- animint2HTML(wb.facets)
 
+rect.list <-
+  getNodeSet(info$html, '//svg[@id="ts"]//rect[@class="border_rect"]')
+expect_equal(length(rect.list), 4)
+at.mat <- sapply(rect.list, xmlAttrs)
+
+test_that("three unique border_rect x values (no horiz space)", {
+  left.vec <- as.numeric(at.mat["x", ])
+  width.vec <- as.numeric(at.mat["width", ])
+  right.vec <- left.vec + width.vec
+  x.values <- unique(c(left.vec, right.vec))
+  expect_equal(length(x.values), 3)
+})
+
+test_that("three unique border_rect y values (no vert space)", {
+  top.vec <- as.numeric(at.mat["y", ])
+  height.vec <- as.numeric(at.mat["height", ])
+  bottom.vec <- top.vec + height.vec
+  y.values <- unique(c(top.vec, bottom.vec))
+  expect_equal(length(y.values), 3)
+})
+
+line.xpath <- '//g[@class="geom2_line_ts"]//g[@class="PANEL4"]//path'
+opacityPattern <-
+  paste0("opacity:",
+         "(?<value>.*?)",
+         ";")
+
+test_that("line opacity initially 0.1 or 0.6", {
+
+  node.set <- getNodeSet(info$html, line.xpath)
+  opacity.list <- list()
+  for(node.i in seq_along(node.set)){
+    node <- node.set[[node.i]]
+    a.vec <- xmlAttrs(node)
+    style.str <- a.vec[["style"]]
+    opacity.mat <- str_match_perl(style.str, opacityPattern)
+    node.id <- a.vec[["id"]]
+    opacity.list[[node.id]] <- as.numeric(opacity.mat[, "value"])
+  }
+  opacity.vec <- do.call(c, opacity.list)
+
+  selected.computed <- as.numeric(opacity.vec[wb.facets$first$country])
+  selected.expected <- rep(0.6, length(selected.computed))
+  expect_equal(selected.computed, selected.expected)
+
+  unselected.computed <-
+    as.numeric(opacity.vec[!names(opacity.vec) %in% wb.facets$first$country])
+  unselected.expected <- rep(0.1, length(unselected.computed))
+  expect_equal(unselected.computed, unselected.expected)
+
+})
+
 dasharrayPattern <-
   paste0("stroke-dasharray:",
          "(?<value>.*?)",
@@ -103,7 +157,8 @@ test_that("wide/tallrect renders a <rect> for every year", {
 getYear <- function(){
   node.set <- getNodeSet(getHTML(), '//g[@class="geom9_text_ts"]//text')
   expect_equal(length(node.set), 1)
-  xmlValue(node.set[[1]])
+  value <- xmlValue(node.set[[1]])
+  sub("year = ", "", value)
 }
 
 test_that("animation updates", {
@@ -243,6 +298,62 @@ if (Sys.getenv("ANIMINT_BROWSER") != "phantomjs") {
     Sys.sleep(4)
     new.year <- getYear()
     expect_true(old.year == new.year)
+  })
+
+  clickID("show_hide_selector_widgets")
+
+  s.tr <- remDr$findElement("id", "year_selector_widget")
+  s.div <- s.tr$findChildElement("class name", "selectize-input")
+  s.div$clickElement()
+  remDr$sendKeysToActiveElement(list(key="backspace"))
+  remDr$sendKeysToActiveElement(list("1962", key="enter"))
+
+  test_that("typing into selectize widget changes year to 1962", {
+    current.year <- getYear()
+    expect_identical(current.year, "1962")
+  })
+  
+  s.div$clickElement()
+  remDr$sendKeysToActiveElement(list(key="down_arrow"))
+  remDr$sendKeysToActiveElement(list(key="enter"))
+  
+  test_that("down arrow key changes year to 1963", {
+    current.year <- getYear()
+    expect_identical(current.year, "1963")
+  })
+
+  getCountries <- function(){
+    country.labels <- getNodeSet(getHTML(), '//g[@class="geom8_text_ts"]//text')
+    sapply(country.labels, xmlValue)
+  }
+
+  test_that("initial countries same as first", {
+    country.vec <- getCountries()
+    expect_identical(sort(country.vec), sort(wb.facets$first$country))
+  })
+  
+  s.tr <- remDr$findElement("id", "country_selector_widget")
+  s.div <- s.tr$findChildElement("class name", "selectize-input")
+  s.div$clickElement()
+  remDr$sendKeysToActiveElement(list("Afg"))
+  remDr$sendKeysToActiveElement(list(key="enter"))
+
+  test_that("Afg autocompletes to Afghanistan", {
+    country.vec <- getCountries()
+    expected.countries <- c("United States", "Vietnam", "Afghanistan")
+    expect_identical(sort(country.vec), sort(expected.countries))
+  })
+  
+  div.list <- s.tr$findChildElements("class name", "item")
+  names(div.list) <- sapply(div.list, function(e)e$getElementText()[[1]])
+  us.div <- div.list[["United States"]]
+  us.div$clickElement()
+  remDr$sendKeysToActiveElement(list(key="backspace"))
+  
+  test_that("backspace removes US from selected countries", {
+    country.vec <- getCountries()
+    expected.countries <- c("Vietnam", "Afghanistan")
+    expect_identical(sort(country.vec), sort(expected.countries))
   })
   
   getWidth <- function(){

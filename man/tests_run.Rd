@@ -7,12 +7,11 @@
 tests_run(dir = ".", filter = NULL)
 }
 \arguments{
-  \item{dir}{character string with the path to animint's
-  source code. Defaults to current directory} \item{filter}
-  {If not NULL, only tests with file names matching this
-  regular expression will be executed. Matching will take
-  on the file name after it has been stripped of "test-" and
-  ".r".}
+\item{dir}{character string with the path to animint's source code. Defaults to current directory}
+
+\item{filter}{If not NULL, only tests with file names matching
+this regular expression will be executed. Matching will take on the
+file name after it has been stripped of "test-" and ".r".}
 }
 \description{
 Convenience function for running animint tests.

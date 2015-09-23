@@ -62,13 +62,13 @@ In this example, the plot aesthetics are fixed, but we could integrate shiny's r
 ```{r reactives}
 getPlotList <- reactive({
   # think of animint objects as a list of ggplots and specially named options
-  list(time = list(variable = "year", ms = input$time),
+  list(# the plots we constructed earlier
+       ts = ts,
+       scatter = scatter,
+       time = list(variable = "year", ms = input$time),
        duration = list(year = input$duration),
        first = list(year = 1975, country = c("United States", "Vietnam")),
-       selector.types = list(country = "multiple"),
-       # the plots we constructed earlier
-       ts = ts,
-       scatter = scatter)
+       selector.types = list(country = "multiple"))
 })
 
 inputPanel(

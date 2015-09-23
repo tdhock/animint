@@ -75,10 +75,11 @@ geom_widerect <- function(mapping=NULL, data=NULL, stat="identity", position="id
 #' @param x.name variable to be used for x, clickSelects.
 #' @param even Logical parameter, should tallrects be of even width?
 #' @param alpha transparency of a selected tallrect, default 1/2.
+#' @param ... passed to geom_tallrect.
 #' @return a geom_tallrect layer.
 #' @author Toby Dylan Hocking
 #' @export
-make_tallrect <- function(data, x.name, even=FALSE, alpha=1/2){
+make_tallrect <- function(data, x.name, even=FALSE, alpha=1/2, ...){
   data <- as.data.frame(data)
   stopifnot(is.character(x.name))
   stopifnot(length(x.name)==1)
@@ -96,7 +97,7 @@ make_tallrect <- function(data, x.name, even=FALSE, alpha=1/2){
                    xmax=breaks[-1])
   names(df)[1] <- x.name
   a <- aes_string(xmin="xmin", xmax="xmax", clickSelects=x.name)
-  geom_tallrect(a, df, alpha=alpha)
+  geom_tallrect(a, df, alpha=alpha, ...)
 }
 
 #' Convenience function for an interactive bar that might otherwise be

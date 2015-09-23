@@ -103,9 +103,9 @@ animint2dir(good, "WorldBank-good")
 
 ## This example additionally uses multiple selection on countries.
 library(dplyr)
-max.years <- not.na %.%
-  group_by(country) %.%
-  filter(year==max(year)) %.%
+max.years <- not.na %>%
+  group_by(country) %>%
+  filter(year==max(year)) %>%
   mutate(year=2012)
 wb.mult <-
   list(ts=ggplot()+
@@ -134,17 +134,15 @@ wb.mult <-
                  data=not.na)+
        scale_size_animint(breaks=10^(5:9))+
        make_text(not.na, 5, 85, "year"),
+       
        time=list(variable="year",ms=3000),
-       bar=ggplot()+
-       theme_animint(height=2400)+
-       geom_bar(aes(country, life.expectancy, fill=region,
-                    showSelected=year, clickSelects=country,
-                    key=country),
-                data=not.na, stat="identity", position="identity")+
-       coord_flip(),
+       
        duration=list(year=1000),
+       
        first=list(year=1975, country=c("United States", "Vietnam")),
+       
        selector.types=list(country="multiple"),
+       
        title="World Bank data (multiple selection)")
 animint2dir(wb.mult, "WorldBank-multiple")
 
@@ -157,9 +155,9 @@ TS <- function(df)BOTH(df, "Years", "Life expectancy")
 SCATTER <- function(df)BOTH(df, "Fertility rate", "Life expectancy")
 TS2 <- function(df)BOTH(df, "Fertility rate", "Years")
 years <- unique(not.na[, "year", drop=FALSE])
-min.years <- not.na %.%
-  group_by(country) %.%
-  filter(year==min(year)) %.%
+min.years <- not.na %>%
+  group_by(country) %>%
+  filter(year==min(year)) %>%
   mutate(year=1958)
 wb.facets <-
   list(ts=ggplot()+
@@ -196,6 +194,7 @@ wb.facets <-
                   data=SCATTER(not.na))+
        geom_text(aes(fertility.rate, life.expectancy, label=country,
                      showSelected=country, showSelected2=year,
+                     showSelected3=region,
                      clickSelects=country,
                      key=country), #also use key here!
                  data=SCATTER(not.na))+
@@ -204,16 +203,23 @@ wb.facets <-
        geom_text(aes(5, 85, label=paste0("year = ", year),
                      showSelected=year),
                  data=SCATTER(years)),
+       
        time=list(variable="year",ms=3000),
-       bar=ggplot()+
-       theme_animint(height=2400)+
-       geom_bar(aes(country, life.expectancy, fill=region,
-                    showSelected=year, clickSelects=country,
-                    key=country),
-                data=not.na, stat="identity", position="identity")+
-       coord_flip(),
+       
        duration=list(year=1000),
+       
        first=list(year=1975, country=c("United States", "Vietnam")),
+       
        selector.types=list(country="multiple"),
+       
        title="World Bank data (multiple selection, facets)")
+
 animint2dir(wb.facets, "WorldBank-facets")
+
+## Make a screencast to quickly show some animint features.
+
+## system("mplayer -ao null screencast.ogv -vo jpeg:outdir=screencast")
+## system("cp -r screencast screencast-small")
+## jpg.vec <- Sys.glob("screencast-small/*.jpg")
+## unlink(jpg.vec[seq_along(jpg.vec) %% 10 != 1])
+## system("convert -resize 728x536 screencast-small/*.jpg -set delay 25 -layers Optimize screencast.gif")

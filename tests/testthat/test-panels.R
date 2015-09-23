@@ -9,7 +9,7 @@ p1 <- ggplot() +
                                     color = "black",
                                     size = 2,
                                     linetype = "dashed"),
-        panel.margin = grid::unit(.1, "cm")) +
+        panel.margin = grid::unit(0.1, "cm")) +
   facet_wrap(~Species, nrow = 2)
 p2 <- ggplot() +
   geom_point(aes(Petal.Length, Petal.Width,
@@ -33,6 +33,19 @@ p4 <- p2 +
         complete = T)
 
 info <- animint2HTML(list(sepal = p1, petal = p2, blank = p3, gg538 = p4))
+
+rect.list <-
+  getNodeSet(info$html, '//svg[@id="sepal"]//rect[@class="border_rect"]')
+expect_equal(length(rect.list), 3)
+at.mat <- sapply(rect.list, xmlAttrs)
+
+test_that("four unique border_rect x values (some horiz space)", {
+  left.vec <- as.numeric(at.mat["x", ])
+  width.vec <- as.numeric(at.mat["width", ])
+  right.vec <- left.vec + width.vec
+  x.values <- unique(c(left.vec, right.vec))
+  expect_equal(length(x.values), 4)
+})
 
 # extracting html from plots --------------------------------------
 
@@ -85,19 +98,6 @@ dasharrayPattern <- paste0("stroke-dasharray:",
                            "(?<value>.*?)",
                            ";")
 
-test_color <- function(value, expected) {
-  # convert R color to hexadecimal
-  expected_col <- toRGB(expected)
-
-  if(grepl("rgb", value)) {
-    expected_string <- paste0("rgb(", paste(col2rgb(expected_col), collapse = ", "), ")")
-  } else {
-    expected_string <- expected_col
-  }
-
-  expect_equal(toupper(value), toupper(expected_string))
-}
-
 # Testing -----------------------------------
 
 test_that("panel backgrounds render correctly", {
@@ -110,15 +110,15 @@ test_that("panel backgrounds render correctly", {
   # test background fills
   match_sepal <- str_match_perl(attr_back_sepal["style",], fillPattern)
   value_sepal <- match_sepal[, "value"]
-  test_color(value_sepal[1], "lightblue")
+  expect_color(value_sepal[1], "lightblue")
 
   match_petal <- str_match_perl(attr_back_petal["style",], fillPattern)
   value_petal <- match_petal[, "value"]
-  test_color(value_petal[1], "white")
+  expect_color(value_petal[1], "white")
   
   match_gg538 <- str_match_perl(attr_gg538["style",], fillPattern)
   value_gg538 <- match_gg538[, "value"]
-  test_color(value_gg538[1], "#F0F0F0")
+  expect_color(value_gg538[1], "#F0F0F0")
 })
 
 test_that("panel borders render correctly", {
@@ -129,11 +129,11 @@ test_that("panel borders render correctly", {
   # test border colors
   match_sepal <- str_match_perl(attr_border_sepal["style",], strokePattern)
   value_sepal <- match_sepal[, "value"]
-  test_color(value_sepal[1], "black")
+  expect_color(value_sepal[1], "black")
 
   match_petal <- str_match_perl(attr_border_petal["style",], strokePattern)
   value_petal <- match_petal[, "value"]
-  test_color(value_petal[1], "grey50")
+  expect_color(value_petal[1], "grey50")
 })
 
 test_that("grid lines are drawn correctly", {
@@ -149,15 +149,15 @@ test_that("grid lines are drawn correctly", {
   # correct color of grid lines
   match_sepal <- str_match_perl(attr_major_sepal["style",], strokePattern)
   value_sepal <- match_sepal[, "value"]
-  test_color(value_sepal[1], "white")
+  expect_color(value_sepal[1], "white")
   
   match_petal <- str_match_perl(attr_major_petal["style",], strokePattern)
   value_petal <- match_petal[, "value"]
-  test_color(value_petal[1], "grey90")
+  expect_color(value_petal[1], "grey90")
   
   match_gg538 <- str_match_perl(attr_major_gg538["style",], strokePattern)
   value_gg538 <- match_gg538[, "value"]
-  test_color(value_gg538[1], "#D2D2D2")
+  expect_color(value_gg538[1], "#D2D2D2")
 })
 
 data(tips, package = "reshape2")
@@ -185,7 +185,8 @@ test_that("renderer can handle no grid lines", {
 test_that("multiple selection sex_smoker plot", {
   ss.viz$selector.types$sex_smoker <- "multiple"
   info <- animint2HTML(ss.viz)
-  expect_equal(length(info$first$sex_smoker), 4)
+  circle.list <- getNodeSet(info$html, '//svg[@id="p2"]//circle')
+  expect_equal(length(circle.list), nrow(tips))
 })
 
 test_that("renderer can handle only one grid line", {

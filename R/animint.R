@@ -2,7 +2,7 @@
 #' @param meta environment with previously calculated plot data, and a new plot to parse, already stored in plot and plot.name.
 #' @return nothing, info is stored in meta.
 #' @export
-#' @import ggplot2
+#' @import ggplot2 plyr
 parsePlot <- function(meta){
   ## adding data and mapping to each layer from base plot, if necessary
   for(layer.i in seq_along(meta$plot$layers)) {
@@ -54,6 +54,10 @@ parsePlot <- function(meta){
   ## grid 0-1 scale). This allows transformations to be used
   ## out of the box, with no additional d3 coding.
   theme.pars <- ggplot2:::plot_theme(meta$plot)
+
+  ## Interpret panel.margin as the number of lines between facets
+  ## (ignoring whatever grid::unit such as cm that was specified).
+  plot.meta$panel_margin_lines <- as.numeric(theme.pars$panel.margin)
   
   ## No legend if theme(legend.postion="none").
   plot.meta$legend <- if(theme.pars$legend.position != "none"){
@@ -69,13 +73,10 @@ parsePlot <- function(meta){
     
     ## If any legends are specified, add showSelected aesthetic
     for(legend.i in seq_along(plot.meta$legend)) {
-      # the type of legend: colour, fill, etc
-      legend_type <- plot.meta$legend[[legend.i]]$legend_type
+      one.legend <- plot.meta$legend[[legend.i]]
       # the name of the variable used in this legend
-      var_name <- plot.meta$legend[[legend.i]]$vars
       # var_name can have length greater than one if an expression is used
-      var_name <- intersect(var_name, names(L$data))
-      
+      var_name <- intersect(one.legend$vars, names(L$data))
       if(length(var_name) > 0) {
         ### need to make sure the variable is used in the mapping
         ### i.e. that it is used in this plot
@@ -105,10 +106,10 @@ parsePlot <- function(meta){
         ## not add any showSelected aesthetic for it.
         var.is.interactive <- any(is.interactive.aes & is.legend.var)
         if(!var.is.interactive){
-          for(i in legend_type) {
+          for(legend_type in one.legend$legend_type) {
             ## only adding showSelected aesthetic if the variable is used by the geom
-            if(!is.null(L$mapping[[i]])) {
-              temp_name <- paste0("showSelectedlegend", i)
+            if(!is.null(L$mapping[[legend_type]])) {
+              temp_name <- paste0("showSelectedlegend", legend_type)
               L$mapping[[temp_name]] <- as.symbol(var_name)
             }
           }
@@ -121,20 +122,13 @@ parsePlot <- function(meta){
         if(is.null(meta$selector.types[[var_name]])) {
           meta$selector.types[[var_name]] <- "multiple"
         }
+        # if first is not specified, create it
+        if(is.null(meta$first)) {
+          meta$first <- list()
+        }
         # if first is not specified, add all to first
         if(is.null(meta$first[[var_name]])) {
           u.vals <- unique(var)
-          s.type <- if(var_name %in% names(meta$selectors)){
-            ## Selector has already been created.
-            meta$selectors[[var_name]]$type
-          }else{
-            meta$selector.types[[var_name]]
-          }
-          meta$first[[var_name]] <- if(s.type == "multiple"){
-            u.vals
-          }else{
-            u.vals[[1]]
-          }
         }
       }
     }
@@ -169,6 +163,21 @@ parsePlot <- function(meta){
       geom.next <- plot.meta$geoms[[geom.i + 1]]
       meta$geoms[[geom.prev]]$nextgeom <- meta$geoms[[geom.next]]$classed
     }
+  }
+  ## Selector levels and update were stored in saveLayer, so now
+  ## compute the unique values to store in meta$selectors.
+  for(selector.name in names(meta$selector.values)){
+    values.update <- meta$selector.values[[selector.name]]
+    value.vec <- unique(unlist(lapply(values.update, "[[", "values")))
+    meta$selectors[[selector.name]]$selected <-
+      if(meta$selectors[[selector.name]]$type=="single"){
+        value.vec[1]
+      }else{
+        value.vec
+      }
+    meta$selectors[[selector.name]]$levels <- value.vec
+    meta$selectors[[selector.name]]$update <-
+      as.list(unique(unlist(lapply(values.update, "[[", "update"))))
   }
 
   ## Export axis specification as a combination of breaks and
@@ -326,7 +335,7 @@ parsePlot <- function(meta){
   # grab the unique axis labels (makes rendering simpler)
   axis.info <- plot.meta[grepl("^axis[0-9]+$", names(plot.meta))]
   plot.meta$xlabs <- as.list(unique(unlist(lapply(axis.info, "[", "xlab"))))
-  plot.meta$ylabs <- as.list(unique(unlist(lapply(axis.info, "[", "ylab"))))  
+  plot.meta$ylabs <- as.list(unique(unlist(lapply(axis.info, "[", "ylab"))))
 
   if("element_blank"%in%attr(theme.pars$plot.title, "class")){
     plot.meta$title <- ""
@@ -422,33 +431,59 @@ saveLayer <- function(l, d, meta){
   ## currently selected values of these variables are stored in
   ## plot.Selectors.
 
-  is.ss <- is.showSelected(names(g$aes))
-  show.vars <- g$aes[is.ss]
-  g$subset_order <- as.list(names(show.vars))
+  s.aes <- selector.aes(names(g$aes))
 
-  is.cs <- is.clickSelects(names(g$aes))
+  is.ss <- names(g$aes) %in% s.aes$showSelected$one
+  show.vars <- g$aes[is.ss]
+  pre.subset.order <- as.list(names(show.vars))
+
+  is.cs <- names(g$aes) %in% s.aes$clickSelects$one
   update.vars <- g$aes[is.ss | is.cs]
 
+  update.var.names <- if(0 < length(update.vars)){
+    data.frame(variable=names(update.vars), value=NA)
+  }
+  
+  interactive.aes <- with(s.aes, {
+    rbind(clickSelects$several, showSelected$several,
+          update.var.names)
+  })
+
   ## Construct the selector.
-  for(sel.i in seq_along(update.vars)){
-    v.name <- update.vars[[sel.i]]
-    col.name <- names(update.vars)[[sel.i]]
-    if(!v.name %in% names(meta$selectors)){
-      value <- g.data[[col.name]][1]
-      if(v.name %in% names(meta$selector.types)) {
-        selector.type <- meta$selector.types[[v.name]]
-      } else {
-        selector.type <- "single"
-      }
-      stopifnot(is.character(selector.type))
-      stopifnot(length(selector.type)==1)
-      stopifnot(selector.type %in% c("single", "multiple"))
-      meta$selectors[[v.name]] <-
-        list(selected=as.character(value),
-             type=selector.type)
+  for(row.i in seq_along(interactive.aes$variable)){
+    aes.row <- interactive.aes[row.i, ]
+    selector.df <- if(is.na(aes.row$value)){
+      value.col <- paste(aes.row$variable)
+      data.frame(value.col,
+                 selector.name=update.vars[[value.col]])
+    }else{
+      selector.vec <- g.data[[paste(aes.row$variable)]]
+      data.frame(value.col=aes.row$value,
+                 selector.name=unique(paste(selector.vec)))
     }
-    meta$selectors[[v.name]]$update <-
-      c(meta$selectors[[v.name]]$update, as.list(g$classed))
+    for(sel.i in 1:nrow(selector.df)){
+      sel.row <- selector.df[sel.i,]
+      value.col <- paste(sel.row$value.col)
+      selector.name <- paste(sel.row$selector.name)
+      ## If this selector has no defined type yet, we define it once
+      ## and for all here, so we can use it later for chunk
+      ## separation.
+      if(is.null(meta$selectors[[selector.name]]$type)){
+        selector.type <- meta$selector.types[[selector.name]]
+        if(is.null(selector.type))selector.type <- "single"
+        stopifnot(is.character(selector.type))
+        stopifnot(length(selector.type)==1)
+        stopifnot(selector.type %in% c("single", "multiple"))
+        meta$selectors[[selector.name]]$type <- selector.type
+      }
+      ## We also store all the values of this selector in this layer,
+      ## so we can accurate set levels after all geoms have been
+      ## compiled.
+      value.vec <- unique(g.data[[value.col]])
+      key <- paste(g$classed, row.i, sel.i)
+      meta$selector.values[[selector.name]][[key]] <-
+        list(values=paste(value.vec), update=g$classed)
+    }
   }
 
   ## Warn if stat_bin is used with animint aes. geom_bar + stat_bin
@@ -508,14 +543,7 @@ saveLayer <- function(l, d, meta){
     if(!"fill"%in%names(g.data) & "colour"%in%names(g.data)){
       g.data[["fill"]] <- g.data[["colour"]]
     }
-    ## group is meaningless for points, so delete it.
-    g.data <- g.data[names(g.data) != "group"]
-  } else if(g$geom=="segment"){
-    ## group is meaningless for segments, so delete it.
-    g.data <- g.data[names(g.data) != "group"]
   } else if(g$geom=="text"){
-    ## group is meaningless for text, so delete it.
-    g.data <- g.data[names(g.data) != "group"]
     ## check invalid hjust value
     if ("hjust" %in% names(g$params)) { #  hjust is parameter
       hjust <- g$params$hjust
@@ -525,9 +553,6 @@ saveLayer <- function(l, d, meta){
       hjust <- 0.5
     }
     anchor <- hjust2anchor(hjust)
-  } else if(g$geom=="rect"){
-    ## group is meaningless for rects, so delete it.
-    g.data <- g.data[names(g.data) != "group"]
   } else if(g$geom=="ribbon"){
     # Color set to match ggplot2 default of fill with no outside border.
     if("fill"%in%names(g.data) & !"colour"%in%names(g.data)){
@@ -544,6 +569,8 @@ saveLayer <- function(l, d, meta){
     }
     g$geom <- "rect"
   } else if(g$geom=="bar"){
+    is.xy <- names(g.data) %in% c("x", "y")
+    g.data <- g.data[!is.xy]
     g$geom <- "rect"
   } else if(g$geom=="bin2d"){
     stop("bin2d is not supported in animint. Try using geom_tile() and binning the data yourself.")
@@ -616,28 +643,10 @@ saveLayer <- function(l, d, meta){
     g$geom
   }
 
-  ##print("after pre-processing")
-
-  ## idea: if geom is calculated, group is not meaningful -
-  ## it has already been used in the calculation stage, and
-  ## will only confuse the issue later.
-  geom.aes.vars = g$aes[which(names(g$aes)%in%c("x", "y", "fill", "colour", "alpha", "size"))]
-  grpidx <- which(names(g$aes)=="group")
-  if(length(grpidx) > 0){
-    if(length(geom.aes.vars)>0 & nrow(g.data)!=nrow(l$data) &
-         !g$geom%in%c("ribbon","polygon","line", "path")){
-      ## need to exclude geom_ribbon and geom_violin, since they are
-      ## coded to allow group aesthetics because they use the d3 path
-      ## setup.
-      if(g$aes[grpidx]%in%geom.aes.vars){
-        ## if the group aesthetic is also mapped to another visual aesthetic,
-        ## then remove the group aesthetic
-        g$aes <- g$aes[-which(names(g$aes)=="group")]
-      }
-    }
+  ## Some geoms need their data sorted before saving to tsv.
+  if(g$geom %in% c("ribbon", "line")){
+    g.data <- g.data[order(g.data$x), ]
   }
-
-  ##print("after group block")
 
   ## Check g.data for color/fill - convert to hexadecimal so JS can parse correctly.
   for(color.var in c("colour", "color", "fill")){
@@ -717,7 +726,11 @@ saveLayer <- function(l, d, meta){
     names(g$aes)[g$aes==meta$time$var & click.or.show]
   }
   if(length(time.col)){
-    g$subset_order <- g$subset_order[order(g$subset_order != time.col)]
+    pre.subset.order <- pre.subset.order[order(pre.subset.order != time.col)]
+  }
+  ## Get unique values of time variable.
+  if(length(time.col)){ # if this layer/geom is animated,
+    g$timeValues <- unique(g.data[[time.col]])
   }
 
   ## Determine which showSelected values to use for breaking the data
@@ -726,7 +739,7 @@ saveLayer <- function(l, d, meta){
   ## when year is clicked, we may need to download some new data for
   ## this geom.
 
-  subset.vec <- unlist(g$subset_order)
+  subset.vec <- unlist(pre.subset.order)
   if("chunk_vars" %in% names(g$params)){ #designer-specified chunk vars.
     designer.chunks <- g$params$chunk_vars
     if(!is.character(designer.chunks)){
@@ -753,35 +766,80 @@ saveLayer <- function(l, d, meta){
       selector.names <- g$aes[subset.vec]
       subset.types <- selector.types[selector.names]
       can.chunk <- subset.types != "multiple"
-      if(all(!can.chunk)){
-        ## no possible chunk variables, just make 1 chunk.
-        nest.cols <- subset.vec
-        chunk.cols <- NULL
-      }else{
-        can.chunk.i <- which(can.chunk)[[1]]
-        several.chunks <- if(length(g$subset_order)==0) FALSE else {
-          chunk.var <- subset.vec[[can.chunk.i]]
-          chunk.vec <- g.data[[chunk.var]]
-          counts <- table(chunk.vec)
-          if(length(counts) == 1){
-            ##stop("only 1 chunk") # do we ever get here?
-            TRUE
-          }else if(all(counts == 1)){
-            FALSE #each chunk has only 1 row -- chunks are too small.
-          }else{
-            TRUE
+      names(can.chunk) <- subset.vec
+      ## Guess how big the chunk files will be, and reduce the number of
+      ## chunks if there are any that are too small.
+      tmp <- tempfile()
+      some.lines <- rbind(head(g.data), tail(g.data))
+      write.table(some.lines, tmp,
+                  col.names=FALSE,
+                  quote=FALSE, row.names=FALSE, sep="\t")
+      bytes <- file.info(tmp)$size
+      bytes.per.line <- bytes/nrow(some.lines)
+      bad.chunk <- function(){
+        if(all(!can.chunk))return(NULL)
+        can.chunk.cols <- subset.vec[can.chunk]
+        maybe.factors <- g.data[, can.chunk.cols, drop=FALSE]
+        for(N in names(maybe.factors)){
+          maybe.factors[[N]] <- paste(maybe.factors[[N]])
+        }
+        rows.per.chunk <- table(maybe.factors)
+        bytes.per.chunk <- rows.per.chunk * bytes.per.line
+        if(all(4096 < bytes.per.chunk))return(NULL)
+        ## If all of the tsv chunk files are greater than 4KB, then we
+        ## return NULL here to indicate that the current chunk
+        ## variables (indicated in can.chunk) are fine.
+
+        ## In other words, the compiler will not break a geom into
+        ## chunks if any of the resulting chunk tsv files is estimated
+        ## to be less than 4KB (of course, if the layer has very few
+        ## data overall, the compiler creates 1 file which may be less
+        ## than 4KB, but that is fine).
+        dim.byte.list <- list()
+        if(length(can.chunk.cols) == 1){
+          dim.byte.list[[can.chunk.cols]] <- sum(bytes.per.chunk)
+        }else{
+          for(dim.i in seq_along(can.chunk.cols)){
+            dim.name <- can.chunk.cols[[dim.i]]
+            dim.byte.list[[dim.name]] <-
+              apply(bytes.per.chunk, -dim.i, sum)
           }
         }
-        if(several.chunks){
-          nest.cols <- subset.vec[-can.chunk.i]
-          chunk.cols <- chunk.var
+        selector.df <-
+          data.frame(chunks.for=length(rows.per.chunk),
+                     chunks.without=sapply(dim.byte.list, length),
+                     min.bytes=sapply(dim.byte.list, min))
+        ## chunks.for is the number of chunks you get if you split the
+        ## data set using just this column. If it is 1, then it is
+        ## fine to chunk on this variable (since we certainly won't
+        ## make more than 1 small tsv file) and in fact we want to
+        ## chunk on this variable, since then this layer's data won't
+        ## be downloaded at first if it is not needed.
+        not.one <- subset(selector.df, 1 < chunks.for)
+        if(nrow(not.one) == 0){
+          NULL
         }else{
-          nest.cols <- subset.vec
-          chunk.cols <- NULL
+          rownames(not.one)[[which.max(not.one$min.bytes)]]
         }
       }
-    }
+      while({
+        bad <- bad.chunk()
+        ## str(bad)
+        ## browser()
+        !is.null(bad)
+      }){
+        can.chunk[[bad]] <- FALSE
+      }
+      if(any(can.chunk)){
+        nest.cols <- subset.vec[!can.chunk]
+        chunk.cols <- subset.vec[can.chunk]
+      }else{
+        nest.cols <- subset.vec
+        chunk.cols <- NULL
+      }
+    } # meta$selectors > 0
   }
+  
   # If there is only one PANEL, we don't need it anymore.
   plot.has.panels <- nrow(meta$built$panel$layout) > 1
   g$PANEL <- unique(g.data[["PANEL"]])
@@ -789,14 +847,8 @@ saveLayer <- function(l, d, meta){
   if(geom.has.one.panel && (!plot.has.panels)) {
     g.data <- g.data[names(g.data) != "PANEL"]
   }
-
-  ## Split into chunks and save tsv files.
-  meta$classed <- g$classed
-  meta$chunk.i <- 1L
-  g$chunks <- saveChunks(g.data, chunk.cols, meta)
-  g$total <- length(unlist(g$chunks))
-
-  ## Also add pointers to these chunks to the related selectors.
+  
+  ## Also add pointers to these chunks from the related selectors.
   if(length(chunk.cols)){
     selector.names <- as.character(g$aes[chunk.cols])
     chunk.name <- paste(selector.names, collapse="_")
@@ -812,7 +864,7 @@ saveLayer <- function(l, d, meta){
   names(g$chunk_order) <- NULL
   names(g$nest_order) <- NULL
   g$subset_order <- g$nest_order
-
+  
   ## If this plot has more than one PANEL then add it to subset_order
   ## and nest_order.
   if(plot.has.panels){
@@ -820,10 +872,28 @@ saveLayer <- function(l, d, meta){
     g$nest_order <- c(g$nest_order, "PANEL")
   }
 
+  ## nest_order should contain both .variable .value aesthetics, but
+  ## subset_order should contain only .variable.
+  if(0 < nrow(s.aes$showSelected$several)){
+    g$nest_order <- with(s.aes$showSelected$several, {
+      c(g$nest_order, paste(variable), paste(value))
+    })
+    g$subset_order <-
+      c(g$subset_order, paste(s.aes$showSelected$several$variable))
+  }
+    
   ## group should be the last thing in nest_order, if it is present.
   if("group" %in% names(g$aes)){
     g$nest_order <- c(g$nest_order, "group")
   }
+
+  ## Split into chunks and save tsv files.
+  meta$chunk.i <- 1L
+  meta$g <- g
+  g.data.varied <- saveCommonChunk(g.data, chunk.cols, meta)
+  g <- meta$g
+  g$chunks <- saveChunks(g.data.varied, meta)
+  g$total <- length(unlist(g$chunks))
 
   ## Get unique values of time variable.
   if(length(time.col)){ # if this layer/geom is animated,
@@ -836,57 +906,177 @@ saveLayer <- function(l, d, meta){
   g
 }
 
-##' Split data set into chunks and save them to separate files.
+##' Save the common columns for each tsv to one chunk
 ##' @param x data.frame.
 ##' @param vars character vector of variable names to split on.
 ##' @param meta environment.
-##' @return recursive list of chunk file names.
-##' @author Toby Dylan Hocking
-saveChunks <- function(x, vars, meta){
+##' @return a recursive list of data.frame comprised of varied columns for each tsv.
+saveCommonChunk <- function(x, vars, meta){
+  meta$g$columns <- NULL # initial value
+  # remove default group column added by ggplot builder
+  if("group" %in% names(x) & (!"group" %in% meta$g$nest_order)){
+    x <- x[, !names(x) %in% "group"]
+    meta$g$types <- meta$g$types[!names(meta$g$types) %in% "group"]
+  }
+  
+  if(length(vars) == 0){
+    # rows with NA should not be saved
+    na.omit(x)
+  } else {
+    raw.x <- x
+    # add group column for later joining by group in renderer
+    # if group column already exists, use the existing one
+    if(!"group" %in% meta$g$nest_order){
+      x <- plyr::ddply(x, vars, function(df){
+        data.frame(df[!names(df) %in% vars], group = 1:nrow(df))
+      })
+    }
+    # return recursive list of data.frame
+    r.df.list <- split.x(x, vars)
+    # compare the first and the last data.frame from non-rescursive list of 
+    # data.frame to determine common columns
+    df.list <- split(x[!names(x) %in% vars], x[, vars], drop = TRUE)
+    if(length(df.list) == 1) return(split.x(raw.x, vars))
+    df1 <- df.list[[1]]
+    df2 <- df.list[[length(df.list)]]
+    if(nrow(df1) == 1) return(split.x(raw.x, vars))
+    cols <- names(df1)
+    is.common <- plyr::laply(cols, function(col){
+      r <- identical(df1[, col], df2[, col])
+      x <- na.omit(unique(c(df1[, col], df2[, col])))
+      if(length(x) == 1){
+        r <- TRUE
+        df1[, col] <<- x
+      }
+      r
+    })
+    # If the number of common columns is at least 3 (an nest_order, group, and an 
+    # extra column), it's meaningful to save them into separate chunk and reduce 
+    # the output file size of chunk tsv.
+    if(sum(is.common) >= 3){
+      meta$g$columns$common <- common.cols <- cols[is.common]
+      # save common data to chunk
+      csv.name <- sprintf("%s_chunk_common.tsv", meta$g$classed)
+      common.chunk <- file.path(meta$out.dir, csv.name)
+      common.data <- df1[common.cols]
+      write.table(common.data, common.chunk, quote = FALSE, row.names = FALSE, 
+                  sep = "\t")
+      # remove common data for df.list but keep nest_order field in case of the
+      # need of recovering the data.frame in the renderer
+      # keep group column for later joining by group in renderer
+      remove.cols <- common.cols[!common.cols %in% c(meta$g$nest_order, "group")]
+      meta$g$columns$varied <- varied.cols <- setdiff(names(df1), remove.cols)
+      r.df.list <- varied.chunk(r.df.list, varied.cols, meta$g$nest_order)
+    }
+    r.df.list
+  }
+}
+
+##' Depth of recursive list.
+##' @param this object.
+##' @return depth of this recursive list.
+depth <- function(this) ifelse(is.list(this), 1L + max(sapply(this, depth)), 0L)
+
+##' Extract subset for each data.frame in a list of data.frame
+##' @param df.list list of data.frame.
+##' @param cols cols that each data.frame would keep.
+##' @param nest_order columns used for d3 nest.
+##' @return list of data.frame.
+varied.chunk <- function(df.list, cols, nest_order){
+  if(depth(df.list) == 2){
+    plyr::llply(df.list, function(df){
+      df <- df[, cols, drop = FALSE]
+      # remove duplicated rows to further reduce chunk file size
+      if("group" %in% nest_order) df <- df[!duplicated(df), ]
+      df
+    })
+  } else{
+    lapply(df.list, varied.chunk, cols, nest_order)
+  }
+}
+
+##' Split data.frame into recursive list of data.frame.
+##' @param x data.frame.
+##' @param vars character vector of variable names to split on.
+##' @return recursive list of data.frame.
+split.x <- function(x, vars){
   if(is.data.frame(x)){
-    if(length(vars) == 0){
-      this.i <- meta$chunk.i
-      csv.name <- sprintf("%s_chunk%d.tsv", meta$classed, this.i)
-      meta$chunk.i <- meta$chunk.i + 1L
-      write.table(x,
-                  file.path(meta$out.dir, csv.name),
-                  quote=FALSE, row.names=FALSE, sep="\t")
-      this.i
+    # rows with NA should not be saved
+    x <- na.omit(x)
+    if(length(vars) == 1){
+      df.list <- split(x[names(x) != vars], x[vars], drop = TRUE)
     }else{
-      use <- vars[[1]]
+      use <- vars[1]
       rest <- vars[-1]
-      vec <- x[[use]]
-      df.list <- split(x[names(x) != use], vec, drop=TRUE)
-      saveChunks(df.list, rest, meta)
+      df.list <- split(x[names(x) != use], x[use], drop = TRUE)
+      split.x(df.list, rest)
     }
   }else if(is.list(x)){
-    lapply(x, saveChunks, vars, meta)
+    lapply(x, split.x, vars)
   }else{
     str(x)
     stop("unknown object")
   }
 }
 
-##' Test if aesthetics are showSelected.
-##' @param x character vector.
-##' @return logical vector
-##' @export
+##' Split data set into chunks and save them to separate files.
+##' @param x data.frame.
+##' @param meta environment.
+##' @return recursive list of chunk file names.
 ##' @author Toby Dylan Hocking
-is.showSelected <- function(x){
-  if(length(x) == 0)return(logical())
-  stopifnot(is.character(x))
-  grepl("showSelected", x)
+saveChunks <- function(x, meta){
+  if(is.data.frame(x)){
+    this.i <- meta$chunk.i
+    csv.name <- sprintf("%s_chunk%d.tsv", meta$g$classed, this.i)
+    write.table(x, file.path(meta$out.dir, csv.name), quote=FALSE, 
+                row.names=FALSE, sep="\t")
+    meta$chunk.i <- meta$chunk.i + 1L
+    this.i
+  }else if(is.list(x)){
+    lapply(x, saveChunks, meta)
+  }else{
+    str(x)
+    stop("unknown object")
+  }
 }
 
-##' Test if aesthetics are clickSelects.
-##' @param x character vector.
-##' @return logical vector
+##' Parse selectors from aes names.
+##' @title Parse selectors from aes names.
+##' @param a.vec character vector of aes names.
+##' @return list of selector info.
+##' @author Toby Dylan Hocking
 ##' @export
-##' @author Susan VanderPlas
-is.clickSelects <- function(x){
-  if(length(x) == 0)return(logical())
-  stopifnot(is.character(x))
-  grepl("clickSelects", x)
+selector.aes <- function(a.vec){
+  if(is.null(a.vec))a.vec <- character()
+  stopifnot(is.character(a.vec))
+  cs.or.ss <- grepl("clickSelects|showSelected", a.vec)
+  for(v in c("value", "variable")){
+    regex <- paste0("[.]", v, "$")
+    is.v <- grepl(regex, a.vec)
+    if(any(is.v)){
+      a <- a.vec[is.v & cs.or.ss]
+      other.v <- if(v=="value")"variable" else "value"
+      other.a <- sub(paste0(v, "$"), other.v, a)
+      not.found <- ! other.a %in% a.vec
+      if(any(not.found)){
+        stop(".variable or .value aes not found")
+      }
+    }
+  }
+  aes.list <- list()
+  for(a in c("clickSelects", "showSelected")){
+    is.a <- grepl(a, a.vec)
+    is.value <- grepl("[.]value$", a.vec)
+    is.variable <- grepl("[.]variable$", a.vec)
+    var.or.val <- is.variable | is.value
+    a.value <- a.vec[is.a & is.value]
+    a.variable <- sub("value$", "variable", a.value)
+    single <- a.vec[is.a & (!var.or.val)]
+    aes.list[[a]] <-
+      list(several=data.frame(variable=a.variable, value=a.value),
+           one=single)
+  }
+  aes.list
 }
 
 ##' Deprecated alias for animint2dir.
@@ -1045,9 +1235,9 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
         ## This code assumes that the layer has the complete aesthetic
         ## mapping and data. TODO: Do we need to copy any global
         ## values to this layer?
-        is.ss <- is.showSelected(names(L$mapping))
-        is.cs <- is.clickSelects(names(L$mapping))
-        update.vars <- L$mapping[is.ss | is.cs]
+        iaes <- selector.aes(names(L$mapping))
+        one.names <- with(iaes, c(clickSelects$one, showSelected$one))
+        update.vars <- L$mapping[one.names]
         has.var <- update.vars %in% names(L$data)
         if(!all(has.var)){
           print(L)
@@ -1055,7 +1245,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
                      data.variables=names(L$data)))
           stop("data does not have interactive variables")
         }
-        has.cs <- any(is.cs)
+        has.cs <- 0 < with(iaes$clickSelects, nrow(several) + length(one))
         has.href <- "href" %in% names(L$mapping)
         if(has.cs && has.href){
           stop("aes(clickSelects) can not be used with aes(href)")
@@ -1143,11 +1333,17 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
   ## The first selection:
   for(selector.name in names(meta$first)){
     first <- as.character(meta$first[[selector.name]])
-    s.type <- meta$selectors[[selector.name]]$type
-    if(!is.null(s.type) && s.type == "single"){
-      stopifnot(length(first) == 1)
+    if(selector.name %in% names(meta$selectors)){
+      s.type <- meta$selectors[[selector.name]]$type
+      if(s.type == "single"){
+        stopifnot(length(first) == 1)
+      }
+      meta$selectors[[selector.name]]$selected <- first
+    }else{
+      print(list(selectors=names(meta$selectors),
+                 missing.first=selector.name))
+      stop("missing first selector variable")
     }
-    meta$selectors[[selector.name]]$selected <- first
   }
 
   ## Finally, copy html/js/json files to out.dir.

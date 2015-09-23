@@ -7,19 +7,19 @@
 knit_print.animint(x, options, ...)
 }
 \arguments{
-  \item{x}{named list of ggplots and option lists to pass
-  to \code{animint2dir}.} \item{options}{knitr options.}
-  \item{...}{placeholder.}
+\item{x}{named list of ggplots and option lists to pass to \code{animint2dir}.}
+
+\item{options}{knitr options.}
+
+\item{...}{placeholder.}
 }
 \description{
-Insert an interactive animation into an R markdown document
-using a customized print method.
+Insert an interactive animation into an R markdown document using a customized print method.
 }
 \author{
 Carson Sievert
 }
 \references{
-https://github.com/yihui/knitr/blob/master/vignettes/
-knit_print.Rmd
+https://github.com/yihui/knitr/blob/master/vignettes/knit_print.Rmd
 }
 
