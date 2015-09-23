@@ -38,7 +38,13 @@ knit_print.animint <- function(x, options, ...) {
   # if this is the first plot, place scripts just before the plot
   # there has to be a better way to do this, but this will do for now -- http://stackoverflow.com/questions/14308240/how-to-add-javascript-in-the-head-of-a-html-knitr-document
   if (length(knitr::knit_meta(class = "animint", clean = FALSE)) == 0) {
-    res <- paste0('<script type="text/javascript" src="', dir, '/vendor/d3.v3.js"></script>\n<script type="text/javascript" src="', dir, '/animint.js"></script>', res)
+    res <- sprintf('
+<script type="text/javascript" src="%s/vendor/d3.v3.js"></script>
+<script type="text/javascript" src="%s/animint.js"></script>
+<script type="text/javascript" src="%s/vendor/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="%s/vendor/selectize.min.js"></script>
+<link rel="stylesheet" type="text/css" href="%s/selectize.css" />
+%s', dir, dir, dir, dir, dir, res)
   }
   knitr::asis_output(res, meta = list(animint = structure("", class = "animint")))
 }
