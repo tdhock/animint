@@ -1756,13 +1756,6 @@ var animint = function (to_select, json_file) {
 	.attr("id", legend_selector_name)
       ;
       var legend_class = l_info.vars;
-      var first_tr = legend_table.append("tr");
-      var first_th = first_tr.append("th")
-	.attr("align", "left")
-	.attr("colspan", 2)
-        .text(l_info.title)
-        .attr("class", legend_class)
-      ;
       // the legend table with breaks/value/label.
       var legendgeoms = l_info.geoms;
       var legend_rows = legend_table.selectAll("tr")
@@ -1781,6 +1774,13 @@ var animint = function (to_select, json_file) {
           return "Toggle " + this.id;
 	})
 	.attr("style", "cursor:pointer")
+      ;
+      var first_tr = legend_table.append("tr");
+      var first_th = first_tr.append("th")
+	.attr("align", "left")
+	.attr("colspan", 2)
+        .text(l_info.title)
+        .attr("class", legend_class)
       ;
       var legend_svgs = legend_rows.append("td")
         .append("svg")
