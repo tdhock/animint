@@ -187,7 +187,7 @@ var animint = function (to_select, json_file) {
     Geoms[g_name] = g_info;
     // Determine whether common chunk tsv exists
     // If yes, load it
-    if (g_info.hasOwnProperty("columns") && g_info.columns.common){
+    if(g_info.hasOwnProperty("columns") && g_info.columns.common){
       var common_tsv = get_tsv(g_info, "_common");
       g_info.common_tsv = common_tsv;
       d3.tsv(common_tsv, function (error, response) {
@@ -900,9 +900,8 @@ var animint = function (to_select, json_file) {
           };
           checkFun();
         };
-        
         wait(function(){
-          return g_info.download_status[g_info.common_tsv] == "saved";
+          return g_info.data.hasOwnProperty(g_info.common_tsv);
         }, function(){
           // copy data from common tsv to varied tsv
           var common_chunk = g_info.data[g_info.common_tsv];
