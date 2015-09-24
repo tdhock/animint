@@ -5,9 +5,41 @@
 // </script>
 // Constructor for animint Object.
 var animint = function (to_select, json_file) {
+  function convert_R_types(resp_array, types){
+    return resp_array.map(function (d) {
+      for (var v_name in types) {
+      	if(!is_interactive_aes(v_name)){
+          var r_type = types[v_name];
+          if (r_type == "integer") {
+            d[v_name] = parseInt(d[v_name]);
+          } else if (r_type == "numeric") {
+            d[v_name] = parseFloat(d[v_name]);
+          } else if (r_type == "factor" || r_type == "rgb" 
+		     || r_type == "linetype" || r_type == "label" 
+		     || r_type == "character") {
+            // keep it as a character
+          } else if (r_type == "character" & v_name == "outliers") {
+            d[v_name] = parseFloat(d[v_name].split(" @ "));
+          } else {
+            throw "unsupported R type " + r_type;
+          }
+      	}
+      }
+      return d;
+    });
+  }
   function safe_name(unsafe_name){
     return unsafe_name.replace(/\./g, '_');
   }
+  function is_interactive_aes(v_name){
+    if(v_name.indexOf("clickSelects") > -1){
+      return true;
+    }
+    if(v_name.indexOf("showSelected") > -1){
+      return true;
+    }
+    return false;
+  };
   var linetypesize2dasharray = function (lt, size) {
     var isInt = function(n) {
       return typeof n === 'number' && parseFloat(n) == parseInt(n, 10) && !isNaN(n);
@@ -158,18 +190,8 @@ var animint = function (to_select, json_file) {
     if (g_info.hasOwnProperty("columns") && g_info.columns.common){
       var common_tsv = get_tsv(g_info, "_common");
       g_info.common_tsv = common_tsv;
-      // get the data if it has not yet been downloaded.
-      g_info.tr.select("td.chunk").text(common_tsv);
-      g_info.tr.select("td.status").text("downloading");
-      var svg = SVGs[g_name];
-      var loading = svg.append("text")
-        .attr("class", "loading" + common_tsv)
-        .text("Downloading "+ common_tsv + "...")
-        .attr("font-size", 9)
-        .attr("y", 10)
-        .style("fill", "red");
-      download_chunk(g_info, common_tsv, function(chunk){
-        loading.remove();
+      d3.tsv(common_tsv, function (error, response) {
+	g_info.data[common_tsv] = convert_R_types(response, g_info.types);
       });
     } else {
       g_info.common_tsv = null;
@@ -863,74 +885,38 @@ var animint = function (to_select, json_file) {
     g_info.download_status[tsv_name] = "downloading";
     // prefix tsv file with appropriate path
     var tsv_file = dirs.concat(tsv_name).join("/");
-    function is_interactive_aes(v_name){
-      if(v_name.indexOf("clickSelects") > -1){
-        return true;
-      }
-      if(v_name.indexOf("showSelected") > -1){
-        return true;
-      }
-      return false;
-    };
     d3.tsv(tsv_file, function (error, response) {
       // First convert to correct types.
       g_info.download_status[tsv_name] = "processing";
-      response.forEach(function (d) {
-        for (var v_name in g_info.types) {
-          // interactive aesthetics (clickSelects, showSelected, etc)
-    	    // stay as characters, others may be converted.
-      	  if(!is_interactive_aes(v_name)){
-            var r_type = g_info.types[v_name];
-            if (r_type == "integer") {
-              d[v_name] = parseInt(d[v_name]);
-            } else if (r_type == "numeric") {
-              d[v_name] = parseFloat(d[v_name]);
-            } else if (r_type == "factor" || r_type == "rgb" 
-              || r_type == "linetype" || r_type == "label" 
-              || r_type == "character") {
-              // keep it as a character
-            } else if (r_type == "character" & v_name == "outliers") {
-              d[v_name] = parseFloat(d[v_name].split(" @ "));
-            } else {
-              throw "unsupported R type " + r_type;
+      converted = convert_R_types(response, g_info.types);
+      if (g_info.common_tsv) {
+        function wait(condFun, readyFun) {
+          var checkFun = function() {
+            if(condFun()) {
+              readyFun();
+            } else{
+              setTimeout(checkFun, 5);
             }
-      	  }
-        }
-      });
-
-      if (g_info.common_tsv && (tsv_name == g_info.common_tsv)) {
-        // save common tsv
-        var chunk = response;
-      } else {
-        if (g_info.common_tsv) {
-          function wait(condFun, readyFun) {
-            var checkFun = function() {
-              if(condFun()) {
-                readyFun();
-              } else{
-                setTimeout(checkFun, 5);
-              }
-            };
-            checkFun();
           };
-          
-          wait(function(){
-            return g_info.download_status[g_info.common_tsv] == "saved";
-          }, function(){
-              // copy data from common tsv to varied tsv
-              var common_chunk = g_info.data[g_info.common_tsv];
-              response = copy_chunk(common_chunk, response, g_info.columns.common);
-          });
-        }
-
-        var nest = d3.nest();
-        g_info.nest_order.forEach(function (v_name) {
-          nest.key(function (d) {
-            return d[v_name];
-          });
+          checkFun();
+        };
+        
+        wait(function(){
+          return g_info.download_status[g_info.common_tsv] == "saved";
+        }, function(){
+          // copy data from common tsv to varied tsv
+          var common_chunk = g_info.data[g_info.common_tsv];
+          response = copy_chunk(common_chunk, response, g_info.columns.common);
         });
-        var chunk = nest.map(response);
       }
+
+      var nest = d3.nest();
+      g_info.nest_order.forEach(function (v_name) {
+        nest.key(function (d) {
+          return d[v_name];
+        });
+      });
+      var chunk = nest.map(response);
 
       g_info.data[tsv_name] = chunk;
       g_info.tr.select("td.downloaded").text(d3.keys(g_info.data).length);
