@@ -728,31 +728,31 @@ var animint = function (to_select, json_file) {
     });
 
     groups.forEach(function(id){
-      var varied_obj = findObjectByKey(varied_chunk, group, id);
-      var common_obj = findObjectByKey(common_chunk, group, id);
-      var new_varied_obj = clone(varied_obj);
-      columns_common.forEach(function(col) {
-        new_varied_obj[col] = common_obj[col];
+      var varied_obj = findObjectsByKey(varied_chunk, group, id);
+      var common_obj = findObjectsByKey(common_chunk, group, id);
+      common_obj.forEach(function(g_common_obj){
+        var new_varied_obj = clone(varied_obj[0]);
+        columns_common.forEach(function(col) {
+          new_varied_obj[col] = g_common_obj[col];
+        });
+        new_varied_chunk.push(new_varied_obj);
       });
-      new_varied_chunk.push(new_varied_obj);
     });
     return new_varied_chunk;
   }
 
   /**
-   * find object matching a key of lookup value from an array of objects
-   * @param  {[type]} array array of objects to lookup
+   * find objects matching a key of lookup value from an array of objects
+   * @param  {[type]} array an array of objects to lookup
    * @param  {[type]} key   the key of each objects in the array to lookup
    * @param  {[type]} value the value of key to lookup
-   * @return {[type]}       object
+   * @return {[type]} array an array of filtered objects
   */
-  var findObjectByKey = function(array, key, value) {
-    for (var i = 0; i < array.length; i++) {
-      if (array[i][key] === value) {
-        return array[i];
-      }
-    }
-    return null;
+  var findObjectsByKey = function(array, key, value) {
+    var filtered =  array.filter(function(obj) {
+      return obj[key] === value;
+    });
+    return filtered;
   };
 
   /**
@@ -776,34 +776,37 @@ var animint = function (to_select, json_file) {
    * @return {json object}                json object after merging common chunk tsv into varied chunk tsv
   */
   var copy_chunk = function(common_chunk, varied_chunk, columns_common) {
-    if(columns_common.indexOf("group") != -1){
-      if(Array.isArray(varied_chunk)){
-        var new_varied_chunk = joinChunkByGroup(common_chunk, varied_chunk, columns_common, "group");
-      } else{
-        var new_varied_chunk = {};
+    var new_varied_chunk = joinChunkByGroup(common_chunk, varied_chunk, columns_common, "group");
+    return new_varied_chunk;
 
-        var keys = d3.keys(varied_chunk);
-        keys.forEach(function(k){
-          var g_varied_chunk = varied_chunk[k];
-          var g_common_chunk = common_chunk[k];
+    // if(columns_common.indexOf("group") != -1){
+    //   if(Array.isArray(varied_chunk)){
+    //     var new_varied_chunk = joinChunkByGroup(common_chunk, varied_chunk, columns_common, "group");
+    //   } else{
+    //     var new_varied_chunk = {};
 
-          if(g_varied_chunk.length == 1){
-            var new_g_varied_chunk = [];
-            g_common_chunk.forEach(function(obj){
-              var new_varied_obj = clone(g_varied_chunk[0]);
-              columns_common.forEach(function(col) {
-                new_varied_obj[col] = obj[col];
-              });
-              new_g_varied_chunk.push(new_varied_obj);
-            });
-          } else{
-            var new_g_varied_chunk = joinChunkByGroup(g_common_chunk, g_varied_chunk, columns_common, "group");
-          }
-          new_varied_chunk[k] = new_g_varied_chunk;
-        });
-      }
-      return new_varied_chunk;
-    }
+    //     var keys = d3.keys(varied_chunk);
+    //     keys.forEach(function(k){
+    //       var g_varied_chunk = varied_chunk[k];
+    //       var g_common_chunk = common_chunk[k];
+
+    //       if(g_varied_chunk.length == 1){
+    //         var new_g_varied_chunk = [];
+    //         g_common_chunk.forEach(function(obj){
+    //           var new_varied_obj = clone(g_varied_chunk[0]);
+    //           columns_common.forEach(function(col) {
+    //             new_varied_obj[col] = obj[col];
+    //           });
+    //           new_g_varied_chunk.push(new_varied_obj);
+    //         });
+    //       } else{
+    //         var new_g_varied_chunk = joinChunkByGroup(g_common_chunk, g_varied_chunk, columns_common, "group");
+    //       }
+    //       new_varied_chunk[k] = new_g_varied_chunk;
+    //     });
+    //   }
+    //   return new_varied_chunk;
+    // }
   };
 
   // update_geom is called from add_geom and update_selector. It
@@ -931,12 +934,24 @@ var animint = function (to_select, json_file) {
         var chunk = response;
       } else {
         if (g_info.common_tsv) {
-          while(g_info.download_status[g_info.common_tsv] != "saved") {
-            // wait common chunk dowloading is done
-          }
-          // copy data from common tsv to varied tsv
-          var common_chunk = g_info.data[g_info.common_tsv];
-          response = copy_chunk(common_chunk, response, g_info.columns.common);
+          function wait(condFun, readyFun) {
+            var checkFun = function() {
+              if(condFun()) {
+                readyFun();
+              } else{
+                setTimeout(checkFun, 5);
+              }
+            };
+            checkFun();
+          };
+          
+          wait(function(){
+            return g_info.download_status[g_info.common_tsv] == "saved";
+          }, function(){
+              // copy data from common tsv to varied tsv
+              var common_chunk = g_info.data[g_info.common_tsv];
+              response = copy_chunk(common_chunk, response, g_info.columns.common);
+          });
         }
 
         var nest = d3.nest();
