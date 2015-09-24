@@ -711,20 +711,19 @@ var animint = function (to_select, json_file) {
   var get_tsv = function(g_info, chunk_id){
     return g_info.classed + "_chunk" + chunk_id + ".tsv";
   };
-
+  
   /**
-   * join common chunk tsv into varied chunk tsv by group
+   * copy common chunk tsv to varied chunk tsv
    * @param  {array} common_chunk   array of json objects from common chunk tsv
    * @param  {array} varied_chunk   array of json objects from varied chunk tsv
    * @param  {string array} columns_common array of common column names
-   * @param  {string} group         group column name
-   * @return {array}                array of json objects after joining common chunk tsv into varied chunk tsv
+   * @return {array}                array of json objects after merging common chunk tsv into varied chunk tsv
   */
-  var joinChunkByGroup = function(common_chunk, varied_chunk, columns_common, group) {
+  var copy_chunk = function(common_chunk, varied_chunk, columns_common) {
     var new_varied_chunk = [];
     // join by group
     var groups = varied_chunk.map(function(obj){
-      return obj[group];
+      return obj["group"];
     });
 
     groups.forEach(function(id){
@@ -739,7 +738,7 @@ var animint = function (to_select, json_file) {
       });
     });
     return new_varied_chunk;
-  }
+  };
 
   /**
    * find objects matching a key of lookup value from an array of objects
@@ -766,47 +765,6 @@ var animint = function (to_select, json_file) {
       o[i] = object[i];
     }
     return o;
-  };
-
-  /**
-   * copy common chunk tsv to varied chunk tsv
-   * @param  {json object} common_chunk   json object from common chunk tsv
-   * @param  {json object} varied_chunk   json object from varied chunk tsv
-   * @param  {string array} columns_common array of common column names
-   * @return {json object}                json object after merging common chunk tsv into varied chunk tsv
-  */
-  var copy_chunk = function(common_chunk, varied_chunk, columns_common) {
-    var new_varied_chunk = joinChunkByGroup(common_chunk, varied_chunk, columns_common, "group");
-    return new_varied_chunk;
-
-    // if(columns_common.indexOf("group") != -1){
-    //   if(Array.isArray(varied_chunk)){
-    //     var new_varied_chunk = joinChunkByGroup(common_chunk, varied_chunk, columns_common, "group");
-    //   } else{
-    //     var new_varied_chunk = {};
-
-    //     var keys = d3.keys(varied_chunk);
-    //     keys.forEach(function(k){
-    //       var g_varied_chunk = varied_chunk[k];
-    //       var g_common_chunk = common_chunk[k];
-
-    //       if(g_varied_chunk.length == 1){
-    //         var new_g_varied_chunk = [];
-    //         g_common_chunk.forEach(function(obj){
-    //           var new_varied_obj = clone(g_varied_chunk[0]);
-    //           columns_common.forEach(function(col) {
-    //             new_varied_obj[col] = obj[col];
-    //           });
-    //           new_g_varied_chunk.push(new_varied_obj);
-    //         });
-    //       } else{
-    //         var new_g_varied_chunk = joinChunkByGroup(g_common_chunk, g_varied_chunk, columns_common, "group");
-    //       }
-    //       new_varied_chunk[k] = new_g_varied_chunk;
-    //     });
-    //   }
-    //   return new_varied_chunk;
-    // }
   };
 
   // update_geom is called from add_geom and update_selector. It
