@@ -940,21 +940,27 @@ saveCommonChunk <- function(x, vars, meta){
     df1 <- df.list[[1]]
     df2 <- df.list[[length(df.list)]]
     if(nrow(df1) == 1) return(split.x(raw.x, vars))
-    cols <- names(df1)
-    is.common <- plyr::laply(cols, function(col){
-      r <- identical(df1[, col], df2[, col])
-      x <- na.omit(unique(c(df1[, col], df2[, col])))
-      if(length(x) == 1){
-        r <- TRUE
-        df1[, col] <<- x
+    is.common <- rep(NA, length(names(df1)))
+    names(is.common) <- names(df1)
+    for(col in names(df1)){
+      is.common[col] <- if(col %in% meta$g$nest_order){
+        FALSE
+      }else{
+        r <- identical(df1[, col], df2[, col])
+        x <- na.omit(unique(c(df1[, col], df2[, col])))
+        if(length(x) == 1){
+          r <- TRUE
+          df1[, col] <- x
+        }
+        r
       }
-      r
-    })
+    }
     # If the number of common columns is at least 3 (an nest_order, group, and an 
     # extra column), it's meaningful to save them into separate chunk and reduce 
     # the output file size of chunk tsv.
     if(sum(is.common) >= 3){
-      meta$g$columns$common <- common.cols <- cols[is.common]
+      meta$g$columns$common <- common.cols <-
+        c("group", names(is.common)[is.common])
       # save common data to chunk
       csv.name <- sprintf("%s_chunk_common.tsv", meta$g$classed)
       common.chunk <- file.path(meta$out.dir, csv.name)
