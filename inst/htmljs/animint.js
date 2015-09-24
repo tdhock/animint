@@ -727,8 +727,8 @@ var animint = function (to_select, json_file) {
     });
 
     groups.forEach(function(id){
-      var varied_obj = findObjectsByKey(varied_chunk, group, id);
-      var common_obj = findObjectsByKey(common_chunk, group, id);
+      var varied_obj = findObjectsByKey(varied_chunk, "group", id);
+      var common_obj = findObjectsByKey(common_chunk, "group", id);
       common_obj.forEach(function(g_common_obj){
         var new_varied_obj = clone(varied_obj[0]);
         columns_common.forEach(function(col) {
