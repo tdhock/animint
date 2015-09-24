@@ -1012,7 +1012,7 @@ var animint = function (to_select, json_file) {
         }
       });
       if(g_info.data_is_object){
-	if(value_array.length == 0){
+	if(isArray(some_data)){
 	  data["0"] = some_data;
 	}else{
 	  for(k in some_data){
