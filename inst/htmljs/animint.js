@@ -1012,9 +1012,13 @@ var animint = function (to_select, json_file) {
         }
       });
       if(g_info.data_is_object){
-	for(k in some_data){
-          data[k] = some_data[k];
-        }
+	if(value_array.length == 0){
+	  data["0"] = some_data;
+	}else{
+	  for(k in some_data){
+            data[k] = some_data[k];
+          }
+	}
       }else{//some_data is an array.
         data = data.concat(some_data);
       }
@@ -1174,32 +1178,18 @@ var animint = function (to_select, json_file) {
       // In order to get d3 lines to play nice, bind fake "data" (group
       // id's) -- the kv variable. Then each separate object is plotted
       // using path (case of only 1 thing and no groups).
-      if (!aes.hasOwnProperty("group")) {
-	       // There is either 1 or 0 groups.
-         if(data.length == 0){
-          kv = [];
-	       } else {
-          kv = [{
-            "key": 0,
-            "value": 0
-          }];
-          data = {
-            0: data
-          };
-        }
-      } else {
-        // we need to use a path for each group.
-        var kv = d3.entries(d3.keys(data));
-        kv = kv.map(function (d) {
-          //d[aes.group] = d.value;
 
-          // Need to store the clickSelects value that will
-          // be passed to the selector when we click on this
-          // item.
-          d.clickSelects = data[d.value][0].clickSelects;
-          return d;
-        });
-      }
+      // we need to use a path for each group.
+      var kv = d3.entries(d3.keys(data));
+      kv = kv.map(function (d) {
+        //d[aes.group] = d.value;
+
+        // Need to store the clickSelects value that will
+        // be passed to the selector when we click on this
+        // item.
+        d.clickSelects = data[d.value][0].clickSelects;
+        return d;
+      });
 
       // line, path, and polygon use d3.svg.line(),
       // ribbon uses d3.svg.area()
@@ -1234,7 +1224,7 @@ var animint = function (to_select, json_file) {
         e.attr("d", function (d) {
           var one_group = data[d.value];
           // filter NaN since they make the whole line disappear!
-	        var no_na = one_group.filter(function(d){
+	  var no_na = one_group.filter(function(d){
             if(g_info.geom == "ribbon"){
               return !isNaN(d.x) && !isNaN(d.ymin) && !isNaN(d.ymax);
             }else{
