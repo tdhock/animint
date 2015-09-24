@@ -112,7 +112,12 @@ var animint = function (to_select, json_file) {
 
   //creating an array to contain the selectize widgets
   var selectized_array = [];
-
+  var data_object_geoms = {
+    "line":true,
+    "path":true,
+    "ribbon":true,
+    "polygon":true
+  };
   var css = document.createElement('style');
   css.type = 'text/css';
   var styles = [".axis path{fill: none;stroke: black;shape-rendering: crispEdges;}",
@@ -129,6 +134,12 @@ var animint = function (to_select, json_file) {
       g_info.select_style = "stroke";
     }else{
       g_info.select_style = "opacity";
+    }
+    // Determine if data will be an object or an array.
+    if(g_info.geom in data_object_geoms){
+      g_info.data_is_object = true;
+    }else{
+      g_info.data_is_object = false;
     }
     // Add a row to the loading table.
     g_info.tr = Widgets["loading"].append("tr");
@@ -727,8 +738,8 @@ var animint = function (to_select, json_file) {
     });
 
     groups.forEach(function(id){
-      var varied_obj = findObjectsByKey(varied_chunk, group, id);
-      var common_obj = findObjectsByKey(common_chunk, group, id);
+      var varied_obj = findObjectsByKey(varied_chunk, "group", id);
+      var common_obj = findObjectsByKey(common_chunk, "group", id);
       common_obj.forEach(function(g_common_obj){
         var new_varied_obj = clone(varied_obj[0]);
         columns_common.forEach(function(col) {
@@ -978,25 +989,34 @@ var animint = function (to_select, json_file) {
       }
       selected_arrays = new_arrays;
     });
-    var data = []
+    // data can be either an array[] if it will be directly involved
+    // in a data-bind, or an object{} if it will be involved in a
+    // data-bind by group (e.g. geom_line).
+    var data;
+    if(g_info.data_is_object){
+      data = {};
+    }else{
+      data = [];
+    }
     selected_arrays.forEach(function(value_array){
       var some_data = chunk;
       value_array.forEach(function(value){
         if (some_data.hasOwnProperty(value)) {
           some_data = some_data[value];
         } else {
-          some_data = [];
+	  if(g_info.data_is_object){
+	    some_data = {};
+	  }else{
+            some_data = [];
+	  }
         }
       });
-      if(isArray(some_data)){
-        data = data.concat(some_data);
-      }else{
-        if(isArray(data)){
-          data = {};
-        }
-	      for(k in some_data){
+      if(g_info.data_is_object){
+	for(k in some_data){
           data[k] = some_data[k];
         }
+      }else{//some_data is an array.
+        data = data.concat(some_data);
       }
     });
     var aes = g_info.aes;
@@ -1098,7 +1118,7 @@ var animint = function (to_select, json_file) {
         return d.key;
       };
     }
-    if (g_info.geom == "line" || g_info.geom == "path" || g_info.geom == "polygon" || g_info.geom == "ribbon") {
+    if(g_info.data_is_object) {
 
       // Lines, paths, polygons, and ribbons are a bit special. For
       // every unique value of the group variable, we take the
