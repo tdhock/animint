@@ -25,7 +25,7 @@ second.small <-
                           xend=chromEnd+0.5, yend=mean,
                           showSelected=seed, showSelected2=sample.size,
                           color=model, size=model),
-                      data=PeakConsistency$model)+
+                      data=subset(PeakConsistency$model, increase==1))+
          scale_size_manual(values=c(PeakSegJoint=0.5, PeakSeg=1))+
          scale_color_manual(values=color.code),
        first=list(sample.size=5))
@@ -52,12 +52,16 @@ test_that("15 segments of both colors", {
 })
 
 viz <-
-  list(errors=ggplot()+
+  list(increase=ggplot()+
+         make_tallrect(PeakConsistency$increase, "increase")+
+         geom_line(aes(increase, mean.diff), data=PeakConsistency$increase),
+         errors=ggplot()+
          ylab("distance from true peaks to estimated peaks")+
          scale_color_manual(values=color.code)+
          make_tallrect(PeakConsistency$error, "sample.size")+
          geom_line(aes(sample.size, errors,
                        clickSelects=seed,
+                       showSelected=increase,
                        group=interaction(model, seed),
                        color=model),
                    size=5,
@@ -70,10 +74,13 @@ viz <-
          facet_grid(sample.id ~ ., labeller=function(var, val){
            paste("sample", val)
          })+
-         geom_point(aes(chromEnd, count, showSelected=seed),
+         geom_point(aes(chromEnd, count,
+                        showSelected3=increase,
+                        showSelected=seed),
                     color="grey50",
                     data=PeakConsistency$signal)+
          geom_vline(aes(xintercept=chromStart+0.5, color=model,
+                        showSelected3=increase,
                         showSelected=seed),
                     show_guide=TRUE,
                     linetype="dashed",
@@ -81,11 +88,13 @@ viz <-
          guides(size="none")+
          geom_segment(aes(chromStart+0.5, mean,
                           xend=chromEnd+0.5, yend=mean,
+                          showSelected3=increase,
                           showSelected=seed, showSelected2=sample.size,
                           color=model, size=model),
                       data=PeakConsistency$model)+
          geom_vline(aes(xintercept=chromStart+0.5,
                         showSelected=seed, showSelected2=sample.size,
+                        showSelected3=increase,
                         color=model, size=model),
                     show_guide=TRUE,
                     linetype="dashed",
