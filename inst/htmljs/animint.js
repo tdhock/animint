@@ -146,6 +146,7 @@ var animint = function (to_select, json_file) {
     // If yes, load it
     if (g_info.hasOwnProperty("columns") && g_info.columns.common){
       var common_tsv = get_tsv(g_info, "_common");
+      g_info.common_tsv = common_tsv;
       // get the data if it has not yet been downloaded.
       g_info.tr.select("td.chunk").text(common_tsv);
       g_info.tr.select("td.status").text("downloading");
@@ -158,7 +159,6 @@ var animint = function (to_select, json_file) {
         .style("fill", "red");
       download_chunk(g_info, common_tsv, function(chunk){
         loading.remove();
-        g_info.common_tsv = common_tsv;
       });
     } else {
       g_info.common_tsv = null;
@@ -925,18 +925,29 @@ var animint = function (to_select, json_file) {
       	  }
         }
       });
-      var nest = d3.nest();
-      g_info.nest_order.forEach(function (v_name) {
-        nest.key(function (d) {
-          return d[v_name];
+
+      if (g_info.common_tsv && (tsv_name == g_info.common_tsv)) {
+        // save common tsv
+        var chunk = response;
+      } else {
+        if (g_info.common_tsv) {
+          while(g_info.download_status[g_info.common_tsv] != "saved") {
+            // wait common chunk dowloading is done
+          }
+          // copy data from common tsv to varied tsv
+          var common_chunk = g_info.data[g_info.common_tsv];
+          response = copy_chunk(common_chunk, response, g_info.columns.common);
+        }
+
+        var nest = d3.nest();
+        g_info.nest_order.forEach(function (v_name) {
+          nest.key(function (d) {
+            return d[v_name];
+          });
         });
-      });
-      var chunk = nest.map(response);
-      // copy data from common tsv to varied tsv
-      if (g_info.common_tsv) {
-        var common_chunk = g_info.data[g_info.common_tsv];
-        chunk = copy_chunk(common_chunk, chunk, g_info.columns.common);
+        var chunk = nest.map(response);
       }
+
       g_info.data[tsv_name] = chunk;
       g_info.tr.select("td.downloaded").text(d3.keys(g_info.data).length);
       g_info.download_status[tsv_name] = "saved";

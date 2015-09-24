@@ -264,7 +264,6 @@ test_that("save separate chunks for non-spatial geoms with repetitive field, mul
   tsv.name <- sprintf("geom1_point_scatter_chunk%d.tsv", chunk.num)
   tsv.path <- file.path(out.dir, tsv.name)
   varied.data <- read.csv(tsv.path, sep = "\t")
-  ##print(varied.data)
   expect_equal(nrow(varied.data), nrow(expected.data))
   varied.must.have <-
     c("size", "x", "y", "tooltip", "showSelectedlegendcolour", "group")
