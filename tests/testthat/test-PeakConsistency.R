@@ -32,11 +32,23 @@ second.small <-
 
 info <- animint2HTML(second.small)
 
-test_that("viz of just segments renders", {
+getStroke <- function(element.list){
+  style.strs <- sapply(element.list, function(x) xmlAttrs(x)["style"])
+  pattern <-
+    paste0("(?<name>\\S+?)",
+           ": *",
+           "(?<value>.+?)",
+           ";")
+  style.matrices <- str_match_all_perl(style.strs, pattern)
+  sapply(style.matrices, function(m)m["stroke", "value"])
+}
+
+test_that("15 segments of both colors", {
   line.list <-
     getNodeSet(info$html, '//g[@class="geom1_segment_signals"]//line')
-  ## 5 samples * 2 models * 3 segments = 30 <line> elements.
-  expect_equal(length(line.list), 30)
+  computed.vec <- getStroke(line.list)
+  color.counts <- as.numeric(table(computed.vec))
+  expect_equal(color.counts, c(15, 15))
 })
 
 viz <-
@@ -51,7 +63,6 @@ viz <-
                    size=5,
                    alpha=0.7,
                    data=PeakConsistency$error),
-
        signals=ggplot()+
          theme_bw()+
          theme_animint(width=1000, height=800)+
@@ -80,5 +91,24 @@ viz <-
                     linetype="dashed",
                     data=PeakConsistency$guess)+
          scale_size_manual(values=c(PeakSegJoint=0.5, PeakSeg=1))+
-         scale_color_manual(values=color.code))
+         scale_color_manual(values=color.code),
+       first=list(sample.size=5))
+
+info <- animint2HTML(viz)
+
+test_that("4 paths of both colors in first plot", {
+  path.list <- 
+    getNodeSet(info$html, '//g[@class="geom2_line_errors"]//path')
+  computed.vec <- getStroke(path.list)
+  color.counts <- as.numeric(table(computed.vec))
+  expect_equal(color.counts, c(4, 4))
+})
+
+test_that("15 segments of both colors in second plot", {
+  line.list <-
+    getNodeSet(info$html, '//g[@class="geom5_segment_signals"]//line')
+  computed.vec <- getStroke(line.list)
+  color.counts <- as.numeric(table(computed.vec))
+  expect_equal(color.counts, c(15, 15))
+})
 
