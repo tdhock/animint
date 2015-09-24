@@ -14,7 +14,7 @@ knit_meta()
 ```
   
   
-```{r plot1top}
+```{r plot-1-top}
 library(ggplot2) 
 library(animint)
 dat <- data.frame(x = 1:10, y = 1:10, col = rep(c("a178", "b934"), 5))
@@ -25,7 +25,7 @@ structure(q2, class = "animint")
 
 Clicking on the plot above should not affect the plot below.
 
-```{r plot1bottom}
+```{r plot.1.bottom}
 q1 <- list(q = qplot(x, y, data = dat, colour = col, 
                      xlab = "second plot with color legend"))
 structure(q1, class = "animint")
