@@ -955,7 +955,6 @@ saveCommonChunk <- function(x, vars, meta){
     # extra column), it's meaningful to save them into separate chunk
     # and reduce the output file size of chunk tsv.
     if(sum(is.common) >= 2){
-      ##browser(expr=meta$g$classed=="geom6_bar_bar")
       meta$g$columns$common <- common.cols <- names(is.common)[is.common]
       # save common data to chunk
       csv.name <- sprintf("%s_chunk_common.tsv", meta$g$classed)
@@ -993,7 +992,12 @@ varied.chunk <- function(df.list, cols, nest_order){
   if(depth(df.list) == 2){
     plyr::llply(df.list, function(df){
       df <- df[, cols, drop = FALSE]
-      df
+      u.df <- unique(df)
+      if(nrow(u.df)==1){
+        u.df
+      }else{
+        df
+      }
     })
   } else{
     lapply(df.list, varied.chunk, cols, nest_order)

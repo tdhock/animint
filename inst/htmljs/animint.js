@@ -119,6 +119,7 @@ var animint = function (to_select, json_file) {
     return {height: bbox.height, width: bbox.width};
   };
 
+  var nest_by_group = d3.nest().key("group");
   var dirs = json_file.split("/");
   dirs.pop(); //if a directory path exists, remove the JSON file from dirs
   var element = d3.select(to_select);
@@ -189,7 +190,8 @@ var animint = function (to_select, json_file) {
       var common_tsv = get_tsv(g_info, "_common");
       g_info.common_tsv = common_tsv;
       d3.tsv(common_tsv, function (error, response) {
-	g_info.data[common_tsv] = convert_R_types(response, g_info.types);
+	var converted = convert_R_types(response, g_info.types);
+	g_info.data[common_tsv] = nest_by_group.map(converted);
       });
     } else {
       g_info.common_tsv = null;
@@ -750,21 +752,24 @@ var animint = function (to_select, json_file) {
    * @param  {string array} columns_common array of common column names
    * @return {array}                array of json objects after merging common chunk tsv into varied chunk tsv
   */
-  var copy_chunk = function(common_chunk, varied_chunk, columns_common) {
+  function copy_chunk(g_info, varied_chunk) {
+    var varied_by_group = nest_by_group(varied_chunk);
+    var common_by_group = g_info.data[g_info.common_tsv];
     var new_varied_chunk = [];
-    // join by group
-    var group_array = [];
-    varied_chunk.forEach(function(d){
-      if(group_array.indexOf(d.group) == -1){
-	group_array.push(d.group);
-      }
-    });
-    group_array.forEach(function(group_id){
-      var varied_one_group = findObjectsByKey(varied_chunk, "group", group_id);
-      var common_one_group = findObjectsByKey(common_chunk, "group", group_id);
-      for(var i=0; i<varied_one_group.length; i++){
-	var varied_obj = varied_one_group[i];
-	var common_obj = common_one_group[i];
+    for(group_id in varied_by_group){
+      var varied_one_group = varied_by_group[group_id];
+      var common_one_group = common_by_group[group_id];
+      var common_i;
+      for(var varied_i=0; i<varied_one_group.length; i++){
+	var varied_obj = varied_one_group[varied_i];
+	// there are two cases: each group of varied data is of length
+	// 1, or of length of the common data.
+	if(common_one_group.length == 1){
+	  common_i = 0;
+	}else{
+	  common_i = varied_i;
+	}
+	var common_obj = common_one_group[common_i];
 	for(col in common_obj){
 	  if(col != "group"){
 	    varied_obj[col] = common_obj[col];
@@ -772,9 +777,9 @@ var animint = function (to_select, json_file) {
 	}
 	new_varied_chunk.push(varied_obj);
       }
-    });
+    }
     return new_varied_chunk;
-  };
+  }
 
   /**
    * find objects matching a key of lookup value from an array of objects
@@ -907,9 +912,7 @@ var animint = function (to_select, json_file) {
           return g_info.data.hasOwnProperty(g_info.common_tsv);
         }, function(){
           // copy data from common tsv to varied tsv
-          var common_chunk = g_info.data[g_info.common_tsv];
-          var copied = copy_chunk(common_chunk, response, g_info.columns.common);
-	  response = copied;
+          response = copy_chunk(g_info, response);
         });
       }
 
