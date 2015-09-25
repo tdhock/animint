@@ -950,10 +950,12 @@ saveCommonChunk <- function(x, vars, meta){
       }
       r
     })
-    # If the number of common columns is at least 3 (an nest_order, group, and an 
-    # extra column), it's meaningful to save them into separate chunk and reduce 
+    # since copy common chunk operation is done before nest, it isn't necessary 
+    # to save nest_order in common chunk.
+    # If the number of common columns is at least 2 (an common olumn and extra 
+    # added group), it's meaningful to save them into separate chunk and reduce 
     # the output file size of chunk tsv.
-    if(sum(is.common) >= 3){
+    if(sum(is.common) >= 2){
       meta$g$columns$common <- common.cols <- cols[is.common]
       # save common data to chunk
       csv.name <- sprintf("%s_chunk_common.tsv", meta$g$classed)
@@ -961,10 +963,9 @@ saveCommonChunk <- function(x, vars, meta){
       common.data <- df1[common.cols]
       write.table(common.data, common.chunk, quote = FALSE, row.names = FALSE, 
                   sep = "\t")
-      # remove common data for df.list but keep nest_order field in case of the
-      # need of recovering the data.frame in the renderer
-      # keep group column for later joining by group in renderer
-      remove.cols <- common.cols[!common.cols %in% c(meta$g$nest_order, "group")]
+      # remove common data for df.list but keep group column for later joining 
+      # by group in renderer
+      remove.cols <- common.cols[!common.cols %in% "group"]
       meta$g$columns$varied <- varied.cols <- setdiff(names(df1), remove.cols)
       varied.not.group <- varied.cols[varied.cols != "group"]
       common.not.group <- common.cols[common.cols != "group"]
