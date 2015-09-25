@@ -999,8 +999,6 @@ varied.chunk <- function(df.list, cols, nest_order){
   if(depth(df.list) == 2){
     plyr::llply(df.list, function(df){
       df <- df[, cols, drop = FALSE]
-      # remove duplicated rows to further reduce chunk file size
-      if("group" %in% nest_order) df <- df[!duplicated(df), ]
       df
     })
   } else{
