@@ -1755,9 +1755,15 @@ var animint = function (to_select, json_file) {
 	.attr("class", "legend")
 	//.attr("id", legend_selector_name)
       ;
-      var legend_class = l_info.vars;
+      var legend_class = safe_name(l_info.vars);
       // the legend table with breaks/value/label.
       var legendgeoms = l_info.geoms;
+      //TODO: variable and value should be set in the compiler!
+      for(var entry_i=0; entry_i < l_info.entries.length; entry_i++){
+	var entry = l_info.entries[entry_i];
+	entry.variable = l_info.vars;
+	entry.value = entry.label[0];
+      }
       var legend_rows = legend_table.selectAll("tr")
         .data(l_info.entries)
         .sort(function(d) {return d["order"];})
@@ -1765,13 +1771,11 @@ var animint = function (to_select, json_file) {
         .append("tr")
         .attr("id", function(d) { return d["label"]; })
 	.attr("class", legend_class)
-	.on("click", function() { 
-          var row_id = d3.select(this).attr("id");
-          var s_name = this.className;
-          update_selector(s_name, row_id);
+	.on("click", function(d) { 
+          update_selector(d.variable, d.value);
 	})
-	.attr("title", function() {
-          return "Toggle " + this.id;
+	.attr("title", function(d) {
+          return "Toggle " + d.value;
 	})
 	.attr("style", "cursor:pointer")
       ;
