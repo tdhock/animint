@@ -943,40 +943,34 @@ saveCommonChunk <- function(x, vars, meta){
     is.common <- rep(NA, length(names(df1)))
     names(is.common) <- names(df1)
     for(col in names(df1)){
-      is.common[col] <- if(col %in% meta$g$nest_order){
-        FALSE
-      }else{
-        r <- identical(df1[, col], df2[, col])
-        x <- na.omit(unique(c(df1[, col], df2[, col])))
-        if(length(x) == 1){
-          r <- TRUE
-          df1[, col] <- x
-        }
-        r
+      r <- identical(df1[, col], df2[, col])
+      x <- na.omit(unique(c(df1[, col], df2[, col])))
+      if(length(x) == 1){
+        r <- TRUE
+        df1[, col] <- x
       }
+      is.common[col] <- r
     }
-    # If the number of common columns is at least 3 (an nest_order, group, and an 
-    # extra column), it's meaningful to save them into separate chunk and reduce 
-    # the output file size of chunk tsv.
-    if(sum(is.common) >= 3){
-      meta$g$columns$common <- common.cols <-
-        c("group", names(is.common)[is.common])
+    # If the number of common columns is at least 2 (group and an
+    # extra column), it's meaningful to save them into separate chunk
+    # and reduce the output file size of chunk tsv.
+    if(sum(is.common) >= 2){
+      ##browser(expr=meta$g$classed=="geom6_bar_bar")
+      meta$g$columns$common <- common.cols <- names(is.common)[is.common]
       # save common data to chunk
       csv.name <- sprintf("%s_chunk_common.tsv", meta$g$classed)
       common.chunk <- file.path(meta$out.dir, csv.name)
       common.data <- df1[common.cols]
       write.table(common.data, common.chunk, quote = FALSE, row.names = FALSE, 
                   sep = "\t")
-      # remove common data for df.list but keep nest_order field in case of the
-      # need of recovering the data.frame in the renderer
-      # keep group column for later joining by group in renderer
-      remove.cols <- common.cols[!common.cols %in% c(meta$g$nest_order, "group")]
+      # remove common data for df.list but keep group column for later joining 
+      # by group in renderer
+      remove.cols <- common.cols[!common.cols %in% "group"]
       meta$g$columns$varied <- varied.cols <- setdiff(names(df1), remove.cols)
       varied.not.group <- varied.cols[varied.cols != "group"]
       common.not.group <- common.cols[common.cols != "group"]
       varied.and.common <- intersect(varied.not.group, common.not.group)
       if(0 < length(varied.and.common)){
-        print(varied.and.common)
         stop("columns in both varied and common data")
       }
       r.df.list <- varied.chunk(r.df.list, varied.cols, meta$g$nest_order)

@@ -253,7 +253,7 @@ test_that("save separate chunks for non-spatial geoms with repetitive field, mul
   ## test common.chunk
   common.data <- read.csv(common.chunk, sep = "\t")
   expect_equal(nrow(common.data), length(unique.country.vec))
-  common.must.have <- c("colour", "clickSelects", "key", "fill", "group")
+  common.must.have <- c("colour", "clickSelects", "key", "showSelectedlegendcolour", "fill", "group")
   expect_true(all(common.must.have %in% names(common.data)))
   ## choose first varied.chunk to test
   chunk.info <- info$geoms$geom1_point_scatter$chunks
@@ -266,7 +266,7 @@ test_that("save separate chunks for non-spatial geoms with repetitive field, mul
   varied.data <- read.csv(tsv.path, sep = "\t")
   expect_equal(nrow(varied.data), nrow(expected.data))
   varied.must.have <-
-    c("size", "x", "y", "tooltip", "showSelectedlegendcolour", "group")
+    c("size", "x", "y", "tooltip", "group")
   expect_true(all(varied.must.have %in% names(varied.data)))
   
   unlink(out.dir, recursive = TRUE)
@@ -310,16 +310,21 @@ test_that("save separate chunks for non-spatial geoms with nest_order not being 
     list.files(path = out.dir, pattern = "geom.+segment.+chunk[0-9]+.tsv", 
                full.names = TRUE)
   # number of chunks
-  expect_equal(length(common.chunk), 0L)
+  expect_equal(length(common.chunk), 1L)
   no.chunks <- length(varied.chunks)
   expect_equal(no.chunks, length(unique(breakpoints$segments$samples)))
+  ## test common.chunk
+  common.data <- read.csv(common.chunk, sep = "\t")
+  n.samples <- length(unique(breakpoints$segments$samples))
+  expected.rows <- nrow(breakpoints$segments) / n.samples
+  expect_equal(nrow(common.data), expected.rows)
+  common.must.have <- c("showSelected", "group")
+  expect_true(all(common.must.have %in% names(common.data)))
   # randomly choose an varied.chunk to test
   idx <- sample(no.chunks, 1)
   varied.data <- read.csv(varied.chunks[idx], sep = "\t")
-  n.samples <- length(unique(breakpoints$segments$samples))
-  expected.rows <- nrow(breakpoints$segments) / n.samples
   expect_equal(nrow(varied.data), expected.rows)
-  must.have <- c("x", "xend", "y", "yend", "showSelected")
+  must.have <- c("x", "xend", "y", "yend", "group")
   expect_true(all(must.have %in% names(varied.data)))
   
   unlink(out.dir, recursive = TRUE)

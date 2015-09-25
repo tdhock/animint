@@ -177,6 +177,16 @@ viz <-
 
 info <- animint2HTML(viz)
 
+expected.dot.df <- 
+  subset(malaria$error.variants,
+         filterVar.thresh==malaria$filterVar$best.thresh)
+
+test_that("expected number of <circle> rendered", {
+  circle.list <-
+    getNodeSet(info$html, '//g[@class="geom13_point_variants"]//circle')
+  expect_equal(length(circle.list), nrow(expected.dot.df))
+})
+
 style.pattern <-
   paste0("(?<name>\\S+?)",
          ": *",

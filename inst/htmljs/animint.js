@@ -891,7 +891,7 @@ var animint = function (to_select, json_file) {
     d3.tsv(tsv_file, function (error, response) {
       // First convert to correct types.
       g_info.download_status[tsv_name] = "processing";
-      converted = convert_R_types(response, g_info.types);
+      response = convert_R_types(response, g_info.types);
       if (g_info.common_tsv) {
         function wait(condFun, readyFun) {
           var checkFun = function() {
