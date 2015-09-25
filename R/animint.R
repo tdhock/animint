@@ -971,7 +971,6 @@ saveCommonChunk <- function(x, vars, meta){
       common.not.group <- common.cols[common.cols != "group"]
       varied.and.common <- intersect(varied.not.group, common.not.group)
       if(0 < length(varied.and.common)){
-        print(varied.and.common)
         stop("columns in both varied and common data")
       }
       r.df.list <- varied.chunk(r.df.list, varied.cols, meta$g$nest_order)
