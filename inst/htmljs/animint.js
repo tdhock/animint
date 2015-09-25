@@ -7,7 +7,7 @@
 var animint = function (to_select, json_file) {
   function convert_R_types(resp_array, types){
     return resp_array.map(function (d) {
-      for (var v_name in types) {
+      for (var v_name in d) {
       	if(!is_interactive_aes(v_name)){
           var r_type = types[v_name];
           if (r_type == "integer") {
@@ -20,9 +20,7 @@ var animint = function (to_select, json_file) {
             // keep it as a character
           } else if (r_type == "character" & v_name == "outliers") {
             d[v_name] = parseFloat(d[v_name].split(" @ "));
-          } else {
-            throw "unsupported R type " + r_type;
-          }
+          } 
       	}
       }
       return d;
@@ -755,20 +753,25 @@ var animint = function (to_select, json_file) {
   var copy_chunk = function(common_chunk, varied_chunk, columns_common) {
     var new_varied_chunk = [];
     // join by group
-    var groups = varied_chunk.map(function(obj){
-      return obj["group"];
+    var group_array = [];
+    varied_chunk.forEach(function(d){
+      if(group_array.indexOf(d.group) == -1){
+	group_array.push(d.group);
+      }
     });
-
-    groups.forEach(function(id){
-      var varied_obj = findObjectsByKey(varied_chunk, "group", id);
-      var common_obj = findObjectsByKey(common_chunk, "group", id);
-      common_obj.forEach(function(g_common_obj){
-        var new_varied_obj = clone(varied_obj[0]);
-        columns_common.forEach(function(col) {
-          new_varied_obj[col] = g_common_obj[col];
-        });
-        new_varied_chunk.push(new_varied_obj);
-      });
+    group_array.forEach(function(group_id){
+      var varied_one_group = findObjectsByKey(varied_chunk, "group", group_id);
+      var common_one_group = findObjectsByKey(common_chunk, "group", group_id);
+      for(var i=0; i<varied_one_group.length; i++){
+	var varied_obj = varied_one_group[i];
+	var common_obj = common_one_group[i];
+	for(col in common_obj){
+	  if(col != "group"){
+	    varied_obj[col] = common_obj[col];
+	  }
+	}
+	new_varied_chunk.push(varied_obj);
+      }
     });
     return new_varied_chunk;
   };
@@ -905,7 +908,8 @@ var animint = function (to_select, json_file) {
         }, function(){
           // copy data from common tsv to varied tsv
           var common_chunk = g_info.data[g_info.common_tsv];
-          response = copy_chunk(common_chunk, response, g_info.columns.common);
+          var copied = copy_chunk(common_chunk, response, g_info.columns.common);
+	  response = copied;
         });
       }
 
