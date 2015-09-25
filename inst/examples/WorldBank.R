@@ -93,6 +93,7 @@ good <-
        bar=ggplot()+
        theme_animint(height=2400)+
        geom_bar(aes(country, life.expectancy, fill=region,
+                    key=country,
                     showSelected=year, clickSelects=country),
                 data=WorldBank, stat="identity", position="identity")+
        coord_flip(),
@@ -145,6 +146,68 @@ wb.mult <-
        
        title="World Bank data (multiple selection)")
 animint2dir(wb.mult, "WorldBank-multiple")
+
+## This is the example from the animint paper, but using only single
+## selection.
+short.regions <- not.na %>%
+  mutate(region=sub(" [(].*", "", region))
+wb.paper.single <-
+  list(ts=ggplot()+
+       make_tallrect(short.regions, "year")+
+       guides(color="none")+
+       geom_line(aes(year, life.expectancy, group=country, colour=region,
+                     showSelected=region,
+                     clickSelects=country),
+                 data=short.regions, size=4, alpha=3/5),
+       scatter=ggplot()+
+       geom_point(aes(fertility.rate, life.expectancy, clickSelects=country,
+                      showSelected=year, colour=region, size=population,
+                      key=country), # key aesthetic for animated transitions!
+                  data=short.regions)+
+       geom_text(aes(fertility.rate, life.expectancy, label=country,
+                     showSelected=country, showSelected2=year,
+                     showSelected3=region,
+                     clickSelects=country,
+                     key=country), #also use key here!
+                 data=short.regions)+
+       scale_size_animint(breaks=10^(5:9))+
+       make_text(short.regions, 5, 85, "year"),
+       time=list(variable="year", ms=3000),
+       duration=list(year=1000),
+       first=list(year=1975, country=c("United States", "Vietnam")),
+       selector.types=list(country="multiple"),
+       title="World Bank data (for Animint paper, single selection)")
+animint2dir(wb.paper.single, "WorldBank-paper-single")
+
+## This is the example from the animint paper, with multiple
+## selection.
+wb.paper <-
+  list(ts=ggplot()+
+       make_tallrect(short.regions, "year")+
+       guides(color="none")+
+       geom_line(aes(year, life.expectancy, group=country, colour=region,
+                     showSelected=region,
+                     clickSelects=country),
+                 data=short.regions, size=4, alpha=3/5),
+       scatter=ggplot()+
+       geom_point(aes(fertility.rate, life.expectancy, clickSelects=country,
+                      showSelected=year, colour=region, size=population,
+                      key=country), # key aesthetic for animated transitions!
+                  data=short.regions)+
+       geom_text(aes(fertility.rate, life.expectancy, label=country,
+                     showSelected=country, showSelected2=year,
+                     showSelected3=region,
+                     clickSelects=country,
+                     key=country), #also use key here!
+                 data=short.regions)+
+       scale_size_animint(breaks=10^(5:9))+
+       make_text(short.regions, 5, 85, "year"),
+       time=list(variable="year", ms=3000),
+       duration=list(year=1000),
+       first=list(year=1975, country=c("United States", "Vietnam")),
+       selector.types=list(country="multiple", region="multiple"),
+       title="World Bank data (for Animint paper)")
+info <- animint2dir(wb.paper, "WorldBank-paper")
 
 BOTH <- function(df, top, side){
   data.frame(df,

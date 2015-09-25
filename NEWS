@@ -176,6 +176,11 @@ https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol_type
 
 RENDER: Determine why border of tiles in pirates example does not seem to be rendering.
 
+2015.09.25
+
+BUGFIX: multiple animints can be rendered in the same Rmd, and each
+animint does not affect any of the others.
+
 2015.09.23
 
 BUGFIX: tooltips render for geoms with clickSelects.variable/value.

@@ -18,8 +18,8 @@ dasharrayPattern <-
 rect.xpaths <- 
   c('//svg[@id="numeric"]//g[@class="PANEL1"]//rect',
     '//svg[@id="character"]//g[@class="PANEL1"]//rect',
-    '//td[@id="numeric_legend"]//rect',
-    '//td[@id="character_legend"]//rect')
+    '//td[@class="numeric_legend"]//rect',
+    '//td[@class="character_legend"]//rect')
 
 test_that("linetypes render correctly", {
   viz <-

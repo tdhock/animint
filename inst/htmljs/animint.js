@@ -5,6 +5,8 @@
 // </script>
 // Constructor for animint Object.
 var animint = function (to_select, json_file) {
+  // replacing periods in variable with an underscore
+  // this makes sure that selector doesn't confuse . in name with id selector
   function safe_name(unsafe_name){
     return unsafe_name.replace(/\./g, '_');
   }
@@ -72,7 +74,7 @@ var animint = function (to_select, json_file) {
     if (!pText || pText.length === 0) return {height: 0, width: 0};
     if (pAngle === null || isNaN(pAngle)) pAngle = 0;
 
-    var container = d3.select('body').append('svg')
+    var container = element.append('svg');
     // do we need to set the class so that styling is applied?
     //.attr('class', classname);
 
@@ -173,7 +175,7 @@ var animint = function (to_select, json_file) {
     var plot_table = element.append("table").style("display", "inline-block");
     var plot_tr = plot_table.append("tr");
     var tdLeft = plot_tr.append("td");
-    var tdRight = plot_tr.append("td").attr("id", p_name+"_legend");
+    var tdRight = plot_tr.append("td").attr("class", p_name+"_legend");
     var svg = tdLeft.append("svg")
       .attr("id", p_name)
       .attr("height", p_info.options.height)
@@ -676,36 +678,40 @@ var animint = function (to_select, json_file) {
     Plots[p_name].scales = scales;
   }; //end of add_plot()
 
+  function update_legend_opacity(v_name){
+    var s_info = Selectors[v_name];
+    s_info.legend_tds.style("opacity", s_info.legend_update_fun);
+  }
+
   var add_selector = function (s_name, s_info) {
     Selectors[s_name] = s_info;
     if(s_info.type == "multiple"){
       if(!isArray(s_info.selected)){
         s_info.selected = [s_info.selected];
       }
-    }
-    // update opacity of legend entries
-    var legend_entries = 
-      d3.selectAll("tr#legend th."+safe_name(s_name)+" td.legend_entry_label");
-    legend_entries.style("opacity", function(d) {
-      var d_opacity;
-      if(s_info.type == "multiple") {
-	// if the entry is one of the selected objects set opacity to 1
-	if(s_info.selected.indexOf(this.textContent) > -1) {
-          d_opacity = 1;
-	} else {
-          // otherwise opacity is 0.5
-          d_opacity = 0.5;
-	}
-      } else {
-	// if single selection
-	if(this.textContent == s_info.selected) {
-          d_opacity = 1;
-	} else {
-          d_opacity = 0.5;
+      // legend_update_fun is evaluated in the context of the
+      // td.legend_entry_label.
+      s_info.legend_update_fun = function(d){
+	var i_value = s_info.selected.indexOf(this.textContent);
+	if(i_value == -1){
+	  return 0.5;
+	}else{
+	  return 1;
 	}
       }
-      return d_opacity;
-    });
+    }else{
+      s_info.legend_update_fun = function(d){
+	if(this.textContent == s_info.selected){
+	  return 1;
+	}else{
+	  return 0.5;
+	}
+      }
+    }
+    s_info.legend_tds = 
+      element.selectAll("tr."+safe_name(s_name)+" td.legend_entry_label")
+    ;
+    update_legend_opacity(s_name);
   }; //end of add_selector()
 
   var get_tsv = function(g_info, chunk_id){
@@ -1663,28 +1669,23 @@ var animint = function (to_select, json_file) {
       eActions(elements); // Set the attributes of all elements (enter/exit/stay)
     }
   };
+
   var update_selector = function (v_name, value) {
-    var s_info = Selectors[v_name];
-    var legend_value_opacity, legend_other_opacity;
     value = value + "";
+    var s_info = Selectors[v_name];
     if(s_info.type == "single"){
       // value is the new selection.
       s_info.selected = value;
-      legend_other_opacity = 0.5;
-      legend_value_opacity = 1;
     }else{
       // value should be added or removed from the selection.
       var i_value = s_info.selected.indexOf(value);
       if(i_value == -1){
         // not found, add to selection.
-	      s_info.selected.push(value);
-	      legend_value_opacity = 1;
+	s_info.selected.push(value);
       }else{
-	      // found, remove from selection.
-	      s_info.selected.splice(i_value, 1);
-	      legend_value_opacity = 0.5;
+	// found, remove from selection.
+	s_info.selected.splice(i_value, 1);
       }
-      legend_other_opacity = null;
     }
     // the jquery ids
     if(s_info.type == "single") {
@@ -1700,27 +1701,12 @@ var animint = function (to_select, json_file) {
       selectized_array[v_name].getValue() != selected_ids) {
       selectized_array[v_name].setValue(selected_ids);
     }
-    // update legend opacity
-    // replacing periods in variable with an underscore
-    // this makes sure that selector doesn't confuse . in name with id selector
-    var legend_entries_id = safe_name(v_name);
-    var legend_entries = 
-      d3.selectAll("tr#legend th#"+legend_entries_id+" td.legend_entry_label");
-    legend_entries.style("opacity", function(d){
-      if(this.textContent == value){
-	return legend_value_opacity;
-      }else{
-	if(legend_other_opacity == null){
-	  return this.style.opacity;
-	}else{
-	  return legend_other_opacity;
-	}
-      }
-    });
+    update_legend_opacity(v_name);
     s_info.update.forEach(function(g_name){
       update_geom(g_name, v_name);
     });
   };
+
   var ifSelectedElse = function (s_value, s_name, selected, not_selected) {
     var is_selected;
     var s_info = Selectors[s_name];
@@ -1758,31 +1744,48 @@ var animint = function (to_select, json_file) {
   // then I bind the legend entries to <tr>, <td>, and <svg> elements.
   var add_legend = function(p_name, p_info){
     // case of multiple legends, d3 reads legend structure in as an array
-    var tdRight = element.select("td#"+p_name+"_legend");
+    var tdRight = element.select("td."+p_name+"_legend");
     var legendkeys = d3.keys(p_info.legend);
     for(var i=0; i<legendkeys.length; i++){
+      var legend_key = legendkeys[i];
+      var l_info = p_info.legend[legend_key];
+      var legend_selector_name = safe_name(l_info.vars);
       // the table that contains one row for each legend element.
       var legend_table = tdRight.append("table")
-        .append("tr").attr("id", "legend")
-        .append("th").attr("align", "left")
-        .text(p_info.legend[legendkeys[i]].title)
-        .attr("id", function() {
-          // identifying the name of the variable
-          var var_name = p_info.legend[legendkeys[i]].vars;
-          // replacing periods with underscores
-          return safe_name(var_name);
-        })
-        // adding a class which doesn't have underscores in the name
-        .attr("class", p_info.legend[legendkeys[i]].vars);
-      var l_info = p_info.legend[legendkeys[i]];
+	.attr("class", "legend")
+	//.attr("id", legend_selector_name)
+      ;
+      var legend_class = safe_name(l_info.vars);
       // the legend table with breaks/value/label.
       var legendgeoms = l_info.geoms;
+      //TODO: variable and value should be set in the compiler!
+      for(var entry_i=0; entry_i < l_info.entries.length; entry_i++){
+	var entry = l_info.entries[entry_i];
+	entry.variable = l_info.vars;
+	entry.value = entry.label[0];
+      }
       var legend_rows = legend_table.selectAll("tr")
         .data(l_info.entries)
         .sort(function(d) {return d["order"];})
         .enter()
         .append("tr")
-        .attr("id", function(d) { return d["label"]; });
+        .attr("id", function(d) { return d["label"]; })
+	.attr("class", legend_class)
+	.on("click", function(d) { 
+          update_selector(d.variable, d.value);
+	})
+	.attr("title", function(d) {
+          return "Toggle " + d.value;
+	})
+	.attr("style", "cursor:pointer")
+      ;
+      var first_tr = legend_table.insert("tr", "tr");
+      var first_th = first_tr.append("th")
+	.attr("align", "left")
+	.attr("colspan", 2)
+        .text(l_info.title)
+        .attr("class", legend_class)
+      ;
       var legend_svgs = legend_rows.append("td")
         .append("svg")
   	    .attr("id", function(d){return "legend-"+d["label"];})
@@ -1845,28 +1848,19 @@ var animint = function (to_select, json_file) {
           .style("opacity", function(d){return d["pointalpha"]||1;});
       }
       legend_rows.append("td")
-      .attr("align", "left") // TODO: right for numbers?
-      .attr("class", "legend_entry_label")
-      .attr("id", function(d){ return d["label"]; })
-      .text(function(d){ return d["label"];});
+	.attr("align", "left") // TODO: right for numbers?
+	.attr("class", "legend_entry_label")
+	.attr("id", function(d){ return d["label"]; })
+	.text(function(d){ return d["label"];});
     }
-    
-    // selecting points based on legend
-    d3.select("#plot").selectAll("#legend").selectAll("tr")
-      .on("click", function() { 
-        var row_id = d3.select(this).attr("id");
-        var s_name = this.parentElement.className;
-        update_selector(s_name, row_id);
-      })
-      .attr("title", function() {
-        return "Toggle " + this.id;
-      })
-      .attr("style", "cursor:pointer");
   }
 
   // Download the main description of the interactive plot.
   d3.json(json_file, function (error, response) {
     if(response.hasOwnProperty("title")){
+      // This selects the title of the web page, outside of wherever
+      // the animint is defined, usually a <div> -- so it is OK to use
+      // global d3.select here.
       d3.select("title").text(response.title);
     }
     // Add plots.
@@ -1996,7 +1990,7 @@ var animint = function (to_select, json_file) {
     var show_message2 = "Toggle selected variables";
     var show_hide_selector_widgets = element.append("button")
       .text(show_message2)
-      .attr("id", "show_hide_selector_widgets")
+      .attr("class", "show_hide_selector_widgets")
       .on("click", function(){
         if(this.textContent == show_message2){
           selector_table.style("display", "");
@@ -2010,7 +2004,7 @@ var animint = function (to_select, json_file) {
     // adding a table for selector widgets
     var selector_table = element.append("table")
       .style("display", "none")
-      .attr("id", "table_selector_widgets")
+      .attr("class", "table_selector_widgets")
     ;
     var selector_first_tr = selector_table.append("tr");
     selector_first_tr
@@ -2026,14 +2020,14 @@ var animint = function (to_select, json_file) {
       // adding a row for each selector
       var selector_widget_row = selector_table
         .append("tr")
-        .attr("id", function() { return s_name_id + "_selector_widget"; })
+        .attr("class", function() { return s_name_id + "_selector_widget"; })
       ;
       selector_widget_row.append("td").text(s_name);
       // adding the selector
       var selector_widget_select = selector_widget_row
         .append("td")
         .append("select")
-        .attr("id", function() { return s_name_id + "_input"; })
+        .attr("class", function() { return s_name_id + "_input"; })
         .attr("placeholder", function() { return "Toggle " + s_name; });
       // adding an option for each level of the variable
       selector_widget_select.selectAll("option")
@@ -2049,6 +2043,7 @@ var animint = function (to_select, json_file) {
         .text(function() { return "Toggle " + s_name; });
         
       // calling selectize
+      var selectize_selector = to_select + ' .' + s_name_id + "_input";
       if(s_info.type == "single") {
         // setting up array of selector and options
         var selector_values = [];
@@ -2062,7 +2057,7 @@ var animint = function (to_select, json_file) {
         var selected_id = s_name.concat("___", s_info.selected);
 
         // if single selection, only allow one item
-        var $temp = $('#' + s_name_id + "_input")
+        var $temp = $(selectize_selector)
           .selectize({
               create: false, 
               valueField: 'id',
@@ -2104,7 +2099,7 @@ var animint = function (to_select, json_file) {
         }
         
         // construct the selectize
-        var $temp = $('#' + s_name_id + "_input")
+        var $temp = $(selectize_selector)
           .selectize({
               create: false, 
               valueField: 'id',

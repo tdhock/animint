@@ -29,7 +29,7 @@ wb.facets <-
                       showSelected=country, clickSelects=country),
                   data=TS(not.na))+
 
-       geom_line(aes(fertility.rate, year, group=country, colour=region,
+       geom_path(aes(fertility.rate, year, group=country, colour=region,
                      clickSelects=country),
                  data=TS2(not.na), size=4, alpha=3/5)+
        geom_point(aes(fertility.rate, year, color=region, size=population,
