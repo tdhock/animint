@@ -993,7 +993,9 @@ varied.chunk <- function(df.list, cols, nest_order){
     plyr::llply(df.list, function(df){
       df <- df[, cols, drop = FALSE]
       u.df <- unique(df)
-      if(nrow(u.df)==1){
+      ##browser(expr=identical(cols, c("fill", "group")))
+      group.counts <- table(u.df$group)
+      if(all(group.counts == 1)){
         u.df
       }else{
         df
