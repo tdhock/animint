@@ -2039,6 +2039,7 @@ var animint = function (to_select, json_file) {
         .text(function() { return "Toggle " + s_name; });
         
       // calling selectize
+      var selectize_selector = to_select + ' #' + s_name_id + "_input";
       if(s_info.type == "single") {
         // setting up array of selector and options
         var selector_values = [];
@@ -2052,7 +2053,7 @@ var animint = function (to_select, json_file) {
         var selected_id = s_name.concat("___", s_info.selected);
 
         // if single selection, only allow one item
-        var $temp = $('#' + s_name_id + "_input")
+        var $temp = $(selectize_selector)
           .selectize({
               create: false, 
               valueField: 'id',
@@ -2094,7 +2095,7 @@ var animint = function (to_select, json_file) {
         }
         
         // construct the selectize
-        var $temp = $('#' + s_name_id + "_input")
+        var $temp = $(selectize_selector)
           .selectize({
               create: false, 
               valueField: 'id',
