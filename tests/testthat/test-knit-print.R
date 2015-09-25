@@ -26,11 +26,21 @@ get_circles <- function(id) {
 }
 
 get_elements <- function(id){
+  print("before div")
   div <- remDr$findElement("id", id)
-  list(a178=div$findChildElement("id", "a178"),
-       b934=div$findChildElement("id", "b934"),
-       show_hide=div$findChildElement("id", "show_hide_selector_widgets"),
-       col_widget=div$findChildElement("id", "col_selector_widget"))
+  ## For debugging a NoSuchElement error I insert print statements.
+  print("before css selector")
+  tr.list <- div$findChildElements("css selector", "table.legend tr.col")
+  a <- tr.list[[1]]
+  b <- tr.list[[2]]
+  print("before show_hide")
+  show_hide <- div$findChildElement("class name", "show_hide_selector_widgets")
+  print("before col_selector_widget")
+  col.w <- div$findChildElement("class name", "col_selector_widget")
+  list(a178=a,
+       b934=b,
+       show_hide=show_hide,
+       col_widget=col.w)
 }
 
 plot1top <- get_elements("plot1top")

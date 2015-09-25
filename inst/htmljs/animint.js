@@ -175,7 +175,7 @@ var animint = function (to_select, json_file) {
     var plot_table = element.append("table").style("display", "inline-block");
     var plot_tr = plot_table.append("tr");
     var tdLeft = plot_tr.append("td");
-    var tdRight = plot_tr.append("td").attr("id", p_name+"_legend");
+    var tdRight = plot_tr.append("td").attr("class", p_name+"_legend");
     var svg = tdLeft.append("svg")
       .attr("id", p_name)
       .attr("height", p_info.options.height)
@@ -709,7 +709,7 @@ var animint = function (to_select, json_file) {
       }
     }
     s_info.legend_tds = 
-      element.selectAll("table#"+safe_name(s_name)+" td.legend_entry_label")
+      element.selectAll("tr."+safe_name(s_name)+" td.legend_entry_label")
     ;
     update_legend_opacity(s_name);
   }; //end of add_selector()
@@ -1744,7 +1744,7 @@ var animint = function (to_select, json_file) {
   // then I bind the legend entries to <tr>, <td>, and <svg> elements.
   var add_legend = function(p_name, p_info){
     // case of multiple legends, d3 reads legend structure in as an array
-    var tdRight = element.select("td#"+p_name+"_legend");
+    var tdRight = element.select("td."+p_name+"_legend");
     var legendkeys = d3.keys(p_info.legend);
     for(var i=0; i<legendkeys.length; i++){
       var legend_key = legendkeys[i];
@@ -1753,7 +1753,7 @@ var animint = function (to_select, json_file) {
       // the table that contains one row for each legend element.
       var legend_table = tdRight.append("table")
 	.attr("class", "legend")
-	.attr("id", legend_selector_name)
+	//.attr("id", legend_selector_name)
       ;
       var legend_class = l_info.vars;
       // the legend table with breaks/value/label.
@@ -1844,10 +1844,10 @@ var animint = function (to_select, json_file) {
           .style("opacity", function(d){return d["pointalpha"]||1;});
       }
       legend_rows.append("td")
-      .attr("align", "left") // TODO: right for numbers?
-      .attr("class", "legend_entry_label")
-      .attr("id", function(d){ return d["label"]; })
-      .text(function(d){ return d["label"];});
+	.attr("align", "left") // TODO: right for numbers?
+	.attr("class", "legend_entry_label")
+	.attr("id", function(d){ return d["label"]; })
+	.text(function(d){ return d["label"];});
     }
   }
 
@@ -1986,7 +1986,7 @@ var animint = function (to_select, json_file) {
     var show_message2 = "Toggle selected variables";
     var show_hide_selector_widgets = element.append("button")
       .text(show_message2)
-      .attr("id", "show_hide_selector_widgets")
+      .attr("class", "show_hide_selector_widgets")
       .on("click", function(){
         if(this.textContent == show_message2){
           selector_table.style("display", "");
@@ -2000,7 +2000,7 @@ var animint = function (to_select, json_file) {
     // adding a table for selector widgets
     var selector_table = element.append("table")
       .style("display", "none")
-      .attr("id", "table_selector_widgets")
+      .attr("class", "table_selector_widgets")
     ;
     var selector_first_tr = selector_table.append("tr");
     selector_first_tr
@@ -2016,14 +2016,14 @@ var animint = function (to_select, json_file) {
       // adding a row for each selector
       var selector_widget_row = selector_table
         .append("tr")
-        .attr("id", function() { return s_name_id + "_selector_widget"; })
+        .attr("class", function() { return s_name_id + "_selector_widget"; })
       ;
       selector_widget_row.append("td").text(s_name);
       // adding the selector
       var selector_widget_select = selector_widget_row
         .append("td")
         .append("select")
-        .attr("id", function() { return s_name_id + "_input"; })
+        .attr("class", function() { return s_name_id + "_input"; })
         .attr("placeholder", function() { return "Toggle " + s_name; });
       // adding an option for each level of the variable
       selector_widget_select.selectAll("option")
@@ -2039,7 +2039,7 @@ var animint = function (to_select, json_file) {
         .text(function() { return "Toggle " + s_name; });
         
       // calling selectize
-      var selectize_selector = to_select + ' #' + s_name_id + "_input";
+      var selectize_selector = to_select + ' .' + s_name_id + "_input";
       if(s_info.type == "single") {
         // setting up array of selector and options
         var selector_values = [];
