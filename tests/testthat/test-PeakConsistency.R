@@ -55,7 +55,7 @@ viz <-
   list(increase=ggplot()+
          make_tallrect(PeakConsistency$increase, "increase")+
          geom_line(aes(increase, mean.diff), data=PeakConsistency$increase),
-         errors=ggplot()+
+       errors=ggplot()+
          ylab("distance from true peaks to estimated peaks")+
          scale_color_manual(values=color.code)+
          make_tallrect(PeakConsistency$error, "sample.size")+
@@ -103,22 +103,24 @@ viz <-
          scale_color_manual(values=color.code),
        first=list(sample.size=5))
 
+viz$errors+facet_grid(. ~ increase)
+
 info <- animint2HTML(viz)
 
-test_that("4 paths of both colors in first plot", {
+test_that("4 paths of both colors in second plot", {
   path.list <- 
-    getNodeSet(info$html, '//g[@class="geom2_line_errors"]//path')
+    getNodeSet(info$html, '//g[@class="geom4_line_errors"]//path')
   computed.vec <- getStroke(path.list)
   color.counts <- as.numeric(table(computed.vec))
   expect_equal(color.counts, c(4, 4))
 })
 
-test_that("15 segments of both colors in second plot", {
+test_that("15 segments of both colors in last plot", {
   line.list <-
-    getNodeSet(info$html, '//g[@class="geom5_segment_signals"]//line')
+    getNodeSet(info$html, '//g[@class="geom7_segment_signals"]//line')
   computed.vec <- getStroke(line.list)
   color.counts <- as.numeric(table(computed.vec))
-  ##expect_equal(color.counts, c(15, 15)) #firefox bug.
-  expect_equal(sum(color.counts), 30)
+  expect_equal(color.counts, c(15, 15)) #firefox bug.
+  ##expect_equal(sum(color.counts), 30)
 })
 
