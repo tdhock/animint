@@ -206,6 +206,14 @@ tornado.lines <-
 ##animint2dir(tornado.lines, "tornado-lines")
 info <- animint2HTML(tornado.lines)
 
+test_that("1950 <circle> and <line> elements", {
+  t1950 <- subset(UStornadoes, year==1950)
+  nodes <- getNodeSet(info$html, '//g[@class="geom3_segment_map"]//line')
+  expect_equal(length(nodes), nrow(t1950))
+  nodes <- getNodeSet(info$html, '//g[@class="geom4_point_map"]//circle')
+  expect_equal(length(nodes), nrow(t1950))
+})
+
 test_that("default is 2 <path> and <text> elements", {
   nodes <- getNodeSet(info$html, '//g[@class="geom7_line_ts"]//path')
   expect_equal(length(nodes), 2)
