@@ -915,10 +915,16 @@ saveCommonChunk <- function(x, vars, meta){
   meta$g$columns <- NULL # initial value
   # remove default group column added by ggplot builder
   if("group" %in% names(x) & (!"group" %in% meta$g$nest_order)){
-    x <- x[, !names(x) %in% "group"]
-    meta$g$types <- meta$g$types[!names(meta$g$types) %in% "group"]
+    x <- x[, names(x) != "group"]
+    meta$g$types <- meta$g$types[names(meta$g$types) != "group"]
   }
-  
+  ## Treat factors as characters, to avoid having them be coerced to
+  ## integer later.
+  for(col.name in names(x)){
+    if(is.factor(x[, col.name])){
+      x[, col.name] <- paste(x[, col.name])
+    }
+  }
   if(length(vars) == 0){
     # rows with NA should not be saved
     na.omit(x)
@@ -942,14 +948,14 @@ saveCommonChunk <- function(x, vars, meta){
     if(nrow(df1) == 1) return(split.x(raw.x, vars))
     is.common <- rep(NA, length(names(df1)))
     names(is.common) <- names(df1)
-    for(col in names(df1)){
-      r <- identical(df1[, col], df2[, col])
-      x <- na.omit(unique(c(df1[, col], df2[, col])))
-      if(length(x) == 1){
-        r <- TRUE
-        df1[, col] <- x
+    for(col.name in names(df1)){
+      col.is.common <- identical(df1[, col.name], df2[, col.name])
+      one.vec <- na.omit(unique(c(df1[, col.name], df2[, col.name])))
+      if(length(one.vec) == 1){
+        col.is.common <- TRUE
+        df1[, col.name] <- one.vec
       }
-      is.common[col] <- r
+      is.common[col.name] <- col.is.common
     }
     # If the number of common columns is at least 2 (group and an
     # extra column), it's meaningful to save them into separate chunk
@@ -964,13 +970,13 @@ saveCommonChunk <- function(x, vars, meta){
                   sep = "\t")
       # remove common data for df.list but keep group column for later joining 
       # by group in renderer
-      remove.cols <- common.cols[!common.cols %in% "group"]
+      remove.cols <- common.cols[common.cols != "group"]
       meta$g$columns$varied <- varied.cols <- setdiff(names(df1), remove.cols)
       varied.not.group <- varied.cols[varied.cols != "group"]
       common.not.group <- common.cols[common.cols != "group"]
       varied.and.common <- intersect(varied.not.group, common.not.group)
       if(0 < length(varied.and.common)){
-        stop("columns in both varied and common data")
+        warning("columns in both varied and common data")
       }
       r.df.list <- varied.chunk(r.df.list, varied.cols, meta$g$nest_order)
     }
