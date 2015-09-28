@@ -51,7 +51,7 @@ chunk1 <- read.table(chunk1.tsv, sep="\t", header=TRUE,
                      comment.char="", quote="")
 
 test_that("chunk1 contains expected columns", {
-  expect_identical(names(chunk1), c("xmax", "group"))
+  expect_identical(sort(names(chunk1)), sort(c("xmax", "group")))
 })
 
 test_that("chunk1 does not contain NA", {
