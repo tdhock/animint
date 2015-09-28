@@ -41,7 +41,7 @@ breakpointError <-
        title="breakpointError (select one model size)")
 
 info <- animint2HTML(breakpointError)
-remDr$screenshot(file="~/R/animint/phantom-bug-screenshot.png")
+##remDr$screenshot(file="~/R/animint/phantom-bug-screenshot.png")
 
 dasharrayPattern <-
   paste0("stroke-dasharray:",
