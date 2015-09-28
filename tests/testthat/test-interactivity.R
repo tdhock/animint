@@ -26,21 +26,22 @@ breakpointError <-
        points=ggplot()+
        geom_point(aes(samples, error,
                       showSelected=segments,
-                      id=samples,
+                      id=paste0("samples", samples),
                       clickSelects=samples),
                   data=only.error, stat="identity"),
        error=ggplot()+
-       geom_vline(aes(xintercept=segments, clickSelects=segments,
-                      id=segments),
+       geom_vline(aes(xintercept=segments, 
+                      id=paste0("segments", segments),
+                      clickSelects=segments),
                   data=only.segments, lwd=17, alpha=1/2)+
        geom_line(aes(segments, error, group=samples,
-                     ##key=samples,
                      clickSelects=samples),
                  data=only.error, lwd=4),
        first=list(samples=150, segments=4),
        title="breakpointError (select one model size)")
 
 info <- animint2HTML(breakpointError)
+remDr$screenshot(file="~/R/animint/phantom-bug-screenshot.png")
 
 dasharrayPattern <-
   paste0("stroke-dasharray:",
@@ -89,9 +90,14 @@ test_that("default is single selection", {
   expect_match(selector.types$segments, "single")
 })
 
-test_that("aes(key) geoms have ids", {
+test_that("aes(id) geoms have ids", {
   nodes <- getNodeSet(info$html, '//*[@id][@class="geom"]')
   expect_equal(length(nodes), 24)
+})
+
+test_that("4 <circle> elements in second plot", {
+  nodes <- getNodeSet(info$html, '//g[@class="geom5_point_points"]//circle')
+  expect_equal(length(nodes), 4)
 })
 
 test_that("default is 150 <circle> elements", {
@@ -105,13 +111,13 @@ test_that("default is 4 <line> segments", {
 })
 
 test_that("clickSelects 300 makes 300 <circle> elements", {
-  html <- clickHTML(id=300)
+  html <- clickHTML(id=paste0("samples", 300))
   nodes <- getNodeSet(html, '//g[@class="geom1_point_signal"]//circle')
   expect_equal(length(nodes), 300)
 })
 
 test_that("clickSelects 1 changes to 1 <line> element", {
-  html <- clickHTML(id=1)
+  html <- clickHTML(id=paste0("segments", 1))
   nodes <- getNodeSet(html, '//g[@class="geom3_segment_signal"]//line')
   expect_equal(length(nodes), 1)
 })
@@ -137,13 +143,13 @@ test_that("default is 150 and 4 <circle> elements", {
 })
 
 test_that("clickSelects 300 makes 300 <circle> elements", {
-  html <- clickHTML(id=300)
+  html <- clickHTML(id=paste0("samples", 300))
   nodes <- getNodeSet(html, '//g[@class="geom1_point_signal"]//circle')
   expect_equal(length(nodes), 300)
 })
 
 test_that("clickSelects 1 adds 1 <line> and 4 <circle>", {
-  html <- clickHTML(id=1)
+  html <- clickHTML(id=paste0("segments", 1))
   nodes <- getNodeSet(html, '//g[@class="geom3_segment_signal"]//line')
   expect_equal(length(nodes), 5)
   nodes <- getNodeSet(html, '//g[@class="geom5_point_points"]//circle')
@@ -151,7 +157,7 @@ test_that("clickSelects 1 adds 1 <line> and 4 <circle>", {
 })
 
 test_that("clickSelects 4 removes 4 <line> elements and 4 <circle>", {
-  html <- clickHTML(id=4)
+  html <- clickHTML(id=paste0("segments", 4))
   nodes <- getNodeSet(html, '//g[@class="geom3_segment_signal"]//line')
   expect_equal(length(nodes), 1)
   nodes <- getNodeSet(html, '//g[@class="geom5_point_points"]//circle')
@@ -159,7 +165,7 @@ test_that("clickSelects 4 removes 4 <line> elements and 4 <circle>", {
 })
 
 test_that("clickSelects 1 removes all <line> elements and all <circle>", {
-  html <- clickHTML(id=1)
+  html <- clickHTML(id=paste0("segments", 1))
   nodes <- getNodeSet(html, '//g[@class="geom3_segment_signal"]//line')
   expect_equal(length(nodes), 0)
   nodes <- getNodeSet(html, '//g[@class="geom5_point_points"]//circle')
