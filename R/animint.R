@@ -887,11 +887,24 @@ saveLayer <- function(l, d, meta){
     g$nest_order <- c(g$nest_order, "group")
   }
 
-  ## Split into chunks and save tsv files.
+  ## Determine if there are any "common" data that can be saved
+  ## separately to reduce disk usage.
+  data.or.null <- getCommonChunk(g.data, chunk.cols, g$aes)
+  g.data.varied <- if(is.null(data.or.null)){
+    split.x(g.data, chunk.cols)
+  }else{
+    g$columns <- lapply(data.or.null, names)
+    tsv.name <- sprintf("%s_chunk_common.tsv", g$classed)
+    tsv.path <- file.path(meta$out.dir, tsv.name)
+    write.table(data.or.null$common, tsv.path,
+                quote = FALSE, row.names = FALSE, 
+                sep = "\t")
+    data.or.null$varied
+  }
+
+  ## Save each variable chunk to a separate tsv file.
   meta$chunk.i <- 1L
   meta$g <- g
-  g.data.varied <- saveCommonChunk(g.data, chunk.cols, meta)
-  g <- meta$g
   g$chunks <- saveChunks(g.data.varied, meta)
   g$total <- length(unlist(g$chunks))
 
@@ -907,108 +920,101 @@ saveLayer <- function(l, d, meta){
 }
 
 ##' Save the common columns for each tsv to one chunk
-##' @param x data.frame.
-##' @param vars character vector of variable names to split on.
-##' @param meta environment.
-##' @return a recursive list of data.frame comprised of varied columns for each tsv.
-saveCommonChunk <- function(x, vars, meta){
-  meta$g$columns <- NULL # initial value
-  # remove default group column added by ggplot builder
-  if("group" %in% names(x) & (!"group" %in% meta$g$nest_order)){
-    x <- x[, names(x) != "group"]
-    meta$g$types <- meta$g$types[names(meta$g$types) != "group"]
+##' @param built data.frame.
+##' @param vars character vector of chunk variable names to split on.
+##' @return a data.frame of common data to save, or NULL if there is
+##' no common data.
+getCommonChunk <- function(built, chunk.vars, aes.list){
+  if(length(chunk.vars) == 0){
+    ## rows with NA should not be saved
+    return(NULL)
+  }
+  if(! "group" %in% names(aes.list)){
+    ## user did not specify group, so do not use any ggplot2-computed
+    ## group for deciding common data.
+    built$group <- NULL
   }
   ## Treat factors as characters, to avoid having them be coerced to
   ## integer later.
-  for(col.name in names(x)){
-    if(is.factor(x[, col.name])){
-      x[, col.name] <- paste(x[, col.name])
+  for(col.name in names(built)){
+    if(is.factor(built[, col.name])){
+      built[, col.name] <- paste(built[, col.name])
     }
   }
-  if(length(vars) == 0){
-    # rows with NA should not be saved
-    na.omit(x)
-  } else {
-    raw.x <- x
-    # add group column for later joining by group in renderer
-    # if group column already exists, use the existing one
-    if(!"group" %in% meta$g$nest_order){
-      x <- plyr::ddply(x, vars, function(df){
-        data.frame(df[!names(df) %in% vars], group = 1:nrow(df))
-      })
-    }
-    # return recursive list of data.frame
-    r.df.list <- split.x(x, vars)
-    # compare the first and the last data.frame from non-rescursive list of 
-    # data.frame to determine common columns
-    df.list <- split(x[!names(x) %in% vars], x[, vars], drop = TRUE)
-    if(length(df.list) == 1) return(split.x(raw.x, vars))
-    df1 <- df.list[[1]]
-    df2 <- df.list[[length(df.list)]]
-    if(nrow(df1) == 1) return(split.x(raw.x, vars))
-    is.common <- rep(NA, length(names(df1)))
-    names(is.common) <- names(df1)
-    for(col.name in names(df1)){
-      col.is.common <- identical(df1[, col.name], df2[, col.name])
-      one.vec <- na.omit(unique(c(df1[, col.name], df2[, col.name])))
-      if(length(one.vec) == 1){
-        col.is.common <- TRUE
-        df1[, col.name] <- one.vec
+  built.by.chunk <- split(built, built[, chunk.vars], drop = TRUE)
+  if(length(built.by.chunk) == 1) return(NULL)
+  ## If there is no group column, and all the chunks are the same
+  ## size, then add one based on the row number.
+  if(! "group" %in% names(built)){
+    chunk.rows.vec <- sapply(built.by.chunk, nrow)
+    chunk.rows <- chunk.rows.vec[1]
+    same.size <- chunk.rows == chunk.rows.vec
+    if(all(same.size)){
+      for(chunk.name in names(built.by.chunk)){
+        built.by.chunk[[chunk.name]]$group <- 1:chunk.rows
       }
-      is.common[col.name] <- col.is.common
+    }else{
+      ## do not save a common chunk file.
+      return(NULL)
     }
-    # If the number of common columns is at least 2 (group and an
-    # extra column), it's meaningful to save them into separate chunk
-    # and reduce the output file size of chunk tsv.
-    if(sum(is.common) >= 2){
-      meta$g$columns$common <- common.cols <- names(is.common)[is.common]
-      # save common data to chunk
-      csv.name <- sprintf("%s_chunk_common.tsv", meta$g$classed)
-      common.chunk <- file.path(meta$out.dir, csv.name)
-      common.data <- df1[common.cols]
-      write.table(common.data, common.chunk, quote = FALSE, row.names = FALSE, 
-                  sep = "\t")
-      # remove common data for df.list but keep group column for later joining 
-      # by group in renderer
-      remove.cols <- common.cols[common.cols != "group"]
-      meta$g$columns$varied <- varied.cols <- setdiff(names(df1), remove.cols)
-      varied.not.group <- varied.cols[varied.cols != "group"]
-      common.not.group <- common.cols[common.cols != "group"]
-      varied.and.common <- intersect(varied.not.group, common.not.group)
-      if(0 < length(varied.and.common)){
-        warning("columns in both varied and common data")
-      }
-      r.df.list <- varied.chunk(r.df.list, varied.cols, meta$g$nest_order)
+  }
+  all.col.names <- names(built.by.chunk[[1]])
+  col.name.vec <- all.col.names[!all.col.names %in% chunk.vars]
+  values.by.group <- list()
+  for(chunk.name in names(built.by.chunk)){
+    chunk.df <- built.by.chunk[[chunk.name]]
+    chunk.by.group <- split(chunk.df, chunk.df$group, drop=TRUE)
+    for(group.name in names(chunk.by.group)){
+      values.by.group[[group.name]][[chunk.name]] <-
+        chunk.by.group[[group.name]]
     }
-    r.df.list
+  }
+  is.common.mat <-
+    matrix(NA, length(values.by.group), length(col.name.vec),
+           dimnames=list(group=names(values.by.group),
+             col.name=col.name.vec))
+  for(group.name in names(values.by.group)){
+    values.by.chunk <- values.by.group[[group.name]]
+    for(col.name in col.name.vec){
+      value.list <- lapply(values.by.chunk, function(df)df[[col.name]])
+      value.mat <- do.call(cbind, value.list)
+      is.common.mat[group.name, col.name] <- all(value.mat[, 1] == value.mat)
+    }
+  }
+  is.common <- apply(is.common.mat, 2, all, na.rm=TRUE)
+  if(is.common[["group"]] && sum(is.common) >= 2){
+    common.cols <- names(is.common)[is.common]
+    one.chunk <- built.by.chunk[[1]]
+    ## Should each chunk have the same info about each group? 
+    common.data <- na.omit(one.chunk[common.cols])
+    ## print(head(common.data))
+    ## browser()
+    built.group <- do.call(rbind, built.by.chunk)
+    built.has.common <- subset(built.group, group %in% common.data$group)
+    varied.df.list <- split.x(built.has.common, chunk.vars)
+    varied.cols <- c("group", names(is.common)[!is.common])
+    varied.data <- varied.chunk(varied.df.list, varied.cols)
+    return(list(common=common.data,
+                varied=varied.data))
   }
 }
-
-##' Depth of recursive list.
-##' @param this object.
-##' @return depth of this recursive list.
-depth <- function(this) ifelse(is.list(this), 1L + max(sapply(this, depth)), 0L)
 
 ##' Extract subset for each data.frame in a list of data.frame
 ##' @param df.list list of data.frame.
 ##' @param cols cols that each data.frame would keep.
-##' @param nest_order columns used for d3 nest.
 ##' @return list of data.frame.
-varied.chunk <- function(df.list, cols, nest_order){
-  if(depth(df.list) == 2){
-    plyr::llply(df.list, function(df){
-      df <- df[, cols, drop = FALSE]
-      u.df <- unique(df)
-      ##browser(expr=identical(cols, c("fill", "group")))
-      group.counts <- table(u.df$group)
-      if(all(group.counts == 1)){
-        u.df
-      }else{
-        df
-      }
-    })
+varied.chunk <- function(df.or.list, cols){
+  if(is.data.frame(df.or.list)){
+    df <- df.or.list[, cols, drop = FALSE]
+    u.df <- unique(df)
+    group.counts <- table(u.df$group)
+    if(all(group.counts == 1)){
+      u.df
+    }else{
+      df
+    }
   } else{
-    lapply(df.list, varied.chunk, cols, nest_order)
+    lapply(df.or.list, varied.chunk, cols)
   }
 }
 
@@ -1017,11 +1023,12 @@ varied.chunk <- function(df.list, cols, nest_order){
 ##' @param vars character vector of variable names to split on.
 ##' @return recursive list of data.frame.
 split.x <- function(x, vars){
+  if(length(vars)==0)return(x)
   if(is.data.frame(x)){
     # rows with NA should not be saved
     x <- na.omit(x)
     if(length(vars) == 1){
-      df.list <- split(x[names(x) != vars], x[vars], drop = TRUE)
+      split(x[names(x) != vars], x[vars], drop = TRUE)
     }else{
       use <- vars[1]
       rest <- vars[-1]
@@ -1035,7 +1042,7 @@ split.x <- function(x, vars){
     stop("unknown object")
   }
 }
-
+  
 ##' Split data set into chunks and save them to separate files.
 ##' @param x data.frame.
 ##' @param meta environment.
