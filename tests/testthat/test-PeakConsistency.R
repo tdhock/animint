@@ -79,7 +79,9 @@ viz <-
                         showSelected=seed),
                     color="grey50",
                     data=PeakConsistency$signal)+
-         geom_vline(aes(xintercept=chromStart+0.5, color=model),
+         geom_vline(aes(xintercept=chromStart+0.5, color=model,
+                        showSelected=increase,
+                        showSelected2=seed),
                     show_guide=TRUE,
                     linetype="dashed",
                     data=PeakConsistency$truth)+
@@ -101,7 +103,8 @@ viz <-
          scale_color_manual(values=color.code),
        first=list(sample.size=5))
 
-viz$errors+facet_grid(. ~ increase)
+## viz$errors+facet_grid(. ~ increase)
+## viz$signals+facet_grid(sample.id ~ increase + seed)
 
 info <- animint2HTML(viz)
 
@@ -118,7 +121,24 @@ test_that("15 segments of both colors in last plot", {
     getNodeSet(info$html, '//g[@class="geom7_segment_signals"]//line')
   computed.vec <- getStroke(line.list)
   color.counts <- as.numeric(table(computed.vec))
-  expect_equal(color.counts, c(15, 15)) #firefox bug.
-  ##expect_equal(sum(color.counts), 30)
+  expect_equal(color.counts, c(15, 15))
+})
+
+test_that("showSelectedlegendcolour is truth", {
+  tsv.path <-
+    file.path("animint-htmltest", "geom6_vline_signals_chunk_common.tsv")
+  common.df <- read.table(tsv.path, comment.char="", header=TRUE)
+  computed.vec <- common.df$showSelectedlegendcolour
+  expected.vec <- rep("truth", length(computed.vec))
+  expect_identical(computed.vec, expected.vec)
+  tsv.path <-
+    file.path("animint-htmltest", "geom6_vline_signals_chunk1.tsv")
+  varied.df <- read.table(tsv.path, comment.char="", header=TRUE)
+})
+
+test_that("20 truth <line> in last plot", {
+  line.list <-
+    getNodeSet(info$html, '//g[@class="geom6_vline_signals"]//line')
+  expect_equal(length(line.list), 20)
 })
 
