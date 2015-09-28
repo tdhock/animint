@@ -128,7 +128,7 @@ test_that("showSelectedlegendcolour is truth", {
   tsv.path <-
     file.path("animint-htmltest", "geom6_vline_signals_chunk_common.tsv")
   common.df <- read.table(tsv.path, comment.char="", header=TRUE)
-  computed.vec <- common.df$showSelectedlegendcolour
+  computed.vec <- paste(common.df$showSelectedlegendcolour)
   expected.vec <- rep("truth", length(computed.vec))
   expect_identical(computed.vec, expected.vec)
   tsv.path <-
@@ -139,6 +139,12 @@ test_that("showSelectedlegendcolour is truth", {
 test_that("20 truth <line> in last plot", {
   line.list <-
     getNodeSet(info$html, '//g[@class="geom6_vline_signals"]//line')
+  expect_equal(length(line.list), 20)
+})
+
+test_that("20 prediction <line> in last plot", {
+  line.list <-
+    getNodeSet(info$html, '//g[@class="geom8_vline_signals"]//line')
   expect_equal(length(line.list), 20)
 })
 
