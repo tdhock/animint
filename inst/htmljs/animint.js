@@ -1948,17 +1948,17 @@ var animint = function (to_select, json_file) {
         return Selectors[s_name].duration;
       });
     // selector widgets
-    var show_message2 = "Toggle selected variables";
+    var toggle_message = "Toggle selected variables";
     var show_hide_selector_widgets = element.append("button")
-      .text(show_message2)
+      .text(toggle_message)
       .attr("class", "show_hide_selector_widgets")
       .on("click", function(){
-        if(this.textContent == show_message2){
+        if(this.textContent == toggle_message){
           selector_table.style("display", "");
           show_hide_selector_widgets.text("Hide variable toggler");
         }else{
           selector_table.style("display", "none");
-          show_hide_selector_widgets.text(show_message2);
+          show_hide_selector_widgets.text(toggle_message);
         }
       })
     ;
@@ -1970,7 +1970,9 @@ var animint = function (to_select, json_file) {
     var selector_first_tr = selector_table.append("tr");
     selector_first_tr
       .append("th")
-      .text("Toggle selected value");
+      .text("Toggle selected value")
+      .attr("colspan", "2")
+    ;
       
      // looping through and adding a row for each selector
     for(s_name in Selectors) {
