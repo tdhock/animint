@@ -875,8 +875,9 @@ var animint = function (to_select, json_file) {
       download_next(g_name);
     })
   };
+
   // download_chunk is called from update_geom and download_sequence.
-  var download_chunk = function(g_info, tsv_name, funAfter){
+  function download_chunk(g_info, tsv_name, funAfter){
     if(g_info.download_status.hasOwnProperty(tsv_name)){
       funAfter();
       return; // do not download twice.
@@ -888,29 +889,32 @@ var animint = function (to_select, json_file) {
       // First convert to correct types.
       g_info.download_status[tsv_name] = "processing";
       response = convert_R_types(response, g_info.types);
-      if(g_info.common_tsv) {
-        wait_until_then(500, function(){
+      wait_until_then(500, function(){
+	if(g_info.common_tsv) {
           return g_info.data.hasOwnProperty(g_info.common_tsv);
-        }, function(){
+	}else{
+	  return true;
+	}
+      }, function(){
+	if(g_info.common_tsv) {
           // copy data from common tsv to varied tsv
           response = copy_chunk(g_info, response);
-        });
-      }
-      //alert(g_info.classed);
-      var nest = d3.nest();
-      g_info.nest_order.forEach(function (v_name) {
-        nest.key(function (d) {
-          return d[v_name];
-        });
+	}
+	var nest = d3.nest();
+	g_info.nest_order.forEach(function (v_name) {
+          nest.key(function (d) {
+            return d[v_name];
+          });
+	});
+	var chunk = nest.map(response);
+	g_info.data[tsv_name] = chunk;
+	g_info.tr.select("td.downloaded").text(d3.keys(g_info.data).length);
+	g_info.download_status[tsv_name] = "saved";
+	funAfter(chunk);
       });
-      var chunk = nest.map(response);
-
-      g_info.data[tsv_name] = chunk;
-      g_info.tr.select("td.downloaded").text(d3.keys(g_info.data).length);
-      g_info.download_status[tsv_name] = "saved";
-      funAfter(chunk);
     });
-  };
+  }//download_chunk.
+
   // update_geom is responsible for obtaining a chunk of downloaded
   // data, and then calling draw_geom to actually draw it.
   var draw_geom = function(g_info, chunk, selector_name, PANEL){
