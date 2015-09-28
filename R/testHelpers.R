@@ -11,7 +11,6 @@
 #' @export
 #' @seealso \link{tests_run}
 #' 
-
 tests_init <- function(browserName = "phantomjs", dir = ".", port = 4848, ...) {
   # try to exit out of previously initated processes
   ex <- tests_exit()
@@ -50,9 +49,13 @@ tests_init <- function(browserName = "phantomjs", dir = ".", port = 4848, ...) {
   remDr$setTimeout(type = "page load", milliseconds = 30000)
   # if we navigate to localhost:%s/htmltest directly, some browsers will
   # redirect to www.htmltest.com. A 'safer' approach is to navigate, then click.
-  remDr$navigate(sprintf("http://localhost:%s", port))
-  e <- remDr$findElement("xpath", "//a[@href='animint-htmltest/']")
-  e$clickElement()
+  remDr$navigate(sprintf("http://localhost:%s/animint-htmltest/", port))
+  
+  ## Why not just navigate to the right URL to begin with?
+  
+  ## e <- remDr$findElement("xpath", "//a[@href='animint-htmltest/']")
+  ## e$clickElement()
+  
   invisible(TRUE)
 }
 

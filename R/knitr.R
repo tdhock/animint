@@ -38,7 +38,13 @@ knit_print.animint <- function(x, options, ...) {
   # if this is the first plot, place scripts just before the plot
   # there has to be a better way to do this, but this will do for now -- http://stackoverflow.com/questions/14308240/how-to-add-javascript-in-the-head-of-a-html-knitr-document
   if (length(knitr::knit_meta(class = "animint", clean = FALSE)) == 0) {
-    res <- paste0('<script type="text/javascript" src="', dir, '/vendor/d3.v3.js"></script>\n<script type="text/javascript" src="', dir, '/animint.js"></script>', res)
+    res <- sprintf('
+<script type="text/javascript" src="%s/vendor/d3.v3.js"></script>
+<script type="text/javascript" src="%s/animint.js"></script>
+<script type="text/javascript" src="%s/vendor/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="%s/vendor/selectize.min.js"></script>
+<link rel="stylesheet" type="text/css" href="%s/vendor/selectize.css" />
+%s', dir, dir, dir, dir, dir, res)
   }
   knitr::asis_output(res, meta = list(animint = structure("", class = "animint")))
 }
@@ -59,9 +65,13 @@ new_animint <- function(attrs, json.file) {
     nm <- attrs[[idx]]
   }  else warning('Unknown attribute')
   # using chunk labels is problematic for JS variable names is problematic since '-', '.', etc are illegal
-  selectr <- paste0(prefix, nm)
+  escaped <- gsub("[-.]", "_", nm)
+  selectr <- paste0(prefix, escaped)
   paste0('<p></p>\n<div ', attrz,
-         '></div>\n<script>var plot = new animint(', selectr, '", ', jsonFile, ');</script>')
+         '></div>\n<script>var ', escaped,
+         ' = new animint(', selectr,
+         '", ', jsonFile,
+         ');</script>')
 }
 
 #' Shiny ui output function

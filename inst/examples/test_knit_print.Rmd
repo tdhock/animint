@@ -1,4 +1,9 @@
-### My Rmd Document
+---
+title: "My Rmd Document"
+output: 
+  html_document:
+    self_contained: false
+---
   
 ```{r safety, echo = FALSE}
 library(knitr)
@@ -9,16 +14,26 @@ knit_meta()
 ```
   
   
-```{r plot1}
+```{r plot-1-top}
 library(ggplot2) 
 library(animint)
-q1 <- list(q = qplot(1:10, 1:10, xlab = "Worthless label 1"))
+dat <- data.frame(x = 1:10, y = 1:10, col = rep(c("a178", "b934"), 5))
+q2 <- list(q = qplot(x, y, data = dat, colour = col, 
+                     xlab = "first plot with color legend"))
+structure(q2, class = "animint")
+```
+
+Clicking on the plot above should not affect the plot below.
+
+```{r plot.1.bottom}
+q1 <- list(q = qplot(x, y, data = dat, colour = col, 
+                     xlab = "second plot with color legend"))
 structure(q1, class = "animint")
 ```
 
-Some other text
-  
-```{r plot2}
-q2 <- list(q = qplot(rnorm(100), xlab = "Worthless label 2"))
-structure(q2, class = "animint")
+The plot below has no interactive features.
+
+```{r boring}
+boring <- list(q = qplot(rnorm(100), xlab = "non-interactive plot"))
+structure(boring, class = "animint")
 ```
