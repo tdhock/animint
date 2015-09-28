@@ -119,7 +119,7 @@ var animint = function (to_select, json_file) {
     return {height: bbox.height, width: bbox.width};
   };
 
-  var nest_by_group = d3.nest().key("group");
+  var nest_by_group = d3.nest().key(function(d){ return d.group; });
   var dirs = json_file.split("/");
   dirs.pop(); //if a directory path exists, remove the JSON file from dirs
   var element = d3.select(to_select);
@@ -746,21 +746,18 @@ var animint = function (to_select, json_file) {
   };
   
   /**
-   * copy common chunk tsv to varied chunk tsv
-   * @param  {array} common_chunk   array of json objects from common chunk tsv
-   * @param  {array} varied_chunk   array of json objects from varied chunk tsv
-   * @param  {string array} columns_common array of common column names
-   * @return {array}                array of json objects after merging common chunk tsv into varied chunk tsv
+   * copy common chunk tsv to varied chunk tsv, returning an array of
+   * objects.
   */
   function copy_chunk(g_info, varied_chunk) {
-    var varied_by_group = nest_by_group(varied_chunk);
+    var varied_by_group = nest_by_group.map(varied_chunk);
     var common_by_group = g_info.data[g_info.common_tsv];
     var new_varied_chunk = [];
     for(group_id in varied_by_group){
       var varied_one_group = varied_by_group[group_id];
       var common_one_group = common_by_group[group_id];
       var common_i;
-      for(var varied_i=0; i<varied_one_group.length; i++){
+      for(var varied_i=0; varied_i<varied_one_group.length; varied_i++){
 	var varied_obj = varied_one_group[varied_i];
 	// there are two cases: each group of varied data is of length
 	// 1, or of length of the common data.
@@ -780,33 +777,6 @@ var animint = function (to_select, json_file) {
     }
     return new_varied_chunk;
   }
-
-  /**
-   * find objects matching a key of lookup value from an array of objects
-   * @param  {[type]} array an array of objects to lookup
-   * @param  {[type]} key   the key of each objects in the array to lookup
-   * @param  {[type]} value the value of key to lookup
-   * @return {[type]} array an array of filtered objects
-  */
-  var findObjectsByKey = function(array, key, value) {
-    var filtered =  array.filter(function(obj) {
-      return obj[key] === value;
-    });
-    return filtered;
-  };
-
-  /**
-   * clone json object without reference
-   * @param  {json object} object json object
-   * @return {json object}        a copy of input json object
-  */
-  var clone = function(object) {
-    var o = {};
-    for(var i in object){
-      o[i] = object[i];
-    }
-    return o;
-  };
 
   // update_geom is called from add_geom and update_selector. It
   // downloads data if necessary, and then calls draw_geom.
