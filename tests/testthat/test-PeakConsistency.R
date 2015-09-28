@@ -79,9 +79,7 @@ viz <-
                         showSelected=seed),
                     color="grey50",
                     data=PeakConsistency$signal)+
-         geom_vline(aes(xintercept=chromStart+0.5, color=model,
-                        showSelected3=increase,
-                        showSelected=seed),
+         geom_vline(aes(xintercept=chromStart+0.5, color=model),
                     show_guide=TRUE,
                     linetype="dashed",
                     data=PeakConsistency$truth)+
@@ -99,7 +97,7 @@ viz <-
                     show_guide=TRUE,
                     linetype="dashed",
                     data=PeakConsistency$guess)+
-         scale_size_manual(values=c(PeakSegJoint=0.5, PeakSeg=1))+
+         scale_size_manual(values=c(PeakSegJoint=1, PeakSeg=2))+
          scale_color_manual(values=color.code),
        first=list(sample.size=5))
 
