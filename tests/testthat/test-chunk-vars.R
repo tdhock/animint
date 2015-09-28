@@ -1,4 +1,4 @@
-context("chunk vars")
+acontext("chunk vars")
 
 test_that("produce as many chunk files as specified", {
   viz <- list(iris=ggplot()+

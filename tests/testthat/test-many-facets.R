@@ -1,7 +1,7 @@
 library(animint)
 library(testthat)
 
-context("many facets")
+acontext("many facets")
 
 n.circles <- 40
 df <- data.frame(x=0, y=0, facet=1:n.circles)

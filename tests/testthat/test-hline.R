@@ -1,5 +1,5 @@
 library(testthat)
-context("hline")
+acontext("hline")
 
 n.rows <- 100
 df <- data.frame(x=rnorm(n.rows), y=rnorm(n.rows))

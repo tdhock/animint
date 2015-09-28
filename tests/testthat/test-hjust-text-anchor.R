@@ -1,4 +1,4 @@
-context("hjust text anchor")
+acontext("hjust text anchor")
 
 # demonstration of gradient descent algorithm from animation package
 grad.desc <- function(

@@ -1,4 +1,4 @@
-context("rotate")
+acontext("rotate")
 
 ss <- data.frame(State=paste("some long text", c("CA", "NY")),
                  Prop.Inv=c(0, 1),

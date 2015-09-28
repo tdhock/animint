@@ -1,4 +1,4 @@
-context("geom_point(aes(fill=numeric))")
+acontext("geom_point(aes(fill=numeric))")
 
 viz <-
   list(fill=ggplot()+

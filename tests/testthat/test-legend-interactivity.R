@@ -1,4 +1,4 @@
-context("Interactive Legends")
+acontext("Interactive Legends")
 
 ## function to extract all circles from an HTML page
 get_circles <- function(id) {

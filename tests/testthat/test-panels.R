@@ -1,4 +1,4 @@
-context("Panel background")
+acontext("Panel background")
 
 p1 <- ggplot() +
   geom_point(aes(Sepal.Length, Sepal.Width,

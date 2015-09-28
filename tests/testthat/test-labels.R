@@ -1,4 +1,4 @@
-context("Labels")
+acontext("Labels")
 
 # create some objects that will be reused
 ggpoint <- ggplot() + geom_point(aes(Petal.Width, Sepal.Width), data = iris)

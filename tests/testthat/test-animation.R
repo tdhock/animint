@@ -1,4 +1,4 @@
-context("animation")
+acontext("animation")
 
 library(maps)
 library(plyr)

@@ -1,4 +1,4 @@
-context("interactivity")
+acontext("interactivity")
 
 ## Example: 2 plots, 2 selectors, but only interacting with 1 plot.
 data(breakpoints)

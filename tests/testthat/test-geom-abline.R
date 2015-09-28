@@ -1,4 +1,4 @@
-context("geom_abline")
+acontext("geom_abline")
 
 p <- qplot(wt, mpg, data = mtcars) + 
   geom_abline(intercept = c(20, 5), slope = c(1,4)) + 

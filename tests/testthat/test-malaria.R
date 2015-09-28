@@ -1,5 +1,5 @@
 library(testthat)
-context("malaria data viz")
+acontext("malaria data viz")
 
 library(animint)
 data(malaria)

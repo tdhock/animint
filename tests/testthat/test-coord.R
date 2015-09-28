@@ -1,4 +1,4 @@
-context("coord")
+acontext("coord")
 
 test_that("coord_flip works", {
   data(worldPop, package="animint")

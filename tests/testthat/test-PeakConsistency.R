@@ -1,4 +1,4 @@
-context("PeakConsistency")
+acontext("PeakConsistency")
 
 data(PeakConsistency)
 

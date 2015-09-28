@@ -1,4 +1,4 @@
-context("facet lines")
+acontext("facet lines")
 
 data(WorldBank)
 not.na <- subset(WorldBank, !(is.na(life.expectancy) | is.na(fertility.rate)))

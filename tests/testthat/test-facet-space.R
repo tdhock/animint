@@ -1,4 +1,4 @@
-context('facet_grid(space="free")')
+acontext('facet_grid(space="free")')
 
 no.panels <- ggplot(mtcars, aes(mpg, wt)) + 
   geom_point(colour='grey50', size = 4) + 

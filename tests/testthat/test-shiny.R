@@ -1,4 +1,4 @@
-context("shiny")
+acontext("shiny")
 
 if (Sys.getenv("TRAVIS") == "true" | Sys.getenv("WERCKER") == "true") {
   message("shiny tests don't work on travis/wercker (but should someday)")

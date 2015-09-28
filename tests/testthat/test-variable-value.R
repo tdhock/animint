@@ -1,4 +1,4 @@
-context("variable value")
+acontext("variable value")
 
 test_that("selector.aes errors when no matching variable for value", {
   a.list <-

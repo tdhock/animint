@@ -1,4 +1,4 @@
-context("params")
+acontext("params")
 
 df <- data.frame(z=rnorm(100))
 

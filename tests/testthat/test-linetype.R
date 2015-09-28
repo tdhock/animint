@@ -1,4 +1,4 @@
-context("linetype")
+acontext("linetype")
 
 error.types <-
   data.frame(x=1:3, status=c("correct", "false positive", "false negative"))

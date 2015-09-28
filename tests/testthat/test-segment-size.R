@@ -1,4 +1,4 @@
-context("Segment size")
+acontext("Segment size")
 
 df <- data.frame(x=c(0, 0),
                  y=c(0, 1),

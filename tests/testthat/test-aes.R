@@ -1,4 +1,4 @@
-context("aesthetics")
+acontext("aesthetics")
 
 test_that("we stop when data does not contain interactive variables",{
   ## In interactive testing, foo will be found and copied to

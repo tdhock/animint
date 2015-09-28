@@ -1,4 +1,4 @@
-context("facet-trivial")
+acontext("facet-trivial")
 
 miris <- iris
 miris$kingdom <- "plantae"

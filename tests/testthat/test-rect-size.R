@@ -1,4 +1,4 @@
-context("rect size")
+acontext("rect size")
 
 df <- data.frame(xmin = c(0, 0),
                  ymin = c(0, 2),

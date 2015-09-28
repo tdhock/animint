@@ -1,4 +1,4 @@
-context("global variables")
+acontext("global variables")
 
 viz <- list(scatter=ggplot()+
   geom_point(aes(y=Petal.Length, x=Sepal.Length,

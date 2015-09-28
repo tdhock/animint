@@ -1,4 +1,4 @@
-context("plot names")
+acontext("plot names")
 
 gg <- qplot(Petal.Width, Sepal.Width, data=iris)
 

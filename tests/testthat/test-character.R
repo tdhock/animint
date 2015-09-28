@@ -1,4 +1,4 @@
-context("One character value")
+acontext("One character value")
 
 df <-
   data.frame(numeric=1,

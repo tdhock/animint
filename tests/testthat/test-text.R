@@ -1,4 +1,4 @@
-context("Text")
+acontext("Text")
 
 data(WorldBank)
 wb  <- WorldBank[WorldBank$year == 2010,]

@@ -1,4 +1,4 @@
-context("facet-strips")
+acontext("facet-strips")
 
 p <- ggplot(mtcars, aes(mpg, wt)) + 
   geom_point(colour='grey50', size = 4) + 

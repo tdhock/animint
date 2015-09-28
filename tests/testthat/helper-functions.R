@@ -10,6 +10,11 @@ animint2HTML <- function(plotList) {
   res
 }
 
+acontext <- function(...){
+  print(...)
+  context(...)
+}
+
 clickHTML <- function(...){
   v <- c(...)
   stopifnot(length(v) == 1)

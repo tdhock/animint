@@ -1,4 +1,4 @@
-context("legends")
+acontext("legends")
 
 data(WorldBank, package="animint")
 breaks <- 10^(4:9)

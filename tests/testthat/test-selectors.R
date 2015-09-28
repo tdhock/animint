@@ -1,4 +1,4 @@
-context("selectors")
+acontext("selectors")
 
 test_that("first options are copied to selectors", {
   data(WorldBank)

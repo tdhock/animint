@@ -1,5 +1,5 @@
 library(testthat)
-context("geom line")
+acontext("geom line")
 library(animint)
 
 data(intreg)

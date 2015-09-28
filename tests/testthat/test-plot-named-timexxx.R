@@ -1,4 +1,4 @@
-context("plot named timexxx")
+acontext("plot named timexxx")
 
 data(WorldBank)
 not.na <- subset(WorldBank, !(is.na(life.expectancy) | is.na(fertility.rate)))

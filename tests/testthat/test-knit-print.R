@@ -1,4 +1,4 @@
-context("knitting multiple animint plots in a single Rmd")
+acontext("knitting multiple animint plots in a single Rmd")
 
 knitr::knit_meta() #clear knitr 'metadata'
 test_file <- system.file("examples", "test_knit_print.Rmd", 

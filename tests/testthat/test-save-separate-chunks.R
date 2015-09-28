@@ -1,4 +1,4 @@
-context("save separate chunks")
+acontext("save separate chunks")
 library(plyr)
 
 data(FluView)
