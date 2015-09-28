@@ -64,8 +64,8 @@ wb.facets <-
                 data=not.na, stat="identity", position="identity")+
        coord_flip(),
 
-       time=list(variable="year", ms=1000),
-       duration=list(year=1000),
+       time=list(variable="year", ms=2000),
+       duration=list(year=2000),
        first=list(year=1975, country=c("United States", "Vietnam")),
        selector.types=list(country="multiple"),
        title="World Bank data (multiple selection, facets)")
@@ -163,7 +163,7 @@ getYear <- function(){
 
 test_that("animation updates", {
   old.year <- getYear()
-  Sys.sleep(1) #wait for one animation frame.
+  Sys.sleep(2) #wait for one animation frame.
   new.year <- getYear()
   expect_true(old.year != new.year)
 })
@@ -173,7 +173,7 @@ clickID("show_hide_animation_controls")
 test_that("pause stops animation", {
   clickID("play_pause")
   old.year <- getYear()
-  Sys.sleep(1)
+  Sys.sleep(2)
   new.year <- getYear()
   expect_true(old.year == new.year)
 })
@@ -189,7 +189,7 @@ test_that("play restarts animation", {
 test_that("pause stops animation (second time)", {
   clickID("play_pause")
   old.year <- getYear()
-  Sys.sleep(1)
+  Sys.sleep(2)
   new.year <- getYear()
   expect_true(old.year == new.year)
 })
@@ -300,9 +300,10 @@ if (Sys.getenv("ANIMINT_BROWSER") != "phantomjs") {
     expect_true(old.year == new.year)
   })
 
-  clickID("show_hide_selector_widgets")
+  e <- remDr$findElement("class name", "show_hide_selector_widgets")
+  e$clickElement()
 
-  s.tr <- remDr$findElement("id", "year_selector_widget")
+  s.tr <- remDr$findElement("class name", "year_selector_widget")
   s.div <- s.tr$findChildElement("class name", "selectize-input")
   s.div$clickElement()
   remDr$sendKeysToActiveElement(list(key="backspace"))
@@ -332,7 +333,7 @@ if (Sys.getenv("ANIMINT_BROWSER") != "phantomjs") {
     expect_identical(sort(country.vec), sort(wb.facets$first$country))
   })
   
-  s.tr <- remDr$findElement("id", "country_selector_widget")
+  s.tr <- remDr$findElement("class name", "country_selector_widget")
   s.div <- s.tr$findChildElement("class name", "selectize-input")
   s.div$clickElement()
   remDr$sendKeysToActiveElement(list("Afg"))
@@ -364,16 +365,20 @@ if (Sys.getenv("ANIMINT_BROWSER") != "phantomjs") {
     alist[["width"]]
   }
   
-  test_that("middle of transition != after when duration=1000", {
+  test_that("middle of transition != after when duration=2000", {
+    clickID("year1960")
+    Sys.sleep(1)
+    before.width <- getWidth()
     clickID("year2010")
     during.width <- getWidth()
-    Sys.sleep(1.5)
+    Sys.sleep(0.1)
     after.width <- getWidth()
+    rbind(before=before.width,
+          during=during.width,
+          after=after.width)
     expect_true(during.width != after.width)
   })
   
-  # doesn't quite work
-  # remDr$executeScript('return document.getElementById("duration_ms_year").value = 0')
   e <- remDr$findElement("id", "duration_ms_year")
   e$clickElement()
   e$clearElement()
@@ -381,12 +386,15 @@ if (Sys.getenv("ANIMINT_BROWSER") != "phantomjs") {
   
   test_that("middle of transition == after when duration=0", {
     clickID("year1960")
-    Sys.sleep(1.5)
+    Sys.sleep(1)
     before.width <- getWidth()
     clickID("year2010")
     during.width <- getWidth()
-    Sys.sleep(1.5)
+    Sys.sleep(0.1)
     after.width <- getWidth()
+    rbind(before=before.width,
+          during=during.width,
+          after=after.width)
     expect_true(before.width != after.width)
     expect_true(during.width == after.width)
   })
