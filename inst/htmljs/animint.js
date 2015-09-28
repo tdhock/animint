@@ -6,6 +6,17 @@
 // Constructor for animint Object.
 var animint = function (to_select, json_file) {
 
+  function wait_until_then(timeout, condFun, readyFun) {
+    function checkFun() {
+      if(condFun()) {
+        readyFun();
+      } else{
+        setTimeout(checkFun, timeout);
+      }
+    }
+    checkFun();
+  }
+
   function convert_R_types(resp_array, types){
     return resp_array.map(function (d) {
       for (var v_name in d) {
@@ -877,25 +888,15 @@ var animint = function (to_select, json_file) {
       // First convert to correct types.
       g_info.download_status[tsv_name] = "processing";
       response = convert_R_types(response, g_info.types);
-      if (g_info.common_tsv) {
-        function wait(condFun, readyFun) {
-          var checkFun = function() {
-            if(condFun()) {
-              readyFun();
-            } else{
-              setTimeout(checkFun, 5);
-            }
-          };
-          checkFun();
-        };
-        wait(function(){
+      if(g_info.common_tsv) {
+        wait_until_then(500, function(){
           return g_info.data.hasOwnProperty(g_info.common_tsv);
         }, function(){
           // copy data from common tsv to varied tsv
           response = copy_chunk(g_info, response);
         });
       }
-
+      //alert(g_info.classed);
       var nest = d3.nest();
       g_info.nest_order.forEach(function (v_name) {
         nest.key(function (d) {
