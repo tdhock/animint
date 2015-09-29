@@ -920,13 +920,13 @@ saveLayer <- function(l, d, meta){
 }
 
 ##' Save the common columns for each tsv to one chunk
-##' @param built data.frame.
+##' @param built data.frame of built data.
 ##' @param vars character vector of chunk variable names to split on.
-##' @return a data.frame of common data to save, or NULL if there is
+##' @param aes.list a character vector of aesthetics.
+##' @return a list of common and varied data to save, or NULL if there is
 ##' no common data.
 getCommonChunk <- function(built, chunk.vars, aes.list){
   if(length(chunk.vars) == 0){
-    ## rows with NA should not be saved
     return(NULL)
   }
   if(! "group" %in% names(aes.list)){
@@ -1000,7 +1000,7 @@ getCommonChunk <- function(built, chunk.vars, aes.list){
 }
 
 ##' Extract subset for each data.frame in a list of data.frame
-##' @param df.list list of data.frame.
+##' @param df.or.list a data.frame or a list of data.frame.
 ##' @param cols cols that each data.frame would keep.
 ##' @return list of data.frame.
 varied.chunk <- function(df.or.list, cols){
