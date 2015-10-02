@@ -86,6 +86,7 @@ set.seed(1)
 viz <- list(
   linetip=ggplot()+
     geom_line(aes(x, y, tooltip=paste("group", g), group=g),
+              size=5,
               data=data.frame(x=c(1,2,1,2), y=rnorm(4), g=c(1,1,2,2))))
 
 test_that("line tooltip renders as title", {
