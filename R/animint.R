@@ -89,48 +89,48 @@ parsePlot <- function(meta){
         ) {
           # if the variable is called "show_..." and it is evaluated, that's okay
           
-        } else {
-          var_name <- character()
-        }
-      }
-      
-      # grabbing the variable from the data
-      var <- L$data[, var_name]
+        } 
+                                        # grabbing the variable from the data
+        var <- L$data[, var_name]
 
-      ## checking if it is a discrete variable.
-      if(plyr::is.discrete(var)) {
-        is.interactive.aes <-
-          grepl("showSelected|clickSelects", names(L$mapping))
-        is.legend.var <- L$mapping == var_name
-        ## If var_name is used with another interactive aes, then do
-        ## not add any showSelected aesthetic for it.
-        var.is.interactive <- any(is.interactive.aes & is.legend.var)
-        if(!var.is.interactive){
-          for(legend_type in one.legend$legend_type) {
-            ## only adding showSelected aesthetic if the variable is used by the geom
-            if(!is.null(L$mapping[[legend_type]])) {
-              temp_name <- paste0("showSelectedlegend", legend_type)
-              L$mapping[[temp_name]] <- as.symbol(var_name)
+        ## checking if it is a discrete variable.
+        if(plyr::is.discrete(var)) {
+          is.interactive.aes <-
+            grepl("showSelected|clickSelects", names(L$mapping))
+          is.legend.var <- L$mapping == var_name
+          ## If var_name is used with another interactive aes, then do
+          ## not add any showSelected aesthetic for it.
+          var.is.interactive <- any(is.interactive.aes & is.legend.var)
+          if(!var.is.interactive){
+            for(legend_type in one.legend$legend_type) {
+              ## only adding showSelected aesthetic if the variable is
+              ## used by the geom
+              if(!is.null(L$mapping[[legend_type]])) {
+                temp_name <- paste0("showSelectedlegend", legend_type)
+                L$mapping[[temp_name]] <- as.symbol(var_name)
+              }
             }
           }
-        }
-        # if selector.types has not been specified, create it
-        if(is.null(meta$selector.types)) {
-          meta$selector.types <- list()
-        }
-        # if selector.types is not specified for this variable, set it to multiple
-        if(is.null(meta$selector.types[[var_name]])) {
-          meta$selector.types[[var_name]] <- "multiple"
-        }
-        # if first is not specified, create it
-        if(is.null(meta$first)) {
-          meta$first <- list()
-        }
-        # if first is not specified, add all to first
-        if(is.null(meta$first[[var_name]])) {
-          u.vals <- unique(var)
-        }
-      }
+          ## if selector.types has not been specified, create it
+          if(is.null(meta$selector.types)) {
+            meta$selector.types <- list()
+          }
+          ## if selector.types is not specified for this variable, set
+          ## it to multiple.
+          ##browser(expr=length(var_name)==0)
+          if(is.null(meta$selector.types[[var_name]])) {
+            meta$selector.types[[var_name]] <- "multiple"
+          }
+          ## if first is not specified, create it
+          if(is.null(meta$first)) {
+            meta$first <- list()
+          }
+          ## if first is not specified, add all to first
+          if(is.null(meta$first[[var_name]])) {
+            u.vals <- unique(var)
+          }
+        }#is.correct
+      }#length(var_name)
     }
     ## need to call ggplot_build again because we've added to the plot
     # I'm sure that there is a way around this, but not immediately sure how. 
@@ -1556,7 +1556,7 @@ getLegendList <- function(plistextra){
     rownames(aes.geom) <- NULL
     legends.by.geom <- split(aes.geom, aes.geom$geom)
     for(g.name in names(legends.by.geom)){
-      one.geom <- legends.by.geom[[g.name]]
+      one.geom <- unique(legends.by.geom[[g.name]])
       has.both <- all(c("colour", "fill") %in% one.geom$aes)
       if(has.both){
         colour.row <- which(one.geom$aes=="colour")
