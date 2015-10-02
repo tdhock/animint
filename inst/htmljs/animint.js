@@ -1184,10 +1184,16 @@ var animint = function (to_select, json_file) {
       // select the correct group before returning anything.
       if(key_fun != null){
         key_fun = function(group_info){
-          var one_group = data[group_info.value];
-	        var one_row = one_group[0];
-	        // take key from first value in the group.
-	        return one_row.key;
+	  if(data.hasOwnProperty(group_info.value)){
+            var one_group = data[group_info.value];
+	    var one_row = one_group[0];
+	    // take key from first value in the group.
+	    return one_row.key;
+	  }else{
+	    // may be called on data which is not in the current
+	    // selection set?
+	    return null;
+	  }
         };
       }
       id_fun = function(group_info){
