@@ -1580,37 +1580,59 @@ var animint = function (to_select, json_file) {
         .on("mouseout", function (d) {
           d3.select(this).call(out_fun);
         })
-        .on("click", function (d) {
+      ;
+      if(has_clickSelects){
+	elements.on("click", function (d) {
 	  // The main idea of how clickSelects works: when we click
 	  // something, we call update_selector with the clicked
 	  // value.
-	  if(has_clickSelects){
             var s_name = g_info.aes.clickSelects;
             update_selector(s_name, d.clickSelects);
-	  }else{
-	    var s_name = d["clickSelects.variable"];
-	    var s_value = d["clickSelects.value"];
-	    update_selector(s_name, s_value);
-	  }
-        })
-      ;
+	});
+      }else{
+	elements.on("click", function(d){
+	  var s_name = d["clickSelects.variable"];
+	  var s_value = d["clickSelects.value"];
+	  update_selector(s_name, s_value);
+	});
+      }
     }else{//has neither clickSelects nor clickSelects.variable.
       elements.style("opacity", get_alpha);
     }
     var has_tooltip = g_info.aes.hasOwnProperty("tooltip");
     if(has_clickSelects || has_tooltip || has_clickSelects_variable){
+      var text_fun, get_one;
+      if(g_info.data_is_object){
+	get_one = function(d_or_kv){
+          var one_group = data[d_or_kv.value];
+	  return one_group[0];
+        };
+      }else{
+	get_one = function(d_or_kv){ 
+	  return d_or_kv;
+	};
+      }
+      if(has_tooltip){
+        text_fun = function(d){
+	  return d.tooltip;
+	};
+      }else if(has_clickSelects){
+	text_fun = function(d){
+          var v_name = g_info.aes.clickSelects;
+          return v_name + " " + d.clickSelects;
+	};
+      }else{ //clickSelects_variable
+	text_fun = function(d){
+	  return d["clickSelects.variable"] + " " + d["clickSelects.value"];
+	};
+      }
       elements.text("")
         .append("svg:title")
-        .text(function (d) {
-          if(has_tooltip){
-            return d.tooltip;
-          }else if(has_clickSelects){
-            var v_name = g_info.aes.clickSelects;
-            return v_name + " " + d.clickSelects;
-          }else{ //clickSelects_variable
-	    return d["clickSelects.variable"] + " " + d["clickSelects.value"];
-	  }
-        });
+        .text(function(d_or_kv){
+	  var d = get_one(d_or_kv);
+	  return text_fun(d);
+	})
+      ;
     }
     // Set attributes of only the entering elements. This is needed to
     // prevent things from flying around from the upper left when they
