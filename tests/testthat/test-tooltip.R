@@ -82,3 +82,15 @@ test_that("aes() means show no tooltip", {
   expect_equal(length(title.nodes), 0)
 })
 
+set.seed(1)
+viz <- list(
+  linetip=ggplot()+
+    geom_line(aes(x, y, tooltip=paste("group", g), group=g),
+              data=data.frame(x=c(1,2,1,2), y=rnorm(4), g=c(1,1,2,2))))
+
+test_that("line tooltip renders as title", {
+  info <- animint2HTML(viz)
+  title.nodes <- getNodeSet(info$html, '//g[@class="geom1_line_linetip"]//title')
+  value.vec <- sapply(title.nodes, xmlValue)
+  expect_identical(value.vec, c("group 1", "group 2"))
+})
