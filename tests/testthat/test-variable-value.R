@@ -142,6 +142,21 @@ viz <-
 
 info <- animint2HTML(viz)
 
+getSelectorWidgets <- function(html){
+  tr.list <- getNodeSet(html, 
+                        '//table[@class="table_selector_widgets"]//tr')
+  td.list <- sapply(tr.list[-1], function(tr)xmlChildren(tr)[[1]])
+  sapply(td.list, xmlValue)
+}
+
+test_that("No widgets for .variable .value selectors", {
+  computed.vec <- getSelectorWidgets(info$html)
+  expected.vec <- c(
+    "chunks", "problem.name", "bases.per.problem",
+    "error.type")
+  expect_identical(sort(computed.vec), sort(expected.vec))
+})
+
 circle.xpath <- '//svg[@id="peaks"]//circle'
 title.xpath <- paste0(circle.xpath, '//title')
 
@@ -281,6 +296,16 @@ for(problem.name in names(p.list)){
 }
 
 info <- animint2HTML(viz.for)
+
+test_that("Widgets for regular selectors", {
+  computed.vec <- getSelectorWidgets(info$html)
+  expected.vec <- c(
+    "problem.name", "bases.per.problem",
+    "size.100.problem.1peaks", "size.100.problem.2peaks",
+    "size.50.problem.1peaks", "size.50.problem.2peaks", 
+    "size.50.problem.3peaks", "size.50.problem.4peaks")
+  expect_identical(sort(computed.vec), sort(expected.vec))
+})
 
 chunk.counts <- function(html=getHTML()){
   node.set <-
