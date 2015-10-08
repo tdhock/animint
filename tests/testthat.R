@@ -7,7 +7,6 @@ library("RSelenium") # RSelenium works with firefox <= 37.0.2
 ## thocking@silene:~/R/animint-mine(fix-common-chunk)$ firefox --version
 ## Mozilla Firefox 11.0
 
-Sys.setenv(ANIMINT_TEST_BROWSER="phantomjs")
-
+tests_init()
 tests_run()
 tests_exit()
