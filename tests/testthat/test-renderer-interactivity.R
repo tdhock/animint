@@ -209,7 +209,7 @@ tornado.lines <-
                 data=UStornadoCounts),
        selector.types=list(state="multiple"),
        first=list(state=c("CA", "NY"), year=1950))
-##animint2dir(tornado.lines, "tornado-lines")
+
 info <- animint2HTML(tornado.lines)
 
 test_that("1950 <circle> and <line> elements", {
