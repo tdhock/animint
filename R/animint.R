@@ -117,7 +117,6 @@ parsePlot <- function(meta){
           }
           ## if selector.types is not specified for this variable, set
           ## it to multiple.
-          ##browser(expr=length(var_name)==0)
           if(is.null(meta$selector.types[[var_name]])) {
             meta$selector.types[[var_name]] <- "multiple"
           }
@@ -824,8 +823,6 @@ saveLayer <- function(l, d, meta){
       }
       while({
         bad <- bad.chunk()
-        ## str(bad)
-        ## browser()
         !is.null(bad)
       }){
         can.chunk[[bad]] <- FALSE
@@ -982,13 +979,13 @@ getCommonChunk <- function(built, chunk.vars, aes.list){
     }
   }
   is.common <- apply(is.common.mat, 2, all, na.rm=TRUE)
+  ## TODO: another criterion could be used to save disk space even if
+  ## there is only 1 chunk.
   if(is.common[["group"]] && sum(is.common) >= 2){
     common.cols <- names(is.common)[is.common]
     one.chunk <- built.by.chunk[[1]]
     ## Should each chunk have the same info about each group? 
     common.data <- na.omit(one.chunk[common.cols])
-    ## print(head(common.data))
-    ## browser()
     built.group <- do.call(rbind, built.by.chunk)
     built.has.common <- subset(built.group, group %in% common.data$group)
     varied.df.list <- split.x(built.has.common, chunk.vars)
