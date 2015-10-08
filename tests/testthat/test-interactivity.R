@@ -6,39 +6,39 @@ only.error <- subset(breakpoints$error,type=="E")
 only.segments <- subset(only.error, samples==samples[1])
 signal.colors <- c(estimate="#0adb0a",
                    latent="#0098ef")
-breakpointError <-
-  list(signal=ggplot()+
-       geom_point(aes(position, signal, showSelected=samples),
-                  data=breakpoints$signals)+
-       geom_line(aes(position, signal), colour=signal.colors[["latent"]],
-                 data=breakpoints$imprecision)+
-       geom_segment(aes(first.base, mean, xend=last.base, yend=mean,
-                        showSelected=segments,
-                        showSelected2=samples),
-                    colour=signal.colors[["estimate"]],
-                    data=breakpoints$segments)+
-       geom_vline(aes(xintercept=base,
-                      showSelected=segments,
-                      showSelected2=samples),
-                  colour=signal.colors[["estimate"]],
-                  linetype="dashed",
-                  data=breakpoints$breaks),
-       points=ggplot()+
-       geom_point(aes(samples, error,
-                      showSelected=segments,
-                      id=paste0("samples", samples),
-                      clickSelects=samples),
-                  data=only.error, stat="identity"),
-       error=ggplot()+
-       geom_vline(aes(xintercept=segments, 
-                      id=paste0("segments", segments),
-                      clickSelects=segments),
-                  data=only.segments, lwd=17, alpha=1/2)+
-       geom_line(aes(segments, error, group=samples,
-                     clickSelects=samples),
-                 data=only.error, lwd=4),
-       first=list(samples=150, segments=4),
-       title="breakpointError (select one model size)")
+breakpointError <- list(
+  signal=ggplot()+
+    geom_point(aes(position, signal, showSelected=samples),
+               data=breakpoints$signals)+
+    geom_line(aes(position, signal), colour=signal.colors[["latent"]],
+              data=breakpoints$imprecision)+
+    geom_segment(aes(first.base, mean, xend=last.base, yend=mean,
+                     showSelected=segments,
+                     showSelected2=samples),
+                 colour=signal.colors[["estimate"]],
+                 data=breakpoints$segments)+
+    geom_vline(aes(xintercept=base,
+                   showSelected=segments,
+                   showSelected2=samples),
+               colour=signal.colors[["estimate"]],
+               linetype="dashed",
+               data=breakpoints$breaks),
+  points=ggplot()+
+    geom_point(aes(samples, error,
+                   showSelected=segments,
+                   id=paste0("samples", samples),
+                   clickSelects=samples),
+               data=only.error, stat="identity"),
+  error=ggplot()+
+    geom_vline(aes(xintercept=segments, 
+                   id=paste0("segments", segments),
+                   clickSelects=segments),
+               data=only.segments, lwd=17, alpha=1/2)+
+    geom_line(aes(segments, error, group=samples,
+                  clickSelects=samples),
+              data=only.error, lwd=4),
+  first=list(samples=150, segments=4),
+  title="breakpointError (select one model size)")
 
 info <- animint2HTML(breakpointError)
 ##remDr$screenshot(file="~/R/animint/phantom-bug-screenshot.png")

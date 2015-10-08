@@ -11,7 +11,12 @@ animint2HTML <- function(plotList) {
 }
 
 acontext <- function(...){
+  test.browser <- Sys.getenv("ANIMINT_TEST_BROWSER")
   print(...)
+  if(test.browser != ""){
+    cat("(re)starting test browser ", test.browser, "\n", sep="")
+    tests_init(test.browser)
+  }
   context(...)
 }
 
