@@ -17,7 +17,7 @@ build:
     - script:
       name: copy source to animint 
       code: |
-        mv /pipeline/source /pipeline/animint
+        cp -r /pipeline/source /pipeline/animint
     - script:
       name: echo renderer1 tests
       code: |
