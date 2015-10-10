@@ -878,6 +878,7 @@ var animint = function (to_select, json_file) {
     var tsv_name = get_tsv(g_info, chunk_id);
     g_info.seq_count += 1;
     if(g_info.seq_count > g_info.seq.length){
+      Animation.play();
       return;
     }
     g_info.seq_i += 1;
@@ -1721,18 +1722,11 @@ var animint = function (to_select, json_file) {
       return not_selected;
     }
   };
-  var animateIfLoaded = function () {
+  var update_next_animation = function () {
     var v_name = Animation.variable;
     var cur = Selectors[v_name].selected;
     var next = Animation.next[cur];
-    // Before starting the animation, make sure all the geoms have
-    // loaded.
-    var geomLoaded = function(x){
-      return d3.keys(Geoms).indexOf(x)!=-1;
-    }
-    if(all_geom_names.every(geomLoaded)){
-      update_selector(v_name, next);
-    }
+    update_selector(v_name, next);
   };
 
   // The main idea of how legends work:
@@ -1923,7 +1917,8 @@ var animint = function (to_select, json_file) {
           time_table.style("display", "none");
           show_hide_animation_controls.text(show_message);
         }
-      });
+      })
+    ;
     // table of the animint widgets
     var time_table = element.append("table")
       .style("display", "none");
@@ -1936,28 +1931,31 @@ var animint = function (to_select, json_file) {
       Animation.variable = response.time.variable;
       Animation.sequence = response.time.sequence;
       Widgets["play_pause"] = first_th.append("button")
+	.text("Play")
         .attr("id", "play_pause")
-	      .on("click", function(){
+	.on("click", function(){
           if(this.textContent == "Play"){
-            play();
+            Animation.play();
           }else{
-            pause(false);
+            Animation.pause(false);
           }
-        });
+        })
+      ;
     }
     first_tr.append("th").text("milliseconds");
     if(response.time){
       var second_tr = time_table.append("tr");
       second_tr.append("td").text("updates");
       second_tr.append("td").append("input")
-	      .attr("id", "updates_ms")
-	      .attr("type", "text")
-	      .attr("value", Animation.ms)
-	      .on("change", function(){
+	.attr("id", "updates_ms")
+	.attr("type", "text")
+	.attr("value", Animation.ms)
+	.on("change", function(){
           Animation.pause(false);
           Animation.ms = this.value;
           Animation.play();
-        });
+        })
+      ;
     }
     for(s_name in Selectors){
       var s_info = Selectors[s_name];
@@ -2188,22 +2186,21 @@ var animint = function (to_select, json_file) {
         Animation.next[prev] = cur;
       }
       all_geom_names = d3.keys(response.geoms);
-
-      var timer;
-      Animation.timer = timer;
-      function play(){
+      Animation.timer = null;
+      Animation.play = function(){
+	if(Animation.timer == null){ // only play if not already playing.
     	  // as shown on http://bl.ocks.org/mbostock/3808234
-    	  timer = setInterval(animateIfLoaded, Animation.ms);
+    	  Animation.timer = setInterval(update_next_animation, Animation.ms);
     	  Widgets["play_pause"].text("Pause");
+	}
       };
-      Animation.play = play;
       Animation.play_after_visible = false;
-      function pause(play_after_visible){
+      Animation.pause = function(play_after_visible){
         Animation.play_after_visible = play_after_visible;
-        clearInterval(timer);
+        clearInterval(Animation.timer);
+	Animation.timer = null;
         Widgets["play_pause"].text("Play");
       };
-      Animation.pause = pause;
 
       // This code starts/stops the animation timer when the page is
       // hidden, inspired by
@@ -2211,17 +2208,15 @@ var animint = function (to_select, json_file) {
       function onchange (evt) {
         if(document.visibilityState == "visible"){
           if(Animation.play_after_visible){
-            play();
+            Animation.play();
           }
         }else{
           if(Widgets["play_pause"].text() == "Pause"){
-            pause(true);
+            Animation.pause(true);
           }
         }
       };
       document.addEventListener("visibilitychange", onchange);
-
-      Animation.play();
     }
   });
 };
