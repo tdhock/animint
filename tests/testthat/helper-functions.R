@@ -5,8 +5,14 @@ animint2HTML <- function(plotList) {
   res <- animint2dir(plotList, out.dir = "animint-htmltest", 
                      open.browser = FALSE)
   remDr$refresh()
+  Sys.sleep(1)
   res$html <- getHTML()
   res
+}
+
+acontext <- function(...){
+  print(...)
+  context(...)
 }
 
 clickHTML <- function(...){

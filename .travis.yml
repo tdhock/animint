@@ -10,7 +10,7 @@ install:
   # Thanks RStudio! https://github.com/rstudio/rmarkdown/blob/master/.travis.yml
   # Install binary pandoc from Rstudio
   - mkdir -p $HOME/opt/pandoc
-  - curl -O https://s3.amazonaws.com/rstudio-buildtools/pandoc-1.12.3.zip
+  - curl -O http://s3.amazonaws.com/rstudio-buildtools/pandoc-1.12.3.zip
   - unzip -j pandoc-1.12.3.zip pandoc-1.12.3/linux/debian/x86_64/pandoc
     -d $HOME/opt/pandoc
   - chmod +x $HOME/opt/pandoc/pandoc*
@@ -37,4 +37,9 @@ notifications:
 
 env:
   global:
-    secure: "KBHQwH4LExvV/rXagTdBa89VKAfC8aYVNUANrklJ6KCoOWQ4Jh3qIWwSDM8ModcR9Oq8JR9I3N/ObatIN/finjgDdCNUndUQcWaT6YNfnbznTQhR0PgthoCmvb0NWJwC2nEYC13XB5hwBMvq65vEkXu4uwthIBDhl5l56RN2+Rc="
+    - secure: "KBHQwH4LExvV/rXagTdBa89VKAfC8aYVNUANrklJ6KCoOWQ4Jh3qIWwSDM8ModcR9Oq8JR9I3N/ObatIN/finjgDdCNUndUQcWaT6YNfnbznTQhR0PgthoCmvb0NWJwC2nEYC13XB5hwBMvq65vEkXu4uwthIBDhl5l56RN2+Rc="
+  matrix:
+    - TEST_SUITE=renderer1
+    - TEST_SUITE=renderer2
+    - TEST_SUITE=compiler
+    
