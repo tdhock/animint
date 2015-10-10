@@ -5,11 +5,56 @@
 // </script>
 // Constructor for animint Object.
 var animint = function (to_select, json_file) {
-  // replacing periods in variable with an underscore
-  // this makes sure that selector doesn't confuse . in name with id selector
+
+  function wait_until_then(timeout, condFun, readyFun) {
+    function checkFun() {
+      if(condFun()) {
+        readyFun();
+      } else{
+        setTimeout(checkFun, timeout);
+      }
+    }
+    checkFun();
+  }
+
+  function convert_R_types(resp_array, types){
+    return resp_array.map(function (d) {
+      for (var v_name in d) {
+      	if(!is_interactive_aes(v_name)){
+          var r_type = types[v_name];
+          if (r_type == "integer") {
+            d[v_name] = parseInt(d[v_name]);
+          } else if (r_type == "numeric") {
+            d[v_name] = parseFloat(d[v_name]);
+          } else if (r_type == "factor" || r_type == "rgb" 
+		     || r_type == "linetype" || r_type == "label" 
+		     || r_type == "character") {
+            // keep it as a character
+          } else if (r_type == "character" & v_name == "outliers") {
+            d[v_name] = parseFloat(d[v_name].split(" @ "));
+          } 
+      	}
+      }
+      return d;
+    });
+  }
+
+  // replacing periods in variable with an underscore this makes sure
+  // that selector doesn't confuse . in name with css selectors
   function safe_name(unsafe_name){
     return unsafe_name.replace(/\./g, '_');
   }
+
+  function is_interactive_aes(v_name){
+    if(v_name.indexOf("clickSelects") > -1){
+      return true;
+    }
+    if(v_name.indexOf("showSelected") > -1){
+      return true;
+    }
+    return false;
+  }
+
   var linetypesize2dasharray = function (lt, size) {
     var isInt = function(n) {
       return typeof n === 'number' && parseFloat(n) == parseInt(n, 10) && !isNaN(n);
@@ -91,6 +136,7 @@ var animint = function (to_select, json_file) {
     return {height: bbox.height, width: bbox.width};
   };
 
+  var nest_by_group = d3.nest().key(function(d){ return d.group; });
   var dirs = json_file.split("/");
   dirs.pop(); //if a directory path exists, remove the JSON file from dirs
   var element = d3.select(to_select);
@@ -114,7 +160,12 @@ var animint = function (to_select, json_file) {
 
   //creating an array to contain the selectize widgets
   var selectized_array = [];
-
+  var data_object_geoms = {
+    "line":true,
+    "path":true,
+    "ribbon":true,
+    "polygon":true
+  };
   var css = document.createElement('style');
   css.type = 'text/css';
   var styles = [".axis path{fill: none;stroke: black;shape-rendering: crispEdges;}",
@@ -132,6 +183,12 @@ var animint = function (to_select, json_file) {
     }else{
       g_info.select_style = "opacity";
     }
+    // Determine if data will be an object or an array.
+    if(g_info.geom in data_object_geoms){
+      g_info.data_is_object = true;
+    }else{
+      g_info.data_is_object = false;
+    }
     // Add a row to the loading table.
     g_info.tr = Widgets["loading"].append("tr");
     g_info.tr.append("td").text(g_name);
@@ -146,21 +203,12 @@ var animint = function (to_select, json_file) {
     Geoms[g_name] = g_info;
     // Determine whether common chunk tsv exists
     // If yes, load it
-    if (g_info.hasOwnProperty("columns") && g_info.columns.common){
+    if(g_info.hasOwnProperty("columns") && g_info.columns.common){
       var common_tsv = get_tsv(g_info, "_common");
-      // get the data if it has not yet been downloaded.
-      g_info.tr.select("td.chunk").text(common_tsv);
-      g_info.tr.select("td.status").text("downloading");
-      var svg = SVGs[g_name];
-      var loading = svg.append("text")
-        .attr("class", "loading" + common_tsv)
-        .text("Downloading "+ common_tsv + "...")
-        .attr("font-size", 9)
-        .attr("y", 10)
-        .style("fill", "red");
-      download_chunk(g_info, common_tsv, function(chunk){
-        loading.remove();
-        g_info.common_tsv = common_tsv;
+      g_info.common_tsv = common_tsv;
+      d3.tsv(common_tsv, function (error, response) {
+	var converted = convert_R_types(response, g_info.types);
+	g_info.data[common_tsv] = nest_by_group.map(converted);
       });
     } else {
       g_info.common_tsv = null;
@@ -717,100 +765,33 @@ var animint = function (to_select, json_file) {
   var get_tsv = function(g_info, chunk_id){
     return g_info.classed + "_chunk" + chunk_id + ".tsv";
   };
-
+  
   /**
-   * join common chunk tsv into varied chunk tsv by group
-   * @param  {array} common_chunk   array of json objects from common chunk tsv
-   * @param  {array} varied_chunk   array of json objects from varied chunk tsv
-   * @param  {string array} columns_common array of common column names
-   * @param  {string} group         group column name
-   * @return {array}                array of json objects after joining common chunk tsv into varied chunk tsv
+   * copy common chunk tsv to varied chunk tsv, returning an array of
+   * objects.
   */
-  var joinChunkByGroup = function(common_chunk, varied_chunk, columns_common, group) {
+  function copy_chunk(g_info, varied_chunk) {
+    var varied_by_group = nest_by_group.map(varied_chunk);
+    var common_by_group = g_info.data[g_info.common_tsv];
     var new_varied_chunk = [];
-    // join by group
-    var groups = varied_chunk.map(function(obj){
-      return obj[group];
-    });
-
-    groups.forEach(function(id){
-      var varied_obj = findObjectByKey(varied_chunk, group, id);
-      var common_obj = findObjectByKey(common_chunk, group, id);
-      var new_varied_obj = clone(varied_obj);
-      columns_common.forEach(function(col) {
-        new_varied_obj[col] = common_obj[col];
-      });
-      new_varied_chunk.push(new_varied_obj);
-    });
+    for(group_id in varied_by_group){
+      var varied_one_group = varied_by_group[group_id];
+      var common_one_group = common_by_group[group_id];
+      // there are two cases: each group of varied data is of length
+      // 1, or of length of the common data.
+      for(var common_i=0; common_i<common_one_group.length; common_i++){
+	var varied_obj = varied_one_group[common_i];
+	var common_obj = common_one_group[common_i];
+	for(col in common_obj){
+	  if(col != "group"){
+	    varied_obj[col] = common_obj[col];
+	  }
+	}
+	new_varied_chunk.push(varied_obj);
+      }
+    }
     return new_varied_chunk;
   }
-
-  /**
-   * find object matching a key of lookup value from an array of objects
-   * @param  {[type]} array array of objects to lookup
-   * @param  {[type]} key   the key of each objects in the array to lookup
-   * @param  {[type]} value the value of key to lookup
-   * @return {[type]}       object
-  */
-  var findObjectByKey = function(array, key, value) {
-    for (var i = 0; i < array.length; i++) {
-      if (array[i][key] === value) {
-        return array[i];
-      }
-    }
-    return null;
-  };
-
-  /**
-   * clone json object without reference
-   * @param  {json object} object json object
-   * @return {json object}        a copy of input json object
-  */
-  var clone = function(object) {
-    var o = {};
-    for(var i in object){
-      o[i] = object[i];
-    }
-    return o;
-  };
-
-  /**
-   * copy common chunk tsv to varied chunk tsv
-   * @param  {json object} common_chunk   json object from common chunk tsv
-   * @param  {json object} varied_chunk   json object from varied chunk tsv
-   * @param  {string array} columns_common array of common column names
-   * @return {json object}                json object after merging common chunk tsv into varied chunk tsv
-  */
-  var copy_chunk = function(common_chunk, varied_chunk, columns_common) {
-    if(columns_common.indexOf("group") != -1){
-      if(Array.isArray(varied_chunk)){
-        var new_varied_chunk = joinChunkByGroup(common_chunk, varied_chunk, columns_common, "group");
-      } else{
-        var new_varied_chunk = {};
-
-        var keys = d3.keys(varied_chunk);
-        keys.forEach(function(k){
-          var g_varied_chunk = varied_chunk[k];
-          var g_common_chunk = common_chunk[k];
-
-          if(g_varied_chunk.length == 1){
-            var new_g_varied_chunk = [];
-            g_common_chunk.forEach(function(obj){
-              var new_varied_obj = clone(g_varied_chunk[0]);
-              columns_common.forEach(function(col) {
-                new_varied_obj[col] = obj[col];
-              });
-              new_g_varied_chunk.push(new_varied_obj);
-            });
-          } else{
-            var new_g_varied_chunk = joinChunkByGroup(g_common_chunk, g_varied_chunk, columns_common, "group");
-          }
-          new_varied_chunk[k] = new_g_varied_chunk;
-        });
-      }
-      return new_varied_chunk;
-    }
-  };
 
   // update_geom is called from add_geom and update_selector. It
   // downloads data if necessary, and then calls draw_geom.
@@ -889,8 +870,9 @@ var animint = function (to_select, json_file) {
       download_next(g_name);
     })
   };
+
   // download_chunk is called from update_geom and download_sequence.
-  var download_chunk = function(g_info, tsv_name, funAfter){
+  function download_chunk(g_info, tsv_name, funAfter){
     if(g_info.download_status.hasOwnProperty(tsv_name)){
       funAfter();
       return; // do not download twice.
@@ -898,58 +880,36 @@ var animint = function (to_select, json_file) {
     g_info.download_status[tsv_name] = "downloading";
     // prefix tsv file with appropriate path
     var tsv_file = dirs.concat(tsv_name).join("/");
-    function is_interactive_aes(v_name){
-      if(v_name.indexOf("clickSelects") > -1){
-        return true;
-      }
-      if(v_name.indexOf("showSelected") > -1){
-        return true;
-      }
-      return false;
-    };
     d3.tsv(tsv_file, function (error, response) {
       // First convert to correct types.
       g_info.download_status[tsv_name] = "processing";
-      response.forEach(function (d) {
-        for (var v_name in g_info.types) {
-          // interactive aesthetics (clickSelects, showSelected, etc)
-    	    // stay as characters, others may be converted.
-      	  if(!is_interactive_aes(v_name)){
-            var r_type = g_info.types[v_name];
-            if (r_type == "integer") {
-              d[v_name] = parseInt(d[v_name]);
-            } else if (r_type == "numeric") {
-              d[v_name] = parseFloat(d[v_name]);
-            } else if (r_type == "factor" || r_type == "rgb" 
-              || r_type == "linetype" || r_type == "label" 
-              || r_type == "character") {
-              // keep it as a character
-            } else if (r_type == "character" & v_name == "outliers") {
-              d[v_name] = parseFloat(d[v_name].split(" @ "));
-            } else {
-              throw "unsupported R type " + r_type;
-            }
-      	  }
-        }
+      response = convert_R_types(response, g_info.types);
+      wait_until_then(500, function(){
+	if(g_info.common_tsv) {
+          return g_info.data.hasOwnProperty(g_info.common_tsv);
+	}else{
+	  return true;
+	}
+      }, function(){
+	if(g_info.common_tsv) {
+          // copy data from common tsv to varied tsv
+          response = copy_chunk(g_info, response);
+	}
+	var nest = d3.nest();
+	g_info.nest_order.forEach(function (v_name) {
+          nest.key(function (d) {
+            return d[v_name];
+          });
+	});
+	var chunk = nest.map(response);
+	g_info.data[tsv_name] = chunk;
+	g_info.tr.select("td.downloaded").text(d3.keys(g_info.data).length);
+	g_info.download_status[tsv_name] = "saved";
+	funAfter(chunk);
       });
-      var nest = d3.nest();
-      g_info.nest_order.forEach(function (v_name) {
-        nest.key(function (d) {
-          return d[v_name];
-        });
-      });
-      var chunk = nest.map(response);
-      // copy data from common tsv to varied tsv
-      if (g_info.common_tsv) {
-        var common_chunk = g_info.data[g_info.common_tsv];
-        chunk = copy_chunk(common_chunk, chunk, g_info.columns.common);
-      }
-      g_info.data[tsv_name] = chunk;
-      g_info.tr.select("td.downloaded").text(d3.keys(g_info.data).length);
-      g_info.download_status[tsv_name] = "saved";
-      funAfter(chunk);
     });
-  };
+  }//download_chunk.
+
   // update_geom is responsible for obtaining a chunk of downloaded
   // data, and then calling draw_geom to actually draw it.
   var draw_geom = function(g_info, chunk, selector_name, PANEL){
@@ -1001,25 +961,38 @@ var animint = function (to_select, json_file) {
       }
       selected_arrays = new_arrays;
     });
-    var data = []
+    // data can be either an array[] if it will be directly involved
+    // in a data-bind, or an object{} if it will be involved in a
+    // data-bind by group (e.g. geom_line).
+    var data;
+    if(g_info.data_is_object){
+      data = {};
+    }else{
+      data = [];
+    }
     selected_arrays.forEach(function(value_array){
       var some_data = chunk;
       value_array.forEach(function(value){
         if (some_data.hasOwnProperty(value)) {
           some_data = some_data[value];
         } else {
-          some_data = [];
+	  if(g_info.data_is_object){
+	    some_data = {};
+	  }else{
+            some_data = [];
+	  }
         }
       });
-      if(isArray(some_data)){
+      if(g_info.data_is_object){
+	if(isArray(some_data)){
+	  data["0"] = some_data;
+	}else{
+	  for(k in some_data){
+            data[k] = some_data[k];
+          }
+	}
+      }else{//some_data is an array.
         data = data.concat(some_data);
-      }else{
-        if(isArray(data)){
-          data = {};
-        }
-	      for(k in some_data){
-          data[k] = some_data[k];
-        }
       }
     });
     var aes = g_info.aes;
@@ -1121,7 +1094,7 @@ var animint = function (to_select, json_file) {
         return d.key;
       };
     }
-    if (g_info.geom == "line" || g_info.geom == "path" || g_info.geom == "polygon" || g_info.geom == "ribbon") {
+    if(g_info.data_is_object) {
 
       // Lines, paths, polygons, and ribbons are a bit special. For
       // every unique value of the group variable, we take the
@@ -1177,32 +1150,18 @@ var animint = function (to_select, json_file) {
       // In order to get d3 lines to play nice, bind fake "data" (group
       // id's) -- the kv variable. Then each separate object is plotted
       // using path (case of only 1 thing and no groups).
-      if (!aes.hasOwnProperty("group")) {
-	       // There is either 1 or 0 groups.
-         if(data.length == 0){
-          kv = [];
-	       } else {
-          kv = [{
-            "key": 0,
-            "value": 0
-          }];
-          data = {
-            0: data
-          };
-        }
-      } else {
-        // we need to use a path for each group.
-        var kv = d3.entries(d3.keys(data));
-        kv = kv.map(function (d) {
-          //d[aes.group] = d.value;
 
-          // Need to store the clickSelects value that will
-          // be passed to the selector when we click on this
-          // item.
-          d.clickSelects = data[d.value][0].clickSelects;
-          return d;
-        });
-      }
+      // we need to use a path for each group.
+      var kv = d3.entries(d3.keys(data));
+      kv = kv.map(function (d) {
+        //d[aes.group] = d.value;
+
+        // Need to store the clickSelects value that will
+        // be passed to the selector when we click on this
+        // item.
+        d.clickSelects = data[d.value][0].clickSelects;
+        return d;
+      });
 
       // line, path, and polygon use d3.svg.line(),
       // ribbon uses d3.svg.area()
@@ -1220,10 +1179,16 @@ var animint = function (to_select, json_file) {
       // select the correct group before returning anything.
       if(key_fun != null){
         key_fun = function(group_info){
-          var one_group = data[group_info.value];
-	        var one_row = one_group[0];
-	        // take key from first value in the group.
-	        return one_row.key;
+	  if(data.hasOwnProperty(group_info.value)){
+            var one_group = data[group_info.value];
+	    var one_row = one_group[0];
+	    // take key from first value in the group.
+	    return one_row.key;
+	  }else{
+	    // may be called on data which is not in the current
+	    // selection set?
+	    return null;
+	  }
         };
       }
       id_fun = function(group_info){
@@ -1237,7 +1202,7 @@ var animint = function (to_select, json_file) {
         e.attr("d", function (d) {
           var one_group = data[d.value];
           // filter NaN since they make the whole line disappear!
-	        var no_na = one_group.filter(function(d){
+	  var no_na = one_group.filter(function(d){
             if(g_info.geom == "ribbon"){
               return !isNaN(d.x) && !isNaN(d.ymin) && !isNaN(d.ymax);
             }else{
@@ -1616,37 +1581,59 @@ var animint = function (to_select, json_file) {
         .on("mouseout", function (d) {
           d3.select(this).call(out_fun);
         })
-        .on("click", function (d) {
+      ;
+      if(has_clickSelects){
+	elements.on("click", function (d) {
 	  // The main idea of how clickSelects works: when we click
 	  // something, we call update_selector with the clicked
 	  // value.
-	  if(has_clickSelects){
             var s_name = g_info.aes.clickSelects;
             update_selector(s_name, d.clickSelects);
-	  }else{
-	    var s_name = d["clickSelects.variable"];
-	    var s_value = d["clickSelects.value"];
-	    update_selector(s_name, s_value);
-	  }
-        })
-      ;
+	});
+      }else{
+	elements.on("click", function(d){
+	  var s_name = d["clickSelects.variable"];
+	  var s_value = d["clickSelects.value"];
+	  update_selector(s_name, s_value);
+	});
+      }
     }else{//has neither clickSelects nor clickSelects.variable.
       elements.style("opacity", get_alpha);
     }
     var has_tooltip = g_info.aes.hasOwnProperty("tooltip");
     if(has_clickSelects || has_tooltip || has_clickSelects_variable){
+      var text_fun, get_one;
+      if(g_info.data_is_object){
+	get_one = function(d_or_kv){
+          var one_group = data[d_or_kv.value];
+	  return one_group[0];
+        };
+      }else{
+	get_one = function(d_or_kv){ 
+	  return d_or_kv;
+	};
+      }
+      if(has_tooltip){
+        text_fun = function(d){
+	  return d.tooltip;
+	};
+      }else if(has_clickSelects){
+	text_fun = function(d){
+          var v_name = g_info.aes.clickSelects;
+          return v_name + " " + d.clickSelects;
+	};
+      }else{ //clickSelects_variable
+	text_fun = function(d){
+	  return d["clickSelects.variable"] + " " + d["clickSelects.value"];
+	};
+      }
       elements.text("")
         .append("svg:title")
-        .text(function (d) {
-          if(has_tooltip){
-            return d.tooltip;
-          }else if(has_clickSelects){
-            var v_name = g_info.aes.clickSelects;
-            return v_name + " " + d.clickSelects;
-          }else{ //clickSelects_variable
-	    return d["clickSelects.variable"] + " " + d["clickSelects.value"];
-	  }
-        });
+        .text(function(d_or_kv){
+	  var d = get_one(d_or_kv);
+	  return text_fun(d);
+	})
+      ;
     }
     // Set attributes of only the entering elements. This is needed to
     // prevent things from flying around from the upper left when they
@@ -1985,17 +1972,17 @@ var animint = function (to_select, json_file) {
         return Selectors[s_name].duration;
       });
     // selector widgets
-    var show_message2 = "Toggle selected variables";
+    var toggle_message = "Toggle selected variables";
     var show_hide_selector_widgets = element.append("button")
-      .text(show_message2)
+      .text(toggle_message)
       .attr("class", "show_hide_selector_widgets")
       .on("click", function(){
-        if(this.textContent == show_message2){
+        if(this.textContent == toggle_message){
           selector_table.style("display", "");
           show_hide_selector_widgets.text("Hide variable toggler");
         }else{
           selector_table.style("display", "none");
-          show_hide_selector_widgets.text(show_message2);
+          show_hide_selector_widgets.text(toggle_message);
         }
       })
     ;
@@ -2007,7 +1994,9 @@ var animint = function (to_select, json_file) {
     var selector_first_tr = selector_table.append("tr");
     selector_first_tr
       .append("th")
-      .text("Toggle selected value");
+      .text("Toggle selected value")
+      .attr("colspan", "2")
+    ;
       
      // looping through and adding a row for each selector
     for(s_name in Selectors) {
