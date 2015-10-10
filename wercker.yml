@@ -15,8 +15,19 @@ build:
       code: |
         Rscript -e "library(devtools); install_deps(dependencies = TRUE); install_github(c('ropensci/RSelenium', 'tdhock/ggplot2')); install()"
     - script:
-      name: echo run animint tests
+      name: copy source to animint 
       code: |
         mv /pipeline/source /pipeline/animint
-        Rscript -e "setwd('/pipeline/animint/tests'); source('testthat.R')"
-        mv /pipeline/animint /pipeline/source
+    - script:
+      name: echo renderer1 tests
+      code: |
+        TEST_SUITE=renderer1 Rscript -e "setwd('/pipeline/animint/tests'); source('testthat.R')"
+    - script:
+      name: echo renderer2 tests
+      code: |
+        TEST_SUITE=renderer2 Rscript -e "setwd('/pipeline/animint/tests'); source('testthat.R')"
+    - script:
+      name: echo compiler tests
+      code: |
+        TEST_SUITE=compiler Rscript -e "setwd('/pipeline/animint/tests'); source('testthat.R')"
+
