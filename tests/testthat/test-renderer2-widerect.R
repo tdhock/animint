@@ -163,7 +163,7 @@ getYear <- function(){
 
 test_that("animation updates", {
   old.year <- getYear()
-  Sys.sleep(2) #wait for one animation frame.
+  Sys.sleep(3) #wait for one animation frame.
   new.year <- getYear()
   expect_true(old.year != new.year)
 })
@@ -173,7 +173,7 @@ clickID("show_hide_animation_controls")
 test_that("pause stops animation", {
   clickID("play_pause")
   old.year <- getYear()
-  Sys.sleep(2)
+  Sys.sleep(3)
   new.year <- getYear()
   expect_true(old.year == new.year)
 })
@@ -181,7 +181,7 @@ test_that("pause stops animation", {
 test_that("play restarts animation", {
   old.year <- getYear()
   clickID("play_pause")
-  Sys.sleep(2)
+  Sys.sleep(3)
   new.year <- getYear()
   expect_true(old.year != new.year)
 })
@@ -189,7 +189,7 @@ test_that("play restarts animation", {
 test_that("pause stops animation (second time)", {
   clickID("play_pause")
   old.year <- getYear()
-  Sys.sleep(2)
+  Sys.sleep(3)
   new.year <- getYear()
   expect_true(old.year == new.year)
 })
@@ -240,7 +240,7 @@ test_that("clicking status legend brings back tallrects", {
 test_that("play restarts animation (second time)", {
   old.year <- getYear()
   clickID("play_pause")
-  Sys.sleep(2)
+  Sys.sleep(3)
   new.year <- getYear()
   expect_true(old.year != new.year)
 })
