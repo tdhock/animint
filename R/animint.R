@@ -168,13 +168,19 @@ parsePlot <- function(meta){
   for(selector.name in names(meta$selector.values)){
     values.update <- meta$selector.values[[selector.name]]
     value.vec <- unique(unlist(lapply(values.update, "[[", "values")))
-    meta$selectors[[selector.name]]$selected <-
-      if(meta$selectors[[selector.name]]$type=="single"){
-        value.vec[1]
-      }else{
-        value.vec
-      }
-    meta$selectors[[selector.name]]$levels <- value.vec
+    meta$selectors[[selector.name]]$selected <- if(
+      meta$selectors[[selector.name]]$type=="single"){
+      value.vec[1]
+    }else{
+      value.vec
+    }
+    ## If this selector was defined by .variable .value aes, then we
+    ## will not generate selectize widgets.
+    if(!isTRUE(meta$selectors[[selector.name]]$is.variable.value)){
+      meta$selectors[[selector.name]]$levels <- value.vec
+    }
+    ## s.info$update is the list of geom names that will be updated
+    ## for this selector.
     meta$selectors[[selector.name]]$update <-
       as.list(unique(unlist(lapply(values.update, "[[", "update"))))
   }
@@ -451,19 +457,23 @@ saveLayer <- function(l, d, meta){
   ## Construct the selector.
   for(row.i in seq_along(interactive.aes$variable)){
     aes.row <- interactive.aes[row.i, ]
-    selector.df <- if(is.na(aes.row$value)){
-      value.col <- paste(aes.row$variable)
-      data.frame(value.col,
-                 selector.name=update.vars[[value.col]])
-    }else{
+    is.variable.value <- !is.na(aes.row$value)
+    selector.df <- if(is.variable.value){
       selector.vec <- g.data[[paste(aes.row$variable)]]
       data.frame(value.col=aes.row$value,
                  selector.name=unique(paste(selector.vec)))
+    }else{
+      value.col <- paste(aes.row$variable)
+      data.frame(value.col,
+                 selector.name=update.vars[[value.col]])
     }
     for(sel.i in 1:nrow(selector.df)){
       sel.row <- selector.df[sel.i,]
       value.col <- paste(sel.row$value.col)
       selector.name <- paste(sel.row$selector.name)
+      ## If this selector was defined by .variable .value aes, then we
+      ## will not generate selectize widgets.
+      meta$selectors[[selector.name]]$is.variable.value <- is.variable.value
       ## If this selector has no defined type yet, we define it once
       ## and for all here, so we can use it later for chunk
       ## separation.
@@ -476,7 +486,7 @@ saveLayer <- function(l, d, meta){
         meta$selectors[[selector.name]]$type <- selector.type
       }
       ## We also store all the values of this selector in this layer,
-      ## so we can accurate set levels after all geoms have been
+      ## so we can accurately set levels after all geoms have been
       ## compiled.
       value.vec <- unique(g.data[[value.col]])
       key <- paste(g$classed, row.i, sel.i)

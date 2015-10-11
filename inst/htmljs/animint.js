@@ -2001,51 +2001,54 @@ var animint = function (to_select, json_file) {
      // looping through and adding a row for each selector
     for(s_name in Selectors) {
       var s_info = Selectors[s_name];
-      // removing "." from name so it can be used in ids
-      var s_name_id = safe_name(s_name);
+      // for .variable .value selectors, levels is undefined and we do
+      // not want to make a selectize widget.
+      if(isArray(s_info.levels)){
+	// removing "." from name so it can be used in ids
+	var s_name_id = safe_name(s_name);
 
-      // adding a row for each selector
-      var selector_widget_row = selector_table
-        .append("tr")
-        .attr("class", function() { return s_name_id + "_selector_widget"; })
-      ;
-      selector_widget_row.append("td").text(s_name);
-      // adding the selector
-      var selector_widget_select = selector_widget_row
-        .append("td")
-        .append("select")
-        .attr("class", function() { return s_name_id + "_input"; })
-        .attr("placeholder", function() { return "Toggle " + s_name; });
-      // adding an option for each level of the variable
-      selector_widget_select.selectAll("option")
-        .data(s_info.levels)
-        .enter()
-        .append("option")
-        .attr("value", function(d) { return d; })
-        .text(function(d) { return d; });
-      // making sure that the first option is blank
-      selector_widget_select
-        .insert("option")
-        .attr("value", "")
-        .text(function() { return "Toggle " + s_name; });
-        
-      // calling selectize
-      var selectize_selector = to_select + ' .' + s_name_id + "_input";
-      if(s_info.type == "single") {
-        // setting up array of selector and options
-        var selector_values = [];
-        for(i in s_info.levels) {
-          selector_values[i] = {
-            id: s_name.concat("___", s_info.levels[i]), 
-            text: s_info.levels[i]
-          };
-        }
-        // the id of the first selector
-        var selected_id = s_name.concat("___", s_info.selected);
+	// adding a row for each selector
+	var selector_widget_row = selector_table
+          .append("tr")
+          .attr("class", function() { return s_name_id + "_selector_widget"; })
+	;
+	selector_widget_row.append("td").text(s_name);
+	// adding the selector
+	var selector_widget_select = selector_widget_row
+          .append("td")
+          .append("select")
+          .attr("class", function() { return s_name_id + "_input"; })
+          .attr("placeholder", function() { return "Toggle " + s_name; });
+	// adding an option for each level of the variable
+	selector_widget_select.selectAll("option")
+          .data(s_info.levels)
+          .enter()
+          .append("option")
+          .attr("value", function(d) { return d; })
+          .text(function(d) { return d; });
+	// making sure that the first option is blank
+	selector_widget_select
+          .insert("option")
+          .attr("value", "")
+          .text(function() { return "Toggle " + s_name; });
+	
+	// calling selectize
+	var selectize_selector = to_select + ' .' + s_name_id + "_input";
+	if(s_info.type == "single") {
+          // setting up array of selector and options
+          var selector_values = [];
+          for(i in s_info.levels) {
+            selector_values[i] = {
+              id: s_name.concat("___", s_info.levels[i]), 
+              text: s_info.levels[i]
+            };
+          }
+          // the id of the first selector
+          var selected_id = s_name.concat("___", s_info.selected);
 
-        // if single selection, only allow one item
-        var $temp = $(selectize_selector)
-          .selectize({
+          // if single selection, only allow one item
+          var $temp = $(selectize_selector)
+            .selectize({
               create: false, 
               valueField: 'id',
               labelField: 'text',
@@ -2055,39 +2058,39 @@ var animint = function (to_select, json_file) {
               maxItems: 1, 
               allowEmptyOption: true,
               onChange: function(value) {
-                // extracting the name and the level to update
-                var selector_name = value.split("___")[0];
-                var selected_level = value.split("___")[1];
-                // updating the selector
-                update_selector(selector_name, selected_level);
+		// extracting the name and the level to update
+		var selector_name = value.split("___")[0];
+		var selected_level = value.split("___")[1];
+		// updating the selector
+		update_selector(selector_name, selected_level);
               }
             })
-         ;
-      } else {
-        // setting up array of selector and options
-        var selector_values = [];
-        if(typeof s_info.levels == "object") {
-          for(i in s_info.levels) {
-            selector_values[i] = {
-              id: s_name.concat("___", s_info.levels[i]), 
-              text: s_info.levels[i]
+          ;
+	} else { // multiple selection:
+          // setting up array of selector and options
+          var selector_values = [];
+          if(typeof s_info.levels == "object") {
+            for(i in s_info.levels) {
+              selector_values[i] = {
+		id: s_name.concat("___", s_info.levels[i]), 
+		text: s_info.levels[i]
+              };
+            }
+          } else {
+            selector_values[0] = {
+              id: s_name.concat("___", s_info.levels), 
+              text: s_info.levels
             };
           }
-        } else {
-          selector_values[0] = {
-            id: s_name.concat("___", s_info.levels), 
-              text: s_info.levels
-          };
-        }
-        // setting up an array to contain the initally selected elements
-        var initial_selections = [];
-        for(i in s_info.selected) {
-          initial_selections[i] = s_name.concat("___", s_info.selected[i]);
-        }
-        
-        // construct the selectize
-        var $temp = $(selectize_selector)
-          .selectize({
+          // setting up an array to contain the initally selected elements
+          var initial_selections = [];
+          for(i in s_info.selected) {
+            initial_selections[i] = s_name.concat("___", s_info.selected[i]);
+          }
+          
+          // construct the selectize
+          var $temp = $(selectize_selector)
+            .selectize({
               create: false, 
               valueField: 'id',
               labelField: 'text',
@@ -2097,8 +2100,8 @@ var animint = function (to_select, json_file) {
               maxItems: s_info.levels.length, 
               allowEmptyOption: true,
               onChange: function(value) { 
-                // if nothing is selected, remove what is currently selected
-                if(value == null) {
+		// if nothing is selected, remove what is currently selected
+		if(value == null) {
                   // extracting the selector ids from the options
                   var the_ids = Object.keys($(this)[0].options);
                   // the name of the appropriate selector
@@ -2109,7 +2112,7 @@ var animint = function (to_select, json_file) {
                   old_selections.forEach(function(element) {
                     update_selector(selector_name, element);
                   });
-                } else {
+		} else { // value is not null:
                   // grabbing the name of the selector from the selected value
                   var selector_name = value[0].split("___")[0];
                   // identifying the levels that should be selected
@@ -2139,12 +2142,13 @@ var animint = function (to_select, json_file) {
                       update_selector(selector_name, element);
                     })
                   ;
-                }
-              }
-            })
-        ;
-      }
-      selectized_array[s_name] = $temp[0].selectize;
+		}//value==null
+              }//onChange
+            })//selectize
+          ;
+	}//single or multiple selection.
+	selectized_array[s_name] = $temp[0].selectize;
+      }//levels, is.variable.value
     } // close for loop through selector widgets
     // If this is an animation, then start downloading all the rest of
     // the data, and start the animation.
