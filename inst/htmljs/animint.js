@@ -777,10 +777,14 @@ var animint = function (to_select, json_file) {
     for(group_id in varied_by_group){
       var varied_one_group = varied_by_group[group_id];
       var common_one_group = common_by_group[group_id];
-      // there are two cases: each group of varied data is of length
-      // 1, or of length of the common data.
-      for(var common_i=0; common_i<common_one_group.length; common_i++){
-	var varied_obj = varied_one_group[common_i];
+      var common_i = 0;
+      for(var varied_i=0; varied_i < varied_one_group.length; varied_i++){
+	// there are two cases: each group of varied data is of length
+	// 1, or of length of the common data.
+	if(common_one_group.length == varied_one_group.length){
+	  common_i = varied_i;
+	}
+	var varied_obj = varied_one_group[varied_i];
 	var common_obj = common_one_group[common_i];
 	for(col in common_obj){
 	  if(col != "group"){
