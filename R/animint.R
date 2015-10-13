@@ -995,7 +995,19 @@ getCommonChunk <- function(built, chunk.vars, aes.list){
     common.cols <- names(is.common)[is.common]
     one.chunk <- built.by.chunk[[1]]
     ## Should each chunk have the same info about each group? 
-    common.data <- unique(na.omit(one.chunk[common.cols]))
+    common.not.na <- na.omit(one.chunk[common.cols])
+    common.unique <- unique(common.not.na)
+    ## For geom_polygon and geom_path we may have two rows that should
+    ## both be kept (the start and the end of each group may be the
+    ## same if the shape is closed), so we define common.data as all
+    ## of the rows (common.not.na) in that case, and just the unique
+    ## data per group (common.unique) in the other case.
+    data.per.group <- table(common.unique$group)
+    common.data <- if(all(data.per.group == 1)){
+      common.unique
+    }else{
+      common.not.na
+    }
     built.group <- do.call(rbind, built.by.chunk)
     built.has.common <- subset(built.group, group %in% common.data$group)
     varied.df.list <- split.x(built.has.common, chunk.vars)
