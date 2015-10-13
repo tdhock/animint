@@ -995,7 +995,7 @@ getCommonChunk <- function(built, chunk.vars, aes.list){
     common.cols <- names(is.common)[is.common]
     one.chunk <- built.by.chunk[[1]]
     ## Should each chunk have the same info about each group? 
-    common.data <- na.omit(one.chunk[common.cols])
+    common.data <- unique(na.omit(one.chunk[common.cols]))
     built.group <- do.call(rbind, built.by.chunk)
     built.has.common <- subset(built.group, group %in% common.data$group)
     varied.df.list <- split.x(built.has.common, chunk.vars)
