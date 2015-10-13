@@ -982,10 +982,17 @@ getCommonChunk <- function(built, chunk.vars, aes.list){
              col.name=col.name.vec))
   for(group.name in names(values.by.group)){
     values.by.chunk <- values.by.group[[group.name]]
+    row.count.vec <- sapply(values.by.chunk, nrow)
+    same.size.chunks <- all(row.count.vec[1] == row.count.vec)
     for(col.name in col.name.vec){
       value.list <- lapply(values.by.chunk, function(df)df[[col.name]])
-      value.mat <- do.call(cbind, value.list)
-      is.common.mat[group.name, col.name] <- all(value.mat[, 1] == value.mat)
+      is.common.mat[group.name, col.name] <- if(same.size.chunks){
+        value.mat <- do.call(cbind, value.list)
+        all(value.mat[, 1] == value.mat)
+      }else{
+        value.tab <- table(unlist(value.list))
+        length(value.tab) == 1
+      }
     }
   }
   is.common <- apply(is.common.mat, 2, all, na.rm=TRUE)
