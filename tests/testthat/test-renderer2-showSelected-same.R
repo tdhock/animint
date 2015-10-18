@@ -48,10 +48,32 @@ test_that("redundant showSelected and color optimized", {
   expect_equal(length(var.list), 1)
 })
 
-test_that("selector widgets table initially invisiable", {
+test_that("selector widgets table initially invisible", {
   display <- getStyleValue(
     info$html, '//table[@class="table_selector_widgets"]',
     "display")
   expect_match(display, "none")
 })
 
+## This test responds to @kferris10 who asked the question "What will
+## happen if there is only one level? Will it render as an array or an
+## object?" https://github.com/tdhock/animint/pull/115 We were talking
+## about what to do with the selector widget when there is a
+## showSelected variable which has only 1 level. However that is a
+## trivial case for a showSelected variable, so it should just be
+## optimized out with a warning.
+iris$kingdom <- "plantae"
+viz <- list(
+  points=ggplot()+
+    geom_point(aes(Petal.Length, Sepal.Length,
+                   color=Species,
+                   showSelected=kingdom),
+               data=iris)
+  )
+
+test_that("compiler warns and optimizes showSelected with 1 level", {
+  expect_warning({
+    info <- animint2HTML(viz)
+  }, "ignoring showSelected variables with only 1 level")
+  expect_identical(names(info$selectors), "Species")
+})
