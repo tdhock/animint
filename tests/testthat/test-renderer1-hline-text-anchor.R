@@ -180,19 +180,33 @@ viz <- list(
               data=vjust.df)
   )
 
-test_that("aes(vjust!=0.5) raises warning", {
+test_that("aes(vjust!=0) raises warning", {
   expect_warning({
     animint2HTML(viz)
-  }, "animint only supports vjust=0.5")
+  }, "animint only supports vjust=0")
 })
 
 viz <- list(
   text=ggplot()+
-    geom_text(aes(vjust, vjust, label=label, vjust=0.5),
+    geom_text(aes(vjust, vjust, label=0, vjust=0),
               data=vjust.df)
   )
 
-test_that("aes(vjust=0.5) does not raise warning", {
+test_that("aes(vjust=0) does not raise warning", {
+  w.or.null <- tryCatch({
+    animint2HTML(viz)
+    NULL
+  }, warning=identity)
+  expect_null(w.or.null)
+})
+
+viz <- list(
+  text=ggplot()+
+    geom_text(aes(vjust, vjust, label="no vjust"),
+              data=vjust.df)
+  )
+
+test_that("unspecified vjust does not raise warning", {
   w.or.null <- tryCatch({
     animint2HTML(viz)
     NULL
@@ -206,10 +220,10 @@ viz.1 <- list(
               vjust=1,
               data=vjust.df)
   )
-viz.0 <- list(
+viz.0.5 <- list(
   text=ggplot()+
     geom_text(aes(vjust, vjust, label=0),
-              vjust=0,
+              vjust=0.5,
               data=vjust.df)
   )
 viz.0.7 <- list(
@@ -219,26 +233,26 @@ viz.0.7 <- list(
               data=vjust.df)
   )
 
-test_that("geom_text(vjust!=0.5) raises warning", {
+test_that("geom_text(vjust!=0) raises warning", {
   expect_warning({
     animint2HTML(viz.1)
-  }, "animint only supports vjust=0.5")
+  }, "animint only supports vjust=0")
   expect_warning({
-    animint2HTML(viz.0)
-  }, "animint only supports vjust=0.5")
+    animint2HTML(viz.0.5)
+  }, "animint only supports vjust=0")
   expect_warning({
     animint2HTML(viz.0.7)
-  }, "animint only supports vjust=0.5")
+  }, "animint only supports vjust=0")
 })
 
 viz <- list(
   text=ggplot()+
-    geom_text(aes(vjust, vjust, label=0.5),
-              vjust=0.5,
+    geom_text(aes(vjust, vjust, label=0),
+              vjust=0,
               data=vjust.df)
   )
 
-test_that("geom_text(vjust=0.5) does not raise warning", {
+test_that("geom_text(vjust=0) does not raise warning", {
   w.or.null <- tryCatch({
     animint2HTML(viz)
     NULL
