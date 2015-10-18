@@ -438,7 +438,7 @@ saveLayer <- function(l, d, meta){
   ## currently selected values of these variables are stored in
   ## plot.Selectors.
 
-  s.aes <- selector.aes(names(g$aes))
+  s.aes <- selector.aes(g$aes)
 
   is.ss <- names(g$aes) %in% s.aes$showSelected$one
   show.vars <- g$aes[is.ss]
@@ -1112,7 +1112,8 @@ saveChunks <- function(x, meta){
 ##' @return list of selector info.
 ##' @author Toby Dylan Hocking
 ##' @export
-selector.aes <- function(a.vec){
+selector.aes <- function(a.list){
+  a.vec <- names(a.list)
   if(is.null(a.vec))a.vec <- character()
   stopifnot(is.character(a.vec))
   cs.or.ss <- grepl("clickSelects|showSelected", a.vec)
@@ -1138,6 +1139,14 @@ selector.aes <- function(a.vec){
     a.value <- a.vec[is.a & is.value]
     a.variable <- sub("value$", "variable", a.value)
     single <- a.vec[is.a & (!var.or.val)]
+    if(1 < length(single)){
+      single.df <- data.frame(
+        aes.name=single,
+        data.var=paste(a.list[single]))
+      single.sorted <- single.df[order(single.df$data.var), ]
+      single.sorted$keep <- c(TRUE, diff(as.integer(single.df$data.var))!=0)
+      single <- with(single.sorted, paste(aes.name[keep]))
+    }
     aes.list[[a]] <-
       list(several=data.frame(variable=a.variable, value=a.value),
            one=single)
@@ -1301,7 +1310,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
         ## This code assumes that the layer has the complete aesthetic
         ## mapping and data. TODO: Do we need to copy any global
         ## values to this layer?
-        iaes <- selector.aes(names(L$mapping))
+        iaes <- selector.aes(L$mapping)
         one.names <- with(iaes, c(clickSelects$one, showSelected$one))
         update.vars <- L$mapping[one.names]
         has.var <- update.vars %in% names(L$data)
