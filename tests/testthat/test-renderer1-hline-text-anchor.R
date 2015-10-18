@@ -193,11 +193,9 @@ viz <- list(
   )
 
 test_that("aes(vjust=0) does not raise warning", {
-  w.or.null <- tryCatch({
+  expect_no_warning({
     animint2HTML(viz)
-    NULL
-  }, warning=identity)
-  expect_null(w.or.null)
+  })
 })
 
 viz <- list(
@@ -207,11 +205,10 @@ viz <- list(
   )
 
 test_that("unspecified vjust does not raise warning", {
-  w.or.null <- tryCatch({
+  expect_no_warning({
     animint2HTML(viz)
     NULL
-  }, warning=identity)
-  expect_null(w.or.null)
+  })
 })
 
 viz.1 <- list(
@@ -253,9 +250,7 @@ viz <- list(
   )
 
 test_that("geom_text(vjust=0) does not raise warning", {
-  w.or.null <- tryCatch({
+  expect_no_warning({
     animint2HTML(viz)
-    NULL
-  }, warning=identity)
-  expect_null(w.or.null)
+  })
 })
