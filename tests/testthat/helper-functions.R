@@ -169,9 +169,12 @@ getStyleValue <- function(html, xpath, style.name) {
 gives_no_warning <- function(){
   function(expr) {
     warnings <- evaluate_promise(expr)$warnings
+    s <- ifelse(length(warnings)==1, "", "s")
     expectation(
       length(warnings) == 0,
-      paste("created warnings:", paste(warnings, collapse=", ")),
+      paste0("created ", length(warnings),
+             " warning", s, ": ",
+             paste(warnings, collapse=", ")),
       "no warnings given"
     )
   }
