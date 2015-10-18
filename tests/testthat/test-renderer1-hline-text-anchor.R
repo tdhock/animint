@@ -132,3 +132,116 @@ test_that('geom_text(hjust=other) => unsupported value error', {
   viz <- grad.desc.viz(hjust = 0.8)
   expect_error(animint2HTML(viz), "animint only supports hjust values 0, 0.5, 1")
 })
+
+hjust.df <- data.frame(
+  hjust=c(0,0.5,1),
+  anchor=c("start", "middle", "end"),
+  stringsAsFactors=FALSE)
+hjust.df$label <- paste0("hjust=",hjust.df$hjust)
+rownames(hjust.df) <- hjust.df$label
+viz <- list(
+  text=ggplot()+
+    geom_text(aes(hjust, hjust, label=label, hjust=hjust),
+              data=hjust.df)
+  )
+
+test_that("aes(hjust) works fine for 0, 0.5, 1", {
+  info <- animint2HTML(viz)
+  xpath <- '//g[@class="geom1_text_text"]//text'
+  text.list <- getNodeSet(info$html, xpath)
+  computed.anchor <- getStyleValue(info$html, xpath, "text-anchor")
+  label.vec <- sapply(text.list, xmlValue)
+  expected.anchor <- hjust.df[label.vec, "anchor"]
+  expect_identical(computed.anchor, expected.anchor)
+})
+
+hjust.df <- data.frame(hjust=c(0,0.5,1,1.5),
+                       anchor=c("start", "middle", "end", "unknown"))
+hjust.df$label <- paste0("hjust=",hjust.df$hjust)
+rownames(hjust.df) <- hjust.df$label
+viz <- list(
+  text=ggplot()+
+    geom_text(aes(hjust, hjust, label=label, hjust=hjust),
+              data=hjust.df)
+  )
+
+test_that("error if aes(hjust) not in 0, 0.5, 1", {
+  expect_error({
+    info <- animint2HTML(viz)
+  }, "animint only supports hjust values 0, 0.5, 1")
+})
+
+vjust.df <- data.frame(vjust=c(0,0.5,1))
+vjust.df$label <- paste0("vjust=",vjust.df$vjust)
+rownames(vjust.df) <- vjust.df$label
+viz <- list(
+  text=ggplot()+
+    geom_text(aes(vjust, vjust, label=label, vjust=vjust),
+              data=vjust.df)
+  )
+
+test_that("aes(vjust!=0.5) raises warning", {
+  expect_warning({
+    animint2HTML(viz)
+  }, "animint only supports vjust=0.5")
+})
+
+viz <- list(
+  text=ggplot()+
+    geom_text(aes(vjust, vjust, label=label, vjust=0.5),
+              data=vjust.df)
+  )
+
+test_that("aes(vjust=0.5) does not raise warning", {
+  w.or.null <- tryCatch({
+    animint2HTML(viz)
+    NULL
+  }, warning=identity)
+  expect_null(w.or.null)
+})
+
+viz.1 <- list(
+  text=ggplot()+
+    geom_text(aes(vjust, vjust, label=1),
+              vjust=1,
+              data=vjust.df)
+  )
+viz.0 <- list(
+  text=ggplot()+
+    geom_text(aes(vjust, vjust, label=0),
+              vjust=0,
+              data=vjust.df)
+  )
+viz.0.7 <- list(
+  text=ggplot()+
+    geom_text(aes(vjust, vjust, label=0.7),
+              vjust=0.7,
+              data=vjust.df)
+  )
+
+test_that("geom_text(vjust!=0.5) raises warning", {
+  expect_warning({
+    animint2HTML(viz.1)
+  }, "animint only supports vjust=0.5")
+  expect_warning({
+    animint2HTML(viz.0)
+  }, "animint only supports vjust=0.5")
+  expect_warning({
+    animint2HTML(viz.0.7)
+  }, "animint only supports vjust=0.5")
+})
+
+viz <- list(
+  text=ggplot()+
+    geom_text(aes(vjust, vjust, label=0.5),
+              vjust=0.5,
+              data=vjust.df)
+  )
+
+test_that("geom_text(vjust=0.5) does not raise warning", {
+  w.or.null <- tryCatch({
+    animint2HTML(viz)
+    NULL
+  }, warning=identity)
+  expect_null(w.or.null)
+})
