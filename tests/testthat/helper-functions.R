@@ -154,11 +154,15 @@ str_match_all_perl <- function(string,pattern){
 getTextValue <- function(tick)xmlValue(getNodeSet(tick, "text")[[1]])
 
 getStyleValue <- function(html, xpath, style.name) {
-  nodes <- getNodeSet(html, xpath)
-  node.style <- xmlAttrs(nodes[[1]])["style"]
-  pattern <-paste0("(?<name>\\S+?)", ": *", "(?<value>.+?)", ";")
-  style.matrices <- str_match_all_perl(node.style, pattern)
-  style.value <- style.matrices[[1]][style.name, "value"]
+  node.list <- getNodeSet(html, xpath)
+  style.vec <- sapply(node.list, function(node)xmlAttrs(node)[["style"]])
+  pattern <-paste0(
+    "(?<name>\\S+?)",
+    ": *",
+    "(?<value>.+?)",
+    ";")
+  style.matrices <- str_match_all_perl(style.vec, pattern)
+  sapply(style.matrices, function(m)m[style.name, "value"])
 }
 
 getTransform <- function(tick)xmlAttrs(tick)[["transform"]]
