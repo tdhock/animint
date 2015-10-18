@@ -1071,22 +1071,22 @@ var animint = function (to_select, json_file) {
     }else if(g_info.params.colour){
       fill = g_info.params.colour;
     }
+
+    // For aes(hjust) the compiler should make an "anchor" column.
     var text_anchor = "middle";
-    var get_text_anchor = function (d) {
-      var hjust = g_info.params.hjust;
-      if (d.hasOwnProperty("hjust")) {
-        hjust = d["hjust"];
+    if(g_info.params.hasOwnProperty("anchor")){
+      text_anchor = g_info.params["anchor"];
+    }
+    var get_text_anchor;
+    if(g_info.aes.hasOwnProperty("hjust")) {
+      get_text_anchor = function(d){
+	return d["anchor"];
       }
-      var o = {
-        0: "start",
-        0.5: "middle",
-        1: "end"
-      };
-      if (typeof hjust != "undefined") {
-        text_anchor = o[hjust];
+    }else{
+      get_text_anchor = function(d){
+	return text_anchor;
       }
-      return text_anchor;
-    };
+    }
 
     var eActions, eAppend;
     var key_fun = null;
