@@ -374,7 +374,8 @@ hjust2anchor <- function(hjust){
   hjust.str <- as.character(hjust)
   is.valid <- hjust.str %in% names(trans)
   if(all(is.valid)){
-    trans[hjust.str]
+    ## as.character removes names.
+    as.character(trans[hjust.str])
   }else{
     print(hjust[!is.valid])
     stop("animint only supports hjust values 0, 0.5, 1")
@@ -560,21 +561,21 @@ saveLayer <- function(l, d, meta){
       df.or.list[names(df.or.list) != "hjust"]
     }
     vjustWarning <- function(vjust.vec){
-      not.supported <- vjust.vec != 0.5
+      not.supported <- vjust.vec != 0
       if(any(not.supported)){
         bad.vjust <- unique(vjust.vec[not.supported])
         print(bad.vjust)
-        warning("animint only supports vjust=0.5")
+        warning("animint only supports vjust=0")
       }
     }
-    if ("hjust" %in% names(g$params)) { #  hjust is parameter
+    if ("hjust" %in% names(g$params)) {
       g$params <- hjustRemove(g$params)
-    } else if ("hjust" %in% names(g.data)) { #  hjust is aesthetic
+    } else if ("hjust" %in% names(g.data)) {
       g.data <- hjustRemove(g.data)
     } 
-    if("vjust" %in% names(g$params)) { #  hjust is parameter
+    if("vjust" %in% names(g$params)) {
       vjustWarning(g$params$vjust)
-    } else if ("hjust" %in% names(g.data)) { #  hjust is aesthetic
+    } else if ("vjust" %in% names(g.data)) { 
       vjustWarning(g.data$vjust)
     } 
   } else if(g$geom=="ribbon"){
