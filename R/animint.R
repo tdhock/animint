@@ -366,6 +366,7 @@ parsePlot <- function(meta){
 
 hjust2anchor <- function(hjust){
   if(is.null(hjust))return(NULL)
+  stopifnot(is.numeric(hjust))
   trans <-
     c("0"="start",
       "0.5"="middle",
@@ -557,7 +558,7 @@ saveLayer <- function(l, d, meta){
     if ("hjust" %in% names(g$params)) { #  hjust is parameter
       hjust <- g$params$hjust
     } else if ("hjust" %in% names(g.data)) { #  hjust is aesthetic
-      hjust <- unique(g.data['hjust'])
+      hjust <- unique(g.data[['hjust']])
     } else { #  default hjust
       hjust <- 0.5
     }
