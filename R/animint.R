@@ -554,15 +554,29 @@ saveLayer <- function(l, d, meta){
       g.data[["fill"]] <- g.data[["colour"]]
     }
   } else if(g$geom=="text"){
-    ## check invalid hjust value
-    if ("hjust" %in% names(g$params)) { #  hjust is parameter
-      hjust <- g$params$hjust
-    } else if ("hjust" %in% names(g.data)) { #  hjust is aesthetic
-      hjust <- unique(g.data[['hjust']])
-    } else { #  default hjust
-      hjust <- 0.5
+    ## convert hjust to anchor.
+    hjustRemove <- function(df.or.list){
+      df.or.list$anchor <- hjust2anchor(df.or.list$hjust)
+      df.or.list[names(df.or.list) != "hjust"]
     }
-    anchor <- hjust2anchor(hjust)
+    vjustWarning <- function(vjust.vec){
+      not.supported <- vjust.vec != 0.5
+      if(any(not.supported)){
+        bad.vjust <- unique(vjust.vec[not.supported])
+        print(bad.vjust)
+        warning("animint only supports vjust=0.5")
+      }
+    }
+    if ("hjust" %in% names(g$params)) { #  hjust is parameter
+      g$params <- hjustRemove(g$params)
+    } else if ("hjust" %in% names(g.data)) { #  hjust is aesthetic
+      g.data <- hjustRemove(g.data)
+    } 
+    if("vjust" %in% names(g$params)) { #  hjust is parameter
+      vjustWarning(g$params$vjust)
+    } else if ("hjust" %in% names(g.data)) { #  hjust is aesthetic
+      vjustWarning(g.data$vjust)
+    } 
   } else if(g$geom=="ribbon"){
     # Color set to match ggplot2 default of fill with no outside border.
     if("fill"%in%names(g.data) & !"colour"%in%names(g.data)){
