@@ -1982,18 +1982,19 @@ var animint = function (to_select, json_file) {
       });
     // selector widgets
     var toggle_message = "Toggle selected variables";
+    var show_or_hide_fun = function(){
+      if(this.textContent == toggle_message){
+        selector_table.style("display", "");
+        show_hide_selector_widgets.text("Hide variable toggler");
+      }else{
+        selector_table.style("display", "none");
+        show_hide_selector_widgets.text(toggle_message);
+      }
+    }
     var show_hide_selector_widgets = element.append("button")
       .text(toggle_message)
       .attr("class", "show_hide_selector_widgets")
-      .on("click", function(){
-        if(this.textContent == toggle_message){
-          selector_table.style("display", "");
-          show_hide_selector_widgets.text("Hide variable toggler");
-        }else{
-          selector_table.style("display", "none");
-          show_hide_selector_widgets.text(toggle_message);
-        }
-      })
+      .on("click", show_or_hide_fun)
     ;
     // adding a table for selector widgets
     var selector_table = element.append("table")
@@ -2018,11 +2019,12 @@ var animint = function (to_select, json_file) {
 	// selectize widgets (and possibly legends). So in this case
 	// we show the selectize widgets by default.
 	var selector_widgets_hidden = 
-	  show_hide_selector_widgets.textContent == toggle_message;
+	  show_hide_selector_widgets.text() == toggle_message;
 	var has_no_clickSelects = 
 	  !Selectors[s_name].hasOwnProperty("clickSelects")
 	if(selector_widgets_hidden && has_no_clickSelects){
-	  show_hide_selector_widgets.onclick.apply(show_hide_selector_widgets);
+	  var node = show_hide_selector_widgets.node();
+	  show_or_hide_fun.apply(node);
 	}
 	// removing "." from name so it can be used in ids
 	var s_name_id = safe_name(s_name);
