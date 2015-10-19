@@ -166,38 +166,6 @@ parsePlot <- function(meta){
       meta$geoms[[geom.prev]]$nextgeom <- meta$geoms[[geom.next]]$classed
     }
   }
-  ## Selector levels and update were stored in saveLayer, so now
-  ## compute the unique values to store in meta$selectors.
-  for(selector.name in names(meta$selector.values)){
-    values.update <- meta$selector.values[[selector.name]]
-    value.vec <- unique(unlist(lapply(values.update, "[[", "values")))
-    meta$selectors[[selector.name]]$selected <- if(
-      meta$selectors[[selector.name]]$type=="single"){
-      value.vec[1]
-    }else{
-      value.vec
-    }
-    ## If this selector was defined by .variable .value aes, then we
-    ## will not generate selectize widgets. This is indicated by the
-    ## compiler by not setting the "levels" attribute of the selector.
-    if(!isTRUE(meta$selectors[[selector.name]]$is.variable.value)){
-      meta$selectors[[selector.name]]$levels <- value.vec
-    }
-    ## s.info$update is the list of geom names that will be updated
-    ## for this selector.
-    meta$selectors[[selector.name]]$update <-
-      as.list(unique(unlist(lapply(values.update, "[[", "update"))))
-  }
-  n.levels <- sapply(meta$selectors, function(s.info)length(s.info$levels))
-  is.trivial <- n.levels == 1
-  if(any(is.trivial)){
-    ## With the current compiler that has already saved the tsv files
-    ## by now, we can't really make this data viz more efficient by
-    ## ignoring this trivial selector. However we can warn the user so
-    ## that they can remove this inefficient showSelected.
-    warning("showSelected variables with only 1 level: ",
-            paste(names(meta$selectors)[is.trivial], collapse=", "))
-  }
 
   ## Export axis specification as a combination of breaks and
   ## labels, on the relevant axis scale (i.e. so that it can
@@ -1380,6 +1348,41 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
     }else{
       stop("list items must be ggplots or option lists, problem: ", list.name)
     }
+  }
+
+  ## Selector levels and update were stored in saveLayer, so now
+  ## compute the unique values to store in meta$selectors.
+  for(selector.name in names(meta$selector.values)){
+    values.update <- meta$selector.values[[selector.name]]
+    value.vec <- unique(unlist(lapply(values.update, "[[", "values")))
+    meta$selectors[[selector.name]]$selected <- if(
+      meta$selectors[[selector.name]]$type=="single"){
+      value.vec[1]
+    }else{
+      value.vec
+    }
+    ## If this selector was defined by .variable .value aes, then we
+    ## will not generate selectize widgets. This is indicated by the
+    ## compiler by not setting the "levels" attribute of the selector.
+    if(!isTRUE(meta$selectors[[selector.name]]$is.variable.value)){
+      meta$selectors[[selector.name]]$levels <- value.vec
+    }
+    ## s.info$update is the list of geom names that will be updated
+    ## for this selector.
+    meta$selectors[[selector.name]]$update <-
+      as.list(unique(unlist(lapply(values.update, "[[", "update"))))
+  }
+  n.levels <- sapply(meta$selectors, function(s.info)length(s.info$levels))
+  one.level <- n.levels == 1
+  has.legend <- sapply(meta$selectors, function(s.info)isTRUE(s.info$legend))
+  is.trivial <- one.level && (!has.legend)
+  if(any(is.trivial)){
+    ## With the current compiler that has already saved the tsv files
+    ## by now, we can't really make this data viz more efficient by
+    ## ignoring this trivial selector. However we can warn the user so
+    ## that they can remove this inefficient showSelected.
+    warning("showSelected variables with only 1 level: ",
+            paste(names(meta$selectors)[is.trivial], collapse=", "))
   }
 
   ## Go through options and add to the list.
