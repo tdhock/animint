@@ -41,22 +41,26 @@ test_that("selector widgets table initially visiable", {
 })
 
 viz <- list(
-  points=ggplot()+
+  length=ggplot()+
     geom_point(aes(Sepal.Length, Petal.Length,
                         showSelected=Species,
                         color=Species),
-                    data=iris)
+                    data=iris),
+  width=ggplot()+
+    geom_point(aes(Sepal.Width, Petal.Width,
+                   clickSelects=Species),
+               data=iris)
   )
 info <- animint2HTML(viz)
 
 test_that("150 <circle> rendered at first", {
   circle.list <- getNodeSet(
-    info$html, '//g[@class="geom1_point_points"]//circle')
+    info$html, '//g[@class="geom1_point_length"]//circle')
   expect_equal(length(circle.list), 150)
 })
 
 test_that("redundant showSelected and color optimized", {
-  var.list <- with(info$geoms$geom1_point_points, c(chunk_order, subset_order))
+  var.list <- with(info$geoms$geom1_point_length, c(chunk_order, subset_order))
   expect_equal(length(var.list), 1)
 })
 
