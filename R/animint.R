@@ -452,8 +452,13 @@ saveLayer <- function(l, d, meta){
 
   ## Do not copy group unless it is specified in aes, and do not copy
   ## showSelected variables which are specified multiple times.
+  group.not.specified <- ! "group" %in% names(g$aes)
+  n.groups <- length(unique(NULL))
+  need.group <- c("violin", "step", "hex")
+  dont.need.group <- ! g$geom %in% need.group
+  remove.group <- group.not.specified && 1 < n.groups && dont.need.group
   do.not.copy <- c(
-    if(! "group" %in% names(g$aes))"group",
+    if(remove.group)"group",
     s.aes$showSelected$ignored,
     s.aes$clickSelects$ignored)
   copy.cols <- ! names(d) %in% do.not.copy
@@ -564,16 +569,6 @@ saveLayer <- function(l, d, meta){
       }
     }
     g.data <- as.data.frame(g.data)
-    
-    if(g$aes[["group"]]=="1"){
-      # ggplot2 defaults to adding a group attribute
-      # which misleads for situations where there are
-      # multiple lines with the same group.
-      # if the group attribute conveys no additional
-      # information, remove it.
-      ## TODO: Figure out a better way to handle this...
-      g$aes <- g$aes[-which(names(g$aes)=="group")]
-    }
     g$geom <- "segment"
   } else if(g$geom=="point"){
     # Fill set to match ggplot2 default of filled in circle.
