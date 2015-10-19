@@ -455,8 +455,20 @@ saveLayer <- function(l, d, meta){
   group.not.specified <- ! "group" %in% names(g$aes)
   n.groups <- length(unique(NULL))
   need.group <- c("violin", "step", "hex")
+  group.meaningless <- g$geom %in% c(
+    "abline", "blank",
+    ##"crossbar", "pointrange", #documented as unsupported
+    ## "rug", "dotplot", "quantile", "smooth", "boxplot",
+    ## "bin2d", "map"
+    "errorbar", "errorbarh",
+    ##"bar", "histogram", #?
+    "hline", "vline",
+    "jitter", "linerange",
+    "point", 
+    "rect", "segment")
   dont.need.group <- ! g$geom %in% need.group
-  remove.group <- group.not.specified && 1 < n.groups && dont.need.group
+  remove.group <- group.meaningless ||
+    group.not.specified && 1 < n.groups && dont.need.group
   do.not.copy <- c(
     if(remove.group)"group",
     s.aes$showSelected$ignored,
