@@ -317,3 +317,18 @@ test_that("geom counts after showing selected", {
   expect_equal(expected.counts, as.numeric(computed.counts))
 })
 
+clickID("errors")
+
+test_that("geom counts after hiding errors", {
+  expected.counts <- c(
+    102, 17, #circles in first plot
+    51, 51, # path and circle in second
+    17, # selected circle in second
+    20, #hline
+    17, #vline
+    34, #path
+    nrow(thresh.fold2.not.knn)) #rect
+  computed.counts <- countGeoms()
+  expect_equal(expected.counts, as.numeric(computed.counts))
+})
+
