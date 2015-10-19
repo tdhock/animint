@@ -21,8 +21,11 @@ test_that("selector.aes errors when no matching variable for value", {
          "clickSelects.value",
          "clickSelects2.value")
   for(a.vec in a.list){
+    arg.list <- as.list(paste0("var", seq_along(a.vec)))
+    names(arg.list) <- a.vec
+    a <- do.call(aes_string, arg.list)
     expect_error({
-      selector.aes(a.vec)
+      selector.aes(a)
     }, ".variable or .value aes not found")
   }
 })
