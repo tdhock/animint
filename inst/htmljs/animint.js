@@ -2013,6 +2013,17 @@ var animint = function (to_select, json_file) {
       // for .variable .value selectors, levels is undefined and we do
       // not want to make a selectize widget.
       if(isArray(s_info.levels)){
+	// If there were no geoms that specified clickSelects for this
+	// selector, then there is no way to select it other than the
+	// selectize widgets (and possibly legends). So in this case
+	// we show the selectize widgets by default.
+	var selector_widgets_hidden = 
+	  show_hide_selector_widgets.textContent == toggle_message;
+	var has_no_clickSelects = 
+	  !Selectors[s_name].hasOwnProperty("clickSelects")
+	if(selector_widgets_hidden && has_no_clickSelects){
+	  show_hide_selector_widgets.onclick.apply(show_hide_selector_widgets);
+	}
 	// removing "." from name so it can be used in ids
 	var s_name_id = safe_name(s_name);
 
