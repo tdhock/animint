@@ -15,6 +15,12 @@ test_that("redundant showSelected are optimized out", {
   expect_equal(length(ss.vec), 1)
 })
 
+test_that("50 <circle> rendered at first", {
+  circle.list <- getNodeSet(
+    info$html, '//g[@class="geom1_point_points"]//circle')
+  expect_equal(length(circle.list), 50)
+})
+
 test_that("redundant aes not saved to tsv", {
   geom.tsv <- Sys.glob(
     file.path("animint-htmltest", "geom1_point_points_*.tsv"))
@@ -42,6 +48,12 @@ viz <- list(
                     data=iris)
   )
 info <- animint2HTML(viz)
+
+test_that("150 <circle> rendered at first", {
+  circle.list <- getNodeSet(
+    info$html, '//g[@class="geom1_point_points"]//circle')
+  expect_equal(length(circle.list), 150)
+})
 
 test_that("redundant showSelected and color optimized", {
   var.list <- with(info$geoms$geom1_point_points, c(chunk_order, subset_order))
@@ -71,9 +83,12 @@ viz <- list(
                data=iris)
   )
 
-test_that("compiler warns and optimizes showSelected with 1 level", {
+test_that("compiler warns for showSelected with 1 level", {
   expect_warning({
     info <- animint2HTML(viz)
-  }, "ignoring showSelected variables with only 1 level")
-  expect_identical(names(info$selectors), "Species")
+  }, "showSelected variables with only 1 level")
+  circle.list <- getNodeSet(
+    info$html, '//g[@class="geom1_point_points"]//circle')
+  expect_equal(length(circle.list), 150)
 })
+
