@@ -495,6 +495,13 @@ saveLayer <- function(l, d, meta){
         stopifnot(selector.type %in% c("single", "multiple"))
         meta$selectors[[selector.name]]$type <- selector.type
       }
+      ## If this selector does not have any clickSelects then we show
+      ## the selectize widgets by default.
+      for(look.for in c("showSelected", "clickSelects")){
+        if(grepl(look.for, aes.row$variable)){
+          meta$selectors[[selector.name]][[look.for]] <- TRUE
+        }
+      }
       ## We also store all the values of this selector in this layer,
       ## so we can accurately set levels after all geoms have been
       ## compiled.
