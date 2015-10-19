@@ -391,7 +391,6 @@ hjust2anchor <- function(hjust){
 saveLayer <- function(l, d, meta){
   ranges <- meta$built$panel$ranges
   g <- list(geom=l$geom$objname)
-  g.data <- d
   g$classed <-
     sprintf("geom%d_%s_%s",
             meta$geom.count, g$geom, meta$plot.name)
@@ -440,6 +439,15 @@ saveLayer <- function(l, d, meta){
 
   s.aes <- selector.aes(g$aes)
 
+  ## Do not copy group unless it is specified in aes, and do not copy
+  ## showSelected variables which are specified multiple times.
+  do.not.copy <- c(
+    if(! "group" %in% names(g$aes))"group",
+    s.aes$showSelected$ignored,
+    s.aes$clickSelects$ignored)
+  copy.cols <- ! names(d) %in% do.not.copy
+  g.data <- d[copy.cols]
+  
   is.ss <- names(g$aes) %in% s.aes$showSelected$one
   show.vars <- g$aes[is.ss]
   pre.subset.order <- as.list(names(show.vars))
@@ -1139,6 +1147,7 @@ selector.aes <- function(a.list){
     a.value <- a.vec[is.a & is.value]
     a.variable <- sub("value$", "variable", a.value)
     single <- a.vec[is.a & (!var.or.val)]
+    ignored <- c()
     if(1 < length(single)){
       single.df <- data.frame(
         aes.name=single,
@@ -1146,10 +1155,11 @@ selector.aes <- function(a.list){
       single.sorted <- single.df[order(single.df$data.var), ]
       single.sorted$keep <- c(TRUE, diff(as.integer(single.df$data.var))!=0)
       single <- with(single.sorted, paste(aes.name[keep]))
+      ignored <- with(single.sorted, paste(aes.name[!keep]))
     }
     aes.list[[a]] <-
       list(several=data.frame(variable=a.variable, value=a.value),
-           one=single)
+           one=single, ignored=ignored)
   }
   aes.list
 }
