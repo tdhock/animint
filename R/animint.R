@@ -175,7 +175,8 @@ parsePlot <- function(meta){
       value.vec
     }
     ## If this selector was defined by .variable .value aes, then we
-    ## will not generate selectize widgets.
+    ## will not generate selectize widgets. This is indicated by the
+    ## compiler by not setting the "levels" attribute of the selector.
     if(!isTRUE(meta$selectors[[selector.name]]$is.variable.value)){
       meta$selectors[[selector.name]]$levels <- value.vec
     }
@@ -183,6 +184,16 @@ parsePlot <- function(meta){
     ## for this selector.
     meta$selectors[[selector.name]]$update <-
       as.list(unique(unlist(lapply(values.update, "[[", "update"))))
+  }
+  n.levels <- sapply(meta$selectors, function(s.info)length(s.info$levels))
+  is.trivial <- n.levels == 1
+  if(any(is.trivial)){
+    ## With the current compiler that has already saved the tsv files
+    ## by now, we can't really make this data viz more efficient by
+    ## ignoring this trivial selector. However we can warn the user so
+    ## that they can remove this inefficient showSelected.
+    warning("showSelected variables with only 1 level: ",
+            paste(names(meta$selectors)[is.trivial], collapse=", "))
   }
 
   ## Export axis specification as a combination of breaks and
