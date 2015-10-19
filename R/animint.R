@@ -562,6 +562,8 @@ saveLayer <- function(l, d, meta){
   ## in the draw method of the geoms.
   if(g$geom=="abline"){
     ## loop through each set of slopes/intercepts
+    
+    ## TODO: vectorize this code!
     for(i in 1:nrow(g.data)) {
       
       # "Trick" ggplot coord_transform into transforming the slope and intercept
@@ -580,7 +582,10 @@ saveLayer <- function(l, d, meta){
         g.data$xend[i] <- (g.data$yend[i] - g.data$intercept[i]) / g.data$slope[i]
       }
     }
-    g.data <- as.data.frame(g.data)
+    ## ggplot2 defaults to adding a group aes for ablines!
+    ## Remove it since it is meaningless.
+    g$aes <- g$aes[names(g$aes)!="group"]
+    g.data <- g.data[! names(g.data) %in% c("slope", "intercept")]
     g$geom <- "segment"
   } else if(g$geom=="point"){
     # Fill set to match ggplot2 default of filled in circle.
