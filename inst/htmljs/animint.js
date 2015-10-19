@@ -2022,7 +2022,9 @@ var animint = function (to_select, json_file) {
 	  show_hide_selector_widgets.text() == toggle_message;
 	var has_no_clickSelects = 
 	  !Selectors[s_name].hasOwnProperty("clickSelects")
-	if(selector_widgets_hidden && has_no_clickSelects){
+	var has_no_legend = 
+	  !Selectors[s_name].hasOwnProperty("legend")
+	if(selector_widgets_hidden && has_no_clickSelects && has_no_legend){
 	  var node = show_hide_selector_widgets.node();
 	  show_or_hide_fun.apply(node);
 	}

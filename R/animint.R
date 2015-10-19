@@ -128,6 +128,9 @@ parsePlot <- function(meta){
           if(is.null(meta$first[[var_name]])) {
             u.vals <- unique(var)
           }
+          ## Tell this selector that it has a legend somewhere in the
+          ## viz.
+          meta$selectors[[var_name]]$legend <- TRUE
         }#is.correct
       }#length(var_name)
     }
