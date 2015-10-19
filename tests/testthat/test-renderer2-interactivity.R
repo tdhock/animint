@@ -210,17 +210,18 @@ tornado.lines <-
        selector.types=list(state="multiple"),
        first=list(state=c("CA", "NY"), year=1950))
 
-info <- animint2HTML(tornado.lines)
-
 test_that("1950 <circle> and <line> elements", {
+  ## A warning should be issued when there is showSelected=place and
+  ## there is only 1 value for place, but not when there is a legend
+  ## (as in this data viz).
+  expect_no_warning({
+    info <- animint2HTML(tornado.lines)
+  })
   t1950 <- subset(UStornadoes, year==1950)
   nodes <- getNodeSet(info$html, '//g[@class="geom3_segment_map"]//line')
   expect_equal(length(nodes), nrow(t1950))
   nodes <- getNodeSet(info$html, '//g[@class="geom4_point_map"]//circle')
   expect_equal(length(nodes), nrow(t1950))
-})
-
-test_that("default is 2 <path> and <text> elements", {
   nodes <- getNodeSet(info$html, '//g[@class="geom7_line_ts"]//path')
   expect_equal(length(nodes), 2)
   nodes <- getNodeSet(info$html, '//g[@class="geom5_text_ts"]//text')
