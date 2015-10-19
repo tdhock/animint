@@ -1372,17 +1372,22 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
     meta$selectors[[selector.name]]$update <-
       as.list(unique(unlist(lapply(values.update, "[[", "update"))))
   }
-  n.levels <- sapply(meta$selectors, function(s.info)length(s.info$levels))
-  one.level <- n.levels == 1
-  has.legend <- sapply(meta$selectors, function(s.info)isTRUE(s.info$legend))
-  is.trivial <- one.level && (!has.legend)
-  if(any(is.trivial)){
-    ## With the current compiler that has already saved the tsv files
-    ## by now, we can't really make this data viz more efficient by
-    ## ignoring this trivial selector. However we can warn the user so
-    ## that they can remove this inefficient showSelected.
-    warning("showSelected variables with only 1 level: ",
-            paste(names(meta$selectors)[is.trivial], collapse=", "))
+
+  ## For a static data viz with no interactive aes, no need to check
+  ## for trivial showSelected variables with only 1 level.
+  if(0 < length(meta$selectors)){
+    n.levels <- sapply(meta$selectors, function(s.info)length(s.info$levels))
+    one.level <- n.levels == 1
+    has.legend <- sapply(meta$selectors, function(s.info)isTRUE(s.info$legend))
+    is.trivial <- one.level && (!has.legend)
+    if(any(is.trivial)){
+      ## With the current compiler that has already saved the tsv files
+      ## by now, we can't really make this data viz more efficient by
+      ## ignoring this trivial selector. However we can warn the user so
+      ## that they can remove this inefficient showSelected.
+      warning("showSelected variables with only 1 level: ",
+              paste(names(meta$selectors)[is.trivial], collapse=", "))
+    }
   }
 
   ## Go through options and add to the list.
