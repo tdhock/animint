@@ -45,6 +45,9 @@ first.list <- with(auc.min.error, {
 })
 first.list$test.fold <- 2
 
+minima.df <- VariantModels$minima
+minima.df$thresh.type <- "min error"
+
 viz <- list(
   auc=ggplot()+
     ggtitle("Performance on 3 test folds")+
@@ -107,10 +110,11 @@ viz <- list(
                    fill=thresh.type),
                pch=21,
                size=4,
-               data=VariantModels$auc)+
+               data=subset(VariantModels$auc, metric.name=="auc"))+
     geom_point(aes(
       FPR, TPR, clickSelects=test.fold,
       key=method,
+      showSelected=test.fold,
       showSelected.variable=paste0(filterVar, "_fold", test.fold),
       showSelected.value=threshold,
       ##showSelected=method, #not needed!
@@ -121,8 +125,9 @@ viz <- list(
                data=VariantModels$roc),
   error=ggplot()+
     geom_hline(aes(yintercept=min.errors,
+                   showSelected2=thresh.type,
                    showSelected=test.fold),
-               data=VariantModels$minima,
+               data=minima.df,
                color="grey50")+
     geom_vline(aes(xintercept=threshold,
                    showSelected2=method,
@@ -190,29 +195,125 @@ test_that("error lines rendered in all panels", {
   expect_equal(computed.counts, expected.counts)
 })
 
-n.auc.total <- nrow(VariantModels$auc)
-test_that("<circle> rendered for each auc datum", { 
-  circle.list <- getNodeSet(info$html, '//g[@class="geom1_point_auc"]//circle')
-  expect_equal(length(circle.list), n.auc.total)
-})
+xpath.vec <- 
+  c('//g[@class="geom1_point_auc"]//circle',
+    '//g[@class="geom2_point_auc"]//circle',
+    '//g[@class="geom3_path_roc"]//path',
+    '//g[@class="geom4_point_roc"]//circle',
+    '//g[@class="geom5_point_roc"]//circle',
+    '//g[@class="geom6_hline_error"]//line',
+    '//g[@class="geom7_vline_error"]//line',
+    '//g[@class="geom8_line_error"]//path',
+    '//g[@class="geom9_tallrect_error"]//rect')
 
-n.auc.selected <- n.auc.total / 3 / 2
-test_that("<circle> rendered for each selected thresh", { 
-  circle.list <- getNodeSet(info$html, '//g[@class="geom2_point_auc"]//circle')
-  expect_equal(length(circle.list), n.auc.selected)
-})
+countGeoms <- function(html=getHTML()){
+  count.vec <- c()
+  for(xpath in xpath.vec){
+    node.list <- getNodeSet(html, xpath)
+    count.vec[[xpath]] <- length(node.list)
+  }
+  count.vec
+}
 
-filterVar.counts <- with(VariantModels$roc, table(filterVar, test.fold))
-n.roc.paths <- length(filterVar.counts)
-test_that("<path> rendered for each method and test fold", { 
-  path.list <- getNodeSet(info$html, '//g[@class="geom3_path_roc"]//path')
-  expect_equal(length(path.list), n.roc.paths)
+thresh.fold2 <- subset(VariantModels$thresholds, test.fold==2)
+
+test_that("initial geom counts", {
+  expected.counts <- c(120, 20, 60, 60, 20, 20, 20, 60, nrow(thresh.fold2))
+  computed.counts <- countGeoms()
+  expect_equal(expected.counts, as.numeric(computed.counts))
 })
 
 clickID("MQ")
 
-##clickID("selected")
+thresh.fold2.not.MQ <- subset(thresh.fold2, method != "MQ")
 
-test_that("things are hidden", {
+test_that("geom counts after hiding MQ", {
+  expected.counts <- c(
+    114, 19, #circles in first plot
+    57, 57, # path and circle in second
+    19, # selected circle in second
+    20, #hline
+    19, #vline
+    57, #path
+    nrow(thresh.fold2.not.MQ)) #rect
+  computed.counts <- countGeoms()
+  expect_equal(expected.counts, as.numeric(computed.counts))
+})
+
+clickID("min error")
+
+test_that("geom counts after hiding min error", {
+  expected.counts <- c(
+    0, 19, #circles in first plot
+    57, 0, # path and circle in second
+    19, # selected circle in second
+    0, #hline
+    0, #vline
+    57, #path
+    nrow(thresh.fold2.not.MQ)) #rect
+  computed.counts <- countGeoms()
+  expect_equal(expected.counts, as.numeric(computed.counts))
+})
+
+clickID("selected")
+
+test_that("geom counts after hiding selected", {
+  expected.counts <- c(
+    0, 0, #circles in first plot
+    57, 0, # path and circle in second
+    0, # selected circle in second
+    0, #hline
+    0, #vline
+    0, #path
+    0) #rect
+  computed.counts <- countGeoms()
+  expect_equal(expected.counts, as.numeric(computed.counts))
+})
+
+clickID("min error")
+
+test_that("geom counts after showing min error", {
+  expected.counts <- c(
+    114, 0, #circles in first plot
+    57, 57, # path and circle in second
+    0, # selected circle in second
+    20, #hline
+    19, #vline
+    0, #path
+    0) #rect
+  computed.counts <- countGeoms()
+  expect_equal(expected.counts, as.numeric(computed.counts))
+})
+
+clickID("knn")
+
+test_that("geom counts after hiding knn", {
+  expected.counts <- c(
+    102, 0, #circles in first plot
+    51, 51, # path and circle in second
+    0, # selected circle in second
+    20, #hline
+    17, #vline
+    0, #path
+    0) #rect
+  computed.counts <- countGeoms()
+  expect_equal(expected.counts, as.numeric(computed.counts))
+})
+
+clickID("selected")
+
+thresh.fold2.not.knn <- subset(thresh.fold2.not.MQ, method != "knn")
+
+test_that("geom counts after showing selected", {
+  expected.counts <- c(
+    102, 17, #circles in first plot
+    51, 51, # path and circle in second
+    17, # selected circle in second
+    20, #hline
+    17, #vline
+    51, #path
+    nrow(thresh.fold2.not.knn)) #rect
+  computed.counts <- countGeoms()
+  expect_equal(expected.counts, as.numeric(computed.counts))
 })
 
