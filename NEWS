@@ -176,6 +176,20 @@ https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol_type
 
 RENDER: Determine why border of tiles in pirates example does not seem to be rendering.
 
+2015.10.18
+
+GGPLOT: aes(hjust) support for values 0, 0.5, 1 (error for other
+values). geom_text(vjust) or aes(vjust) raises warning if values other
+than 0.5 are specified.
+
+RENDERER: do not show selector widgets for selectors that were created
+with .variable .value aesthetics.
+
+RENDERER: play() only after loading all animation chunks.
+
+BUGFIX: common/varied chunk code properly handles the example in
+test-renderer2-VariantModels.R.
+
 2015.09.28
 
 BUGFIX: common/varied chunk code properly handles the example in

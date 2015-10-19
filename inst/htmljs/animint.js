@@ -777,10 +777,14 @@ var animint = function (to_select, json_file) {
     for(group_id in varied_by_group){
       var varied_one_group = varied_by_group[group_id];
       var common_one_group = common_by_group[group_id];
-      // there are two cases: each group of varied data is of length
-      // 1, or of length of the common data.
-      for(var common_i=0; common_i<common_one_group.length; common_i++){
-	var varied_obj = varied_one_group[common_i];
+      var common_i = 0;
+      for(var varied_i=0; varied_i < varied_one_group.length; varied_i++){
+	// there are two cases: each group of varied data is of length
+	// 1, or of length of the common data.
+	if(common_one_group.length == varied_one_group.length){
+	  common_i = varied_i;
+	}
+	var varied_obj = varied_one_group[varied_i];
 	var common_obj = common_one_group[common_i];
 	for(col in common_obj){
 	  if(col != "group"){
@@ -859,6 +863,7 @@ var animint = function (to_select, json_file) {
     var tsv_name = get_tsv(g_info, chunk_id);
     g_info.seq_count += 1;
     if(g_info.seq_count > g_info.seq.length){
+      Animation.play();
       return;
     }
     g_info.seq_i += 1;
@@ -1066,22 +1071,22 @@ var animint = function (to_select, json_file) {
     }else if(g_info.params.colour){
       fill = g_info.params.colour;
     }
+
+    // For aes(hjust) the compiler should make an "anchor" column.
     var text_anchor = "middle";
-    var get_text_anchor = function (d) {
-      var hjust = g_info.params.hjust;
-      if (d.hasOwnProperty("hjust")) {
-        hjust = d["hjust"];
+    if(g_info.params.hasOwnProperty("anchor")){
+      text_anchor = g_info.params["anchor"];
+    }
+    var get_text_anchor;
+    if(g_info.aes.hasOwnProperty("hjust")) {
+      get_text_anchor = function(d){
+	return d["anchor"];
       }
-      var o = {
-        0: "start",
-        0.5: "middle",
-        1: "end"
-      };
-      if (typeof hjust != "undefined") {
-        text_anchor = o[hjust];
+    }else{
+      get_text_anchor = function(d){
+	return text_anchor;
       }
-      return text_anchor;
-    };
+    }
 
     var eActions, eAppend;
     var key_fun = null;
@@ -1674,19 +1679,24 @@ var animint = function (to_select, json_file) {
 	s_info.selected.splice(i_value, 1);
       }
     }
-    // the jquery ids
-    if(s_info.type == "single") {
-      var selected_ids = v_name.concat("___", value);
-    } else {
-      var selected_ids = [];
-      for(i in s_info.selected) {
-        selected_ids[i] = v_name.concat("___", s_info.selected[i]);
+    // if there are levels, then this is not a .variable .value
+    // selector, and there is a selectize widget which should be
+    // updated.
+    if(isArray(s_info.levels)){
+      // the jquery ids
+      if(s_info.type == "single") {
+	var selected_ids = v_name.concat("___", value);
+      } else {
+	var selected_ids = [];
+	for(i in s_info.selected) {
+          selected_ids[i] = v_name.concat("___", s_info.selected[i]);
+	}
       }
-    }
-    // update selected widgets, if necessary
-    if(s_info.type == "multiple" | 
-      selectized_array[v_name].getValue() != selected_ids) {
-      selectized_array[v_name].setValue(selected_ids);
+      // update selected widgets, if necessary
+      if(s_info.type == "multiple" | 
+	 selectized_array[v_name].getValue() != selected_ids) {
+	selectized_array[v_name].setValue(selected_ids);
+      }
     }
     update_legend_opacity(v_name);
     s_info.update.forEach(function(g_name){
@@ -1708,18 +1718,11 @@ var animint = function (to_select, json_file) {
       return not_selected;
     }
   };
-  var animateIfLoaded = function () {
+  var update_next_animation = function () {
     var v_name = Animation.variable;
     var cur = Selectors[v_name].selected;
     var next = Animation.next[cur];
-    // Before starting the animation, make sure all the geoms have
-    // loaded.
-    var geomLoaded = function(x){
-      return d3.keys(Geoms).indexOf(x)!=-1;
-    }
-    if(all_geom_names.every(geomLoaded)){
-      update_selector(v_name, next);
-    }
+    update_selector(v_name, next);
   };
 
   // The main idea of how legends work:
@@ -1910,7 +1913,8 @@ var animint = function (to_select, json_file) {
           time_table.style("display", "none");
           show_hide_animation_controls.text(show_message);
         }
-      });
+      })
+    ;
     // table of the animint widgets
     var time_table = element.append("table")
       .style("display", "none");
@@ -1923,28 +1927,31 @@ var animint = function (to_select, json_file) {
       Animation.variable = response.time.variable;
       Animation.sequence = response.time.sequence;
       Widgets["play_pause"] = first_th.append("button")
+	.text("Play")
         .attr("id", "play_pause")
-	      .on("click", function(){
+	.on("click", function(){
           if(this.textContent == "Play"){
-            play();
+            Animation.play();
           }else{
-            pause(false);
+            Animation.pause(false);
           }
-        });
+        })
+      ;
     }
     first_tr.append("th").text("milliseconds");
     if(response.time){
       var second_tr = time_table.append("tr");
       second_tr.append("td").text("updates");
       second_tr.append("td").append("input")
-	      .attr("id", "updates_ms")
-	      .attr("type", "text")
-	      .attr("value", Animation.ms)
-	      .on("change", function(){
+	.attr("id", "updates_ms")
+	.attr("type", "text")
+	.attr("value", Animation.ms)
+	.on("change", function(){
           Animation.pause(false);
           Animation.ms = this.value;
           Animation.play();
-        });
+        })
+      ;
     }
     for(s_name in Selectors){
       var s_info = Selectors[s_name];
@@ -1975,18 +1982,19 @@ var animint = function (to_select, json_file) {
       });
     // selector widgets
     var toggle_message = "Toggle selected variables";
+    var show_or_hide_fun = function(){
+      if(this.textContent == toggle_message){
+        selector_table.style("display", "");
+        show_hide_selector_widgets.text("Hide variable toggler");
+      }else{
+        selector_table.style("display", "none");
+        show_hide_selector_widgets.text(toggle_message);
+      }
+    }
     var show_hide_selector_widgets = element.append("button")
       .text(toggle_message)
       .attr("class", "show_hide_selector_widgets")
-      .on("click", function(){
-        if(this.textContent == toggle_message){
-          selector_table.style("display", "");
-          show_hide_selector_widgets.text("Hide variable toggler");
-        }else{
-          selector_table.style("display", "none");
-          show_hide_selector_widgets.text(toggle_message);
-        }
-      })
+      .on("click", show_or_hide_fun)
     ;
     // adding a table for selector widgets
     var selector_table = element.append("table")
@@ -2003,51 +2011,68 @@ var animint = function (to_select, json_file) {
      // looping through and adding a row for each selector
     for(s_name in Selectors) {
       var s_info = Selectors[s_name];
-      // removing "." from name so it can be used in ids
-      var s_name_id = safe_name(s_name);
+      // for .variable .value selectors, levels is undefined and we do
+      // not want to make a selectize widget.
+      if(isArray(s_info.levels)){
+	// If there were no geoms that specified clickSelects for this
+	// selector, then there is no way to select it other than the
+	// selectize widgets (and possibly legends). So in this case
+	// we show the selectize widgets by default.
+	var selector_widgets_hidden = 
+	  show_hide_selector_widgets.text() == toggle_message;
+	var has_no_clickSelects = 
+	  !Selectors[s_name].hasOwnProperty("clickSelects")
+	var has_no_legend = 
+	  !Selectors[s_name].hasOwnProperty("legend")
+	if(selector_widgets_hidden && has_no_clickSelects && has_no_legend){
+	  var node = show_hide_selector_widgets.node();
+	  show_or_hide_fun.apply(node);
+	}
+	// removing "." from name so it can be used in ids
+	var s_name_id = safe_name(s_name);
 
-      // adding a row for each selector
-      var selector_widget_row = selector_table
-        .append("tr")
-        .attr("class", function() { return s_name_id + "_selector_widget"; })
-      ;
-      selector_widget_row.append("td").text(s_name);
-      // adding the selector
-      var selector_widget_select = selector_widget_row
-        .append("td")
-        .append("select")
-        .attr("class", function() { return s_name_id + "_input"; })
-        .attr("placeholder", function() { return "Toggle " + s_name; });
-      // adding an option for each level of the variable
-      selector_widget_select.selectAll("option")
-        .data(s_info.levels)
-        .enter()
-        .append("option")
-        .attr("value", function(d) { return d; })
-        .text(function(d) { return d; });
-      // making sure that the first option is blank
-      selector_widget_select
-        .insert("option")
-        .attr("value", "")
-        .text(function() { return "Toggle " + s_name; });
-        
-      // calling selectize
-      var selectize_selector = to_select + ' .' + s_name_id + "_input";
-      if(s_info.type == "single") {
-        // setting up array of selector and options
-        var selector_values = [];
-        for(i in s_info.levels) {
-          selector_values[i] = {
-            id: s_name.concat("___", s_info.levels[i]), 
-            text: s_info.levels[i]
-          };
-        }
-        // the id of the first selector
-        var selected_id = s_name.concat("___", s_info.selected);
+	// adding a row for each selector
+	var selector_widget_row = selector_table
+          .append("tr")
+          .attr("class", function() { return s_name_id + "_selector_widget"; })
+	;
+	selector_widget_row.append("td").text(s_name);
+	// adding the selector
+	var selector_widget_select = selector_widget_row
+          .append("td")
+          .append("select")
+          .attr("class", function() { return s_name_id + "_input"; })
+          .attr("placeholder", function() { return "Toggle " + s_name; });
+	// adding an option for each level of the variable
+	selector_widget_select.selectAll("option")
+          .data(s_info.levels)
+          .enter()
+          .append("option")
+          .attr("value", function(d) { return d; })
+          .text(function(d) { return d; });
+	// making sure that the first option is blank
+	selector_widget_select
+          .insert("option")
+          .attr("value", "")
+          .text(function() { return "Toggle " + s_name; });
+	
+	// calling selectize
+	var selectize_selector = to_select + ' .' + s_name_id + "_input";
+	if(s_info.type == "single") {
+          // setting up array of selector and options
+          var selector_values = [];
+          for(i in s_info.levels) {
+            selector_values[i] = {
+              id: s_name.concat("___", s_info.levels[i]), 
+              text: s_info.levels[i]
+            };
+          }
+          // the id of the first selector
+          var selected_id = s_name.concat("___", s_info.selected);
 
-        // if single selection, only allow one item
-        var $temp = $(selectize_selector)
-          .selectize({
+          // if single selection, only allow one item
+          var $temp = $(selectize_selector)
+            .selectize({
               create: false, 
               valueField: 'id',
               labelField: 'text',
@@ -2057,39 +2082,39 @@ var animint = function (to_select, json_file) {
               maxItems: 1, 
               allowEmptyOption: true,
               onChange: function(value) {
-                // extracting the name and the level to update
-                var selector_name = value.split("___")[0];
-                var selected_level = value.split("___")[1];
-                // updating the selector
-                update_selector(selector_name, selected_level);
+		// extracting the name and the level to update
+		var selector_name = value.split("___")[0];
+		var selected_level = value.split("___")[1];
+		// updating the selector
+		update_selector(selector_name, selected_level);
               }
             })
-         ;
-      } else {
-        // setting up array of selector and options
-        var selector_values = [];
-        if(typeof s_info.levels == "object") {
-          for(i in s_info.levels) {
-            selector_values[i] = {
-              id: s_name.concat("___", s_info.levels[i]), 
-              text: s_info.levels[i]
+          ;
+	} else { // multiple selection:
+          // setting up array of selector and options
+          var selector_values = [];
+          if(typeof s_info.levels == "object") {
+            for(i in s_info.levels) {
+              selector_values[i] = {
+		id: s_name.concat("___", s_info.levels[i]), 
+		text: s_info.levels[i]
+              };
+            }
+          } else {
+            selector_values[0] = {
+              id: s_name.concat("___", s_info.levels), 
+              text: s_info.levels
             };
           }
-        } else {
-          selector_values[0] = {
-            id: s_name.concat("___", s_info.levels), 
-              text: s_info.levels
-          };
-        }
-        // setting up an array to contain the initally selected elements
-        var initial_selections = [];
-        for(i in s_info.selected) {
-          initial_selections[i] = s_name.concat("___", s_info.selected[i]);
-        }
-        
-        // construct the selectize
-        var $temp = $(selectize_selector)
-          .selectize({
+          // setting up an array to contain the initally selected elements
+          var initial_selections = [];
+          for(i in s_info.selected) {
+            initial_selections[i] = s_name.concat("___", s_info.selected[i]);
+          }
+          
+          // construct the selectize
+          var $temp = $(selectize_selector)
+            .selectize({
               create: false, 
               valueField: 'id',
               labelField: 'text',
@@ -2099,8 +2124,8 @@ var animint = function (to_select, json_file) {
               maxItems: s_info.levels.length, 
               allowEmptyOption: true,
               onChange: function(value) { 
-                // if nothing is selected, remove what is currently selected
-                if(value == null) {
+		// if nothing is selected, remove what is currently selected
+		if(value == null) {
                   // extracting the selector ids from the options
                   var the_ids = Object.keys($(this)[0].options);
                   // the name of the appropriate selector
@@ -2111,7 +2136,7 @@ var animint = function (to_select, json_file) {
                   old_selections.forEach(function(element) {
                     update_selector(selector_name, element);
                   });
-                } else {
+		} else { // value is not null:
                   // grabbing the name of the selector from the selected value
                   var selector_name = value[0].split("___")[0];
                   // identifying the levels that should be selected
@@ -2141,12 +2166,13 @@ var animint = function (to_select, json_file) {
                       update_selector(selector_name, element);
                     })
                   ;
-                }
-              }
-            })
-        ;
-      }
-      selectized_array[s_name] = $temp[0].selectize;
+		}//value==null
+              }//onChange
+            })//selectize
+          ;
+	}//single or multiple selection.
+	selectized_array[s_name] = $temp[0].selectize;
+      }//levels, is.variable.value
     } // close for loop through selector widgets
     // If this is an animation, then start downloading all the rest of
     // the data, and start the animation.
@@ -2177,22 +2203,21 @@ var animint = function (to_select, json_file) {
         Animation.next[prev] = cur;
       }
       all_geom_names = d3.keys(response.geoms);
-
-      var timer;
-      Animation.timer = timer;
-      function play(){
+      Animation.timer = null;
+      Animation.play = function(){
+	if(Animation.timer == null){ // only play if not already playing.
     	  // as shown on http://bl.ocks.org/mbostock/3808234
-    	  timer = setInterval(animateIfLoaded, Animation.ms);
+    	  Animation.timer = setInterval(update_next_animation, Animation.ms);
     	  Widgets["play_pause"].text("Pause");
+	}
       };
-      Animation.play = play;
       Animation.play_after_visible = false;
-      function pause(play_after_visible){
+      Animation.pause = function(play_after_visible){
         Animation.play_after_visible = play_after_visible;
-        clearInterval(timer);
+        clearInterval(Animation.timer);
+	Animation.timer = null;
         Widgets["play_pause"].text("Play");
       };
-      Animation.pause = pause;
 
       // This code starts/stops the animation timer when the page is
       // hidden, inspired by
@@ -2200,17 +2225,15 @@ var animint = function (to_select, json_file) {
       function onchange (evt) {
         if(document.visibilityState == "visible"){
           if(Animation.play_after_visible){
-            play();
+            Animation.play();
           }
         }else{
           if(Widgets["play_pause"].text() == "Pause"){
-            pause(true);
+            Animation.pause(true);
           }
         }
       };
       document.addEventListener("visibilitychange", onchange);
-
-      Animation.play();
     }
   });
 };

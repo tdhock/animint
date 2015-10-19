@@ -128,6 +128,9 @@ parsePlot <- function(meta){
           if(is.null(meta$first[[var_name]])) {
             u.vals <- unique(var)
           }
+          ## Tell this selector that it has a legend somewhere in the
+          ## viz.
+          meta$selectors[[var_name]]$legend <- TRUE
         }#is.correct
       }#length(var_name)
     }
@@ -162,21 +165,6 @@ parsePlot <- function(meta){
       geom.next <- plot.meta$geoms[[geom.i + 1]]
       meta$geoms[[geom.prev]]$nextgeom <- meta$geoms[[geom.next]]$classed
     }
-  }
-  ## Selector levels and update were stored in saveLayer, so now
-  ## compute the unique values to store in meta$selectors.
-  for(selector.name in names(meta$selector.values)){
-    values.update <- meta$selector.values[[selector.name]]
-    value.vec <- unique(unlist(lapply(values.update, "[[", "values")))
-    meta$selectors[[selector.name]]$selected <-
-      if(meta$selectors[[selector.name]]$type=="single"){
-        value.vec[1]
-      }else{
-        value.vec
-      }
-    meta$selectors[[selector.name]]$levels <- value.vec
-    meta$selectors[[selector.name]]$update <-
-      as.list(unique(unlist(lapply(values.update, "[[", "update"))))
   }
 
   ## Export axis specification as a combination of breaks and
@@ -360,6 +348,7 @@ parsePlot <- function(meta){
 
 hjust2anchor <- function(hjust){
   if(is.null(hjust))return(NULL)
+  stopifnot(is.numeric(hjust))
   trans <-
     c("0"="start",
       "0.5"="middle",
@@ -367,7 +356,8 @@ hjust2anchor <- function(hjust){
   hjust.str <- as.character(hjust)
   is.valid <- hjust.str %in% names(trans)
   if(all(is.valid)){
-    trans[hjust.str]
+    ## as.character removes names.
+    as.character(trans[hjust.str])
   }else{
     print(hjust[!is.valid])
     stop("animint only supports hjust values 0, 0.5, 1")
@@ -383,7 +373,6 @@ hjust2anchor <- function(hjust){
 saveLayer <- function(l, d, meta){
   ranges <- meta$built$panel$ranges
   g <- list(geom=l$geom$objname)
-  g.data <- d
   g$classed <-
     sprintf("geom%d_%s_%s",
             meta$geom.count, g$geom, meta$plot.name)
@@ -430,8 +419,34 @@ saveLayer <- function(l, d, meta){
   ## currently selected values of these variables are stored in
   ## plot.Selectors.
 
-  s.aes <- selector.aes(names(g$aes))
+  s.aes <- selector.aes(g$aes)
 
+  ## Do not copy group unless it is specified in aes, and do not copy
+  ## showSelected variables which are specified multiple times.
+  group.not.specified <- ! "group" %in% names(g$aes)
+  n.groups <- length(unique(NULL))
+  need.group <- c("violin", "step", "hex")
+  group.meaningless <- g$geom %in% c(
+    "abline", "blank",
+    ##"crossbar", "pointrange", #documented as unsupported
+    ## "rug", "dotplot", "quantile", "smooth", "boxplot",
+    ## "bin2d", "map"
+    "errorbar", "errorbarh",
+    ##"bar", "histogram", #?
+    "hline", "vline",
+    "jitter", "linerange",
+    "point", 
+    "rect", "segment")
+  dont.need.group <- ! g$geom %in% need.group
+  remove.group <- group.meaningless ||
+    group.not.specified && 1 < n.groups && dont.need.group
+  do.not.copy <- c(
+    if(remove.group)"group",
+    s.aes$showSelected$ignored,
+    s.aes$clickSelects$ignored)
+  copy.cols <- ! names(d) %in% do.not.copy
+  g.data <- d[copy.cols]
+  
   is.ss <- names(g$aes) %in% s.aes$showSelected$one
   show.vars <- g$aes[is.ss]
   pre.subset.order <- as.list(names(show.vars))
@@ -451,19 +466,23 @@ saveLayer <- function(l, d, meta){
   ## Construct the selector.
   for(row.i in seq_along(interactive.aes$variable)){
     aes.row <- interactive.aes[row.i, ]
-    selector.df <- if(is.na(aes.row$value)){
-      value.col <- paste(aes.row$variable)
-      data.frame(value.col,
-                 selector.name=update.vars[[value.col]])
-    }else{
+    is.variable.value <- !is.na(aes.row$value)
+    selector.df <- if(is.variable.value){
       selector.vec <- g.data[[paste(aes.row$variable)]]
       data.frame(value.col=aes.row$value,
                  selector.name=unique(paste(selector.vec)))
+    }else{
+      value.col <- paste(aes.row$variable)
+      data.frame(value.col,
+                 selector.name=update.vars[[value.col]])
     }
     for(sel.i in 1:nrow(selector.df)){
       sel.row <- selector.df[sel.i,]
       value.col <- paste(sel.row$value.col)
       selector.name <- paste(sel.row$selector.name)
+      ## If this selector was defined by .variable .value aes, then we
+      ## will not generate selectize widgets.
+      meta$selectors[[selector.name]]$is.variable.value <- is.variable.value
       ## If this selector has no defined type yet, we define it once
       ## and for all here, so we can use it later for chunk
       ## separation.
@@ -475,8 +494,15 @@ saveLayer <- function(l, d, meta){
         stopifnot(selector.type %in% c("single", "multiple"))
         meta$selectors[[selector.name]]$type <- selector.type
       }
+      ## If this selector does not have any clickSelects then we show
+      ## the selectize widgets by default.
+      for(look.for in c("showSelected", "clickSelects")){
+        if(grepl(look.for, aes.row$variable)){
+          meta$selectors[[selector.name]][[look.for]] <- TRUE
+        }
+      }
       ## We also store all the values of this selector in this layer,
-      ## so we can accurate set levels after all geoms have been
+      ## so we can accurately set levels after all geoms have been
       ## compiled.
       value.vec <- unique(g.data[[value.col]])
       key <- paste(g$classed, row.i, sel.i)
@@ -507,6 +533,8 @@ saveLayer <- function(l, d, meta){
   ## in the draw method of the geoms.
   if(g$geom=="abline"){
     ## loop through each set of slopes/intercepts
+    
+    ## TODO: vectorize this code!
     for(i in 1:nrow(g.data)) {
       
       # "Trick" ggplot coord_transform into transforming the slope and intercept
@@ -525,17 +553,10 @@ saveLayer <- function(l, d, meta){
         g.data$xend[i] <- (g.data$yend[i] - g.data$intercept[i]) / g.data$slope[i]
       }
     }
-    g.data <- as.data.frame(g.data)
-    
-    if(g$aes[["group"]]=="1"){
-      # ggplot2 defaults to adding a group attribute
-      # which misleads for situations where there are
-      # multiple lines with the same group.
-      # if the group attribute conveys no additional
-      # information, remove it.
-      ## TODO: Figure out a better way to handle this...
-      g$aes <- g$aes[-which(names(g$aes)=="group")]
-    }
+    ## ggplot2 defaults to adding a group aes for ablines!
+    ## Remove it since it is meaningless.
+    g$aes <- g$aes[names(g$aes)!="group"]
+    g.data <- g.data[! names(g.data) %in% c("slope", "intercept")]
     g$geom <- "segment"
   } else if(g$geom=="point"){
     # Fill set to match ggplot2 default of filled in circle.
@@ -543,15 +564,29 @@ saveLayer <- function(l, d, meta){
       g.data[["fill"]] <- g.data[["colour"]]
     }
   } else if(g$geom=="text"){
-    ## check invalid hjust value
-    if ("hjust" %in% names(g$params)) { #  hjust is parameter
-      hjust <- g$params$hjust
-    } else if ("hjust" %in% names(g.data)) { #  hjust is aesthetic
-      hjust <- unique(g.data['hjust'])
-    } else { #  default hjust
-      hjust <- 0.5
+    ## convert hjust to anchor.
+    hjustRemove <- function(df.or.list){
+      df.or.list$anchor <- hjust2anchor(df.or.list$hjust)
+      df.or.list[names(df.or.list) != "hjust"]
     }
-    anchor <- hjust2anchor(hjust)
+    vjustWarning <- function(vjust.vec){
+      not.supported <- vjust.vec != 0
+      if(any(not.supported)){
+        bad.vjust <- unique(vjust.vec[not.supported])
+        print(bad.vjust)
+        warning("animint only supports vjust=0")
+      }
+    }
+    if ("hjust" %in% names(g$params)) {
+      g$params <- hjustRemove(g$params)
+    } else if ("hjust" %in% names(g.data)) {
+      g.data <- hjustRemove(g.data)
+    } 
+    if("vjust" %in% names(g$params)) {
+      vjustWarning(g$params$vjust)
+    } else if ("vjust" %in% names(g.data)) { 
+      vjustWarning(g.data$vjust)
+    } 
   } else if(g$geom=="ribbon"){
     # Color set to match ggplot2 default of fill with no outside border.
     if("fill"%in%names(g.data) & !"colour"%in%names(g.data)){
@@ -972,10 +1007,17 @@ getCommonChunk <- function(built, chunk.vars, aes.list){
              col.name=col.name.vec))
   for(group.name in names(values.by.group)){
     values.by.chunk <- values.by.group[[group.name]]
+    row.count.vec <- sapply(values.by.chunk, nrow)
+    same.size.chunks <- all(row.count.vec[1] == row.count.vec)
     for(col.name in col.name.vec){
       value.list <- lapply(values.by.chunk, function(df)df[[col.name]])
-      value.mat <- do.call(cbind, value.list)
-      is.common.mat[group.name, col.name] <- all(value.mat[, 1] == value.mat)
+      is.common.mat[group.name, col.name] <- if(same.size.chunks){
+        value.mat <- do.call(cbind, value.list)
+        all(value.mat[, 1] == value.mat)
+      }else{
+        value.tab <- table(unlist(value.list))
+        length(value.tab) == 1
+      }
     }
   }
   is.common <- apply(is.common.mat, 2, all, na.rm=TRUE)
@@ -985,7 +1027,19 @@ getCommonChunk <- function(built, chunk.vars, aes.list){
     common.cols <- names(is.common)[is.common]
     one.chunk <- built.by.chunk[[1]]
     ## Should each chunk have the same info about each group? 
-    common.data <- na.omit(one.chunk[common.cols])
+    common.not.na <- na.omit(one.chunk[common.cols])
+    common.unique <- unique(common.not.na)
+    ## For geom_polygon and geom_path we may have two rows that should
+    ## both be kept (the start and the end of each group may be the
+    ## same if the shape is closed), so we define common.data as all
+    ## of the rows (common.not.na) in that case, and just the unique
+    ## data per group (common.unique) in the other case.
+    data.per.group <- table(common.unique$group)
+    common.data <- if(all(data.per.group == 1)){
+      common.unique
+    }else{
+      common.not.na
+    }
     built.group <- do.call(rbind, built.by.chunk)
     built.has.common <- subset(built.group, group %in% common.data$group)
     varied.df.list <- split.x(built.has.common, chunk.vars)
@@ -1067,7 +1121,8 @@ saveChunks <- function(x, meta){
 ##' @return list of selector info.
 ##' @author Toby Dylan Hocking
 ##' @export
-selector.aes <- function(a.vec){
+selector.aes <- function(a.list){
+  a.vec <- names(a.list)
   if(is.null(a.vec))a.vec <- character()
   stopifnot(is.character(a.vec))
   cs.or.ss <- grepl("clickSelects|showSelected", a.vec)
@@ -1093,9 +1148,19 @@ selector.aes <- function(a.vec){
     a.value <- a.vec[is.a & is.value]
     a.variable <- sub("value$", "variable", a.value)
     single <- a.vec[is.a & (!var.or.val)]
+    ignored <- c()
+    if(1 < length(single)){
+      single.df <- data.frame(
+        aes.name=single,
+        data.var=paste(a.list[single]))
+      single.sorted <- single.df[order(single.df$data.var), ]
+      single.sorted$keep <- c(TRUE, diff(as.integer(single.df$data.var))!=0)
+      single <- with(single.sorted, paste(aes.name[keep]))
+      ignored <- with(single.sorted, paste(aes.name[!keep]))
+    }
     aes.list[[a]] <-
       list(several=data.frame(variable=a.variable, value=a.value),
-           one=single)
+           one=single, ignored=ignored)
   }
   aes.list
 }
@@ -1256,7 +1321,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
         ## This code assumes that the layer has the complete aesthetic
         ## mapping and data. TODO: Do we need to copy any global
         ## values to this layer?
-        iaes <- selector.aes(names(L$mapping))
+        iaes <- selector.aes(L$mapping)
         one.names <- with(iaes, c(clickSelects$one, showSelected$one))
         update.vars <- L$mapping[one.names]
         has.var <- update.vars %in% names(L$data)
@@ -1282,6 +1347,46 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
       meta[[list.name]] <- c(meta[[list.name]], p)
     }else{
       stop("list items must be ggplots or option lists, problem: ", list.name)
+    }
+  }
+
+  ## Selector levels and update were stored in saveLayer, so now
+  ## compute the unique values to store in meta$selectors.
+  for(selector.name in names(meta$selector.values)){
+    values.update <- meta$selector.values[[selector.name]]
+    value.vec <- unique(unlist(lapply(values.update, "[[", "values")))
+    meta$selectors[[selector.name]]$selected <- if(
+      meta$selectors[[selector.name]]$type=="single"){
+      value.vec[1]
+    }else{
+      value.vec
+    }
+    ## If this selector was defined by .variable .value aes, then we
+    ## will not generate selectize widgets. This is indicated by the
+    ## compiler by not setting the "levels" attribute of the selector.
+    if(!isTRUE(meta$selectors[[selector.name]]$is.variable.value)){
+      meta$selectors[[selector.name]]$levels <- value.vec
+    }
+    ## s.info$update is the list of geom names that will be updated
+    ## for this selector.
+    meta$selectors[[selector.name]]$update <-
+      as.list(unique(unlist(lapply(values.update, "[[", "update"))))
+  }
+
+  ## For a static data viz with no interactive aes, no need to check
+  ## for trivial showSelected variables with only 1 level.
+  if(0 < length(meta$selectors)){
+    n.levels <- sapply(meta$selectors, function(s.info)length(s.info$levels))
+    one.level <- n.levels == 1
+    has.legend <- sapply(meta$selectors, function(s.info)isTRUE(s.info$legend))
+    is.trivial <- one.level & (!has.legend)
+    if(any(is.trivial)){
+      ## With the current compiler that has already saved the tsv files
+      ## by now, we can't really make this data viz more efficient by
+      ## ignoring this trivial selector. However we can warn the user so
+      ## that they can remove this inefficient showSelected.
+      warning("showSelected variables with only 1 level: ",
+              paste(names(meta$selectors)[is.trivial], collapse=", "))
     }
   }
 
