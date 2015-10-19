@@ -96,13 +96,13 @@ viz <- list(
       }
     })+
     geom_path(aes(FPR, TPR, clickSelects=test.fold,
-                  showSelected=method,
+                  ##showSelected=method, #not needed!
                   group=method, tooltip=method, color=method),
               size=5,
               data=VariantModels$roc)+
     scale_fill_manual("threshold", values=thresh.colors)+
     geom_point(aes(FPR, TPR, color=method,
-                   showSelected=method,
+                   ##showSelected=method, #not needed!
                    clickSelects=test.fold,
                    fill=thresh.type),
                pch=21,
@@ -113,8 +113,9 @@ viz <- list(
       key=method,
       showSelected.variable=paste0(filterVar, "_fold", test.fold),
       showSelected.value=threshold,
-      showSelected=method,
-      fill=thresh.type, color=method),
+      ##showSelected=method, #not needed!
+      fill=thresh.type,
+      color=method),
                size=3,
                pch=21,
                data=VariantModels$roc),
@@ -164,6 +165,8 @@ viz <- list(
   })
 )
 
+info <- animint2HTML(viz)
+
 viz$error+
   facet_grid(test.fold ~ filterVar.fac, labeller=function(var, val){
     if(var=="test.fold"){
@@ -172,8 +175,6 @@ viz$error+
       paste(val)
     }
   }, scales="free", space="fixed")
-
-info <- animint2HTML(viz)
 
 test_that("no duplicated rows in common data", {
   common.tsv <- file.path("animint-htmltest", "geom8_line_error_chunk_common.tsv")
@@ -188,3 +189,30 @@ test_that("error lines rendered in all panels", {
   expected.counts <- rep(3, 20)
   expect_equal(computed.counts, expected.counts)
 })
+
+n.auc.total <- nrow(VariantModels$auc)
+test_that("<circle> rendered for each auc datum", { 
+  circle.list <- getNodeSet(info$html, '//g[@class="geom1_point_auc"]//circle')
+  expect_equal(length(circle.list), n.auc.total)
+})
+
+n.auc.selected <- n.auc.total / 3 / 2
+test_that("<circle> rendered for each selected thresh", { 
+  circle.list <- getNodeSet(info$html, '//g[@class="geom2_point_auc"]//circle')
+  expect_equal(length(circle.list), n.auc.selected)
+})
+
+filterVar.counts <- with(VariantModels$roc, table(filterVar, test.fold))
+n.roc.paths <- length(filterVar.counts)
+test_that("<path> rendered for each method and test fold", { 
+  path.list <- getNodeSet(info$html, '//g[@class="geom3_path_roc"]//path')
+  expect_equal(length(path.list), n.roc.paths)
+})
+
+clickID("MQ")
+
+##clickID("selected")
+
+test_that("things are hidden", {
+})
+
