@@ -1379,7 +1379,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
     n.levels <- sapply(meta$selectors, function(s.info)length(s.info$levels))
     one.level <- n.levels == 1
     has.legend <- sapply(meta$selectors, function(s.info)isTRUE(s.info$legend))
-    is.trivial <- one.level && (!has.legend)
+    is.trivial <- one.level & (!has.legend)
     if(any(is.trivial)){
       ## With the current compiler that has already saved the tsv files
       ## by now, we can't really make this data viz more efficient by
