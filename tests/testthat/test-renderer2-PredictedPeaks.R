@@ -2,6 +2,8 @@ context("PredictedPeaks data set")
 
 data(PredictedPeaks)
 
+hover.dots <- subset(PredictedPeaks$chromCounts, nonInputType==type)
+
 viz <- list(
   oneChrom=ggplot()+
     ggtitle("PeakSegJoint detections on selected chromosome")+
@@ -10,15 +12,21 @@ viz <- list(
     theme_animint(width=1500, height=100)+
     theme(axis.line.x=element_blank(), axis.text.x=element_blank(), 
           axis.ticks.x=element_blank(), axis.title.x=element_blank())+
-    scale_y_discrete("cell type", drop=FALSE)+
     geom_text(aes(relative.middle, type.fac, label=samples.up,
-                  href=paste0(
-                    "http://genome.ucsc.edu/cgi-bin/hgTracks?db=hg19&position=",
-                    chrom, ":", zoomStart, "-", zoomEnd),
+                  clickSelects=peak.name,
                   showSelected2=chrom,
                   showSelected=dotID),
               size=11,
-              data=PredictedPeaks$chromCounts),
+              data=PredictedPeaks$chromCounts)+
+    ## geom_text(aes(relative.middle, type.fac, label=samples.up,
+    ##               href=paste0(
+    ##                 "http://genome.ucsc.edu/cgi-bin/hgTracks?db=hg19&position=",
+    ##                 chrom, ":", zoomStart, "-", zoomEnd),
+    ##               showSelected2=chrom,
+    ##               showSelected=dotID),
+    ##           size=11,
+    ##           data=PredictedPeaks$chromCounts)+
+    scale_y_discrete("cell type", drop=FALSE),
   chroms=ggplot()+
     theme_bw()+
     theme_animint(width=1500, height=330)+
@@ -64,10 +72,13 @@ viz <- list(
                   showSelected=chrom,
                   fill=log10(count)),
               color="transparent",
-              data=PredictedPeaks$bg.rect),
+              data=PredictedPeaks$bg.rect)+
+   geom_point(aes(up, Input,
+                  showSelected=peak.name),
+              data=hover.dots),
   first=list(dotID="38 neutro samples, 1 Input samples", chrom="chr16"))
 
-## TODO:hoverselects!
+## TODO:href + hoverselects!
 
 info <- animint2HTML(viz)
 
