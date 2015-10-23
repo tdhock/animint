@@ -72,10 +72,7 @@ viz <- list(
                   showSelected=chrom,
                   fill=log10(count)),
               color="transparent",
-              data=PredictedPeaks$bg.rect)+
-   geom_point(aes(up, Input,
-                  showSelected=peak.name),
-              data=hover.dots),
+              data=PredictedPeaks$bg.rect),
   first=list(dotID="38 neutro samples, 1 Input samples", chrom="chr16"))
 
 ## TODO:href + hoverselects!
