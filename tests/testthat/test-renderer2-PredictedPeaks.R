@@ -2,7 +2,6 @@ context("PredictedPeaks data set")
 
 data(PredictedPeaks)
 
-hgTracks <- "http://genome.ucsc.edu/cgi-bin/hgTracks"
 viz <- list(
   oneChrom=ggplot()+
     ggtitle("PeakSegJoint detections on selected chromosome")+
@@ -13,8 +12,9 @@ viz <- list(
           axis.ticks.x=element_blank(), axis.title.x=element_blank())+
     scale_y_discrete("cell type", drop=FALSE)+
     geom_text(aes(relative.middle, type.fac, label=samples.up,
-                  href=sprintf("%s?db=hg19&position=%s:%d-%d",
-                    hgTracks, chrom, zoomStart, zoomEnd),
+                  href=paste0(
+                    "http://genome.ucsc.edu/cgi-bin/hgTracks?db=hg19&position=",
+                    chrom, ":", zoomStart, "-", zoomEnd),
                   showSelected2=chrom,
                   showSelected=dotID),
               size=11,
