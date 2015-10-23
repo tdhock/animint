@@ -2013,7 +2013,10 @@ var animint = function (to_select, json_file) {
       var s_info = Selectors[s_name];
       // for .variable .value selectors, levels is undefined and we do
       // not want to make a selectize widget.
-      if(isArray(s_info.levels)){
+
+      // TODO: why does it take so long to initialize the selectize
+      // widget when there are many values?
+      if(isArray(s_info.levels) && s_info.levels.length < 1000){
 	// If there were no geoms that specified clickSelects for this
 	// selector, then there is no way to select it other than the
 	// selectize widgets (and possibly legends). So in this case
