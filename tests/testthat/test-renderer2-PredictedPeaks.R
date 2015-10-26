@@ -94,22 +94,23 @@ test_that("initially 2 text elements rendered", {
 })
 
 clickID("chrM")
+Sys.sleep(1)
 
 exp.vec <- c(1, 14, 38)
 
 test_that("3 elements rendered (first time)", {
   num.vec <- getSorted()
-  print(list(num.vec, exp.vec))
   expect_equal(num.vec, exp.vec)
 })
 
 clickID("chrY")
+Sys.sleep(1)
 
 clickID("chrM")
+Sys.sleep(1)
 
 test_that("3 elements rendered (second time)", {
   num.vec <- getSorted()
-  print(list(num.vec, exp.vec))
   expect_equal(num.vec, exp.vec)
 })
 
