@@ -1361,10 +1361,20 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
     }else{
       value.vec
     }
-    ## If this selector was defined by .variable .value aes, then we
-    ## will not generate selectize widgets. This is indicated by the
-    ## compiler by not setting the "levels" attribute of the selector.
-    if(!isTRUE(meta$selectors[[selector.name]]$is.variable.value)){
+    ## Check the selectize option to determine if the designer wants
+    ## to show a widget for this selector.
+    selectize <- meta$selectize[[selector.name]]
+    render.widget <- if(is.logical(selectize)){
+      selectize[1]
+    }else{
+      ## If the designer did not set selectize, then we set a default
+      ## (if .variable .value aes, then no selectize; otherwise yes).
+      !isTRUE(meta$selectors[[selector.name]]$is.variable.value)
+    }
+    if(render.widget){
+      ## Showing selectize widgets is optional, and indicated to the
+      ## renderer by the compiler by not setting the "levels"
+      ## attribute of the selector.
       meta$selectors[[selector.name]]$levels <- value.vec
     }
     ## s.info$update is the list of geom names that will be updated
