@@ -16,6 +16,7 @@ if(filter == ""){
 if(interactive()){
   setwd("testthat")
   source("helper-functions.R")
+  tests_init("firefox")
 }
 
 if(use.browser)tests_init()

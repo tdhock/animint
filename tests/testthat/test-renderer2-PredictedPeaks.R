@@ -5,7 +5,10 @@ PredictedPeaks.RData <- file.path(tempdir(), "PredictedPeaks.RData")
 request <- GET("http://github.com/tdhock/animint-examples/blob/master/data/PredictedPeaks.RData?raw=true")
 stop_for_status(request)
 writeBin(content(request), PredictedPeaks.RData)
-load(PredictedPeaks.RData)
+## If we don't load this data set into the global environment, then we
+## get Error in eval(expr, envir, enclos) (from helper-functions.R#5)
+## : object 'PredictedPeaks' not found
+load(PredictedPeaks.RData, .GlobalEnv) 
 
 hover.dots <- subset(PredictedPeaks$chromCounts, nonInputType==type)
 
