@@ -176,6 +176,17 @@ https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol_type
 
 RENDER: Determine why border of tiles in pirates example does not seem to be rendering.
 
+2015.10.26
+
+DATA: PredictedPeaks and test-renderer2-PredictedPeaks.R
+
+BUGFIX: do not call update_selector twice from selectize widgets,
+since we are now using setValue(values, true).
+
+DSL: selectize option list for determining which selector widgets to
+render. By default do not render a widget if there are more than 1000
+values.
+
 2015.10.18
 
 GGPLOT: aes(hjust) support for values 0, 0.5, 1 (error for other
