@@ -1368,8 +1368,17 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
       selectize[1]
     }else{
       ## If the designer did not set selectize, then we set a default
-      ## (if .variable .value aes, then no selectize; otherwise yes).
-      !isTRUE(meta$selectors[[selector.name]]$is.variable.value)
+      ## (if .variable .value aes, then no selectize; otherwise if
+      ## there are less than 1000 values then yes).
+      if(isTRUE(meta$selectors[[selector.name]]$is.variable.value)){
+        FALSE
+      }else{
+        if(length(value.vec) < 1000){
+          TRUE
+        }else{
+          FALSE
+        }
+      }
     }
     if(render.widget){
       ## Showing selectize widgets is optional, and indicated to the
