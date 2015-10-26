@@ -15,6 +15,13 @@ acontext <- function(...){
   context(...)
 }
 
+getSelectorWidgets <- function(html=getHTML()){
+  tr.list <- getNodeSet(html, 
+                        '//table[@class="table_selector_widgets"]//tr')
+  td.list <- sapply(tr.list[-1], function(tr)xmlChildren(tr)[[1]])
+  sapply(td.list, xmlValue)
+}
+
 clickHTML <- function(...){
   v <- c(...)
   stopifnot(length(v) == 1)

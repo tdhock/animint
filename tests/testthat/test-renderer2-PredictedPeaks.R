@@ -75,9 +75,12 @@ viz <- list(
               data=PredictedPeaks$bg.rect),
   first=list(dotID="38 neutro samples, 1 Input samples", chrom="chr16"))
 
-## TODO:href + hoverselects!
-
 info <- animint2HTML(viz)
+
+test_that("without selectize option, only render chrom widget", {
+  widget.vec <- getSelectorWidgets(info$html)
+  expect_identical(widget.vec, "chrom")
+})
 
 getSorted <- function(){
   text.list <- getNodeSet(getHTML(), '//g[@class="geom1_text_oneChrom"]//text')
@@ -170,11 +173,22 @@ viz <- list(
    geom_point(aes(up, Input,
                   showSelected=peak.name),
               data=hover.dots),
+  selectize=list(dotID=TRUE, chrom=FALSE),
   first=list(dotID="38 neutro samples, 1 Input samples", chrom="chr16"))
 
 ## TODO:href + hoverselects!
 
 info <- animint2HTML(viz)
+
+test_that("selectize option respected", {
+  widget.vec <- getSelectorWidgets(info$html)
+  expect_identical(widget.vec, "dotID")
+})
+
+## e <- remDr$findElement("class name", "show_hide_selector_widgets")
+## e$clickElement()
+
+## remDr$findElements("class name", "selectize-input")
 
 ## It takes a long time to render the selectize widget with many
 ## levels, why?
