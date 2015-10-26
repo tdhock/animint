@@ -1691,6 +1691,10 @@ var animint = function (to_select, json_file) {
           selected_ids[i] = v_name.concat("___", s_info.selected[i]);
 	}
       }
+      // from
+      // https://github.com/brianreavis/selectize.js/blob/master/docs/api.md:
+      // setValue(value, silent) If "silent" is truthy, no change
+      // event will be fired on the original input.
       selectized_array[v_name].setValue(selected_ids, true);
     }
     update_legend_opacity(v_name);
