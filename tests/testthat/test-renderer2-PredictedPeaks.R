@@ -1,4 +1,4 @@
-context("PredictedPeaks data set")
+acontext("PredictedPeaks data set")
 
 require(httr)
 PredictedPeaks.RData <- file.path(tempdir(), "PredictedPeaks.RData")
