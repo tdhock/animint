@@ -1,6 +1,11 @@
 context("PredictedPeaks data set")
 
-data(PredictedPeaks)
+require(httr)
+PredictedPeaks.RData <- file.path(tempdir(), "PredictedPeaks.RData")
+request <- GET("http://github.com/tdhock/animint-examples/blob/master/data/PredictedPeaks.RData?raw=true")
+stop_for_status(request)
+writeBin(content(request), PredictedPeaks.RData)
+load(PredictedPeaks.RData)
 
 hover.dots <- subset(PredictedPeaks$chromCounts, nonInputType==type)
 
