@@ -1679,9 +1679,8 @@ var animint = function (to_select, json_file) {
 	s_info.selected.splice(i_value, 1);
       }
     }
-    // if there are levels, then this is not a .variable .value
-    // selector, and there is a selectize widget which should be
-    // updated.
+    // if there are levels, then there is a selectize widget which
+    // should be updated.
     if(isArray(s_info.levels)){
       // the jquery ids
       if(s_info.type == "single") {
@@ -1692,11 +1691,7 @@ var animint = function (to_select, json_file) {
           selected_ids[i] = v_name.concat("___", s_info.selected[i]);
 	}
       }
-      // update selected widgets, if necessary
-      if(s_info.type == "multiple" | 
-	 selectized_array[v_name].getValue() != selected_ids) {
-	selectized_array[v_name].setValue(selected_ids);
-      }
+      selectized_array[v_name].setValue(selected_ids, true);
     }
     update_legend_opacity(v_name);
     s_info.update.forEach(function(g_name){
