@@ -12,6 +12,8 @@ dont.need.browser <- grepl("compiler", filter)
 use.browser <- !dont.need.browser
 if(filter == ""){
   filter <- NULL
+}
+if(interactive()){
   setwd("testthat")
   source("helper-functions.R")
 }
