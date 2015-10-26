@@ -77,6 +77,29 @@ viz <- list(
 
 info <- animint2HTML(viz)
 
+## Simulate mouseover using javascript?
+
+## myScript <- 'myObj = document.getElementById("chrM");
+## myArray = [];
+## for(var b in myObj) { 
+##   myArray.push(b);
+## }
+## return myArray;'
+## remDr$executeScript(myScript)
+## remDr$executeScript('return document.getElementById("chrM").onmouseover();')
+
+## Simulate mouseover using RSelenium?
+
+## e <- remDr$findElement("id", "chrM")
+## remDr$mouseMoveToLocation(webElement=e)
+
+## e <- remDr$findElement("id", "chrY")
+## remDr$mouseMoveToLocation(webElement=e)
+
+## getStyleValue(getHTML(), '//g[@class="geom4_point_chroms"]//circle', "opacity")
+
+## getNodeSet(getHTML(), '//g[@class="geom4_point_chroms"]//circle')
+
 test_that("without selectize option, only render chrom widget", {
   widget.vec <- getSelectorWidgets(info$html)
   expect_identical(widget.vec, "chrom")
