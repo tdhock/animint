@@ -95,9 +95,12 @@ test_that("initially 2 text elements rendered", {
 
 clickID("chrM")
 
+exp.vec <- c(1, 14, 38)
+
 test_that("3 elements rendered (first time)", {
   num.vec <- getSorted()
-  expect_equal(num.vec, c(1, 14, 38))
+  print(list(num.vec, exp.vec))
+  expect_equal(num.vec, exp.vec)
 })
 
 clickID("chrY")
@@ -106,7 +109,8 @@ clickID("chrM")
 
 test_that("3 elements rendered (second time)", {
   num.vec <- getSorted()
-  expect_equal(num.vec, c(1, 14, 38))
+  print(list(num.vec, exp.vec))
+  expect_equal(num.vec, exp.vec)
 })
 
 viz <- list(
