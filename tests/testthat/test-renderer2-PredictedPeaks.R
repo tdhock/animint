@@ -145,6 +145,10 @@ test_that("3 elements rendered (second time)", {
   expect_equal(num.vec, exp.vec)
 })
 
+thresh.dt <- data.table(max.input.samples=9, thresh.type="specific")
+PredictedPeaks$counts.not.Input$thresh.type <- "max samples"
+PredictedPeaks$counts.Input$thresh.type <- "max samples"
+
 viz <- list(
   oneChrom=ggplot()+
     ggtitle("PeakSegJoint detections on selected chromosome")+
@@ -186,8 +190,16 @@ viz <- list(
                   label=totals),
              data=PredictedPeaks$scatter.text),
   scatter=ggplot()+
-    geom_hline(aes(yintercept=N),
-               color="grey",
+    geom_vline(aes(xintercept=N, color=thresh.type),
+               data=PredictedPeaks$counts.not.Input)+
+    scale_color_manual("threshold", values=c(
+                                      "max samples"="grey",
+                                      specific="grey30"))+
+    geom_hline(aes(yintercept=max.input.samples+0.5, color=thresh.type),
+               show_guide=TRUE,
+               data=thresh.dt)+
+    geom_hline(aes(yintercept=N, color=thresh.type),
+               show_guide=TRUE,
                data=PredictedPeaks$counts.Input)+
     scale_x_continuous("number of samples with a peak")+
     facet_grid(nonInputType ~ .)+
@@ -195,9 +207,6 @@ viz <- list(
     scale_fill_gradient(low="grey", high="red")+
     theme_animint(width=1500)+
     theme(panel.margin=grid::unit(0, "cm"))+
-    geom_vline(aes(xintercept=N),
-               color="grey",
-               data=PredictedPeaks$counts.not.Input)+
     geom_rect(aes(xmin=up-size, xmax=up+size,
                   ymin=Input-size, ymax=Input+size,
                   tooltip=totals,
@@ -219,6 +228,21 @@ info <- animint2HTML(viz)
 test_that("selectize option respected", {
   widget.vec <- getSelectorWidgets(info$html)
   expect_identical(widget.vec, "dotID")
+})
+
+test_that("rects rendered in fill legend", {
+  rect.list <- getNodeSet(info$html, '//tr[@class="show_fill"]//rect')
+  expect_equal(length(rect.list), 5)
+})
+
+test_that("no lines rendered in fill legend", {
+  line.list <- getNodeSet(info$html, '//tr[@class="show_fill"]//line')
+  expect_equal(length(line.list), 0)
+})
+
+test_that("lines in color legend", {
+  line.list <- getNodeSet(info$html, '//tr[@class="thresh_type"]//line')
+  expect_equal(length(line.list), 2)
 })
 
 ## e <- remDr$findElement("class name", "show_hide_selector_widgets")
