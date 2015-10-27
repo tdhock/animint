@@ -1645,6 +1645,12 @@ getLegendList <- function(plistextra){
     if(length(vars) > 0) {
       gdefs[[leg]]$vars <- unique( setNames(vars, NULL))
     }
+    ## do not draw geoms which are constant:
+    geom.list <- gdefs[[leg]]$geoms
+    not.redundant <- sapply(geom.list, function(L){
+      nrow(unique(L$data)) == nrow(L$data)
+    })
+    gdefs[[leg]]$geoms <- geom.list[not.redundant]
   }
   
   ## Add a flag to specify whether or not breaks was manually
