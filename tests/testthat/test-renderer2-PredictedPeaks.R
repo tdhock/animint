@@ -145,7 +145,7 @@ test_that("3 elements rendered (second time)", {
   expect_equal(num.vec, exp.vec)
 })
 
-thresh.dt <- data.table(max.input.samples=9, thresh.type="specific")
+thresh.df <- data.frame(max.input.samples=9, thresh.type="specific")
 PredictedPeaks$counts.not.Input$thresh.type <- "max samples"
 PredictedPeaks$counts.Input$thresh.type <- "max samples"
 
@@ -197,7 +197,7 @@ viz <- list(
                                       specific="grey30"))+
     geom_hline(aes(yintercept=max.input.samples+0.5, color=thresh.type),
                show_guide=TRUE,
-               data=thresh.dt)+
+               data=thresh.df)+
     geom_hline(aes(yintercept=N, color=thresh.type),
                show_guide=TRUE,
                data=PredictedPeaks$counts.Input)+
