@@ -227,7 +227,8 @@ info <- animint2HTML(viz)
 
 test_that("selectize option respected", {
   widget.vec <- getSelectorWidgets(info$html)
-  expect_identical(widget.vec, "dotID")
+  expected.widgets <- c("dotID", "thresh.type")
+  expect_identical(sort(widget.vec), sort(expected.widgets))
 })
 
 test_that("rects rendered in fill legend", {
