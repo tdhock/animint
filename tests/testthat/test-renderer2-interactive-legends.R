@@ -106,6 +106,20 @@ test_that("Two plots with both color and fill", {
   style.mat <- getStyleValue(
     info$html, '//table[@class="legend"]//circle', c("fill", "stroke"))
   expect_identical(style.mat["fill", ], style.mat["stroke", ])
+  ## Make sure lines are rendered in the first but not second legend:
+  left.lines <- getNodeSet(info$html, '//tr[@class="vs"]//line')
+  expect_equal(length(left.lines), 5)
+  right.lines <- getNodeSet(info$html, '//tr[@class="vs_fac"]//line')
+  expect_equal(length(right.lines), 0)
+  right.circles <- getNodeSet(info$html, '//tr[@class="vs_fac"]//circle')
+  expect_equal(length(right.circles), 2)
+  ## Lines should be rendered in both plots:
+  left.lines <-
+    getNodeSet(info$html, '//g[@class="geom2_segment_numeric"]//line')
+  expect_equal(length(left.lines), 1)
+  right.lines <-
+    getNodeSet(info$html, '//g[@class="geom4_segment_factor"]//line')
+  expect_equal(length(right.lines), 1)
 })
 
 vs0 <- subset(mtcars, vs == 0)
