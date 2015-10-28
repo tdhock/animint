@@ -1738,36 +1738,38 @@ var animint = function (to_select, json_file) {
     for(var i=0; i<legendkeys.length; i++){
       var legend_key = legendkeys[i];
       var l_info = p_info.legend[legend_key];
-      var legend_selector_name = safe_name(l_info.vars);
       // the table that contains one row for each legend element.
       var legend_table = tdRight.append("table")
 	.attr("class", "legend")
-	//.attr("id", legend_selector_name)
       ;
-      var legend_class = safe_name(l_info.vars);
-      // the legend table with breaks/value/label.
+      var legend_class = safe_name(l_info.title);
+      // the legend table with breaks/value/label .
       var legendgeoms = l_info.geoms;
-      //TODO: variable and value should be set in the compiler!
+      // TODO: variable and value should be set in the compiler! What
+      // if label is different from the data value?
       for(var entry_i=0; entry_i < l_info.entries.length; entry_i++){
 	var entry = l_info.entries[entry_i];
-	entry.variable = l_info.vars;
-	entry.value = entry.label[0];
+	entry.variable = l_info.selector;
+	entry.value = entry.label;
       }
       var legend_rows = legend_table.selectAll("tr")
         .data(l_info.entries)
-        .sort(function(d) {return d["order"];})
         .enter()
         .append("tr")
         .attr("id", function(d) { return d["label"]; })
 	.attr("class", legend_class)
-	.on("click", function(d) { 
-          update_selector(d.variable, d.value);
-	})
-	.attr("title", function(d) {
-          return "Toggle " + d.value;
-	})
-	.attr("style", "cursor:pointer")
       ;
+      if(l_info.selector != null){
+	legend_rows
+	  .on("click", function(d) { 
+            update_selector(d.variable, d.value);
+	  })
+	  .attr("title", function(d) {
+            return "Toggle " + d.value;
+	  })
+	  .attr("style", "cursor:pointer")
+	;
+      }
       var first_tr = legend_table.insert("tr", "tr");
       var first_th = first_tr.append("th")
 	.attr("align", "left")

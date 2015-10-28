@@ -178,6 +178,11 @@ RENDER: Determine why border of tiles in pirates example does not seem to be ren
 
 2015.10.26
 
+DSL: geom_1(aes(color=something))+geom_2(aes(color=something.else)) is
+now an error. aes(color="constant") and aes(color=factor(x)) are also
+errors. The idea is to force the designer to use informative and
+consistent selector variable names for interactive legends.
+
 DATA: PredictedPeaks and test-renderer2-PredictedPeaks.R
 
 BUGFIX: do not call update_selector twice from selectize widgets,

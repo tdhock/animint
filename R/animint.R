@@ -8,22 +8,13 @@ parsePlot <- function(meta){
   for(layer.i in seq_along(meta$plot$layers)) {
     
     ## if data is not specified, get it from plot
-    if(length(meta$plot$layers[[layer.i]]$data) == 0) meta$plot$layers[[layer.i]]$data <- meta$plot$data
+    if(length(meta$plot$layers[[layer.i]]$data) == 0){
+      meta$plot$layers[[layer.i]]$data <- meta$plot$data
+    }
     
     ## if mapping is not specified, get it from plot
-    if(is.null(meta$plot$layers[[layer.i]]$mapping)) meta$plot$layers[[layer.i]]$mapping <- meta$plot$mapping
-    
-    ## loop through each mapping except for x and y
-    mappings <- meta$plot$layers[[layer.i]]$mapping
-    mappings <- mappings[!(names(mappings) %in% c("x", "y"))]
-    for(i in seq_along(mappings)) {
-      mapping <- mappings[i]
-      ## if there are any expressions in mapping, evaluate them and add to data
-      if(is.call(mapping[[1]])) {
-        meta$plot$layers[[layer.i]]$data[[
-          paste("show", names(mapping), sep = "_")
-          ]] <- eval(mapping[[1]], meta$plot$layers[[layer.i]]$data)
-      }
+    if(is.null(meta$plot$layers[[layer.i]]$mapping)){
+      meta$plot$layers[[layer.i]]$mapping <- meta$plot$mapping
     }
     
   }
@@ -74,66 +65,53 @@ parsePlot <- function(meta){
     ## If any legends are specified, add showSelected aesthetic
     for(legend.i in seq_along(plot.meta$legend)) {
       one.legend <- plot.meta$legend[[legend.i]]
-      # the name of the variable used in this legend
-      # var_name can have length greater than one if an expression is used
-      var_name <- intersect(one.legend$vars, names(L$data))
-      if(length(var_name) > 0) {
-        ### need to make sure the variable is used in the mapping
-        ### i.e. that it is used in this plot
-        if(any(var_name %in% L$mapping)) {
-          # if it is in mapping, then it should be in a legend aesthetic
-          var_name <- intersect(var_name, 
-                                as.character(L$mapping[ !(names(L$mapping) %in% c("x", "y", "group", "ymin", "ymax")) ]))
-        } else if(substr(var_name, 1, 4) == "show" & 
-                    is.call(L$mapping[[ substr(var_name, 6, nchar(var_name))]])
-        ) {
-          # if the variable is called "show_..." and it is evaluated, that's okay
-          
-        } 
-                                        # grabbing the variable from the data
-        var <- L$data[, var_name]
-
-        ## checking if it is a discrete variable.
-        if(plyr::is.discrete(var)) {
-          is.interactive.aes <-
-            grepl("showSelected|clickSelects", names(L$mapping))
-          is.legend.var <- L$mapping == var_name
-          ## If var_name is used with another interactive aes, then do
-          ## not add any showSelected aesthetic for it.
-          var.is.interactive <- any(is.interactive.aes & is.legend.var)
-          if(!var.is.interactive){
-            for(legend_type in one.legend$legend_type) {
-              ## only adding showSelected aesthetic if the variable is
-              ## used by the geom
-              if(!is.null(L$mapping[[legend_type]])) {
-                temp_name <- paste0("showSelectedlegend", legend_type)
-                L$mapping[[temp_name]] <- as.symbol(var_name)
-              }
-            }
+      ## the name of the selection variable used in this legend.
+      s.name <- one.legend$selector
+      is.variable.name <- is.character(s.name) && length(s.name) == 1
+      layer.has.variable <- s.name %in% names(L$data)
+      if(is.variable.name && layer.has.variable) {
+        ## grabbing the variable from the data
+        var <- L$data[, s.name]
+        is.interactive.aes <-
+          grepl("showSelected|clickSelects", names(L$mapping))
+        is.legend.var <- L$mapping == s.name
+        ## If s.name is used with another interactive aes, then do
+        ## not add any showSelected aesthetic for it.
+        var.is.interactive <- any(is.interactive.aes & is.legend.var)
+        if(!var.is.interactive){
+          ## only add showSelected aesthetic if the variable is
+          ## used by the geom
+          type.vec <- one.legend$legend_type
+          if(any(type.vec %in% names(L$mapping))){
+            type.str <- paste(type.vec, collapse="")
+            a.name <- paste0("showSelectedlegend", type.str)
+            L$mapping[[a.name]] <- as.symbol(s.name)
           }
-          ## if selector.types has not been specified, create it
-          if(is.null(meta$selector.types)) {
-            meta$selector.types <- list()
-          }
-          ## if selector.types is not specified for this variable, set
-          ## it to multiple.
-          if(is.null(meta$selector.types[[var_name]])) {
-            meta$selector.types[[var_name]] <- "multiple"
-          }
-          ## if first is not specified, create it
-          if(is.null(meta$first)) {
-            meta$first <- list()
-          }
-          ## if first is not specified, add all to first
-          if(is.null(meta$first[[var_name]])) {
-            u.vals <- unique(var)
-          }
-          ## Tell this selector that it has a legend somewhere in the
-          ## viz.
-          meta$selectors[[var_name]]$legend <- TRUE
-        }#is.correct
-      }#length(var_name)
-    }
+        }
+        ## if selector.types has not been specified, create it
+        if(is.null(meta$selector.types)) {
+          meta$selector.types <- list()
+        }
+        ## if selector.types is not specified for this variable, set
+        ## it to multiple.
+        if(is.null(meta$selector.types[[s.name]])) {
+          meta$selector.types[[s.name]] <- "multiple"
+        }
+        ## if first is not specified, create it
+        if(is.null(meta$first)) {
+          meta$first <- list()
+        }
+        ## if first is not specified, add all to first
+        if(is.null(meta$first[[s.name]])) {
+          u.vals <- unique(var)
+        }
+        ## Tell this selector that it has a legend somewhere in the
+        ## viz. (if the selector has no interactive legend and no
+        ## clickSelects, then we show the widgets by default).
+        meta$selectors[[s.name]]$legend <- TRUE
+      }#length(s.name)
+    }#legend.i
+    
     ## need to call ggplot_build again because we've added to the plot
     # I'm sure that there is a way around this, but not immediately sure how. 
     # There's sort of a Catch-22 here because to create the interactivity, 
@@ -1623,27 +1601,28 @@ getLegendList <- function(plistextra){
     legend_type <- names(gdefs[[leg]]$key)
     legend_type <- legend_type[legend_type != ".label"]
     gdefs[[leg]]$legend_type <- legend_type
-    # grabbing the name of the variable
-    vars <- character()
-    for(layer_i in plot$layers) {
-      temp <- sapply(legend_type, function(type) { 
-        if( !is.null(layer_i$mapping[[type]]) ) {
-          ## if the legend is evaluated, ex. colour = factor(var), use show_colour
-          if( is.call(layer_i$mapping[[type]]) ) {
-            paste("show", type, sep = "_")
-          } 
-          ## otherwise, just use the variable name
-          else {
-            as.character( layer_i$mapping[[type]] )
-          }
-        }
-      })
-      if(!is.null(unlist(temp))) {
-        vars <- c(vars, temp)
-      }
+    scale.list <- scales$scales[which(scales$find(legend_type))]
+    discrete.vec <- sapply(scale.list, inherits, "discrete")
+    is.discrete <- all(discrete.vec)
+    gdefs[[leg]]$is.discrete <- is.discrete
+    ## get the name of the legend/selection variable.
+    var.list <- list()
+    for(layer.i in seq_along(plot$layers)) {
+      L <- plot$layers[[layer.i]]
+      var.list[[layer.i]] <- L$mapping[legend_type]
     }
-    if(length(vars) > 0) {
-      gdefs[[leg]]$vars <- unique( setNames(vars, NULL))
+    unique.var.list <- unique(unlist(var.list))
+    if(is.discrete){
+      var.name <- unique.var.list[[1]]
+      if(length(unique.var.list) == 1 && is.symbol(var.name)){
+        gdefs[[leg]]$selector <- paste(var.name)
+      }else{
+        str(unique.var.list)
+        stop("need exactly 1 variable name ",
+             "(not constant, not language/expression) ",
+             "to create interactive discrete legend for aes ",
+             paste(legend_type, collapse=", "))
+      }
     }
     ## do not draw geoms which are constant:
     geom.list <- gdefs[[leg]]$geoms
@@ -1672,28 +1651,19 @@ getLegendList <- function(plistextra){
   ## Add a flag to specify whether or not there is both a color and a
   ## fill legend to display. If so, we need to draw the interior of
   ## the points in the color legend as the same color.
-  if(0 < length(legend.list)){
-    aes.geom.list <- list()
-    for(legend.name in names(legend.list)){
-      L <- legend.list[[legend.name]]
-      aes.geom.list[[legend.name]] <-
-        data.frame(legend.name,
-                   geom=L$geom,
-                   aes=L$legend_type)
-    }
-    aes.geom <- do.call(rbind, aes.geom.list)
-    rownames(aes.geom) <- NULL
-    legends.by.geom <- split(aes.geom, aes.geom$geom)
-    for(g.name in names(legends.by.geom)){
-      one.geom <- unique(legends.by.geom[[g.name]])
-      has.both <- all(c("colour", "fill") %in% one.geom$aes)
-      if(has.both){
-        colour.row <- which(one.geom$aes=="colour")
-        legend.name <- paste(one.geom$legend.name[[colour.row]])
-        fill.name <- paste0(g.name, "fill")
-        for(entry.i in seq_along(legend.list[[legend.name]]$entries)){
-          legend.list[[legend.name]]$entries[[entry.i]][[fill.name]] <-
-            "#FFFFFF"
+  if(1 < length(legend.list)){
+    is.color <- sapply(legend.list, function(L)"colour" %in% L$legend_type)
+    is.fill <- sapply(legend.list, function(L)"fill" %in% L$legend_type)
+    has.both <- 2 == sum(is.color | is.fill)
+    if(has.both){
+      for(legend.i in which(is.color)){
+        entry.list <- legend.list[[legend.i]]$entries
+        for(entry.i in seq_along(entry.list)){
+          entry <- entry.list[[entry.i]]
+          color.names <- grep("colour", names(entry), value=TRUE)
+          fill.names <- sub("colour", "fill", color.names)
+          entry[fill.names] <- "#FFFFFF"
+          legend.list[[legend.i]]$entries[[entry.i]] <- entry
         }
       }
     }
@@ -1706,6 +1676,7 @@ getLegendList <- function(plistextra){
 #' @return list of legend information, NULL if guide=FALSE.
 getLegend <- function(mb){
   guidetype <- mb$name
+
   ## The main idea of legends:
   
   ## 1. Here in getLegend I export the legend entries as a list of
@@ -1730,6 +1701,7 @@ getLegend <- function(mb){
     if("fill" %in% names(data)) data[["fill"]] <- toRGB(data[["fill"]]) # fill hex values
     names(data) <- paste0(geom, names(data))# aesthetics by geom
     names(data) <- gsub(paste0(geom, "."), "", names(data), fixed=TRUE) # label isn't geom-specific
+    data$label <- paste(data$label) # otherwise it is AsIs.
     data
   }
   dataframes <- lapply(mb$geoms, function(i) cleanData(i$data, mb$key, i$geom$objname, i$params))
@@ -1741,7 +1713,10 @@ getLegend <- function(mb){
   label.num <- suppressWarnings({
     as.numeric(data$label)
   })
-  entry.order <- if(is.atomic(mb$breaks) || anyNA(label.num)){
+  ## mb$breaks could be a vector of values to use, NULL, or an empty
+  ## list with class "waiver"
+  breaks.specified <- length(mb$breaks)
+  entry.order <- if(breaks.specified || anyNA(label.num)){
     1:nrow(data)
   }else{
     nrow(data):1
@@ -1753,7 +1728,8 @@ getLegend <- function(mb){
     list(guide = guidetype,
          geoms = geoms,
          title = mb$title,
-         vars = mb$vars, 
+         selector = mb$selector,
+         is.discrete= mb$is.discrete,
          legend_type = mb$legend_type, 
          entries = data)
   }
