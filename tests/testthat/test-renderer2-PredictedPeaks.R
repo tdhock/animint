@@ -232,18 +232,51 @@ test_that("selectize option respected", {
 })
 
 test_that("rects rendered in fill legend", {
-  rect.list <- getNodeSet(info$html, '//tr[@class="show_fill"]//rect')
+  rect.list <- getNodeSet(info$html, '//tr[@class="log10(count)"]//rect')
   expect_equal(length(rect.list), 5)
 })
 
 test_that("no lines rendered in fill legend", {
-  line.list <- getNodeSet(info$html, '//tr[@class="show_fill"]//line')
+  line.list <- getNodeSet(info$html, '//tr[@class="log10(count)"]//line')
   expect_equal(length(line.list), 0)
 })
 
 test_that("lines in color legend", {
-  line.list <- getNodeSet(info$html, '//tr[@class="thresh_type"]//line')
+  line.list <- getNodeSet(info$html, '//tr[@class="threshold"]//line')
   expect_equal(length(line.list), 2)
+})
+
+specific_hlines <- function(html=getHTML()){
+  getNodeSet(html, '//g[@class="geom7_hline_scatter"]//line')
+}
+
+specific_opacity <- function(html=getHTML()){
+  getStyleValue(html, '//td[@id="specific"]', "opacity")
+}
+
+test_that("initially rendered hlines", {
+  line.list <- specific_hlines(info$html)
+  expect_equal(length(line.list), 2)
+  na.or.opacity <- specific_opacity(info$html)
+  expect_true(is.na(na.or.opacity))
+})
+
+test_that("hlines after clicking specific", {
+  html <- clickHTML(id="specific")
+  line.list <- specific_hlines(html)
+  expect_equal(length(line.list), 0)
+  na.or.opacity <- specific_opacity(html)
+  expect_equal(na.or.opacity, 0.5)
+})
+
+clickID("specific")
+
+test_that("hlines after clicking specific again", {
+  html <- clickHTML(id="specific")
+  line.list <- specific_hlines(html)
+  expect_equal(length(line.list), 2)
+  na.or.opacity <- specific_opacity(html)
+  expect_true(is.na(na.or.opacity))
 })
 
 ## e <- remDr$findElement("class name", "show_hide_selector_widgets")
