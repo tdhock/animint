@@ -1724,12 +1724,13 @@ getLegend <- function(mb){
   data <- lapply(entry.order, function(i) as.list(data[i,]))
   if(guidetype=="none"){
     NULL
-  } else{
+  }else{
     list(guide = guidetype,
          geoms = geoms,
          title = mb$title,
+         class = if(mb$is.discrete)mb$selector else mb$title,
          selector = mb$selector,
-         is.discrete= mb$is.discrete,
+         is_discrete= mb$is.discrete,
          legend_type = mb$legend_type, 
          entries = data)
   }

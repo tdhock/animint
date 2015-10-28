@@ -1742,7 +1742,7 @@ var animint = function (to_select, json_file) {
       var legend_table = tdRight.append("table")
 	.attr("class", "legend")
       ;
-      var legend_class = safe_name(l_info.title);
+      var legend_class = safe_name(l_info["class"]);
       // the legend table with breaks/value/label .
       var legendgeoms = l_info.geoms;
       // TODO: variable and value should be set in the compiler! What
