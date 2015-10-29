@@ -1,6 +1,6 @@
 acontext("Interactive Legends")
 
-## function to extract all circles from an HTML page
+## extract all <circle> elements under a particular <svg> element.
 get_circles <- function(id) {
   getNodeSet(getHTML(), paste0("//svg[@id='", id, "']//circle"))
 }
@@ -120,6 +120,23 @@ test_that("Two plots with both color and fill", {
   right.lines <-
     getNodeSet(info$html, '//g[@class="geom4_segment_factor"]//line')
   expect_equal(length(right.lines), 1)
+})
+
+viz <- list(
+  vs=ggplot()+
+    geom_point(aes(mpg, hp, fill=factor(vs)),
+               color="black",
+               data=mtcars),
+  am=ggplot()+
+    geom_point(aes(mpg, hp, fill=factor(am)),
+               color="black",
+               data=mtcars)
+  )
+
+test_that("two plots with different aes(fill=factor(var))", {
+  expect_error({
+    info <- animint2HTML(viz)
+  }, "need exactly 1 variable name")
 })
 
 vs0 <- subset(mtcars, vs == 0)
