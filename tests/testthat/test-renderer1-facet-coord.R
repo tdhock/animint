@@ -10,8 +10,8 @@ test_that("coord_fixed() + facet_wrap(nrow=1) with shrunk y-axis", {
     list(wrapPlot=p +
          facet_wrap(~am) + coord_fixed(ratio2))
   info <- animint2HTML(wrapViz)
-  x.axes <- getNodeSet(info$html, "//g[@id='xaxis']")
-  y.axes <- getNodeSet(info$html, "//g[@id='yaxis']")
+  x.axes <- getNodeSet(info$html, "//g[contains(@class, 'xaxis')]")
+  y.axes <- getNodeSet(info$html, "//g[contains(@class, 'yaxis')]")
   xdiff1 <- getTickDiff(x.axes[[1]])
   ydiff <- getTickDiff(y.axes[[1]], axis = "y")
   diffs <- normDiffs(xdiff1, ydiff, ratio2)
@@ -27,8 +27,8 @@ test_that("coord_fixed() + facet_wrap(nrow=1) with shrunk x-axis", {
     list(wrapPlot=p +
            facet_wrap(~am) + coord_fixed(ratio10))
   info <- animint2HTML(wrapViz)
-  x.axes <- getNodeSet(info$html, "//g[@id='xaxis']")
-  y.axes <- getNodeSet(info$html, "//g[@id='yaxis']")
+  x.axes <- getNodeSet(info$html, "//g[contains(@class, 'xaxis')]")
+  y.axes <- getNodeSet(info$html, "//g[contains(@class, 'yaxis')]")
   xdiff1 <- getTickDiff(x.axes[[1]])
   ydiff <- getTickDiff(y.axes[[1]], axis = "y")
   diffs <- normDiffs(xdiff1, ydiff, ratio10)

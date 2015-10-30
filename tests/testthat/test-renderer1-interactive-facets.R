@@ -69,7 +69,8 @@ info <- animint2HTML(mmir.facets)
 getTransform <- function(tick)xmlAttrs(tick)[["transform"]]
 
 test_that("y axes align in facet_grid(variable~.)", {
-  g.list <- getNodeSet(info$html, "//svg[@id='penalty']//g[@id='yaxis']")
+  g.list <- getNodeSet(
+    info$html, "//svg[@id='penalty']//g[contains(@class, 'yaxis')]")
   expect_equal(length(g.list), 3)
   transform.txt <- sapply(g.list, getTransform)
   x.txt <- sub("translate[(](.*?),.*", "\\1", transform.txt)
