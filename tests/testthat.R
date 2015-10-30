@@ -8,9 +8,16 @@ library("RSelenium") # RSelenium works with firefox <= 37.0.2
 ## Mozilla Firefox 11.0
 
 filter <- Sys.getenv("TEST_SUITE")
-if(filter == "")filter <- NULL
 dont.need.browser <- grepl("compiler", filter)
 use.browser <- !dont.need.browser
+if(filter == ""){
+  filter <- NULL
+}
+if(interactive()){
+  setwd("testthat")
+  source("helper-functions.R")
+  tests_init("firefox")
+}
 
 if(use.browser)tests_init()
 tests_run(filter=filter)

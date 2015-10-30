@@ -15,6 +15,13 @@ acontext <- function(...){
   context(...)
 }
 
+getSelectorWidgets <- function(html=getHTML()){
+  tr.list <- getNodeSet(html, 
+                        '//table[@class="table_selector_widgets"]//tr')
+  td.list <- sapply(tr.list[-1], function(tr)xmlChildren(tr)[[1]])
+  sapply(td.list, xmlValue)
+}
+
 clickHTML <- function(...){
   v <- c(...)
   stopifnot(length(v) == 1)
@@ -155,7 +162,12 @@ getTextValue <- function(tick)xmlValue(getNodeSet(tick, "text")[[1]])
 
 getStyleValue <- function(html, xpath, style.name) {
   node.list <- getNodeSet(html, xpath)
-  style.vec <- sapply(node.list, function(node)xmlAttrs(node)[["style"]])
+  attr.mat <- sapply(node.list, xmlAttrs)
+  style.vec <- if("style" %in% rownames(attr.mat)){
+    attr.mat["style", ]
+  }else{
+    rep("", length(node.list))
+  }
   pattern <-paste0(
     "(?<name>\\S+?)",
     ": *",
