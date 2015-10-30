@@ -471,29 +471,33 @@ var animint = function (to_select, json_file) {
       current_col = p_info.layout.COL[layout_i];
       var draw_x = p_info.layout.AXIS_X[layout_i];
       var draw_y = p_info.layout.AXIS_Y[layout_i];
-      // panels are drawn using a "typewriter approach" (left to right & top to bottom)
-      // if the carriage is returned (ie, there is a new row), change some parameters:
+      // panels are drawn using a "typewriter approach" (left to right
+      // & top to bottom) if the carriage is returned (ie, there is a
+      // new row), change some parameters:
       var new_row = current_col <= p_info.layout.COL[layout_i - 1]
       if (new_row) {
 	n_yaxes = 0;
 	graph_width_cum = (graph_width_blank / 2) * graph_width;
-	graph_height_cum = graph_height_cum + plotdim.graph.height;
+	graph_height_cum += graph_height * hp[layout_i-1];
       }
-      n_xaxes = n_xaxes + draw_x;
-      n_yaxes = n_yaxes + draw_y;
+      n_xaxes += draw_x;
+      n_yaxes += draw_y;
 
-      // calculate panel specific locations to be used in placing axes, labels, etc.
+      // calculate panel specific locations to be used in placing
+      // axes, labels, etc.
       plotdim.xstart =  current_col * plotdim.margin.left +
         (current_col - 1) * plotdim.margin.right +
         graph_width_cum + n_yaxes * axispaddingy + ytitlepadding;
-      // room for right strips should be distributed evenly across panels to preserve aspect ratio
+      // room for right strips should be distributed evenly across
+      // panels to preserve aspect ratio
       plotdim.xend = plotdim.xstart + plotdim.graph.width;
       // total height of strips drawn thus far
       var strip_h = cum_height_per_row[current_row-1];
       plotdim.ystart = current_row * plotdim.margin.top +
         (current_row - 1) * plotdim.margin.bottom +
         graph_height_cum + titlepadding + strip_h;
-      // room for xaxis title should be distributed evenly across panels to preserve aspect ratio
+      // room for xaxis title should be distributed evenly across
+      // panels to preserve aspect ratio
       plotdim.yend = plotdim.ystart + plotdim.graph.height;
       // always add to the width (note it may have been reset earlier)
       graph_width_cum = graph_width_cum + plotdim.graph.width;
@@ -505,8 +509,12 @@ var animint = function (to_select, json_file) {
           .attr("class", "ytitle")
           .style("text-anchor", "middle")
           .style("font-size", "11px")
-          .attr("transform", "translate(" + (plotdim.xstart - axispaddingy - ytitlepadding / 2)
-		+ "," + (p_info.options.height / 2) + ")rotate(270)");
+          .attr("transform", "translate(" + 
+		(plotdim.xstart - axispaddingy - ytitlepadding / 2)+
+		"," +
+		(p_info.options.height / 2) + 
+		")rotate(270)")
+	;
       }
       // draw the x-axis title when drawing the last panel
       if (layout_i === (npanels - 1)) {
@@ -515,8 +523,12 @@ var animint = function (to_select, json_file) {
           .attr("class", "xtitle")
           .style("text-anchor", "middle")
           .style("font-size", "11px")
-          .attr("transform", "translate(" + plotdim.title.x
-		+ "," + (plotdim.yend + axispaddingx) + ")");
+          .attr("transform", "translate(" + 
+		plotdim.title.x	+ 
+		"," + 
+		(plotdim.yend + axispaddingx) + 
+		")")
+	;
       }
 
       var draw_strip = function(strip, side) {
