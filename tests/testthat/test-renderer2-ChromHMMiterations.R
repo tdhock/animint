@@ -39,7 +39,9 @@ viz <- list(
   first=list(iteration=100),
   title="ChromHMM parameter fitting for one iPS sample")
 
-info <- animint2HTML(viz)
+expect_no_warning({
+  info <- animint2HTML(viz)
+})
 
 test_that("no vertical space between border_rects", {
   rect.list <-
