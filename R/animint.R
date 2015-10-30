@@ -670,7 +670,9 @@ saveLayer <- function(l, d, meta){
     }
   }
 
-  if(any(g.data$size == 0, na.rm=TRUE)){
+  has.no.fill <- g$geom %in% c("path", "line")
+  zero.size <- any(g.data$size == 0, na.rm=TRUE)
+  if(zero.size && has.no.fill){
     warning(sprintf("geom_%s with size=0 will be invisible",g$geom))
   }
 
