@@ -578,8 +578,8 @@ var animint = function (to_select, json_file) {
             return xaxislabs[xaxisvals.indexOf(d)].toString();
           })
           .orient("bottom");
-	      var xaxis_g = svg.append("g")
-          .attr("class", "xaxis")
+	var xaxis_g = svg.append("g")
+          .attr("class", "xaxis axis")
           .attr("transform", "translate(0," + plotdim.yend + ")")
           .call(xaxis);
 	      xaxis_g.selectAll("text")
@@ -595,7 +595,7 @@ var animint = function (to_select, json_file) {
           })
           .orient("left");
 	svg.append("g")
-          .attr("class", "xaxis")
+          .attr("class", "yaxis axis")
           .attr("transform", "translate(" + (plotdim.xstart) + ",0)")
           .call(yaxis);
       }
@@ -615,7 +615,7 @@ var animint = function (to_select, json_file) {
       
       // creating g element for background, grid lines, and border
       // uses insert to draw it right before plot title
-      var background = svg.insert("g", "#plottitle")
+      var background = svg.insert("g", ".plottitle")
         .attr("class", "background");
       
       // drawing background
