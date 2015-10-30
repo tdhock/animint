@@ -14,13 +14,6 @@ viz <-
        kS=gg+facet_grid(kingdom ~ Species),
        Sk=gg+facet_grid(Species ~ kingdom))
 
-translatePattern <-
-  paste0("translate[(]",
-         "(?<x>.*?)",
-         ",",
-         "(?<y>.*?)",
-         "[)]")
-
 test_that("facet_grid(1 row and/or 1 column) is fine", {
   info <- animint2HTML(viz)
   expect_axes <- function(plot.name, expected.x, expected.y){

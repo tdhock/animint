@@ -10,6 +10,13 @@ animint2HTML <- function(plotList) {
   res
 }
 
+translatePattern <-
+  paste0("translate[(]",
+         "(?<x>.*?)",
+         ",",
+         "(?<y>.*?)",
+         "[)]")
+
 acontext <- function(...){
   print(...)
   context(...)
@@ -209,19 +216,18 @@ expect_no_warning <- function(object, ..., info=NULL, label=NULL){
 }
 
 getTransform <- function(tick)xmlAttrs(tick)[["transform"]]
-# get difference between axis ticks in both pixels and on original data scale
-# @param doc rendered HTML document
-# @param ticks which ticks? (can use text label of the tick)
-# @param axis which axis?
-getTickDiff <- function(doc, ticks = c(1, 2), axis = "x"){
+
+## get difference between axis ticks in both pixels and on original data scale
+## @param doc rendered HTML document
+## @param ticks which ticks? (can use text label of the tick)
+## @param axis which axis?
+getTickDiff <- function(doc, ticks = 1:2, axis="x"){
   g.ticks <- getNodeSet(doc, "g[@class='tick major']")
   tick.labs <- sapply(g.ticks, getTextValue)
   names(g.ticks) <- tick.labs
-  g.ticks <- g.ticks[ticks]
-  tick.transform <- sapply(g.ticks, getTransform)
-  expr <- if (axis == "x") "translate[(](.*?),.*" else "translate[(][0-9]+?,(.*)[)]"
-  txt <- sub(expr, "\\1", tick.transform)
-  num <- as.numeric(txt)
+  tick.transform <- sapply(g.ticks[ticks], getTransform)
+  trans.mat <- str_match_perl(tick.transform, translatePattern)
+  num <- as.numeric(trans.mat[, axis])
   val <- abs(diff(num))
   attr(val, "label-diff") <- diff(as.numeric(names(tick.transform)))
   val
