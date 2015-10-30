@@ -52,4 +52,14 @@ test_that("no vertical space between border_rects", {
   expect_equal(first.bottom, second.top)
 })
 
+test_that("fill not constant in probability legend and circles", {
+  fill.vec <- getStyleValue(
+    info$html, '//svg[@id="parameters"]//circle', "fill")
+  expect_true(1 < length(table(fill.vec)))
+  fill.vec <- getStyleValue(
+    info$html, '//tr[@class="probability"]//circle', "fill")
+  expect_true(1 < length(table(fill.vec)))
+})
+
+
 
