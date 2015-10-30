@@ -1654,7 +1654,8 @@ getLegendList <- function(plistextra){
   if(1 < length(legend.list)){
     is.color <- sapply(legend.list, function(L)"colour" %in% L$legend_type)
     is.fill <- sapply(legend.list, function(L)"fill" %in% L$legend_type)
-    has.both <- 2 == sum(is.color | is.fill)
+    is.point <- sapply(legend.list, function(L)"point" %in% L$geoms)
+    has.both <- 2 == sum(is.point & (is.color | is.fill))
     if(has.both){
       for(legend.i in which(is.color)){
         entry.list <- legend.list[[legend.i]]$entries
