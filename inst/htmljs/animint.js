@@ -502,33 +502,19 @@ var animint = function (to_select, json_file) {
       // always add to the width (note it may have been reset earlier)
       graph_width_cum = graph_width_cum + plotdim.graph.width;
 
-      // draw the y-axis title (and add padding) when drawing the first panel
+      // get the x position of the y-axis title (and add padding) when
+      // rendering the first plot.
       if (layout_i === 0) {
-	svg.append("text")
-          .text(p_info["ytitle"])
-          .attr("class", "ytitle")
-          .style("text-anchor", "middle")
-          .style("font-size", "11px")
-          .attr("transform", "translate(" + 
-		(plotdim.xstart - axispaddingy - ytitlepadding / 2)+
-		"," +
-		(p_info.options.height / 2) + 
-		")rotate(270)")
-	;
+	var ytitle_x = (plotdim.xstart - axispaddingy - ytitlepadding / 2);
+	var xtitle_left = plotdim.xstart;
+	var ytitle_top = plotdim.ystart;
       }
-      // draw the x-axis title when drawing the last panel
+      // get the y position of the x-axis title when drawing the last
+      // panel.
       if (layout_i === (npanels - 1)) {
-	svg.append("text")
-          .text(p_info["xtitle"])
-          .attr("class", "xtitle")
-          .style("text-anchor", "middle")
-          .style("font-size", "11px")
-          .attr("transform", "translate(" + 
-		plotdim.title.x	+ 
-		"," + 
-		(plotdim.yend + axispaddingx) + 
-		")")
-	;
+	var xtitle_y = (plotdim.yend + axispaddingx);
+	var xtitle_right = plotdim.xend;
+	var ytitle_bottom = plotdim.yend;
       }
 
       var draw_strip = function(strip, side) {
@@ -729,6 +715,29 @@ var animint = function (to_select, json_file) {
       }
 
     } //end of for(layout_i
+    // After drawing all backgrounds, we can draw the axis labels.
+    svg.append("text")
+      .text(p_info["ytitle"])
+      .attr("class", "ytitle")
+      .style("text-anchor", "middle")
+      .style("font-size", "11px")
+      .attr("transform", "translate(" + 
+	    ytitle_x +
+	    "," +
+	    (ytitle_top + ytitle_bottom)/2 + 
+	    ")rotate(270)")
+    ;
+    svg.append("text")
+      .text(p_info["xtitle"])
+      .attr("class", "xtitle")
+      .style("text-anchor", "middle")
+      .style("font-size", "11px")
+      .attr("transform", "translate(" + 
+	    (xtitle_left + xtitle_right)/2 +
+	    "," + 
+	    xtitle_y + 
+	    ")")
+    ;
 
     Plots[p_name].scales = scales;
   }; //end of add_plot()
