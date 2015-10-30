@@ -1679,9 +1679,8 @@ var animint = function (to_select, json_file) {
 	s_info.selected.splice(i_value, 1);
       }
     }
-    // if there are levels, then this is not a .variable .value
-    // selector, and there is a selectize widget which should be
-    // updated.
+    // if there are levels, then there is a selectize widget which
+    // should be updated.
     if(isArray(s_info.levels)){
       // the jquery ids
       if(s_info.type == "single") {
@@ -1692,11 +1691,11 @@ var animint = function (to_select, json_file) {
           selected_ids[i] = v_name.concat("___", s_info.selected[i]);
 	}
       }
-      // update selected widgets, if necessary
-      if(s_info.type == "multiple" | 
-	 selectized_array[v_name].getValue() != selected_ids) {
-	selectized_array[v_name].setValue(selected_ids);
-      }
+      // from
+      // https://github.com/brianreavis/selectize.js/blob/master/docs/api.md:
+      // setValue(value, silent) If "silent" is truthy, no change
+      // event will be fired on the original input.
+      selectized_array[v_name].setValue(selected_ids, true);
     }
     update_legend_opacity(v_name);
     s_info.update.forEach(function(g_name){
@@ -1739,36 +1738,38 @@ var animint = function (to_select, json_file) {
     for(var i=0; i<legendkeys.length; i++){
       var legend_key = legendkeys[i];
       var l_info = p_info.legend[legend_key];
-      var legend_selector_name = safe_name(l_info.vars);
       // the table that contains one row for each legend element.
       var legend_table = tdRight.append("table")
 	.attr("class", "legend")
-	//.attr("id", legend_selector_name)
       ;
-      var legend_class = safe_name(l_info.vars);
-      // the legend table with breaks/value/label.
+      var legend_class = safe_name(l_info["class"]);
+      // the legend table with breaks/value/label .
       var legendgeoms = l_info.geoms;
-      //TODO: variable and value should be set in the compiler!
+      // TODO: variable and value should be set in the compiler! What
+      // if label is different from the data value?
       for(var entry_i=0; entry_i < l_info.entries.length; entry_i++){
 	var entry = l_info.entries[entry_i];
-	entry.variable = l_info.vars;
-	entry.value = entry.label[0];
+	entry.variable = l_info.selector;
+	entry.value = entry.label;
       }
       var legend_rows = legend_table.selectAll("tr")
         .data(l_info.entries)
-        .sort(function(d) {return d["order"];})
         .enter()
         .append("tr")
         .attr("id", function(d) { return d["label"]; })
 	.attr("class", legend_class)
-	.on("click", function(d) { 
-          update_selector(d.variable, d.value);
-	})
-	.attr("title", function(d) {
-          return "Toggle " + d.value;
-	})
-	.attr("style", "cursor:pointer")
       ;
+      if(l_info.selector != null){
+	legend_rows
+	  .on("click", function(d) { 
+            update_selector(d.variable, d.value);
+	  })
+	  .attr("title", function(d) {
+            return "Toggle " + d.value;
+	  })
+	  .attr("style", "cursor:pointer")
+	;
+      }
       var first_tr = legend_table.insert("tr", "tr");
       var first_th = first_tr.append("th")
 	.attr("align", "left")
@@ -2013,6 +2014,9 @@ var animint = function (to_select, json_file) {
       var s_info = Selectors[s_name];
       // for .variable .value selectors, levels is undefined and we do
       // not want to make a selectize widget.
+
+      // TODO: why does it take so long to initialize the selectize
+      // widget when there are many (>1000) values?
       if(isArray(s_info.levels)){
 	// If there were no geoms that specified clickSelects for this
 	// selector, then there is no way to select it other than the

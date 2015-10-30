@@ -145,13 +145,6 @@ viz <-
 
 info <- animint2HTML(viz)
 
-getSelectorWidgets <- function(html){
-  tr.list <- getNodeSet(html, 
-                        '//table[@class="table_selector_widgets"]//tr')
-  td.list <- sapply(tr.list[-1], function(tr)xmlChildren(tr)[[1]])
-  sapply(td.list, xmlValue)
-}
-
 test_that("No widgets for .variable .value selectors", {
   computed.vec <- getSelectorWidgets(info$html)
   expected.vec <- c(
