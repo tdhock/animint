@@ -284,8 +284,7 @@ var animint = function (to_select, json_file) {
     plotdim.title.y = titlepadding / 2;
     svg.append("text")
       .text(p_info.title)
-      .attr("id", "plottitle")
-      .attr("class", "title")
+      .attr("class", "plottitle")
       .attr("font-family", "sans-serif")
       .attr("font-size", "20px")
       .attr("transform", "translate(" + plotdim.title.x + "," + 
@@ -405,11 +404,11 @@ var animint = function (to_select, json_file) {
 
     // create a grouping for strip labels (even if there are none).
     var topStrip = svg.append("g")
-      .attr("class", "strip")
-      .attr("id", "topStrip");
+      .attr("class", "topStrip")
+    ;
     var rightStrip = svg.append("g")
-      .attr("class", "strip")
-      .attr("id", "rightStrip");
+      .attr("class", "rightStrip")
+    ;
 
     // this will hold x/y scales for each panel
     // eventually we inject this into Plots[p_name]
@@ -503,8 +502,7 @@ var animint = function (to_select, json_file) {
       if (layout_i === 0) {
 	svg.append("text")
           .text(p_info["ytitle"])
-          .attr("class", "label")
-          .attr("id", "ytitle")
+          .attr("class", "ytitle")
           .style("text-anchor", "middle")
           .style("font-size", "11px")
           .attr("transform", "translate(" + (plotdim.xstart - axispaddingy - ytitlepadding / 2)
@@ -514,8 +512,7 @@ var animint = function (to_select, json_file) {
       if (layout_i === (npanels - 1)) {
 	svg.append("text")
           .text(p_info["xtitle"])
-          .attr("class", "label")
-          .attr("id", "xtitle")
+          .attr("class", "xtitle")
           .style("text-anchor", "middle")
           .style("font-size", "11px")
           .attr("transform", "translate(" + plotdim.title.x
@@ -582,8 +579,7 @@ var animint = function (to_select, json_file) {
           })
           .orient("bottom");
 	      var xaxis_g = svg.append("g")
-          .attr("class", "axis")
-          .attr("id", "xaxis")
+          .attr("class", "xaxis")
           .attr("transform", "translate(0," + plotdim.yend + ")")
           .call(xaxis);
 	      xaxis_g.selectAll("text")
@@ -599,8 +595,7 @@ var animint = function (to_select, json_file) {
           })
           .orient("left");
 	svg.append("g")
-          .attr("class", "axis")
-          .attr("id", "yaxis")
+          .attr("class", "xaxis")
           .attr("transform", "translate(" + (plotdim.xstart) + ",0)")
           .call(yaxis);
       }
@@ -1756,6 +1751,9 @@ var animint = function (to_select, json_file) {
         .data(l_info.entries)
         .enter()
         .append("tr")
+      // in a good data viz there should not be more than one legend
+      // that shows the same thing, so there should be no duplicate
+      // id.
         .attr("id", function(d) { return d["label"]; })
 	.attr("class", legend_class)
       ;
