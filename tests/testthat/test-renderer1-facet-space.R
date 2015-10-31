@@ -18,6 +18,10 @@ test_that("some horizontal space between border_rects", {
   for(plot.name in names(viz)){
     xpath <- sprintf('//svg[@id="%s"]//rect[@class="border_rect"]', plot.name)
     rect.list <- getNodeSet(info$html, xpath)
+    print(list(plot=plot.name, xpath=xpath, rects=rect.list))
+    if(length(rect.list) != 2){
+      print(info$html)
+    }
     expect_equal(length(rect.list), 2)
     first <- xmlAttrs(rect.list[[1]])
     first.left <- as.numeric(first[["x"]])
