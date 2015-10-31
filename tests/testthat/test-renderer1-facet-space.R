@@ -14,14 +14,17 @@ viz <-
 
 info <- animint2HTML(viz)
 
-test_that("some horizontal space between background_rects", {
+## For some reason the "space between panels" tests only work on
+## travis/wercker if the rect class is "background_rect". Not
+## "border_rect"! Even though they both should appear, only
+## background_rect appears on travis/wercker... is this because we
+## don't wait long enough before calling getHTML()?
+panel.rect.xpath.tmp <- '//svg[@id="%s"]//rect[@class="background_rect"]'
+
+test_that("some horizontal space between panels", {
   for(plot.name in names(viz)){
-    xpath <- sprintf('//svg[@id="%s"]//rect[@class="background_rect"]', plot.name)
+    xpath <- sprintf(panel.rect.xpath.tmp, plot.name)
     rect.list <- getNodeSet(info$html, xpath)
-    print(list(plot=plot.name, xpath=xpath, rects=rect.list))
-    if(length(rect.list) != 2){
-      print(info$html)
-    }
     expect_equal(length(rect.list), 2)
     first <- xmlAttrs(rect.list[[1]])
     first.left <- as.numeric(first[["x"]])
@@ -109,9 +112,9 @@ viz <-
 
 info <- animint2HTML(viz)
 
-test_that("some vertical space between background_rects", {
+test_that("some vertical space between panels", {
   for(plot.name in names(viz)){
-    xpath <- sprintf('//svg[@id="%s"]//rect[@class="background_rect"]', plot.name)
+    xpath <- sprintf(panel.rect.xpath.tmp, plot.name)
     rect.list <- getNodeSet(info$html, xpath)
     expect_equal(length(rect.list), 2)
     first <- xmlAttrs(rect.list[[1]])
