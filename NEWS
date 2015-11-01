@@ -176,6 +176,15 @@ https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol_type
 
 RENDER: Determine why border of tiles in pirates example does not seem to be rendering.
 
+2015.11.01
+
+BUGFIX: facet_grid(var ~ ., space="free") now uses the correct amount
+of space between vertical panels, and we test for it in
+test-renderer2-ChromHMMiterations.R.
+
+BUGFIX: axis names are now correctly spaced in the middle between the
+extreme panel edges.
+
 2015.10.26
 
 DSL: geom_1(aes(color=something))+geom_2(aes(color=something.else)) is
