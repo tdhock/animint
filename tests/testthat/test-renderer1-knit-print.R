@@ -11,7 +11,7 @@ remDr$refresh()
 html <- getHTML()
 
 test_that("knit_print.animint renders three plots", {
-  nodes <- getNodeSet(html, "//text[@id='xtitle']")
+  nodes <- getNodeSet(html, "//text[@class='xtitle']")
   value.vec <- sapply(nodes, xmlValue)
   expected.vec <-
     c("first plot with color legend",

@@ -14,7 +14,7 @@ wrapViz <-
 
 test_that("facet_grid() strip labels are placed correctly", {
   info <- animint2HTML(gridViz)
-  top <- getNodeSet(info$html, "//g[@id='topStrip']")
+  top <- getNodeSet(info$html, "//g[@class='topStrip']")
   # there should one be one 'top_strip' group (their children contain the vital info)
   kids <- xmlChildren(top[[1]])
   labs <- as.character(sapply(kids, xmlValue))
@@ -26,7 +26,7 @@ test_that("facet_grid() strip labels are placed correctly", {
   expect_equal(styles, rep("text-anchor: middle; font-size: 11px;", 2))
   transforms <- as.character(sapply(attrs, "[[", "transform"))
   # there should one be one 'right_strip' group (their children contain the vital info)
-  right <- getNodeSet(info$html, "//g[@id='rightStrip']")
+  right <- getNodeSet(info$html, "//g[@class='rightStrip']")
   kids <- xmlChildren(right[[1]])
   labs <- as.character(sapply(kids, xmlValue))
   expect_equal(labs[labs != ""], c("cyl: 4", "cyl: 6", "cyl: 8"))
@@ -40,7 +40,7 @@ test_that("facet_grid() strip labels are placed correctly", {
 
 test_that("facet_wrap() strip labels are placed correctly", {
   info <- animint2HTML(wrapViz)
-  top <- getNodeSet(info$html, "//g[@id='topStrip']")
+  top <- getNodeSet(info$html, "//g[@class='topStrip']")
   kids <- xmlChildren(top[[1]])
   labs <- as.character(sapply(kids, xmlValue))
   expect_equal(labs, c("4, 0", "4, 1", "6, 0", 

@@ -25,8 +25,8 @@ test_that("coord_fixed with shrinking y-axis", {
   ratio5 <- 5
   viz1 <- p + coord_fixed(ratio5)
   info <- animint2HTML(list(plot = viz1))
-  x.axes <- getNodeSet(info$html, "//g[@id='xaxis']")
-  y.axes <- getNodeSet(info$html, "//g[@id='yaxis']")
+  x.axes <- getNodeSet(info$html, "//g[contains(@class, 'xaxis')]")
+  y.axes <- getNodeSet(info$html, "//g[contains(@class, 'yaxis')]")
   xdiff <- getTickDiff(x.axes[[1]])
   ydiff <- getTickDiff(y.axes[[1]], axis = "y")
   diffs <- normDiffs(xdiff, ydiff, ratio5)
@@ -37,8 +37,8 @@ test_that("coord_fixed with shrinking x-axis", {
   ratio10 <- 10
   viz2 <- p + coord_fixed(ratio10)
   info <- animint2HTML(list(plot = viz2))
-  x.axes <- getNodeSet(info$html, "//g[@id='xaxis']")
-  y.axes <- getNodeSet(info$html, "//g[@id='yaxis']")
+  x.axes <- getNodeSet(info$html, "//g[contains(@class, 'xaxis')]")
+  y.axes <- getNodeSet(info$html, "//g[contains(@class, 'yaxis')]")
   xdiff <- getTickDiff(x.axes[[1]])
   ydiff <- getTickDiff(y.axes[[1]], axis = "y")
   diffs <- normDiffs(xdiff, ydiff, ratio10)

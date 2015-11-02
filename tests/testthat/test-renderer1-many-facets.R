@@ -51,16 +51,9 @@ test_that("no vertical space between border_rects", {
   expect_equal(first.bottom, second.top)
 })
 
-translatePattern <-
-  paste0("translate[(]",
-         "(?<x>.*?)",
-         ",",
-         "(?<y>.*?)",
-         "[)]")
-
 test_that("right strips all at the same x position", {
   text.list <-
-    getNodeSet(info$html, '//svg[@id="vertical"]//g[@class="strip"]//text')
+    getNodeSet(info$html, '//svg[@id="vertical"]//g[@class="rightStrip"]//text')
   expect_equal(length(text.list), n.circles)
   translate.vec <- sapply(text.list, function(x)xmlAttrs(x)[["transform"]])
   translate.mat <- str_match_perl(translate.vec, translatePattern)

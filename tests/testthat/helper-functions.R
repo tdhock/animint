@@ -10,6 +10,13 @@ animint2HTML <- function(plotList) {
   res
 }
 
+translatePattern <-
+  paste0("translate[(]",
+         "(?<x>.*?)",
+         ",",
+         "(?<y>.*?)",
+         "[)]")
+
 acontext <- function(...){
   print(...)
   context(...)
@@ -209,19 +216,18 @@ expect_no_warning <- function(object, ..., info=NULL, label=NULL){
 }
 
 getTransform <- function(tick)xmlAttrs(tick)[["transform"]]
-# get difference between axis ticks in both pixels and on original data scale
-# @param doc rendered HTML document
-# @param ticks which ticks? (can use text label of the tick)
-# @param axis which axis?
-getTickDiff <- function(doc, ticks = c(1, 2), axis = "x"){
+
+## get difference between axis ticks in both pixels and on original data scale
+## @param doc rendered HTML document
+## @param ticks which ticks? (can use text label of the tick)
+## @param axis which axis?
+getTickDiff <- function(doc, ticks = 1:2, axis="x"){
   g.ticks <- getNodeSet(doc, "g[@class='tick major']")
   tick.labs <- sapply(g.ticks, getTextValue)
   names(g.ticks) <- tick.labs
-  g.ticks <- g.ticks[ticks]
-  tick.transform <- sapply(g.ticks, getTransform)
-  expr <- if (axis == "x") "translate[(](.*?),.*" else "translate[(][0-9]+?,(.*)[)]"
-  txt <- sub(expr, "\\1", tick.transform)
-  num <- as.numeric(txt)
+  tick.transform <- sapply(g.ticks[ticks], getTransform)
+  trans.mat <- str_match_perl(tick.transform, translatePattern)
+  num <- as.numeric(trans.mat[, axis])
   val <- abs(diff(num))
   attr(val, "label-diff") <- diff(as.numeric(names(tick.transform)))
   val
@@ -242,7 +248,7 @@ normDiffs <- function(xdiff, ydiff, ratio = 1) {
 }
 
 getTicks <- function(html, p.name){
-  xp <- sprintf('//svg[@id="%s"]//g[@id="xaxis"]//text', p.name)
+  xp <- sprintf('//svg[@id="%s"]//g[contains(@class, "xaxis")]//text', p.name)
   nodes <- getNodeSet(html, xp)
   stopifnot(length(nodes) > 0)
   sapply(nodes, xmlAttrs)
@@ -256,7 +262,7 @@ expect_rotate_anchor <- function(info, rotate, anchor){
   expect_match(rotated["style", ], paste("text-anchor:", anchor), fixed=TRUE)
   expect_match(rotated["transform", ], paste0("rotate(", rotate), fixed=TRUE)
   # http://stackoverflow.com/questions/442404/retrieve-the-position-x-y-of-an-html-element
-  tick_box <- remDr$executeScript('return document.getElementById("xaxis").firstChild.getBoundingClientRect()')
-  title_box <- remDr$executeScript('return document.getElementById("xtitle").getBoundingClientRect()')
+  tick_box <- remDr$executeScript('return document.getElementsByClassName("xaxis")[0].firstChild.getBoundingClientRect()')
+  title_box <- remDr$executeScript('return document.getElementsByClassName("xtitle")[0].getBoundingClientRect()')
   expect_true(title_box$top >= tick_box$bottom)
 }

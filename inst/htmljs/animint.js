@@ -284,8 +284,7 @@ var animint = function (to_select, json_file) {
     plotdim.title.y = titlepadding / 2;
     svg.append("text")
       .text(p_info.title)
-      .attr("id", "plottitle")
-      .attr("class", "title")
+      .attr("class", "plottitle")
       .attr("font-family", "sans-serif")
       .attr("font-size", "20px")
       .attr("transform", "translate(" + plotdim.title.x + "," + 
@@ -405,11 +404,11 @@ var animint = function (to_select, json_file) {
 
     // create a grouping for strip labels (even if there are none).
     var topStrip = svg.append("g")
-      .attr("class", "strip")
-      .attr("id", "topStrip");
+      .attr("class", "topStrip")
+    ;
     var rightStrip = svg.append("g")
-      .attr("class", "strip")
-      .attr("id", "rightStrip");
+      .attr("class", "rightStrip")
+    ;
 
     // this will hold x/y scales for each panel
     // eventually we inject this into Plots[p_name]
@@ -472,54 +471,50 @@ var animint = function (to_select, json_file) {
       current_col = p_info.layout.COL[layout_i];
       var draw_x = p_info.layout.AXIS_X[layout_i];
       var draw_y = p_info.layout.AXIS_Y[layout_i];
-      // panels are drawn using a "typewriter approach" (left to right & top to bottom)
-      // if the carriage is returned (ie, there is a new row), change some parameters:
+      // panels are drawn using a "typewriter approach" (left to right
+      // & top to bottom) if the carriage is returned (ie, there is a
+      // new row), change some parameters:
       var new_row = current_col <= p_info.layout.COL[layout_i - 1]
       if (new_row) {
 	n_yaxes = 0;
 	graph_width_cum = (graph_width_blank / 2) * graph_width;
-	graph_height_cum = graph_height_cum + plotdim.graph.height;
+	graph_height_cum += graph_height * hp[layout_i-1];
       }
-      n_xaxes = n_xaxes + draw_x;
-      n_yaxes = n_yaxes + draw_y;
+      n_xaxes += draw_x;
+      n_yaxes += draw_y;
 
-      // calculate panel specific locations to be used in placing axes, labels, etc.
+      // calculate panel specific locations to be used in placing
+      // axes, labels, etc.
       plotdim.xstart =  current_col * plotdim.margin.left +
         (current_col - 1) * plotdim.margin.right +
         graph_width_cum + n_yaxes * axispaddingy + ytitlepadding;
-      // room for right strips should be distributed evenly across panels to preserve aspect ratio
+      // room for right strips should be distributed evenly across
+      // panels to preserve aspect ratio
       plotdim.xend = plotdim.xstart + plotdim.graph.width;
       // total height of strips drawn thus far
       var strip_h = cum_height_per_row[current_row-1];
       plotdim.ystart = current_row * plotdim.margin.top +
         (current_row - 1) * plotdim.margin.bottom +
         graph_height_cum + titlepadding + strip_h;
-      // room for xaxis title should be distributed evenly across panels to preserve aspect ratio
+      // room for xaxis title should be distributed evenly across
+      // panels to preserve aspect ratio
       plotdim.yend = plotdim.ystart + plotdim.graph.height;
       // always add to the width (note it may have been reset earlier)
       graph_width_cum = graph_width_cum + plotdim.graph.width;
 
-      // draw the y-axis title (and add padding) when drawing the first panel
+      // get the x position of the y-axis title (and add padding) when
+      // rendering the first plot.
       if (layout_i === 0) {
-	svg.append("text")
-          .text(p_info["ytitle"])
-          .attr("class", "label")
-          .attr("id", "ytitle")
-          .style("text-anchor", "middle")
-          .style("font-size", "11px")
-          .attr("transform", "translate(" + (plotdim.xstart - axispaddingy - ytitlepadding / 2)
-		+ "," + (p_info.options.height / 2) + ")rotate(270)");
+	var ytitle_x = (plotdim.xstart - axispaddingy - ytitlepadding / 2);
+	var xtitle_left = plotdim.xstart;
+	var ytitle_top = plotdim.ystart;
       }
-      // draw the x-axis title when drawing the last panel
+      // get the y position of the x-axis title when drawing the last
+      // panel.
       if (layout_i === (npanels - 1)) {
-	svg.append("text")
-          .text(p_info["xtitle"])
-          .attr("class", "label")
-          .attr("id", "xtitle")
-          .style("text-anchor", "middle")
-          .style("font-size", "11px")
-          .attr("transform", "translate(" + plotdim.title.x
-		+ "," + (plotdim.yend + axispaddingx) + ")");
+	var xtitle_y = (plotdim.yend + axispaddingx);
+	var xtitle_right = plotdim.xend;
+	var ytitle_bottom = plotdim.yend;
       }
 
       var draw_strip = function(strip, side) {
@@ -581,9 +576,8 @@ var animint = function (to_select, json_file) {
             return xaxislabs[xaxisvals.indexOf(d)].toString();
           })
           .orient("bottom");
-	      var xaxis_g = svg.append("g")
-          .attr("class", "axis")
-          .attr("id", "xaxis")
+	var xaxis_g = svg.append("g")
+          .attr("class", "xaxis axis")
           .attr("transform", "translate(0," + plotdim.yend + ")")
           .call(xaxis);
 	      xaxis_g.selectAll("text")
@@ -599,8 +593,7 @@ var animint = function (to_select, json_file) {
           })
           .orient("left");
 	svg.append("g")
-          .attr("class", "axis")
-          .attr("id", "yaxis")
+          .attr("class", "yaxis axis")
           .attr("transform", "translate(" + (plotdim.xstart) + ",0)")
           .call(yaxis);
       }
@@ -620,7 +613,7 @@ var animint = function (to_select, json_file) {
       
       // creating g element for background, grid lines, and border
       // uses insert to draw it right before plot title
-      var background = svg.insert("g", "#plottitle")
+      var background = svg.insert("g", ".plottitle")
         .attr("class", "background");
       
       // drawing background
@@ -722,6 +715,29 @@ var animint = function (to_select, json_file) {
       }
 
     } //end of for(layout_i
+    // After drawing all backgrounds, we can draw the axis labels.
+    svg.append("text")
+      .text(p_info["ytitle"])
+      .attr("class", "ytitle")
+      .style("text-anchor", "middle")
+      .style("font-size", "11px")
+      .attr("transform", "translate(" + 
+	    ytitle_x +
+	    "," +
+	    (ytitle_top + ytitle_bottom)/2 + 
+	    ")rotate(270)")
+    ;
+    svg.append("text")
+      .text(p_info["xtitle"])
+      .attr("class", "xtitle")
+      .style("text-anchor", "middle")
+      .style("font-size", "11px")
+      .attr("transform", "translate(" + 
+	    (xtitle_left + xtitle_right)/2 +
+	    "," + 
+	    xtitle_y + 
+	    ")")
+    ;
 
     Plots[p_name].scales = scales;
   }; //end of add_plot()
@@ -1756,6 +1772,9 @@ var animint = function (to_select, json_file) {
         .data(l_info.entries)
         .enter()
         .append("tr")
+      // in a good data viz there should not be more than one legend
+      // that shows the same thing, so there should be no duplicate
+      // id.
         .attr("id", function(d) { return d["label"]; })
 	.attr("class", legend_class)
       ;

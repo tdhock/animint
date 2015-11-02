@@ -19,8 +19,10 @@ test_that("categorical variables with 1 value", {
   ylab.vec <- as.character(info$plots$dots$axis$ylab)
   expect_true(is.list(info$plots$dots$axis$y))
   expect_identical(ylab.vec, "character value")
-  xticks <- getNodeSet(info$html, "//g[@id='xaxis']/g[@class='tick major']")
+  xticks <- getNodeSet(
+    info$html, "//g[contains(@class, 'xaxis')]/g[@class='tick major']")
   expect_identical(sapply(xticks, xmlValue), "factor value")
-  yticks <- getNodeSet(info$html, "//g[@id='yaxis']/g[@class='tick major']")
+  yticks <- getNodeSet(
+    info$html, "//g[contains(@class, 'yaxis')]/g[@class='tick major']")
   expect_identical(sapply(yticks, xmlValue), "character value")
 })
