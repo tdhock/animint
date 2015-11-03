@@ -10,5 +10,5 @@ test_that("aes(showSelected=var1, showSelected=var2) is an error", {
     )
   expect_error({
     animint2dir(viz)
-  }, "aes names must be unique")
+  }, "aes names must be unique, problems: showSelected")
 })
