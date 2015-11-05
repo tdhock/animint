@@ -21,7 +21,7 @@ viz <- list(
                   showSelected=repeat.fac,
                   showSelected2=iteration),
               ##chunk_vars=c("repeat.fac"),
-              data=data.table(ChromHMMinit$emission, parameters="emission"))+
+              data=data.frame(ChromHMMinit$emission, parameters="emission"))+
     scale_color_gradient(low="white", high="red")+
     theme_bw()+
     theme_animint(height=500, width=400)+
