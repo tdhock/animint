@@ -29,6 +29,11 @@ build:
         export TEST_SUITE=renderer2
         Rscript -e "setwd('/pipeline/animint/tests'); source('testthat.R')"
     - script:
+      name: echo renderer3 tests
+      code: |
+        export TEST_SUITE=renderer3
+        Rscript -e "setwd('/pipeline/animint/tests'); source('testthat.R')"
+    - script:
       name: echo compiler tests
       code: |
         export TEST_SUITE=compiler

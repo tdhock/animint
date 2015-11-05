@@ -41,5 +41,6 @@ env:
   matrix:
     - TEST_SUITE=renderer1
     - TEST_SUITE=renderer2
+    - TEST_SUITE=renderer3
     - TEST_SUITE=compiler
     
