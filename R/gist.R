@@ -53,6 +53,24 @@ animint2gist <- function(plot.list, description = plot.list$title,
   ## TODO: delete the next line when gist_create can upload PNGs.
   is.ignored <- is.ignored | is.png
   to.post <- all.files[!is.ignored]
+  if(40 < length(to.post)){
+    print(to.post)
+    stop("your animint has ", length(to.post),
+         " files but the Gist API will not serve more than 40 files,",
+         " so your animint will not be viewable on bl.ocks.org.",
+         " Try using https://pages.github.com/ to share your animint,",
+         " or the chunk_vars argument to reduce the number of tsv files",
+         " http://bit.ly/21scnod")
+  }
+  if(any(1024 * 1024 < all.file.info$size)){
+    print(all.file.info[, "size", drop=FALSE])
+    stop("your animint has files bigger than 1MB,",
+         " but the Gist API will truncate files bigger than 1MB,",
+         " so your animint will not be viewable on bl.ocks.org.",
+         " Try using https://pages.github.com/ to share your animint,",
+         " or the chunk_vars argument to combine some tsv files",
+         " http://bit.ly/21scnod")
+  }
   gist <- gistr::gist_create(to.post, description = description, 
                              browse = FALSE, ...)
   if (browse) 

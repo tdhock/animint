@@ -363,6 +363,9 @@ saveLayer <- function(l, d, meta){
   ## e.g. colour.
   g$params <- c(l$geom_params, l$stat_params)
   for(p.name in names(g$params)){
+    if("chunk_vars" %in% names(g$params) && is.null(g$params[["chunk_vars"]])){
+      g$params[["chunk_vars"]] <- character()
+    }
     names(g$params[[p.name]]) <- NULL
     ## Ignore functions.
     if(is.function(g$params[[p.name]])){
@@ -1301,6 +1304,13 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
         ## This code assumes that the layer has the complete aesthetic
         ## mapping and data. TODO: Do we need to copy any global
         ## values to this layer?
+        name.counts <- table(names(L$mapping))
+        is.dup <- 1 < name.counts
+        if(any(is.dup)){
+          print(L)
+          stop("aes names must be unique, problems: ",
+               paste(names(name.counts)[is.dup], collapse=", "))
+        }
         iaes <- selector.aes(L$mapping)
         one.names <- with(iaes, c(clickSelects$one, showSelected$one))
         update.vars <- L$mapping[one.names]

@@ -163,7 +163,7 @@ getYear <- function(){
 
 test_that("animation updates", {
   old.year <- getYear()
-  Sys.sleep(3) #wait for one animation frame.
+  Sys.sleep(5) #wait for two animation frames.
   new.year <- getYear()
   expect_true(old.year != new.year)
 })
