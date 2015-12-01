@@ -363,6 +363,9 @@ saveLayer <- function(l, d, meta){
   ## e.g. colour.
   g$params <- c(l$geom_params, l$stat_params)
   for(p.name in names(g$params)){
+    if("chunk_vars" %in% names(g$params) && is.null(g$params[["chunk_vars"]])){
+      g$params[["chunk_vars"]] <- character()
+    }
     names(g$params[[p.name]]) <- NULL
     ## Ignore functions.
     if(is.function(g$params[[p.name]])){
