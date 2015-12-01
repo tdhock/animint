@@ -13,18 +13,18 @@ viz <- list(
 
 test_that("axes hidden", {
   info <- animint2HTML(viz)
-  for(class.prefix in c("background", "border")){
-    xpath <- sprintf('//rect[@class="%s_rect"]', class.prefix)
-    rect.list <- getNodeSet(info$html, xpath)
-    expect_equal(length(rect.list), 0)
+  ec <- function(element, class){
+    data.frame(element, class)
   }
-  for(contains.value in c("tick", "axis")){
-    xpath <- sprintf('//g[contains(@class,"%s")]', contains.value)
-    element.list <- getNodeSet(info$html, xpath)
-    expect_equal(length(element.list), 0)
-  }
-  for(contains.value in c("xtitle", "ytitle")){
-    xpath <- sprintf('//text[contains(@class,"%s")]', contains.value)
+  elem.df <- rbind(
+    ec("rect", paste0(c("background","border"), "_rect")),
+    ec("g", "axis"),
+    ec("path", "domain"),
+    ec("text", paste0(c("x", "y"), "title")))
+  for(elem.i in seq_along(elem.df$element)){
+    xpath <- with(elem.df[elem.i, ], {
+      sprintf('//%s[@class="%s"]', element, class)
+    })
     element.list <- getNodeSet(info$html, xpath)
     expect_equal(length(element.list), 0)
   }
