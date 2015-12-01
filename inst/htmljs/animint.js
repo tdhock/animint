@@ -460,8 +460,12 @@ var animint = function (to_select, json_file) {
         }
       };
 
-      axislabs(axis.x, axis.xlab, "x");
-      axislabs(axis.y, axis.ylab, "y");
+      if(p_info["xticks"]){
+	axislabs(axis.x, axis.xlab, "x");
+      }
+      if(p_info["yticks"]){
+	axislabs(axis.y, axis.ylab, "y");
+      }
 
       // compute the current panel height/width
       plotdim.graph.height = graph_height * hp[layout_i];
@@ -575,14 +579,19 @@ var animint = function (to_select, json_file) {
           .tickFormat(function (d) {
             return xaxislabs[xaxisvals.indexOf(d)].toString();
           })
-          .orient("bottom");
+          .orient("bottom")
+	;
 	var xaxis_g = svg.append("g")
           .attr("class", "xaxis axis")
           .attr("transform", "translate(0," + plotdim.yend + ")")
           .call(xaxis);
-	      xaxis_g.selectAll("text")
-	        .style("text-anchor", p_info.xanchor)
-	        .attr("transform", "rotate(" + p_info.xangle + " 0 9)");
+	if(axis["xline"] == false){
+	  var axis_path = xaxis_g.select("path.domain");
+	  axis_path.remove();
+	}
+	xaxis_g.selectAll("text")
+	  .style("text-anchor", p_info.xanchor)
+	  .attr("transform", "rotate(" + p_info.xangle + " 0 9)");
       }
       if(draw_y){
 	var yaxis = d3.svg.axis()
@@ -592,10 +601,14 @@ var animint = function (to_select, json_file) {
             return yaxislabs[yaxisvals.indexOf(d)].toString();
           })
           .orient("left");
-	svg.append("g")
+	var yaxis_g = svg.append("g")
           .attr("class", "yaxis axis")
           .attr("transform", "translate(" + (plotdim.xstart) + ",0)")
           .call(yaxis);
+	if(axis["yline"] == false){
+	  var axis_path = yaxis_g.select("path.domain");
+	  axis_path.remove();
+	}
       }
 
       if(!axis.xline) {
@@ -716,29 +729,32 @@ var animint = function (to_select, json_file) {
 
     } //end of for(layout_i
     // After drawing all backgrounds, we can draw the axis labels.
-    svg.append("text")
-      .text(p_info["ytitle"])
-      .attr("class", "ytitle")
-      .style("text-anchor", "middle")
-      .style("font-size", "11px")
-      .attr("transform", "translate(" + 
-	    ytitle_x +
-	    "," +
-	    (ytitle_top + ytitle_bottom)/2 + 
-	    ")rotate(270)")
-    ;
-    svg.append("text")
-      .text(p_info["xtitle"])
-      .attr("class", "xtitle")
-      .style("text-anchor", "middle")
-      .style("font-size", "11px")
-      .attr("transform", "translate(" + 
-	    (xtitle_left + xtitle_right)/2 +
-	    "," + 
-	    xtitle_y + 
-	    ")")
-    ;
-
+    if(p_info["ytitle"]){
+      svg.append("text")
+	.text(p_info["ytitle"])
+	.attr("class", "ytitle")
+	.style("text-anchor", "middle")
+	.style("font-size", "11px")
+	.attr("transform", "translate(" + 
+	      ytitle_x +
+	      "," +
+	      (ytitle_top + ytitle_bottom)/2 + 
+	      ")rotate(270)")
+      ;
+    }
+    if(p_info["xtitle"]){
+      svg.append("text")
+	.text(p_info["xtitle"])
+	.attr("class", "xtitle")
+	.style("text-anchor", "middle")
+	.style("font-size", "11px")
+	.attr("transform", "translate(" + 
+	      (xtitle_left + xtitle_right)/2 +
+	      "," + 
+	      xtitle_y + 
+	      ")")
+      ;
+    }
     Plots[p_name].scales = scales;
   }; //end of add_plot()
 
