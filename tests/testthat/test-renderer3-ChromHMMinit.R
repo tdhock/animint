@@ -72,14 +72,16 @@ system.time({
   info <- animint2HTML(viz) #TODO: why does this take so long?
 })
 
-getTileFill <- function(html=getHTML()){
-  getStyleValue(html, '//g[@class="geom1_tile_parameters"]//rect', "fill")
+getFill <- function(html=getHTML()){
+  getStyleValue(html, '//g[@class="geom2_point_parameters"]//circle', "fill")
 }
 
 test_that("animation starts by default", {
-  initial.fill.vec <- getTileFill()
+  initial.fill.vec <- getFill()
+  expect_equal(length(initial.fill.vec), 225)
   Sys.sleep(5)
-  updated.fill.vec <- getTileFill()
-  n.same <- sum(initial.fill.vec == updated.fill.vec)
-  expect_less_than(n.same, length(updated.fill.vec))
+  updated.fill.vec <- getFill()
+  expect_equal(length(updated.fill.vec), 225)
+  n.different <- sum(initial.fill.vec != updated.fill.vec)
+  expect_more_than(n.different, 0)
 })
