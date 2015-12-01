@@ -176,6 +176,16 @@ https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol_type
 
 RENDER: Determine why border of tiles in pirates example does not seem to be rendering.
 
+2015.11.30
+
+BUGFIX: axis hiding on maps works again, via 6 element_blank()s:
+theme(axis.line=element_blank(), 
+      axis.text=element_blank(), 
+      axis.ticks=element_blank(), 
+      axis.title=element_blank(),
+      panel.background = element_blank(),
+      panel.border = element_blank())
+
 2015.11.01
 
 BUGFIX: facet_grid(var ~ ., space="free") now uses the correct amount
