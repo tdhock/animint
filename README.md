@@ -13,7 +13,7 @@ renders using [D3](http://d3js.org/). For example, this multi-layer
 facetted interactive animation of WorldBank data was defined using
 only [about 60 lines of R code](inst/examples/WorldBank-facets.R).
 
-[![WorldBank viz screenshot](screencast-WorldBank.gif)](http://bl.ocks.org/tdhock/raw/217823c39eb1fc7c5dc9/)
+[![WorldBank viz screenshot](screencast-WorldBank.gif)](http://cbio.ensmp.fr/~thocking/WorldBank-facets/)
 
 ## Installation
 
