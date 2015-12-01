@@ -12,10 +12,20 @@ viz <- list(
   )
 
 test_that("axes hidden", {
-  info <- animint2dir(viz)
+  info <- animint2HTML(viz)
   for(class.prefix in c("background", "border")){
-    xpath <- sprintf('//svg[@id="gg"]//rect[@class="%s_rect"]', class.prefix)
+    xpath <- sprintf('//rect[@class="%s_rect"]', class.prefix)
     rect.list <- getNodeSet(info$html, xpath)
     expect_equal(length(rect.list), 0)
+  }
+  for(contains.value in c("tick", "axis")){
+    xpath <- sprintf('//g[contains(@class,"%s")]', contains.value)
+    element.list <- getNodeSet(info$html, xpath)
+    expect_equal(length(element.list), 0)
+  }
+  for(contains.value in c("xtitle", "ytitle")){
+    xpath <- sprintf('//text[contains(@class,"%s")]', contains.value)
+    element.list <- getNodeSet(info$html, xpath)
+    expect_equal(length(element.list), 0)
   }
 })
