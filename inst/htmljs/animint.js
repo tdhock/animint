@@ -460,10 +460,10 @@ var animint = function (to_select, json_file) {
         }
       };
 
-      if(p_info["xticks"]){
+      if(axis["xticks"]){
 	axislabs(axis.x, axis.xlab, "x");
       }
-      if(p_info["yticks"]){
+      if(axis["yticks"]){
 	axislabs(axis.y, axis.ylab, "y");
       }
 
