@@ -176,6 +176,19 @@ https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol_type
 
 RENDER: Determine why border of tiles in pirates example does not seem to be rendering.
 
+2015.12.01 PR#119
+
+animint2gist now stops with an error when there are over 40 files
+(fixes #122) and when there is at least one file that is over 1MB,
+which would be truncated (fixes #121).
+
+Animations with geoms that have more than one chunk var start playing
+immediately.
+
+Compiler stops with an informative error "aes names must be unique"
+when the same interactive aes appears multiple times,
+e.g. aes(showSelected=var1, showSelected=var2)
+
 2015.11.30
 
 BUGFIX: axis hiding on maps works again, via 6 element_blank()s:
