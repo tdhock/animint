@@ -2217,21 +2217,6 @@ var animint = function (to_select, json_file) {
     // the data, and start the animation.
     if (response.time) {
       var i, prev, cur;
-      Selectors[Animation.variable].update.forEach(function(g_name){
-        var g_info = Geoms[g_name];
-	      // If there is only 1 chunk we don't need to download anything
-	      // else.
-	      if(g_info.chunk_order.length == 0){
-          return;
-        }
-        if(g_info.chunk_order.length != 1){
-          throw "do not know how to handle more than 1 chunk variable";
-        }
-        if(g_info.chunk_order[0] != Animation.variable){
-          return; // ignore if this geom is chunked on a non-anim variable.
-        }
-        download_sequence(g_name, Animation.variable, Animation.sequence);
-      });
       for (var i = 0; i < Animation.sequence.length; i++) {
         if (i == 0) {
           prev = Animation.sequence[Animation.sequence.length-1];
@@ -2241,7 +2226,6 @@ var animint = function (to_select, json_file) {
         cur = Animation.sequence[i];
         Animation.next[prev] = cur;
       }
-      all_geom_names = d3.keys(response.geoms);
       Animation.timer = null;
       Animation.play = function(){
 	if(Animation.timer == null){ // only play if not already playing.
@@ -2257,6 +2241,23 @@ var animint = function (to_select, json_file) {
 	Animation.timer = null;
         Widgets["play_pause"].text("Play");
       };
+      Selectors[Animation.variable].update.forEach(function(g_name){
+        var g_info = Geoms[g_name];
+	// If there is only 1 chunk we don't need to download anything
+	// else.
+	if(g_info.chunk_order.length == 0){
+          return;
+        }
+        if(g_info.chunk_order.length != 1){
+	  Animation.play();
+	  return;
+        }
+        if(g_info.chunk_order[0] != Animation.variable){
+          return; // ignore if this geom is chunked on a non-anim variable.
+        }
+        download_sequence(g_name, Animation.variable, Animation.sequence);
+      });
+      all_geom_names = d3.keys(response.geoms);
 
       // This code starts/stops the animation timer when the page is
       // hidden, inspired by
