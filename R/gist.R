@@ -64,10 +64,10 @@ animint2gist <- function(plot.list, description = plot.list$title,
   }
   if(any(1024 * 1024 < all.file.info$size)){
     print(all.file.info[, "size", drop=FALSE])
-    stop("your animint has files bigger than 1MB,"
+    stop("your animint has files bigger than 1MB,",
          " but the Gist API will truncate files bigger than 1MB,",
          " so your animint will not be viewable on bl.ocks.org.",
-         " Try using https://pages.github.com/ to share your animint,"
+         " Try using https://pages.github.com/ to share your animint,",
          " or the chunk_vars argument to combine some tsv files",
          " http://bit.ly/21scnod")
   }
