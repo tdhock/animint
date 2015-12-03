@@ -23,62 +23,6 @@ years <- unique(not.na[, "year", drop=FALSE])
 by.country <- split(not.na, not.na$country)
 min.years <- do.call(rbind, lapply(by.country, subset, year == min(year)))
 min.years$year <- 1958
-viz.chunk.year <-
-  list(ts=ggplot()+
-         theme_bw()+
-         theme(panel.margin=grid::unit(0, "lines"))+
-         xlab("")+
-         ylab("")+
-         geom_tallrect(aes(xmin=year-1/2, xmax=year+1/2,
-                           clickSelects=year),
-                       data=TS(years), alpha=1/2)+
-         theme_animint(width=1000, height=800)+
-         geom_line(aes(year, life.expectancy, group=country, colour=region,
-                       clickSelects=country),
-                   data=TS(not.na), size=4, alpha=3/5)+
-         geom_point(aes(year, life.expectancy, color=region, size=population,
-                        showSelected=country, clickSelects=country),
-                    data=TS(not.na))+
-         geom_text(aes(year, life.expectancy, colour=region, label=country,
-                       showSelected=country,
-                       clickSelects=country),
-                   data=TS(min.years), hjust=1)+
-         geom_widerect(aes(ymin=year-1/2, ymax=year+1/2,
-                           clickSelects=year),
-                       data=TS2(years), alpha=1/2)+
-         geom_path(aes(fertility.rate, year, group=country, colour=region,
-                       clickSelects=country),
-                   data=TS2(not.na), size=4, alpha=3/5)+
-         geom_point(aes(fertility.rate, year, color=region, size=population,
-                        showSelected=country, clickSelects=country),
-                    data=TS2(not.na))+
-         geom_point(aes(fertility.rate, life.expectancy, clickSelects=country,
-                        showSelected=year, colour=region, size=population,
-                        key=country), # key aesthetic for animated transitions!
-                    chunk_vars=c("year"),
-                    data=SCATTER(not.na))+
-         geom_text(aes(fertility.rate, life.expectancy, label=country,
-                       showSelected=country, showSelected2=year,
-                       showSelected3=region,
-                       clickSelects=country,
-                       key=country), #also use key here!
-                   data=SCATTER(not.na))+
-         scale_size_animint(breaks=10^(5:9))+
-         facet_grid(side ~ top, scales="free")+
-         geom_text(aes(5, 85, label=paste0("year = ", year),
-                       showSelected=year),
-                   data=SCATTER(years)),
-       time=list(variable="year",ms=3000),
-       duration=list(year=1000),
-       first=list(year=1975, country=c("United States", "Vietnam")),
-       selector.types=list(country="multiple"),
-       title="World Bank data (multiple selection, facets)")
-
-test_that("too many files error", {
-  expect_error({
-    animint2gist(viz.chunk.year)
-  }, "the Gist API will not serve more than 40 files")
-})
 
 viz.chunk.none <- 
   list(ts=ggplot()+
@@ -136,4 +80,33 @@ test_that("too big files error", {
   expect_error({
     animint2gist(viz.chunk.none)
   }, "files bigger than 1MB")
+})
+
+set.seed(1)
+nrows <- 300
+too.many <- data.frame(row=1:nrows, x=rnorm(nrows), y=rnorm(nrows))
+too.tall.list <- list()
+for(col.name in c("x", "y")){
+  too.tall.list[[col.name]] <-
+    data.frame(col.name,
+               row=1:nrows,
+               value=too.many[[col.name]])
+}
+too.tall <- do.call(rbind, too.tall.list)
+
+viz.too.many <-
+  list(points=ggplot()+
+         geom_point(aes(x, y, clickSelects=row),
+                    data=too.many),
+       bars=ggplot()+
+         geom_bar(aes(col.name, value, showSelected=row),
+                  chunk_vars=c("row"),
+                  stat="identity",
+                  position="identity",
+                  data=too.tall))
+    
+test_that("too many files error", {
+  expect_error({
+    animint2gist(viz.too.many)
+  }, "the Gist API will not serve more than 300 files")
 })
