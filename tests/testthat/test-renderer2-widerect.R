@@ -181,7 +181,7 @@ test_that("pause stops animation", {
 test_that("play restarts animation", {
   old.year <- getYear()
   clickID("play_pause")
-  Sys.sleep(3)
+  Sys.sleep(5)
   new.year <- getYear()
   expect_true(old.year != new.year)
 })
@@ -240,7 +240,7 @@ test_that("clicking status legend brings back tallrects", {
 test_that("play restarts animation (second time)", {
   old.year <- getYear()
   clickID("play_pause")
-  Sys.sleep(3)
+  Sys.sleep(5)
   new.year <- getYear()
   expect_true(old.year != new.year)
 })
