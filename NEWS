@@ -176,6 +176,10 @@ https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol_type
 
 RENDER: Determine why border of tiles in pirates example does not seem to be rendering.
 
+2015.12.03 PR#124
+
+animint2gist stops with the new max of 300 files per gist.
+
 2015.12.01 PR#119
 
 animint2gist now stops with an error when there are over 40 files
