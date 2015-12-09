@@ -1401,9 +1401,9 @@ var animint = function (to_select, json_file) {
     } else if (g_info.geom == "widerect") {
       elements = elements.data(data, key_fun);
       eActions = function (e) {
-        e.attr("y", toXY("y", "ymin"))
+        e.attr("y", toXY("y", "ymax"))
           .attr("height", function (d) {
-            return scales.x(d["ymax"]) - scales.x(d["ymin"]);
+            return scales.y(d["ymin"]) - scales.y(d["ymax"]);
           })
           .attr("x", scales.x.range()[0])
           .attr("width", scales.x.range()[1] - scales.x.range()[0])

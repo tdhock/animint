@@ -176,6 +176,12 @@ https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol_type
 
 RENDER: Determine why border of tiles in pirates example does not seem to be rendering.
 
+2015.12.09 PR#125
+
+BUGFIX: geom_widerect should now render properly in all
+contexts. There was some problem when plot width << height which is
+now fixed.
+
 2015.12.03 PR#124
 
 animint2gist stops with the new max of 300 files per gist.
