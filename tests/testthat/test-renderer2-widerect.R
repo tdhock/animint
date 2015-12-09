@@ -1,5 +1,38 @@
 acontext("geom_widerect")
 
+recommendation <- data.frame(
+  min.C=21,
+  max.C=23)
+set.seed(1)
+temp.time <- data.frame(
+  time=strptime(paste0("2015-10-", 1:31), "%Y-%m-%d"),
+  temp.C=rnorm(31))
+
+viz <- list(
+  gg=ggplot()+
+    theme_bw()+
+    theme_animint(height=200, width=2000)+
+    geom_widerect(aes(ymin=min.C, ymax=max.C),
+                  color=NA,
+                  fill="grey",
+                  data=recommendation)+
+    geom_line(aes(time, temp.C),
+              data=temp.time)
+  )
+
+info <- animint2HTML(viz)
+
+getBounds <- function(geom.class){
+  script.txt <- sprintf('return document.getElementsByClassName("%s")[0].getBoundingClientRect()', geom.class)
+  remDr$executeScript(script.txt)
+}
+
+test_that("bottom of widerect is above line", {
+  rect.bounds <- getBounds("geom1_widerect_gg")
+  line.bounds <- getBounds("geom2_line_gg")
+  expect_less_than(rect.bounds$bottom, line.bounds$top)
+})
+
 data(WorldBank)
 not.na <- subset(WorldBank, !(is.na(life.expectancy) | is.na(fertility.rate)))
 BOTH <- function(df, top, side){
