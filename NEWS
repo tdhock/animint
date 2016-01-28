@@ -176,6 +176,10 @@ https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol_type
 
 RENDER: Determine why border of tiles in pirates example does not seem to be rendering.
 
+2016.01.28
+
+Depend ggplot2 < 2.0.
+
 2015.12.09 PR#125
 
 BUGFIX: geom_widerect should now render properly in all
