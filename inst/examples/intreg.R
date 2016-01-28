@@ -1,5 +1,5 @@
 works_with_R("3.2.2",
-             "tdhock/animint@9df282ba7b9e1dec9fd16124219870fa25e5df57")
+             "tdhock/animint@3b1f84ec926ffbd765f0aa004596e43203750fd4")
 
 ## Example: 4 plots, 2 selectors.
 data(intreg)
@@ -167,6 +167,10 @@ for(signal in names(breaks.by.signal)){
 }
 error.regions <- do.call(rbind, error.regions.list)
 
+reg <- subset(intreg$model, line=="regression")
+slope <- with(reg, (min.L-max.L)/(min.feature-max.feature))
+intreg$intervals$pred.L <-
+  slope * (intreg$intervals$feature - reg$min.feature) + reg$min.L
 intreg.errors <- 
   list(signal=ggplot()+
        theme_animint(height=300, width=800)+       
@@ -200,7 +204,6 @@ intreg.errors <-
                   colour=signal.colors[["estimate"]],
                   linetype="dashed",
                   data=intreg$breaks),
-       
        penalty=ggplot()+
          theme_bw()+
          theme_animint(height=500, width=800)+
@@ -213,27 +216,31 @@ intreg.errors <-
                                      ),
                      alpha=1/2)+
        ylab("")+
+       geom_vline(aes(xintercept=pred.L, showSelected=signal),
+                  color="violet",
+                  data=intreg$intervals)+
        geom_segment(aes(min.L, feature, xend=max.L, yend=feature,
                         clickSelects=signal),
-                    size=5,
-                    data=data.frame(intreg$int, what="regression"))+
+                    size=6,
+                    data=data.frame(intreg$intervals, what="regression"))+
        geom_segment(aes(min.L, min.feature, xend=max.L, yend=max.feature,
                         linetype=line),
                     colour="violet",
                     size=3,
                     data=data.frame(intreg$model, what="regression"))+
+       ## geom_point(aes(pred.L, feature),
+       ##            size=5,
+       ##            data=data.frame(intreg$intervals, what="regression"))+
        scale_linetype_manual(values=model.linetypes)+
        geom_segment(aes(min.L, cost, xend=max.L, yend=cost,
                         showSelected=signal),
-                    data=data.frame(intreg$selection, what="error"))+
+                    data=data.frame(intreg$selection, what="incorrect labels"))+
        geom_segment(aes(min.L, segments, xend=max.L, yend=segments,
                         showSelected=signal),
                     data=data.frame(intreg$selection, what="segments"))+
        xlab("penalty value log(lambda)")+ # TODO: mathjax.
        facet_grid(what~., scales="free"),
-
        title="Max-margin interval regression")
-
 animint2dir(intreg.errors, "intreg-errors")
 
 ##animint2gist(intreg.errors)
