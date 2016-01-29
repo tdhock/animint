@@ -1,17 +1,3 @@
-##' Insert an interactive animation into an R markdown document.
-##' @param plot.list named list of ggplots and option lists to pass to
-##' gg2animint.
-##' @return Nothing, but outputs HTML that will render the interactive
-##' animation.
-##' @author Toby Dylan Hocking
-##' @export
-gg2animint_knitr <- function(plot.list){
-  gg2animint(plot.list, ".", FALSE)
-  html <- system.file(file.path("htmljs","scripts.html"), package="animint")
-  slines <- readLines(html)
-  cat(slines,sep="\n")
-}
-
 #' Insert an interactive animation into an R markdown document using a customized print method.
 #' @param x named list of ggplots and option lists to pass to \code{animint2dir}.
 #' @param options knitr options.
@@ -21,18 +7,17 @@ gg2animint_knitr <- function(plot.list){
 #' @export
 knit_print.animint <- function(x, options, ...) {
   if (!requireNamespace("knitr")) warning("Please install.packages('knitr')")
-  wd <- getwd()
-  on.exit(setwd(wd))
   # This function should be evaluated in knitr's output directory
-  setwd(knitr::opts_knit$get()[["output.dir"]])
+  output.dir <- knitr::opts_knit$get()[["output.dir"]]
+  ## sink()
+  ## print(output.dir)
+  ## browser()
+  old.wd <- setwd(output.dir)
+  on.exit(setwd(old.wd))
   # the current knitr chunk 'label' defines a directory to place the animints 
   # hopefully this regular expression is safe enough to workaround bad chunk names
   # http://stackoverflow.com/questions/8959243/r-remove-non-alphanumeric-symbols-from-a-string
   dir <- gsub("[^[:alnum:]]", "", options$label)
-  # modify the directory name until we find a unique one
-#   while (file.exists(dir)) {
-#     dir <- paste0(dir, "2")
-#   }
   animint2dir(x, out.dir = dir, json.file = 'plot.json', open.browser = FALSE)
   res <- new_animint(list(id = dir), json.file = file.path(dir, 'plot.json'))
   # if this is the first plot, place scripts just before the plot

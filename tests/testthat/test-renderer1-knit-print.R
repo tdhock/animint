@@ -1,12 +1,13 @@
 acontext("knitting multiple animint plots in a single Rmd")
 
 knitr::knit_meta() #clear knitr 'metadata'
-test_file <- system.file("examples", "test_knit_print.Rmd", 
+Rmd.file <- system.file("examples", "test_knit_print.Rmd", 
                          package = "animint")
-
-setwd("animint-htmltest")
-rmarkdown::render(input = test_file, output_file = "index.html")
-setwd("..")
+index.file <- file.path("animint-htmltest", "index.Rmd")
+file.copy(Rmd.file, index.file)
+## https://github.com/rstudio/rmarkdown/issues/587#issuecomment-168437646
+## @yihui says "Do not use the output_dir argument of render()"
+rmarkdown::render(index.file)
 remDr$refresh()
 html <- getHTML()
 

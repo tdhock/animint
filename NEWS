@@ -180,6 +180,11 @@ RENDER: Determine why border of tiles in pirates example does not seem to be ren
 
 Depend ggplot2 < 2.0.
 
+BUGFIX: knit_print.animint seems to be working again with the most
+recent version of knitr/rmarkdown. Use rmarkdown::render("doc.Rmd")
+without the output_dir argument!
+https://github.com/rstudio/rmarkdown/issues/587#issuecomment-168437646
+
 2015.12.09 PR#125
 
 BUGFIX: geom_widerect should now render properly in all
