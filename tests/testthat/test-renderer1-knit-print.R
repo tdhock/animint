@@ -5,7 +5,7 @@ test_file <- system.file("examples", "test_knit_print.Rmd",
                          package = "animint")
 
 setwd("animint-htmltest")
-rmarkdown::render(input = test_file, output = "index.html")
+rmarkdown::render(input = test_file, output_file = "index.html")
 setwd("..")
 remDr$refresh()
 html <- getHTML()
