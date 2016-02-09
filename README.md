@@ -19,7 +19,9 @@ only [about 60 lines of R code](inst/examples/WorldBank-facets.R).
 
 ```s
 if (!require(devtools)) install.packages("devtools")
-devtools::install_github(c("tdhock/ggplot2", "tdhock/animint"), build_vignettes=FALSE)
+devtools::install_github("tdhock/animint", dep=TRUE) # all dependencies.
+devtools::install_github("tdhock/ggplot2", dep=TRUE, build_vignettes=FALSE) #old ggplot2
+devtools::install_github("tdhock/animint", dep=FALSE) # do not install ggplot2 from CRAN.
 library(animint)
 example(animint)
 ```
