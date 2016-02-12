@@ -30,3 +30,5 @@ Suggests:
     devtools,
     httr,
     maps
+Remotes:
+    tdhock/ggplot2
