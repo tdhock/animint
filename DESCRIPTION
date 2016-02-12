@@ -31,5 +31,5 @@ Suggests:
     httr,
     maps
 Remotes:
-    tdhock/ggplot2
+    tdhock/ggplot2,
     ropensci/RSelenium
