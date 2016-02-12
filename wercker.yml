@@ -13,7 +13,8 @@ build:
     - script:
       name: echo install animint dependencies
       code: |
-        Rscript -e "library(devtools); install(dep=TRUE, upgrade_dependencies=FALSE)"
+        Rscript -e "devtools::install_deps(dependencies=TRUE)"
+        Rscript -e "devtools::install(upgrade_dependencies=FALSE)"
     - script:
       name: copy source to animint 
       code: |
