@@ -880,34 +880,26 @@ var animint = function (to_select, json_file) {
       draw_geom(g_info, chunk, selector_name, panel);
     });
   };
-  var download_sequence = function(g_name, s_name, seq){
+
+  function download_next(g_name){
     var g_info = Geoms[g_name];
-    var s_info = Selectors[s_name];
-    g_info.seq_i = seq.indexOf(s_info.selected);
-    g_info.seq_count = 0;
-    g_info.seq = seq;
-    download_next(g_name);
-  };
-  var download_next = function(g_name){
-    var g_info = Geoms[g_name];
-    var selector_value = g_info.seq[g_info.seq_i];
+    var selector_value = Animation.sequence[g_info.seq_i];
     var chunk_id = g_info.chunks[selector_value];
     var tsv_name = get_tsv(g_info, chunk_id);
     g_info.seq_count += 1;
-    if(g_info.seq_count > g_info.seq.length){
-      Animation.play();
-      return;
+    if(Animation.sequence.length == g_info.seq_count){
+      Animation.done_geoms[g_name] = 1;
     }
     g_info.seq_i += 1;
-    if(g_info.seq_i == g_info.seq.length){
+    if(g_info.seq_i == Animation.sequence.length){
       g_info.seq_i = 0;
     }
     download_chunk(g_info, tsv_name, function(chunk){
       download_next(g_name);
     })
-  };
+  }
 
-  // download_chunk is called from update_geom and download_sequence.
+  // download_chunk is called from update_geom and download_next.
   function download_chunk(g_info, tsv_name, funAfter){
     if(g_info.download_status.hasOwnProperty(tsv_name)){
       funAfter();
@@ -1749,12 +1741,19 @@ var animint = function (to_select, json_file) {
       return not_selected;
     }
   };
-  var update_next_animation = function () {
-    var v_name = Animation.variable;
-    var cur = Selectors[v_name].selected;
-    var next = Animation.next[cur];
-    update_selector(v_name, next);
-  };
+  
+  function update_next_animation(){
+    var values = d3.values(Animation.done_geoms);
+    if(d3.sum(values) == values.length){
+      // If the values in done_geoms are all 1, then we have loaded
+      // all of the animation-related chunks, and we can start
+      // playing the animation.
+      var v_name = Animation.variable;
+      var cur = Selectors[v_name].selected;
+      var next = Animation.next[cur];
+      update_selector(v_name, next);
+    }
+  }
 
   // The main idea of how legends work:
 
@@ -2241,22 +2240,19 @@ var animint = function (to_select, json_file) {
 	Animation.timer = null;
         Widgets["play_pause"].text("Play");
       };
-      Selectors[Animation.variable].update.forEach(function(g_name){
+      var s_info = Selectors[Animation.variable];
+      Animation.done_geoms = {};
+      s_info.update.forEach(function(g_name){
         var g_info = Geoms[g_name];
-	// If there is only 1 chunk we don't need to download anything
-	// else.
-	if(g_info.chunk_order.length == 0){
-          return;
-        }
-        if(g_info.chunk_order.length != 1){
-	  Animation.play();
-	  return;
-        }
-        if(g_info.chunk_order[0] != Animation.variable){
-          return; // ignore if this geom is chunked on a non-anim variable.
-        }
-        download_sequence(g_name, Animation.variable, Animation.sequence);
+        if(g_info.chunk_order.length == 1 &&
+	   g_info.chunk_order[0] == Animation.variable){
+	  g_info.seq_i = Animation.sequence.indexOf(s_info.selected);
+	  g_info.seq_count = 0;
+	  Animation.done_geoms[g_name] = 0;
+	  download_next(g_name);
+	}
       });
+      Animation.play();
       all_geom_names = d3.keys(response.geoms);
 
       // This code starts/stops the animation timer when the page is
