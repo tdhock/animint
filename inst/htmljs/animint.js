@@ -889,6 +889,7 @@ var animint = function (to_select, json_file) {
     g_info.seq_count += 1;
     if(Animation.sequence.length == g_info.seq_count){
       Animation.done_geoms[g_name] = 1;
+      return;
     }
     g_info.seq_i += 1;
     if(g_info.seq_i == Animation.sequence.length){
