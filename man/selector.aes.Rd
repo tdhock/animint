@@ -4,7 +4,7 @@
 \alias{selector.aes}
 \title{Parse selectors from aes names.}
 \usage{
-selector.aes(a.vec)
+selector.aes(a.list)
 }
 \arguments{
 \item{a.vec}{character vector of aes names.}

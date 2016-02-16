@@ -4,14 +4,12 @@
 \alias{varied.chunk}
 \title{Extract subset for each data.frame in a list of data.frame}
 \usage{
-varied.chunk(df.list, cols, nest_order)
+varied.chunk(df.or.list, cols)
 }
 \arguments{
-\item{df.list}{list of data.frame.}
+\item{df.or.list}{a data.frame or a list of data.frame.}
 
 \item{cols}{cols that each data.frame would keep.}
-
-\item{nest_order}{columns used for d3 nest.}
 }
 \value{
 list of data.frame.

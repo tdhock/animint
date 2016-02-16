@@ -99,7 +99,8 @@ Unsupported scales:
 library(animint)
 data(WorldBank)
 gapminder <-
-  list(ts=ggplot()+
+  list(title="Linked scatterplot and time series",
+       ts=ggplot()+
        make_tallrect(WorldBank, "year")+
        geom_line(aes(year, life.expectancy, group=country, color=region,
                      clickSelects=country),
@@ -108,6 +109,7 @@ gapminder <-
        duration=list(year=1000),
        scatter=ggplot()+
        geom_point(aes(fertility.rate, life.expectancy, clickSelects=country,
+                      key=country,
                       showSelected=year, colour=region, size=population),
                   data=WorldBank)+
        geom_text(aes(fertility.rate, life.expectancy, label=country,
@@ -143,15 +145,15 @@ popPlots <-
        geom_line(aes(year, population, group=subcontinent,
                      clickSelects=subcontinent),
                  data=worldPop, size=4, alpha=3/4))
-animint2dir(popPlots)
+animint2dir(popPlots, "WorldPop-interactive")
 ## Make it animated by specifying year as the variable to animate and
 ## an interval of 2000 milliseconds between animation frames.
 popAnim <- c(popPlots, list(time=list(variable="year",ms=2000)))
-animint2dir(popAnim)
+animint2dir(popAnim, "WorldPop-animated")
 ## Make the animation smooth by specifying a duration of 1000 ms for
 ## geoms with aes(showSelected=year).
 popSmooth <- c(popAnim, list(duration=list(year=1000)))
-animint2dir(popSmooth)
+animint2dir(popSmooth, "WorldPop-smooth")
 
 }
 \seealso{
