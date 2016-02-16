@@ -4,8 +4,10 @@ library(animint)
 shinyServer(function(input, output) {
   
   getPlot <- reactive({
-    ggplot(mapping = aes_string(x = input$x, y = input$y, 
-                                color = input$col)) + 
+    ggplot(mapping = aes_string(
+             x = input$x, y = input$y,
+             size=input$size,
+             color = input$col)) + 
       geom_point(data = mtcars)
   })
   
