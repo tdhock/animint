@@ -2,11 +2,23 @@ acontext("TestROC")
 
 data(TestROC, package="animint")
 
+##RColorBrewer::display.brewer.all()
+## x <- RColorBrewer::brewer.pal(12, "Paired")
+## cat(deparse(x))
+
+algo.colors <-
+  c(hmcan="#A6CEE3",
+    hmcan.broad="#1F78B4",
+    PeakSegJoint="grey40",
+    macs="#FDBF6F",
+    macs.broad="#FF7F00")
+
 path.before.params <- list(
   title="Test ROC curves, predicted peaks and errors",
   roc=ggplot()+
   geom_path(aes(FPR, TPR, group=Model, key=Model, color=Model),
             data=TestROC$roc)+
+  scale_color_manual(values=algo.colors, breaks=names(algo.colors))+
   geom_point(aes(FPR, TPR, color=Model, key=paste(model, parameter),
                  size=parameter,
                  fill=parameter),
@@ -47,6 +59,9 @@ test_that("path before params, 5 paths rendered", {
   expect_identical(linetype.computed, linetype.expected)
   path.list <- getNodeSet(info$html, '//g[@class="geom1_path_roc"]//path')
   expect_equal(length(path.list), 5)
+  stroke.vec <- getStyleValue(
+    info$html, '//td[@class="roc_legend"]//line', "stroke")
+  expect_color(stroke.vec, algo.colors)
 })
 
 path.after.params <- list(
@@ -62,6 +77,7 @@ path.after.params <- list(
                  fill=parameter),
              shape=21,
              data=subset(TestROC$parameters, parameter=="default"))+
+  scale_color_manual(values=algo.colors, breaks=names(algo.colors))+
   geom_path(aes(FPR, TPR, group=Model, key=Model, color=Model),
             data=TestROC$roc)+
   geom_point(aes(FPR, TPR, color=Model,
@@ -94,6 +110,9 @@ test_that("path after params, 5 paths rendered", {
   expect_identical(linetype.computed, linetype.expected)
   path.list <- getNodeSet(info$html, '//g[@class="geom3_path_roc"]//path')
   expect_equal(length(path.list), 5)
+  stroke.vec <- getStyleValue(
+    info$html, '//td[@class="roc_legend"]//line', "stroke")
+  expect_color(stroke.vec, algo.colors)
 })
 
 
