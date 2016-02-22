@@ -41,6 +41,10 @@ path.before.params <- list(
 
 test_that("path before params, 5 paths rendered", {
   info <- animint2HTML(path.before.params)
+  entry.list <- info$plots$roc$legend$Model$entries
+  linetype.computed <- sapply(entry.list, "[[", "pathlinetype")
+  linetype.expected <- rep(1, 5)
+  expect_identical(linetype.computed, linetype.expected)
   path.list <- getNodeSet(info$html, '//g[@class="geom1_path_roc"]//path')
   expect_equal(length(path.list), 5)
 })
@@ -84,6 +88,10 @@ path.after.params <- list(
 
 test_that("path after params, 5 paths rendered", {
   info <- animint2HTML(path.after.params)
+  entry.list <- info$plots$roc$legend$Model$entries
+  linetype.computed <- sapply(entry.list, "[[", "pathlinetype")
+  linetype.expected <- rep(1, 5)
+  expect_identical(linetype.computed, linetype.expected)
   path.list <- getNodeSet(info$html, '//g[@class="geom3_path_roc"]//path')
   expect_equal(length(path.list), 5)
 })
