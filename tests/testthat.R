@@ -1,11 +1,23 @@
 library("testthat")
 library("animint")
-library("RSelenium") # RSelenium works with firefox <= 37.0.2
+library("RSelenium")
 
-## TDH usually tests using 
+## RSelenium does not work with all versions of firefox, TDH usually
+## tests using one of the following.
 
 ## thocking@silene:~/R/animint-mine(fix-common-chunk)$ firefox --version
 ## Mozilla Firefox 11.0
+## TODO add version of selenium binary on my work computer.
+
+## > packageVersion("RSelenium")
+## [1] ‘1.3.5’
+## tdhock@recycled:~/R/animint(roc-bugfix)$ firefox --version
+## Mozilla Firefox 41.0
+## tdhock@recycled:~/R/animint(roc-bugfix*)$ java -jar ~/lib/R/library/RSelenium/bin/selenium-server-standalone.jar --version
+## 08:13:17.803 INFO - Launching a standalone Selenium Server
+## 08:13:17.877 INFO - Java: Oracle Corporation 24.79-b02
+## 08:13:17.877 INFO - OS: Linux 3.13.0-65-generic i386
+## 08:13:17.907 INFO - v2.47.0, with Core v2.47.0. Built from revision 0e4837e
 
 filter <- Sys.getenv("TEST_SUITE")
 dont.need.browser <- grepl("compiler", filter)

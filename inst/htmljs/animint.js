@@ -72,7 +72,7 @@ var animint = function (to_select, json_file) {
         6: size * 2 + "," + size * 2 + "," + size * 6 + "," + size * 2
       };
     } else { // R defined line types
-      if(lt == "solid"){
+      if(lt == "solid" || lt === null){
         return null;
       }
       var o = {

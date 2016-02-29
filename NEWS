@@ -176,6 +176,12 @@ https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol_type
 
 RENDER: Determine why border of tiles in pirates example does not seem to be rendering.
 
+2016.02.29 PR#134
+
+BUGFIX in merge_recurse when there are several geoms with different
+aes values that could be used to render legend entries, just take the
+last one (test-renderer3-roc.R).
+
 2016.01.28
 
 Depend ggplot2 < 2.0.
