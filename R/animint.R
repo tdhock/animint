@@ -1749,20 +1749,17 @@ getLegend <- function(mb){
   }
 }
 
-#' Function to merge a list of data frames (from the reshape package)
+#' Merge a list of data frames.
 #' @param dfs list of data frames
-#' @param ... other arguments to merge
-#' @return data frame of merged lists
-merge_recurse = function (dfs, ...)
-{
-  if (length(dfs) == 1) {
-    dfs[[1]]
+#' @return data frame
+merge_recurse <- function(dfs){
+  label.vec <- unique(unlist(lapply(dfs, function(df)paste(df$label))))
+  result <- data.frame(row.names=label.vec)
+  for(df in dfs){
+    df.label <- paste(df$label)
+    for(col.name in names(df)){
+      result[df.label, col.name] <- df[[col.name]]
+    }
   }
-  else if (length(dfs) == 2) {
-    merge(dfs[[1]], dfs[[2]], all.x = TRUE, sort = FALSE, ...)
-  }
-  else {
-    merge(dfs[[1]], Recall(dfs[-1]), all.x = TRUE, sort = FALSE,
-          ...)
-  }
+  result
 }
