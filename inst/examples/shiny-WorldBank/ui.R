@@ -16,7 +16,7 @@ shinyUI(fluidPage(
   br(),
   
   fluidRow(
-    column(2,
+    column(1,
       selectInput("x", "Choose an x variable", choices = nms,
                   selected = "fertility.rate"),
       selectInput("y", "Choose an y variable", choices = nms,
@@ -26,10 +26,7 @@ shinyUI(fluidPage(
       selectInput("size", "Choose a size variable", choices = nms,
                   selected = "population")
     ),
-    column(5,
-      plotOutput("ggplot", height = "300px")
-    ),
-    column(5, 
+    column(2, 
       animintOutput("animint")
     )
   )
