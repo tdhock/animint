@@ -75,7 +75,12 @@ test_that("shiny changes axes", {
   old.facets <- getFacets()
   expect_identical(old.facets, c("fertility.rate", "Years"))
   e <- remDr$findElement("class name", "selectize-input")
+  ## This click and sendKeys is just to make sure we have focus on the
+  ## first selectize element.
   e$clickElement()
+  e$sendKeysToElement(list(key="backspace"))
+  e$clickElement() # hide menu
+  e$clickElement() # show menu
   remDr$sendKeysToActiveElement(list(key="backspace"))
   remDr$sendKeysToActiveElement(list("lite"))
   remDr$sendKeysToActiveElement(list(key="enter"))
