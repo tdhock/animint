@@ -7,7 +7,13 @@ library("RSelenium")
 
 ## thocking@silene:~/R/animint-mine(fix-common-chunk)$ firefox --version
 ## Mozilla Firefox 11.0
-## TODO add version of selenium binary on my work computer.
+## thocking@silene:~/R/animint(animation-fix)$ java -jar ~/lib/R/library/RSelenium/bin/selenium-server-standalone.jar --version
+## 10:10:58.942 INFO - Launching a standalone server
+## 10:10:58.973 INFO - Java: Sun Microsystems Inc. 23.25-b01
+## 10:10:58.973 INFO - OS: Linux 3.8.0-44-generic amd64
+## 10:10:58.987 INFO - v2.44.0, with Core v2.44.0. Built from revision 76d78cf
+## > packageVersion("RSelenium")
+## [1] ‘1.3.6’
 
 ## > packageVersion("RSelenium")
 ## [1] ‘1.3.5’
