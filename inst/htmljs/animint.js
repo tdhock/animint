@@ -897,9 +897,13 @@ var animint = function (to_select, json_file) {
     if(g_info.seq_i == Animation.sequence.length){
       g_info.seq_i = 0;
     }
-    download_chunk(g_info, tsv_name, function(chunk){
+    if(typeof(chunk_id) == "string"){
+      download_chunk(g_info, tsv_name, function(chunk){
+	download_next(g_name);
+      })
+    }else{
       download_next(g_name);
-    })
+    }
   }
 
   // download_chunk is called from update_geom and download_next.
