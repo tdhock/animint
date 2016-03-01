@@ -30,13 +30,27 @@ animint:::run_servr(port = 3148, directory = shiny_dir, code = shiny_cmd)
 address <- sprintf("http://localhost:3148")
 
 test_that("WorldBank renders in a shiny app", {
-  Sys.sleep(10) # give shiny a second to do it's thing
+  Sys.sleep(1) # give shiny a second to do it's thing
   remDr$navigate(address)
-  Sys.sleep(10)
+  Sys.sleep(20)
   ## just check that svg is displayed
   html <- getHTML()
   circles <- getNodeSet(html, "//div[@id='animint']//circle")
   expect_true(length(circles) >= 1)
+})
+
+getYear <- function(){
+  node.set <- getNodeSet(getHTML(), '//g[@class="geom10_text_ts"]//text')
+  expect_equal(length(node.set), 1)
+  value <- xmlValue(node.set[[1]])
+  sub("year = ", "", value)
+}
+
+test_that("animation updates", {
+  old.year <- getYear()
+  Sys.sleep(5) #wait for two animation frames.
+  new.year <- getYear()
+  expect_true(old.year != new.year)
 })
 
 getTickLeft <- function(){
@@ -61,20 +75,6 @@ test_that("animint fits in div", {
   tick.left.vec <- getTickLeft()
   div.left <- getDivLeft()
   expect_true(all(div.left < tick.left.vec))
-})
-
-getYear <- function(){
-  node.set <- getNodeSet(getHTML(), '//g[@class="geom10_text_ts"]//text')
-  expect_equal(length(node.set), 1)
-  value <- xmlValue(node.set[[1]])
-  sub("year = ", "", value)
-}
-
-test_that("animation updates", {
-  old.year <- getYear()
-  Sys.sleep(5) #wait for two animation frames.
-  new.year <- getYear()
-  expect_true(old.year != new.year)
 })
 
 getCountries <- function(){
