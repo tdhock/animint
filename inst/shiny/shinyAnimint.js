@@ -10,8 +10,8 @@ animintBinding.renderValue = function(el, data) {
   var old_plot = d3.select(el).selectAll("*").remove();
   // add the new plot
   var json_file = "animintAssets/" + data.jsonFile
-  var plot = new animint(el, json_file);
-  
+  var selector_string = "#" + el.id;
+  var plot = new animint(selector_string, json_file);
 };
 
 Shiny.outputBindings.register(animintBinding, "cpsievert.animintBinding");

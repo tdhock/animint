@@ -17,7 +17,8 @@ shinyUI(fluidPage(
     column(2,
       selectInput("x", "Choose an x variable", choices = nms, selected = nms[1]),
       selectInput("y", "Choose an y variable", choices = nms, selected = nms[3]),
-      selectInput("col", "Choose an color variable", choices = nms, selected = nms[6])
+      selectInput("col", "Choose an color variable", choices = nms, selected = nms[6]),
+      selectInput("size", "Choose a size variable", choices = nms, selected = nms[5])
     ),
     column(5,
       plotOutput("ggplot", height = "300px")

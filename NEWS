@@ -176,6 +176,16 @@ https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol_type
 
 RENDER: Determine why border of tiles in pirates example does not seem to be rendering.
 
+RENDER: multiple animints inside of a single shiny app? This is
+probably just a theoretical issue. (why not just make a single
+animint?)
+
+2016.03.01 PR#133
+
+BUGFIX for an animint inside of shiny. Thanks to @lrmelt who brought
+up the issue #132. Now we have a test for animating, changing shiny
+widgets, and re-rendering an animint inside of a shiny app.
+
 2016.02.29 PR#134
 
 BUGFIX in merge_recurse when there are several geoms with different
