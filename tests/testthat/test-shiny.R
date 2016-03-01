@@ -39,6 +39,30 @@ test_that("WorldBank renders in a shiny app", {
   expect_true(length(circles) >= 1)
 })
 
+getTickLeft <- function(){
+  remDr$executeScript('
+var node_list = document.querySelectorAll(".yaxis text");
+var left_array = [];
+for(var i=0; i < node_list.length; i++){
+  var rect = node_list[i].getBoundingClientRect();
+  left_array[i] = rect["left"];
+}
+return left_array;
+')[[1]]
+}
+
+getDivLeft <- function(){
+  remDr$executeScript('
+return document.querySelector("#animint").getBoundingClientRect()["left"];
+')[[1]]
+}
+
+test_that("animint fits in div", {
+  tick.left.vec <- getTickLeft()
+  div.left <- getDivLeft()
+  expect_true(all(div.left < tick.left.vec))
+})
+
 getYear <- function(){
   node.set <- getNodeSet(getHTML(), '//g[@class="geom10_text_ts"]//text')
   expect_equal(length(node.set), 1)
