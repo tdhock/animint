@@ -26,9 +26,9 @@ shinyServer(function(input, output) {
     not.na.x$year.country <- with(not.na.x, paste(year, country))
     not.na.y <- WorldBank[!is.na(y.na),]
     not.na.y$year.country <- with(not.na.y, paste(year, country))
-    x <- not.na[[input$x]]
-    y <- not.na[[input$y]]
-    years <- unique(not.na[, "year", drop=FALSE])
+    x <- not.na.x[[input$x]]
+    y <- not.na.y[[input$y]]
+    years <- unique(WorldBank[, "year", drop=FALSE])
     years$x <- (max(x)+min(x))/2
     years$y <- max(y)
     by.country <- split(not.na, not.na$country)
