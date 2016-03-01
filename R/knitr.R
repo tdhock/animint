@@ -96,12 +96,11 @@ renderAnimint <- function(expr, env = parent.frame(), quoted = FALSE) {
   # everytime shiny calls renderFunc
   renderFunc <- function(shinysession, name, ...) {
     val <- func()
-    # using digest will guarantee a unique json file name for each animint plot
-    jsonFile <- paste0(digest::digest(val), '.json')
-    tmp <- tempdir()
-    stuff <- animint2dir(val, out.dir = tmp, json.file = jsonFile, open.browser = FALSE)
+    tmp <- tempfile()
+    dir.create(tmp)
+    stuff <- animint2dir(val, out.dir = tmp, open.browser = FALSE)
     shiny::addResourcePath("animintAssets", tmp)
-    list(jsonFile = jsonFile)
+    list(jsonFile = "plot.json")
   }
   shiny::markRenderFunction(animint::animintOutput, renderFunc)
 }
