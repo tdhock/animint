@@ -295,7 +295,9 @@ var animint = function (to_select, json_file) {
     var axispaddingy = 5;
     if(p_info.hasOwnProperty("ylabs") && p_info.ylabs.length){
       axispaddingy += Math.max.apply(null, p_info.ylabs.map(function(entry){
-	     return measureText(entry, 11).width;
+	// + 5 to give a little extra space to avoid bad axis labels
+	// in shiny.
+	return measureText(entry, 11).width + 5;
       }));
     }
     var axispaddingx = 10 + 20;
