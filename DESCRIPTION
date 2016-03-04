@@ -7,7 +7,7 @@ Title: Interactive animations
 Description: An interactive animation can be defined using a list of
     ggplots with clickSelects and showSelected aesthetics.
 Depends:
-    ggplot2 (< 2.0),
+    ggplot2 (>= 2.0),
     proto,
     R (>= 2.10)
 Imports:
@@ -31,6 +31,4 @@ Suggests:
     httr,
     maps
 Remotes:
-    tdhock/ggplot2,
-    ropensci/RSelenium,
-    hadley/scales@2c3edf45de56d617444dc38e47e0404173817886
+    ropensci/RSelenium
