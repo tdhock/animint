@@ -3,7 +3,7 @@ acontext("law of large numbers")
 #The function which is used to simulate the law of large numbers
 law_large_numbers <- function(FUN = rnorm,mu = 0,np = 30,n = 100)
 {
-r ploygons and points for showing the animation
+ # ploygons and points for showing the animation
   polygon_data = points_data = NULL
   for (i in 1:n) {
     d = colMeans(matrix(replicate(np, FUN(i, mu)), i))
