@@ -1,0 +1,265 @@
+{
+ "geoms": {
+ "geom1_polygon_ani": {
+ "geom": "polygon",
+"classed": "geom1_polygon_ani",
+"aes": {
+ "x": "x",
+"y": "y",
+"showSelected": "index" 
+},
+"params": {
+ "colour": "#FFE4C4" 
+},
+"types": {
+ "x": "numeric",
+"y": "numeric",
+"showSelected": "integer",
+"PANEL": "integer",
+"group": "integer" 
+},
+"timeValues": [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100 ],
+"PANEL": 1,
+"chunk_order": [],
+"nest_order": [
+ "showSelected" 
+],
+"subset_order": [
+ "showSelected" 
+],
+"chunks": 1,
+"total": 1,
+"nextgeom": "geom2_point_ani" 
+},
+"geom2_point_ani": {
+ "geom": "point",
+"classed": "geom2_point_ani",
+"aes": {
+ "x": "x",
+"y": "y",
+"showSelected": "index" 
+},
+"params": {
+ "na.rm": false,
+"shape":     20,
+"colour": "#BEBEBE" 
+},
+"types": {
+ "x": "numeric",
+"y": "numeric",
+"showSelected": "integer",
+"PANEL": "integer" 
+},
+"timeValues": [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100 ],
+"PANEL": 1,
+"chunk_order": [],
+"nest_order": [
+ "showSelected" 
+],
+"subset_order": [
+ "showSelected" 
+],
+"chunks": 1,
+"total": 1,
+"nextgeom": "geom3_abline_ani" 
+},
+"geom3_abline_ani": {
+ "geom": "segment",
+"classed": "geom3_abline_ani",
+"aes": [ ],
+"params": {
+ "intercept":      0,
+"slope":      0 
+},
+"types": {
+ "PANEL": "integer",
+"x": "numeric",
+"xend": "numeric",
+"y": "numeric",
+"yend": "numeric" 
+},
+"PANEL": 1,
+"chunk_order": [],
+"nest_order": [],
+"subset_order": [],
+"chunks": 1,
+"total": 1 
+} 
+},
+"time": {
+ "variable": "index",
+"ms":    200,
+"variable": "index",
+"ms":    200,
+"sequence": [ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59", "60", "61", "62", "63", "64", "65", "66", "67", "68", "69", "70", "71", "72", "73", "74", "75", "76", "77", "78", "79", "80", "81", "82", "83", "84", "85", "86", "87", "88", "89", "90", "91", "92", "93", "94", "95", "96", "97", "98", "99", "100" ] 
+},
+"selectors": {
+ "index": {
+ "is.variable.value": false,
+"type": "single",
+"showSelected": true,
+"selected": "1",
+"levels": [ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59", "60", "61", "62", "63", "64", "65", "66", "67", "68", "69", "70", "71", "72", "73", "74", "75", "76", "77", "78", "79", "80", "81", "82", "83", "84", "85", "86", "87", "88", "89", "90", "91", "92", "93", "94", "95", "96", "97", "98", "99", "100" ],
+"update": [
+ "geom1_polygon_ani",
+"geom2_point_ani" 
+] 
+} 
+},
+"plots": {
+ "ani": {
+ "panel_margin_lines":   0.25,
+"legend": {},
+"strips": {
+ "top": [
+ "" 
+],
+"right": [
+ "" 
+],
+"n": {
+ "top":      0,
+"right":      0 
+} 
+},
+"layout": {
+ "PANEL": [ 1 ],
+"ROW": [ 1 ],
+"COL": [ 1 ],
+"SCALE_X": [ 1 ],
+"SCALE_Y": [ 1 ],
+"AXIS_X": [ true ],
+"AXIS_Y": [ true ],
+"coord_fixed": [ false ],
+"width_proportion": [      1 ],
+"height_proportion": [      1 ] 
+},
+"geoms": [
+ "geom1_polygon_ani",
+"geom2_point_ani",
+"geom3_abline_ani" 
+],
+"panel_background": {
+ "fill": "#FFFFFF",
+"colour": "transparent",
+"size":    0.5,
+"linetype":      1 
+},
+"panel_border": {
+ "fill": "transparent",
+"colour": "#7F7F7F",
+"size":    0.5,
+"linetype":      1 
+},
+"grid_major": {
+ "colour": "#E5E5E5",
+"size":    0.2,
+"linetype":      1,
+"lineend": "butt",
+"loc": {
+ "x": [
+ 0.036272,
+0.26584,
+0.49541,
+0.72498,
+0.95455 
+],
+"y": [
+ 0.0047561,
+0.18187,
+0.35899,
+0.53611,
+0.71323,
+0.89035 
+] 
+} 
+},
+"grid_minor": {
+ "colour": "#FAFAFA",
+"size":    0.5,
+"linetype":      1,
+"lineend": "butt",
+"loc": {
+ "x": [
+ 0.15106,
+0.38062,
+0.61019,
+0.83976 
+],
+"y": [
+ 0.093315,
+0.27043,
+0.44755,
+0.62467,
+0.80179,
+0.97891 
+] 
+} 
+},
+"axis1": {
+ "x": [
+ 0.036272,
+0.26584,
+0.49541,
+0.72498,
+0.95455 
+],
+"xlab": [
+ "0",
+"25",
+"50",
+"75",
+"100" 
+],
+"xrange": [  -3.95, 104.95 ],
+"xline": false,
+"xticks": true,
+"y": [
+ 0.0047561,
+0.18187,
+0.35899,
+0.53611,
+0.71323,
+0.89035 
+],
+"ylab": [
+ "-3",
+"-2",
+"-1",
+"0",
+"1",
+"2" 
+],
+"yrange": [ -3.0269, 2.6191 ],
+"yline": false,
+"yticks": true 
+},
+"xtitle": "n",
+"xanchor": "middle",
+"xangle":      0,
+"ytitle": "Mean of X",
+"yanchor": "end",
+"yangle":      0,
+"xlabs": [
+ "0",
+"25",
+"50",
+"75",
+"100" 
+],
+"ylabs": [
+ "-3",
+"-2",
+"-1",
+"0",
+"1",
+"2" 
+],
+"title": "Law of Large numbers",
+"options": {
+ "width":    400,
+"height":    400 
+} 
+} 
+} 
+}
