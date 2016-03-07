@@ -83,6 +83,10 @@ test_that("lines do not exceed ranges of plot", {
   expect_true(all(as.numeric(start_ends) >= 0))
 })
 
+test_that("ablines are horizontal", {
+  expect_true(start_ends["y1"]==start_ends["y2"])
+})
+
 #Testing about polygons
 
 polygons <- getNodeSet(info$html, '//svg//g[@class="geom1_polygon_ani"]//path')
@@ -131,6 +135,21 @@ test_that("xlab renders", {
   ylabel <- getNodeSet(info$html, "//text[@class='xtitle']")
   expect_identical(xmlValue(ylabel[[1]]), "n")
 })
+
+getPoint <- function(){
+  node.set <- getNodeSet(getHTML(), '//svg//g[@class="geom2_point_ani"]//circle')
+  attr_points <- sapply(node.set, xmlAttrs)
+  points_paths <- attr_points[c("cx","cy","r"), ]
+  length(points_paths)
+}
+
+test_that("Test that animation starts immediately", {
+  old.point <- getPoint()
+  Sys.sleep(5) #wait for two animation frames.
+  new.point <- getPoint()
+  expect_true(old.point != new.point)
+})
+
 
 
 
