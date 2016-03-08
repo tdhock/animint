@@ -4,7 +4,7 @@ path.list <- list()
 N <- 100
 x <- 1:N
 point <- data.frame(
-  showSelected.i=1:n.showSelected)
+  showSelected.i=1:2)
 set.seed(1)
 for(group.i in 1:2){
   for(showSelected.i in point$showSelected.i){
@@ -51,6 +51,6 @@ test_that("transitions only for equivalent keys", {
   d.during <- getD()
   Sys.sleep(3)
   d.after <- getD()
-  expect_identical(d.before == d.during, c(FALSE, FALSE, TRUE, TRUE))
-  expect_identical(d.before == d.after, c(FALSE, FALSE, FALSE, FALSE))
+  expect_identical(d.before == d.during, c(FALSE, FALSE, FALSE, FALSE))
+  expect_identical(d.during == d.after, c(FALSE, FALSE, TRUE, TRUE))
 })
