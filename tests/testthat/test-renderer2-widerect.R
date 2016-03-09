@@ -306,11 +306,13 @@ test_that("clicking legend removes/adds countries", {
   expect_opacity(before$legends, 1)
   
   clickID("North America")
+  Sys.sleep(1)
   oneclick <- rects_and_legends()
   expect_equal(length(oneclick$rects), 0)
   expect_opacity(oneclick$legends, 0.5)
 
   clickID("North America")
+  Sys.sleep(1)
   twoclicks <- rects_and_legends()
   expect_equal(length(twoclicks$rects), 1)
   expect_opacity(twoclicks$legends, 1)
