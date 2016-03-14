@@ -49,20 +49,50 @@ getHTML <- function(){
   XML::htmlParse(remDr$getPageSource(), asText = TRUE)
 }
 
-ensure_rgb <- function(color.vec){
-  is.rgb <- grepl("rgb", color.vec)
-  not.rgb <- color.vec
-  not.rgb[is.rgb] <- "black"
-  hex.vec <- toRGB(not.rgb)
-  rgb.mat <- col2rgb(hex.vec)
-  no.paren <- apply(rgb.mat, 2, function(x)paste(x, collapse=", "))
-  rgb.vec <- paste0("rgb(", no.paren, ")")
-  as.character(ifelse(is.rgb, color.vec, rgb.vec))
+rgba.pattern <- paste0(
+  "(?<before>rgba?)",
+  " *[(] *",
+  "(?<red>[0-9]+)",
+  " *, *",
+  "(?<green>[0-9]+)",
+  " *, *",
+  "(?<blue>[0-9]+)",
+  "(?:",
+  " *, *",
+  "(?<alpha>[^)]+)",
+  ")?",
+  " *[)]")
+ensure_rgba <- function(color.vec){
+  match.mat <- str_match_perl(color.vec, rgba.pattern)
+  is.not.rgb <- is.na(match.mat[,1])
+  hex.vec <- toRGB(color.vec[is.not.rgb])
+  not.rgb.mat <- col2rgb(hex.vec, alpha=TRUE)
+  rgb.cols <- c("red", "green", "blue")
+  match.mat[is.not.rgb, rgb.cols] <- t(not.rgb.mat[rgb.cols,])
+  match.mat[is.not.rgb, "alpha"] <- not.rgb.mat["alpha",]/255
+  is.rgb <- match.mat[, "before"] == "rgb"
+  match.mat[is.rgb, "alpha"] <- 1
+  is.transparent <- match.mat[, "alpha"] == 0
+  match.mat[, rgb.cols] <- 0
+  opacity <- as.numeric(match.mat[, "alpha"])
+  if(any(is.na(opacity))){
+    print(match.mat)
+    stop("missing alpha opacity value")
+  }
+  match.mat[, "alpha"] <- paste(opacity)
+  rgba.cols <- c(rgb.cols, "alpha")
+  rgba.mat <- matrix(match.mat[, rgba.cols], nrow(match.mat), length(rgba.cols))
+  no.paren <- apply(rgba.mat, 1, function(x)paste(x, collapse=", "))
+  paste0("rgba(", no.paren, ")")
 }
+stopifnot(ensure_rgba("transparent") == ensure_rgba("rgba(0, 0, 0, 0.0)"))
+stopifnot(ensure_rgba("rgba(0, 0, 0, 0.0)") == ensure_rgba("rgba(0, 0, 0, 0)"))
+stopifnot(ensure_rgba("rgba(0, 0, 0, 0.1)") != ensure_rgba("rgba(0, 0, 0, 0)"))
+stopifnot(ensure_rgba("rgb(0, 0, 0)") == ensure_rgba("rgba(0, 0, 0, 1)"))
 
 expect_color <- function(computed.vec, expected.vec) {
-  computed.rgb <- ensure_rgb(computed.vec)
-  expected.rgb <- ensure_rgb(expected.vec)
+  computed.rgb <- ensure_rgba(computed.vec)
+  expected.rgb <- ensure_rgba(expected.vec)
   expect_identical(computed.rgb, expected.rgb)
 }
 
