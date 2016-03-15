@@ -2,7 +2,7 @@
 #'
 #' @param plotList A named list of ggplot2 objects
 animint2HTML <- function(plotList) {
-  res <- animint2dir(plotList, out.dir = "animint-htmltest",
+  res <- animint2dir(plotList, out.dir = "animint-htmltest", 
                      open.browser = FALSE)
   remDr$refresh()
   Sys.sleep(1)
@@ -68,7 +68,7 @@ str_match_all_perl <- function(string,pattern){
 }
 
 getSelectorWidgets <- function(html=getHTML()){
-  tr.list <- getNodeSet(html,
+  tr.list <- getNodeSet(html, 
                         '//table[@class="table_selector_widgets"]//tr')
   td.list <- sapply(tr.list[-1], function(tr)xmlChildren(tr)[[1]])
   sapply(td.list, xmlValue)
