@@ -1187,14 +1187,25 @@ var animint = function (to_select, json_file) {
       // using path (case of only 1 thing and no groups).
 
       // we need to use a path for each group.
-      var kv = d3.entries(d3.keys(data));
-      kv = kv.map(function (d) {
+      var keyed_data = {}, one_group, group_id, k;
+      for(group_id in data){
+	one_group = data[group_id];
+	one_row = one_group[0];
+	if(one_row.hasOwnProperty("key")){
+	  k = one_row.key;
+	}else{
+	  k = group_id;
+	}
+	keyed_data[k] = one_group;
+      }
+      var kv_array = d3.entries(d3.keys(keyed_data));
+      var kv = kv_array.map(function (d) {
         //d[aes.group] = d.value;
 
         // Need to store the clickSelects value that will
         // be passed to the selector when we click on this
         // item.
-        d.clickSelects = data[d.value][0].clickSelects;
+        d.clickSelects = keyed_data[d.value][0].clickSelects;
         return d;
       });
 
@@ -1212,22 +1223,11 @@ var animint = function (to_select, json_file) {
           .y(toXY("y", "y"));
       }
       // select the correct group before returning anything.
-      if(key_fun != null){
-        key_fun = function(group_info){
-	  if(data.hasOwnProperty(group_info.value)){
-            var one_group = data[group_info.value];
-	    var one_row = one_group[0];
-	    // take key from first value in the group.
-	    return one_row.key;
-	  }else{
-	    // may be called on data which is not in the current
-	    // selection set?
-	    return null;
-	  }
-        };
-      }
+      key_fun = function(group_info){
+	return group_info.value;
+      };
       id_fun = function(group_info){
-        var one_group = data[group_info.value];
+        var one_group = keyed_data[group_info.value];
         var one_row = one_group[0];
 	      // take key from first value in the group.
 	      return one_row.id;
@@ -1235,7 +1235,7 @@ var animint = function (to_select, json_file) {
       elements = elements.data(kv, key_fun);
       eActions = function (e) {
         e.attr("d", function (d) {
-          var one_group = data[d.value];
+          var one_group = keyed_data[d.value];
           // filter NaN since they make the whole line disappear!
 	  var no_na = one_group.filter(function(d){
             if(g_info.geom == "ribbon"){
@@ -1250,31 +1250,31 @@ var animint = function (to_select, json_file) {
             if (g_info.geom == "line" || g_info.geom == "path") {
               return "none";
             }
-            var one_group = data[group_info.value];
+            var one_group = keyed_data[group_info.value];
             var one_row = one_group[0];
             // take color for first value in the group
             return get_fill(one_row);
           })
           .style("stroke-width", function (group_info) {
-            var one_group = data[group_info.value];
+            var one_group = keyed_data[group_info.value];
             var one_row = one_group[0];
   	        // take size for first value in the group
             return get_size(one_row);
           })
           .style("stroke", function (group_info) {
-            var one_group = data[group_info.value];
+            var one_group = keyed_data[group_info.value];
             var one_row = one_group[0];
   	        // take color for first value in the group
             return get_colour(one_row);
           })
           .style("stroke-dasharray", function (group_info) {
-            var one_group = data[group_info.value];
+            var one_group = keyed_data[group_info.value];
             var one_row = one_group[0];
   	        // take linetype for first value in the group
             return get_dasharray(one_row);
           })
           .style("stroke-width", function (group_info) {
-            var one_group = data[group_info.value];
+            var one_group = keyed_data[group_info.value];
             var one_row = one_group[0];
   	        // take line size for first value in the group
             return get_size(one_row);
@@ -1640,7 +1640,7 @@ var animint = function (to_select, json_file) {
       var text_fun, get_one;
       if(g_info.data_is_object){
 	get_one = function(d_or_kv){
-          var one_group = data[d_or_kv.value];
+          var one_group = keyed_data[d_or_kv.value];
 	  return one_group[0];
         };
       }else{
