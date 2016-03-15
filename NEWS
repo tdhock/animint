@@ -180,6 +180,17 @@ RENDER: multiple animints inside of a single shiny app? This is
 probably just a theoretical issue. (why not just make a single
 animint?)
 
+2016.03.14 PR#140
+
+BUGFIX for geom_point(aes(color), fill=NA), new ensure_rgba for test
+infrastructure that can convert arbitrary colors to rgba format
+(respecting alpha opacity).
+
+2016.03.08 PR#137
+
+BUGFIX for geom_path(aes(group, key)) with animated transitions, see
+test-renderer3-path-key.R.
+
 2016.03.01 PR#133
 
 BUGFIX for an animint inside of shiny. Thanks to @lrmelt who brought
