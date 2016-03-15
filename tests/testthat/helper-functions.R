@@ -22,6 +22,51 @@ acontext <- function(...){
   context(...)
 }
 
+## Parse the first occurance of pattern from each of several strings
+## using (named) capturing regular expressions, returning a matrix
+## (with column names).
+str_match_perl <- function(string,pattern){
+  stopifnot(is.character(string))
+  stopifnot(is.character(pattern))
+  stopifnot(length(pattern)==1)
+  parsed <- regexpr(pattern,string,perl=TRUE)
+  captured.text <- substr(string,parsed,parsed+attr(parsed,"match.length")-1)
+  captured.text[captured.text==""] <- NA
+  captured.groups <- do.call(rbind,lapply(seq_along(string),function(i){
+    st <- attr(parsed,"capture.start")[i,]
+    if(is.na(parsed[i]) || parsed[i]==-1)return(rep(NA,length(st)))
+    substring(string[i],st,st+attr(parsed,"capture.length")[i,]-1)
+  }))
+  result <- cbind(captured.text,captured.groups)
+  colnames(result) <- c("",attr(parsed,"capture.names"))
+  result
+}
+
+## Parse several occurances of pattern from each of several strings
+## using (named) capturing regular expressions, returning a list of
+## matrices (with column names).
+str_match_all_perl <- function(string,pattern){
+  stopifnot(is.character(string))
+  stopifnot(is.character(pattern))
+  stopifnot(length(pattern)==1)
+  parsed <- gregexpr(pattern,string,perl=TRUE)
+  lapply(seq_along(parsed),function(i){
+    r <- parsed[[i]]
+    starts <- attr(r,"capture.start")
+    if(r[1]==-1)return(matrix(nrow=0,ncol=1+ncol(starts)))
+    names <- attr(r,"capture.names")
+    lengths <- attr(r,"capture.length")
+    full <- substring(string[i],r,r+attr(r,"match.length")-1)
+    subs <- substring(string[i],starts,starts+lengths-1)
+    m <- matrix(c(full,subs),ncol=length(names)+1)
+    colnames(m) <- c("",names)
+    if("name" %in% names){
+      rownames(m) <- m[, "name"]
+    }
+    m
+  })
+}
+
 getSelectorWidgets <- function(html=getHTML()){
   tr.list <- getNodeSet(html,
                         '//table[@class="table_selector_widgets"]//tr')
@@ -49,20 +94,50 @@ getHTML <- function(){
   XML::htmlParse(remDr$getPageSource(), asText = TRUE)
 }
 
-ensure_rgb <- function(color.vec){
-  is.rgb <- grepl("rgb", color.vec)
-  not.rgb <- color.vec
-  not.rgb[is.rgb] <- "black"
-  hex.vec <- toRGB(not.rgb)
-  rgb.mat <- col2rgb(hex.vec)
-  no.paren <- apply(rgb.mat, 2, function(x)paste(x, collapse=", "))
-  rgb.vec <- paste0("rgb(", no.paren, ")")
-  as.character(ifelse(is.rgb, color.vec, rgb.vec))
+rgba.pattern <- paste0(
+  "(?<before>rgba?)",
+  " *[(] *",
+  "(?<red>[0-9]+)",
+  " *, *",
+  "(?<green>[0-9]+)",
+  " *, *",
+  "(?<blue>[0-9]+)",
+  "(?:",
+  " *, *",
+  "(?<alpha>[^)]+)",
+  ")?",
+  " *[)]")
+ensure_rgba <- function(color.vec){
+  match.mat <- str_match_perl(color.vec, rgba.pattern)
+  is.not.rgb <- is.na(match.mat[,1])
+  hex.vec <- toRGB(color.vec[is.not.rgb])
+  not.rgb.mat <- col2rgb(hex.vec, alpha=TRUE)
+  rgb.cols <- c("red", "green", "blue")
+  match.mat[is.not.rgb, rgb.cols] <- t(not.rgb.mat[rgb.cols,])
+  match.mat[is.not.rgb, "alpha"] <- not.rgb.mat["alpha",]/255
+  is.rgb <- match.mat[, "before"] == "rgb"
+  match.mat[is.rgb, "alpha"] <- 1
+  is.transparent <- match.mat[, "alpha"] == 0
+  match.mat[, rgb.cols] <- 0
+  opacity <- as.numeric(match.mat[, "alpha"])
+  if(any(is.na(opacity))){
+    print(match.mat)
+    stop("missing alpha opacity value")
+  }
+  match.mat[, "alpha"] <- paste(opacity)
+  rgba.cols <- c(rgb.cols, "alpha")
+  rgba.mat <- matrix(match.mat[, rgba.cols], nrow(match.mat), length(rgba.cols))
+  no.paren <- apply(rgba.mat, 1, function(x)paste(x, collapse=", "))
+  paste0("rgba(", no.paren, ")")
 }
+stopifnot(ensure_rgba("transparent") == ensure_rgba("rgba(0, 0, 0, 0.0)"))
+stopifnot(ensure_rgba("rgba(0, 0, 0, 0.0)") == ensure_rgba("rgba(0, 0, 0, 0)"))
+stopifnot(ensure_rgba("rgba(0, 0, 0, 0.1)") != ensure_rgba("rgba(0, 0, 0, 0)"))
+stopifnot(ensure_rgba("rgb(0, 0, 0)") == ensure_rgba("rgba(0, 0, 0, 1)"))
 
 expect_color <- function(computed.vec, expected.vec) {
-  computed.rgb <- ensure_rgb(computed.vec)
-  expected.rgb <- ensure_rgb(expected.vec)
+  computed.rgb <- ensure_rgba(computed.vec)
+  expected.rgb <- ensure_rgba(expected.vec)
   expect_identical(computed.rgb, expected.rgb)
 }
 
@@ -118,51 +193,6 @@ expect_styles <- function(html, styles.expected){
       expect_match(style.values, expected.regexp, all=FALSE)
     }
   }
-}
-
-## Parse the first occurance of pattern from each of several strings
-## using (named) capturing regular expressions, returning a matrix
-## (with column names).
-str_match_perl <- function(string,pattern){
-  stopifnot(is.character(string))
-  stopifnot(is.character(pattern))
-  stopifnot(length(pattern)==1)
-  parsed <- regexpr(pattern,string,perl=TRUE)
-  captured.text <- substr(string,parsed,parsed+attr(parsed,"match.length")-1)
-  captured.text[captured.text==""] <- NA
-  captured.groups <- do.call(rbind,lapply(seq_along(string),function(i){
-    st <- attr(parsed,"capture.start")[i,]
-    if(is.na(parsed[i]) || parsed[i]==-1)return(rep(NA,length(st)))
-    substring(string[i],st,st+attr(parsed,"capture.length")[i,]-1)
-  }))
-  result <- cbind(captured.text,captured.groups)
-  colnames(result) <- c("",attr(parsed,"capture.names"))
-  result
-}
-
-## Parse several occurances of pattern from each of several strings
-## using (named) capturing regular expressions, returning a list of
-## matrices (with column names).
-str_match_all_perl <- function(string,pattern){
-  stopifnot(is.character(string))
-  stopifnot(is.character(pattern))
-  stopifnot(length(pattern)==1)
-  parsed <- gregexpr(pattern,string,perl=TRUE)
-  lapply(seq_along(parsed),function(i){
-    r <- parsed[[i]]
-    starts <- attr(r,"capture.start")
-    if(r[1]==-1)return(matrix(nrow=0,ncol=1+ncol(starts)))
-    names <- attr(r,"capture.names")
-    lengths <- attr(r,"capture.length")
-    full <- substring(string[i],r,r+attr(r,"match.length")-1)
-    subs <- substring(string[i],starts,starts+lengths-1)
-    m <- matrix(c(full,subs),ncol=length(names)+1)
-    colnames(m) <- c("",names)
-    if("name" %in% names){
-      rownames(m) <- m[, "name"]
-    }
-    m
-  })
 }
 
 getTextValue <- function(tick)xmlValue(getNodeSet(tick, "text")[[1]])
