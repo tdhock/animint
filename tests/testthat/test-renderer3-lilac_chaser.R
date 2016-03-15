@@ -1,21 +1,3 @@
-## Load required packages
-library(testthat)
-library(ggplot2)
-library(proto)
-library(animint)
-library(RSelenium)
-
-
-## Helper Functions
-animint2HTML <- function(plotList) {
-    res1 <- animint2dir(plotList, out.dir = "animint-htmltest",
-                       open.browser = FALSE)
-    remDr$refresh()
-    Sys.sleep(1)
-    res1$html <- getHTML()
-    res1
-}
-
 acontext("lilac chaser vi")
 
 ## Function to implement the vi.lilac.chaser() function from package 'animation'
@@ -95,19 +77,19 @@ test_that("x and y have no labels", {
 })
 
 test_that("Different points are rendered", {
-    x1_pts <- getNodeSet(info$html, "//circle[@class='geom']/@cx")
-    y1_pts <- getNodeSet(info$html, "//circle[@class='geom']/@cy")
-    x1_pts <- sapply(x1_pts, xmlNode)
-    y1_pts <- sapply(y1_pts, xmlNode)
+    x1_nodes <- getNodeSet(info$html, "//circle[@class='geom']/@cx")
+    y1_nodes <- getNodeSet(info$html, "//circle[@class='geom']/@cy")
+    x1_pts <- sapply(x1_nodes, xmlNode)
+    y1_pts <- sapply(y1_nodes, xmlNode)
 
     Sys.sleep(1.739)  # Wait an arbitrary amount to get point locations
 
     info$html <- getHTML()
 
-    x2_pts <- getNodeSet(info$html, "//circle[@class='geom']/@cx")
-    y2_pts <- getNodeSet(info$html, "//circle[@class='geom']/@cy")
-    x2_pts <- sapply(x2_pts, xmlNode)
-    y2_pts <- sapply(y2_pts, xmlNode)
+    x2_nodes <- getNodeSet(info$html, "//circle[@class='geom']/@cx")
+    y2_nodes <- getNodeSet(info$html, "//circle[@class='geom']/@cy")
+    x2_pts <- sapply(x2_nodes, xmlNode)
+    y2_pts <- sapply(y2_nodes, xmlNode)
     expect_false(identical(x1_pts, x2_pts))
     expect_false(identical(y1_pts, y2_pts))
 })
