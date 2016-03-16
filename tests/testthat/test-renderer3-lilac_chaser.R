@@ -73,7 +73,8 @@ test_that("axes hidden", {
 test_that("x and y have no labels", {
     xlabel <- getNodeSet(info$html, "//text[@class='xtitle']")
     ylabel <- getNodeSet(info$html, "//text[@class='ytitle']")
-    expect_false(identical(length(c(xlabel, ylabel)), c(0, 0)))
+    expect_equal(length(xlabel), 0)
+    expect_equal(length(ylabel), 0)
 })
 
 test_that("Different points are rendered", {
