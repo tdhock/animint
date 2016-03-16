@@ -1,10 +1,12 @@
 acontext("knitting multiple animint plots in a single Rmd")
 
 knitr::knit_meta() #clear knitr 'metadata'
+Rmd.file <- "~/R/animint/inst/examples/test_knit_print.Rmd"
 Rmd.file <- system.file("examples", "test_knit_print.Rmd", 
                          package = "animint")
 index.file <- file.path("animint-htmltest", "index.Rmd")
-file.copy(Rmd.file, index.file)
+
+file.copy(Rmd.file, index.file, overwrite=TRUE)
 ## https://github.com/rstudio/rmarkdown/issues/587#issuecomment-168437646
 ## @yihui says "Do not use the output_dir argument of render()"
 rmarkdown::render(index.file)
@@ -19,6 +21,13 @@ test_that("knit_print.animint renders three plots", {
       "second plot with color legend",
       "non-interactive plot")
   expect_identical(value.vec, expected.vec)
+})
+
+test_that("svg id property is unique", {
+  svg.list <- getNodeSet(html, "//svg")
+  attr.mat <- sapply(svg.list, xmlAttrs)
+  id.counts <- table(attr.mat["id",])
+  expect_true(all(id.counts==1))
 })
 
 ## function to extract all circles from an HTML page
@@ -103,4 +112,3 @@ test_that("clicking top legend adds/remove points", {
   remDr$sendKeysToActiveElement(list("b", key="enter"))
   expect_equal(length(get_circles()), 20)
 })
-
