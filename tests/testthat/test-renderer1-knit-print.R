@@ -13,14 +13,23 @@ rmarkdown::render(index.file)
 remDr$refresh()
 html <- getHTML()
 
-test_that("knit_print.animint renders three plots", {
+test_that("knit_print.animint renders five x axis titles", {
   nodes <- getNodeSet(html, "//text[@class='xtitle']")
   value.vec <- sapply(nodes, xmlValue)
   expected.vec <-
     c("first plot with color legend",
       "second plot with color legend",
-      "non-interactive plot")
+      "non-interactive plot",
+      "position",
+      "segments")
   expect_identical(value.vec, expected.vec)
+})
+
+test_that("segments and breakpoints are rendered", {
+  seg.list <- getNodeSet(html, "//g[@class='geom2_segment_signal']//line")
+  expect_equal(length(seg.list), 6)
+  break.list <- getNodeSet(html, "//g[@class='geom3_vline_signal']//line")
+  expect_equal(length(break.list), 5)
 })
 
 test_that("svg id property is unique", {
@@ -31,8 +40,15 @@ test_that("svg id property is unique", {
 })
 
 ## function to extract all circles from an HTML page
-get_circles <- function(id) {
-  getNodeSet(getHTML(), "//circle[@class='geom']")
+get_circles <- function(html=getHTML()) {
+  plot.names <- c("plot1top", "plot1bottom")
+  count.vec <- c()
+  for(i in seq_along(plot.names)){
+    xpath <- sprintf("//div[@id='%s']//circle[@class='geom']", plot.names[[i]])
+    circle.list <- getNodeSet(html, xpath)
+    count.vec[[i]] <- length(circle.list)
+  }
+  count.vec
 }
 
 get_elements <- function(id){
@@ -57,43 +73,43 @@ plot1top <- get_elements("plot1top")
 plot1bottom <- get_elements("plot1bottom")
 
 test_that("clicking top legend adds/remove points", {
-  expect_equal(length(get_circles()), 20)
+  expect_equal(get_circles(), c(10, 10))
   plot1top$a178$clickElement()
-  expect_equal(length(get_circles()), 15)
+  expect_equal(get_circles(), c(5, 10))
   plot1top$b934$clickElement()
-  expect_equal(length(get_circles()), 10)
+  expect_equal(get_circles(), c(0, 10))
   plot1top$b934$clickElement()
-  expect_equal(length(get_circles()), 15)
+  expect_equal(get_circles(), c(5, 10))
   plot1top$a178$clickElement()
-  expect_equal(length(get_circles()), 20)
+  expect_equal(get_circles(), c(10, 10))
 })
 
 test_that("clicking bottom legend adds/remove points", {
-  expect_equal(length(get_circles()), 20)
+  expect_equal(get_circles(), c(10, 10))
   plot1bottom$a178$clickElement()
-  expect_equal(length(get_circles()), 15)
+  expect_equal(get_circles(), c(10, 5))
   plot1bottom$b934$clickElement()
-  expect_equal(length(get_circles()), 10)
+  expect_equal(get_circles(), c(10, 0))
   plot1bottom$b934$clickElement()
-  expect_equal(length(get_circles()), 15)
+  expect_equal(get_circles(), c(10, 5))
   plot1bottom$a178$clickElement()
-  expect_equal(length(get_circles()), 20)
+  expect_equal(get_circles(), c(10, 10))
 })
 
 plot1top$show_hide$clickElement()
 s.div <- plot1top$col_widget$findChildElement("class name", "selectize-input")
 s.div$clickElement()
 
-test_that("clicking top legend adds/remove points", {
-  expect_equal(length(get_circles()), 20)
+test_that("top widget adds/remove points", {
+  expect_equal(get_circles(), c(10, 10))
   remDr$sendKeysToActiveElement(list(key="backspace"))
-  expect_equal(length(get_circles()), 15)
+  expect_equal(get_circles(), c(5, 10))
   remDr$sendKeysToActiveElement(list(key="backspace"))
-  expect_equal(length(get_circles()), 10)
+  expect_equal(get_circles(), c(0, 10))
   remDr$sendKeysToActiveElement(list("a", key="enter"))
-  expect_equal(length(get_circles()), 15)
+  expect_equal(get_circles(), c(5, 10))
   remDr$sendKeysToActiveElement(list("b", key="enter"))
-  expect_equal(length(get_circles()), 20)
+  expect_equal(get_circles(), c(10, 10))
 })
 
 plot1bottom$show_hide$clickElement()
@@ -101,14 +117,14 @@ s.div <-
   plot1bottom$col_widget$findChildElement("class name", "selectize-input")
 s.div$clickElement()
 
-test_that("clicking top legend adds/remove points", {
-  expect_equal(length(get_circles()), 20)
+test_that("bottom widget adds/remove points", {
+  expect_equal(get_circles(), c(10, 10))
   remDr$sendKeysToActiveElement(list(key="backspace"))
-  expect_equal(length(get_circles()), 15)
+  expect_equal(get_circles(), c(10, 5))
   remDr$sendKeysToActiveElement(list(key="backspace"))
-  expect_equal(length(get_circles()), 10)
+  expect_equal(get_circles(), c(10, 0))
   remDr$sendKeysToActiveElement(list("a", key="enter"))
-  expect_equal(length(get_circles()), 15)
+  expect_equal(get_circles(), c(10, 5))
   remDr$sendKeysToActiveElement(list("b", key="enter"))
-  expect_equal(length(get_circles()), 20)
+  expect_equal(get_circles(), c(10, 10))
 })
