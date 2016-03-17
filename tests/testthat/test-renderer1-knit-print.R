@@ -26,9 +26,9 @@ test_that("knit_print.animint renders five x axis titles", {
 })
 
 test_that("segments and breakpoints are rendered", {
-  seg.list <- getNodeSet(html, "//g[@class='geom2_segment_signal']//line")
+  seg.list <- getNodeSet(html, "//g[@class='geom3_segment_signal']//line")
   expect_equal(length(seg.list), 6)
-  break.list <- getNodeSet(html, "//g[@class='geom3_vline_signal']//line")
+  break.list <- getNodeSet(html, "//g[@class='geom4_vline_signal']//line")
   expect_equal(length(break.list), 5)
 })
 
