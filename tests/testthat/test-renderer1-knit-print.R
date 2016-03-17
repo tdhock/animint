@@ -56,13 +56,14 @@ get_elements <- function(id){
   div <- remDr$findElement("id", id)
   ## For debugging a NoSuchElement error I insert print statements.
   ##print("before css selector")
-  tr.list <- div$findChildElements("css selector", "table.legend tr.col")
+  tr.list <- div$findChildElements(
+    "css selector", "table.legend tr.label_legend")
   a <- tr.list[[1]]
   b <- tr.list[[2]]
   ##print("before show_hide")
   show_hide <- div$findChildElement("class name", "show_hide_selector_widgets")
   ##print("before col_selector_widget")
-  col.w <- div$findChildElement("class name", "col_selector_widget")
+  col.w <- div$findChildElement("class name", "label_selector_widget")
   list(a178=a,
        b934=b,
        show_hide=show_hide,
