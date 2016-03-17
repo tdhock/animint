@@ -192,10 +192,14 @@ test_that("one line is rendered for each region", {
   expect_equal(length(region.lines), nrow(malaria$regions))
 })
 
-some <- getStyleValue(
-  info$html, '//tr[@id="some"]//circle', c("stroke", "fill"))
-none <- getStyleValue(
-  info$html, '//tr[@id="none"]//circle', c("stroke", "fill"))
+getFillStroke <- function(value){
+  xpath <- sprintf(
+    '//tr[@id="plot_chroms_highly_divergent_regions_variable_%s"]//circle',
+    value)
+  getStyleValue(info$html, xpath, c("stroke", "fill"))
+}
+some <- getFillStroke("some")
+none <- getFillStroke("none")
 test_that("geom_point(aes(color)) legend shows as circle stroke", {
   expect_true(some["stroke",] != none["stroke",])
   expect_true(some["fill",] == none["fill",])
