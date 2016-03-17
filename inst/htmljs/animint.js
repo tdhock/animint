@@ -207,7 +207,8 @@ var animint = function (to_select, json_file) {
     if(g_info.hasOwnProperty("columns") && g_info.columns.common){
       var common_tsv = get_tsv(g_info, "_common");
       g_info.common_tsv = common_tsv;
-      d3.tsv(common_tsv, function (error, response) {
+      var common_path = getTSVpath(common_tsv);
+      d3.tsv(common_path, function (error, response) {
 	var converted = convert_R_types(response, g_info.types);
 	g_info.data[common_tsv] = nest_by_group.map(converted);
       });
@@ -802,9 +803,12 @@ var animint = function (to_select, json_file) {
     update_legend_opacity(s_name);
   }; //end of add_selector()
 
-  var get_tsv = function(g_info, chunk_id){
+  function get_tsv(g_info, chunk_id){
     return g_info.classed + "_chunk" + chunk_id + ".tsv";
-  };
+  }
+  function getTSVpath(tsv_name){
+    return dirs.concat(tsv_name).join("/");
+  }
   
   /**
    * copy common chunk tsv to varied chunk tsv, returning an array of
@@ -920,7 +924,7 @@ var animint = function (to_select, json_file) {
     }
     g_info.download_status[tsv_name] = "downloading";
     // prefix tsv file with appropriate path
-    var tsv_file = dirs.concat(tsv_name).join("/");
+    var tsv_file = getTSVpath(tsv_name);
     d3.tsv(tsv_file, function (error, response) {
       // First convert to correct types.
       g_info.download_status[tsv_name] = "processing";
