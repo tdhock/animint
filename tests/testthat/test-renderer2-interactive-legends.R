@@ -99,19 +99,19 @@ test_that("Two plots with both color and fill", {
   expect_equal(length(get_circles("factor")), 14)
   clickID("0")
   expect_equal(length(get_circles("factor")), 32)
-  td.list <-
-    getNodeSet(info$html, '//tr[@class="vs"]//td[@class="legend_entry_label"]')
+  td.list <- getNodeSet(
+    info$html, '//tr[@class="vs_legend"]//td[@class="legend_entry_label"]')
   value.vec <- sapply(td.list, xmlValue)
   expect_identical(value.vec, c("1.00", "0.75", "0.50", "0.25", "0.00"))
   style.mat <- getStyleValue(
     info$html, '//table[@class="legend"]//circle', c("fill", "stroke"))
   expect_identical(style.mat["fill", ], style.mat["stroke", ])
   ## Make sure lines are rendered in the first but not second legend:
-  left.lines <- getNodeSet(info$html, '//tr[@class="vs"]//line')
+  left.lines <- getNodeSet(info$html, '//tr[@class="vs_legend"]//line')
   expect_equal(length(left.lines), 5)
-  right.lines <- getNodeSet(info$html, '//tr[@class="vs_fac"]//line')
+  right.lines <- getNodeSet(info$html, '//tr[@class="vs_fac_legend"]//line')
   expect_equal(length(right.lines), 0)
-  right.circles <- getNodeSet(info$html, '//tr[@class="vs_fac"]//circle')
+  right.circles <- getNodeSet(info$html, '//tr[@class="vs_fac_legend"]//circle')
   expect_equal(length(right.circles), 2)
   ## Lines should be rendered in both plots:
   left.lines <-
@@ -161,11 +161,10 @@ viz <- list(
                data=vs0)+
     geom_point(aes(mpg, hp, color = vs),
                data=vs1))
-
 test_that('aes(color=vs) aes(color=vs.num) is OK"', {
   info <- animint2HTML(viz)
   expect_equal(length(get_circles("p")), 32)
-  tr.list <- getNodeSet(info$html, '//tr[@class="vs_num"]')
+  tr.list <- getNodeSet(info$html, '//tr[@class="vs_num_legend"]')
   attr.mat <- sapply(tr.list, "xmlAttrs")
   expect_false("title" %in% rownames(attr.mat))
   expect_false("style" %in% rownames(attr.mat))
@@ -179,7 +178,6 @@ viz <- list(
     geom_point(aes(mpg, hp, color = vs, fill=vs.fac),
                shape=21,
                data=vs1))
-
 test_that('aes(color=vs, fill=vs.fac) aes(color=vs.num, fill=vs.fac) is OK"', {
   info <- animint2HTML(viz)
   expect_equal(length(get_circles("p")), 32)
@@ -189,12 +187,12 @@ test_that('aes(color=vs, fill=vs.fac) aes(color=vs.num, fill=vs.fac) is OK"', {
   expect_equal(length(get_circles("p")), 32)
   ## Stroke should be constant in the fill legend:
   style.mat <- getStyleValue(
-    info$html, '//tr[@class="vs_fac"]//circle', c("fill", "stroke"))
+    info$html, '//tr[@class="vs_fac_legend"]//circle', c("fill", "stroke"))
   expected.stroke <- rep(style.mat[["stroke", 1]], ncol(style.mat))
   expect_identical(style.mat["stroke", ], expected.stroke)
   ## Fill should be constant in the stroke legend:
   style.mat <- getStyleValue(
-    info$html, '//tr[@class="vs_num"]//circle', c("fill", "stroke"))
+    info$html, '//tr[@class="vs_num_legend"]//circle', c("fill", "stroke"))
   expected.fill <- rep(style.mat[["fill", 1]], ncol(style.mat))
   expect_identical(style.mat["fill", ], expected.fill)
 })
@@ -206,7 +204,6 @@ viz <- list(
                data=vs0)+
     geom_point(aes(mpg, hp, color = vs.fac),
                data=vs1))
-
 test_that('aes(color=vs.fac) is OK"', {
   info <- animint2HTML(viz)
   expect_equal(length(get_circles("p")), 32)
@@ -223,7 +220,6 @@ viz <- list(
                data=vs0)+
     geom_point(aes(mpg, hp, color = vs.fac2),
                data=vs1))
-
 test_that('aes(color=something), aes(color=something.else) is an error"', {
   expect_error({
     info <- animint2HTML(viz)
