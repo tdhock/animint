@@ -59,7 +59,7 @@ test_that("fill not constant in probability legend and circles", {
     info$html, '//svg[@id="plot_parameters"]//circle', "fill")
   expect_true(1 < length(table(fill.vec)))
   fill.vec <- getStyleValue(
-    info$html, '//tr[@class="probability"]//circle', "fill")
+    info$html, '//tr[@class="probability_variable"]//circle', "fill")
   expect_true(1 < length(table(fill.vec)))
 })
 
