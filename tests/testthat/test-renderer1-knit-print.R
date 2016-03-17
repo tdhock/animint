@@ -11,6 +11,7 @@ file.copy(Rmd.file, index.file, overwrite=TRUE)
 ## @yihui says "Do not use the output_dir argument of render()"
 rmarkdown::render(index.file)
 remDr$refresh()
+Sys.sleep(1)
 html <- getHTML()
 
 test_that("knit_print.animint renders five x axis titles", {
