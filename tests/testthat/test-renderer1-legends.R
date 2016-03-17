@@ -101,7 +101,7 @@ test_that("renderer shows legend entries in correct order", {
       "bottom")
   for(plot.name in names(expected.legend.list)){
     xpath <-
-      sprintf('//td[@class="%s_legend"]//td[@class="legend_entry_label"]',
+      sprintf('//td[@class="%s_variable"]//td[@class="legend_entry_label"]',
               plot.name)
     expected.entries <- expected.legend.list[[plot.name]]
     node.set <- getNodeSet(info$html, xpath)

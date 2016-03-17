@@ -42,7 +42,7 @@ var animint = function (to_select, json_file) {
   // replacing periods in variable with an underscore this makes sure
   // that selector doesn't confuse . in name with css selectors
   function safe_name(unsafe_name){
-    return unsafe_name.replace(/\./g, '_') + "_legend";
+    return unsafe_name.replace(/\./g, '_') + "_variable";
   }
 
   function is_interactive_aes(v_name){

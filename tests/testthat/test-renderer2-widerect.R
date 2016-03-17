@@ -279,7 +279,7 @@ test_that("play restarts animation (second time)", {
 })
 
 legend.td.xpath <-
-  '//tr[@class="region_legend"]//td[@class="legend_entry_label"]'
+  '//tr[@class="region_variable"]//td[@class="legend_entry_label"]'
 rects_and_legends <- function(){
   html <- getHTML()
   list(rects=getNodeSet(html, '//rect[@id="United States"]'),

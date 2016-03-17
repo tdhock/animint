@@ -207,24 +207,24 @@ get.opacity <- function(class.name){
     class.name)
   getStyleValue(getHTML(), xpath, "opacity")
 }
-before.vec <- get.opacity("annotation_legend")
+before.vec <- get.opacity("annotation_variable")
 test_that("INTERGENIC legend entry opacity 1 before clicking", {
   expect_identical(before.vec, c("1", "1", "1", "1"))
 })
 
 clickID("INTERGENIC")
-after.vec <- get.opacity("annotation_legend")
+after.vec <- get.opacity("annotation_variable")
 test_that("INTERGENIC legend entry opacity 0.5 after clicking", {
   expect_identical(after.vec, c("1", "0.5", "1", "1"))
 })
 
-before.vec <- get.opacity("highly_divergent_regions_legend")
+before.vec <- get.opacity("highly_divergent_regions_variable")
 test_that("none legend entry opacity 1 before clicking", {
   expect_identical(before.vec, c("1", "1"))
 })
 
 clickID("none")
-after.vec <- get.opacity("highly_divergent_regions_legend")
+after.vec <- get.opacity("highly_divergent_regions_variable")
 test_that("none legend entry opacity 0.5 after clicking", {
   expect_identical(after.vec, c("0.5", "1"))
 })

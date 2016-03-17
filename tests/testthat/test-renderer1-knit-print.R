@@ -57,17 +57,17 @@ get_elements <- function(id){
   ## For debugging a NoSuchElement error I insert print statements.
   ##print("before css selector")
   tr.list <- div$findChildElements(
-    "css selector", "table.legend tr.label_legend")
+    "css selector", "table.legend tr.label_variable")
   a <- tr.list[[1]]
   b <- tr.list[[2]]
   ##print("before show_hide")
   show_hide <- div$findChildElement("class name", "show_hide_selector_widgets")
   ##print("before col_selector_widget")
-  col.w <- div$findChildElement("class name", "label_selector_widget")
+  widget <- div$findChildElement("class name", "label_variable_selector_widget")
   list(a178=a,
        b934=b,
        show_hide=show_hide,
-       col_widget=col.w)
+       widget=widget)
 }
 
 plot1top <- get_elements("plot1top")
@@ -98,7 +98,7 @@ test_that("clicking bottom legend adds/remove points", {
 })
 
 plot1top$show_hide$clickElement()
-s.div <- plot1top$col_widget$findChildElement("class name", "selectize-input")
+s.div <- plot1top$widget$findChildElement("class name", "selectize-input")
 s.div$clickElement()
 
 test_that("top widget adds/remove points", {
@@ -115,7 +115,7 @@ test_that("top widget adds/remove points", {
 
 plot1bottom$show_hide$clickElement()
 s.div <-
-  plot1bottom$col_widget$findChildElement("class name", "selectize-input")
+  plot1bottom$widget$findChildElement("class name", "selectize-input")
 s.div$clickElement()
 
 test_that("bottom widget adds/remove points", {
