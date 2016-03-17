@@ -42,7 +42,7 @@ var animint = function (to_select, json_file) {
   // replacing periods in variable with an underscore this makes sure
   // that selector doesn't confuse . in name with css selectors
   function safe_name(unsafe_name){
-    return unsafe_name.replace(/\./g, '_');
+    return unsafe_name.replace(/\./g, '_') + "_legend";
   }
 
   function is_interactive_aes(v_name){
@@ -1780,7 +1780,7 @@ var animint = function (to_select, json_file) {
       var legend_table = tdRight.append("table")
 	.attr("class", "legend")
       ;
-      var legend_class = safe_name(l_info["class"]) + "_legend";
+      var legend_class = safe_name(l_info["class"]);
       // the legend table with breaks/value/label .
       var legendgeoms = l_info.geoms;
       // TODO: variable and value should be set in the compiler! What
