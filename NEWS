@@ -180,6 +180,11 @@ RENDER: multiple animints inside of a single shiny app? This is
 probably just a theoretical issue. (why not just make a single
 animint?)
 
+2016.03.15 PR#141
+
+TEST: Added the test for Lilac Chaser Visual Illusion.
+test-renderer3-lilac_chaser.R
+
 2016.03.14 PR#140
 
 BUGFIX for geom_point(aes(color), fill=NA), new ensure_rgba for test
