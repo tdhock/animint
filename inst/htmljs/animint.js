@@ -225,14 +225,13 @@ var animint = function (to_select, json_file) {
     var plot_tr = plot_table.append("tr");
     var tdLeft = plot_tr.append("td");
     var tdRight = plot_tr.append("td").attr("class", p_name+"_legend");
-    var plot_id;
     if(viz_id === null){
-      plot_id = p_name;
+      p_info.plot_id = p_name;
     }else{
-      plot_id = viz_id + "_" + p_name;
+      p_info.plot_id = viz_id + "_" + p_name;
     }
     var svg = tdLeft.append("svg")
-      .attr("id", plot_id)
+      .attr("id", p_info.plot_id)
       .attr("height", p_info.options.height)
       .attr("width", p_info.options.width);
 
@@ -1788,6 +1787,7 @@ var animint = function (to_select, json_file) {
 	.attr("class", "legend")
       ;
       var legend_class = safe_name(l_info["class"]);
+      var legend_id = p_info.plot_id + "_" + legend_class;
       // the legend table with breaks/value/label .
       var legendgeoms = l_info.geoms;
       // TODO: variable and value should be set in the compiler! What
@@ -1804,7 +1804,7 @@ var animint = function (to_select, json_file) {
       // in a good data viz there should not be more than one legend
       // that shows the same thing, so there should be no duplicate
       // id.
-        .attr("id", function(d) { return d["label"]; })
+        .attr("id", function(d) { return legend_id+"_"+d["label"]; })
 	.attr("class", legend_class)
       ;
       if(l_info.selector != null){
@@ -1827,7 +1827,7 @@ var animint = function (to_select, json_file) {
       ;
       var legend_svgs = legend_rows.append("td")
         .append("svg")
-  	    .attr("id", function(d){return "legend-"+d["label"];})
+  	    .attr("id", function(d){return legend_id+"_"+d["label"]+"_svg";})
   	    .attr("height", 14)
   	    .attr("width", 20);
       var pointscale = d3.scale.linear().domain([0,7]).range([1,4]);
