@@ -324,7 +324,7 @@ if (Sys.getenv("ANIMINT_BROWSER") != "phantomjs") {
   e <- remDr$findElement("class name", "show_hide_selector_widgets")
   e$clickElement()
 
-  s.tr <- remDr$findElement("class name", "year_selector_widget")
+  s.tr <- remDr$findElement("class name", "year_variable_selector_widget")
   s.div <- s.tr$findChildElement("class name", "selectize-input")
   s.div$clickElement()
   remDr$sendKeysToActiveElement(list(key="backspace"))
@@ -354,7 +354,7 @@ if (Sys.getenv("ANIMINT_BROWSER") != "phantomjs") {
     expect_identical(sort(country.vec), sort(wb.facets$first$country))
   })
   
-  s.tr <- remDr$findElement("class name", "country_selector_widget")
+  s.tr <- remDr$findElement("class name", "country_variable_selector_widget")
   s.div <- s.tr$findChildElement("class name", "selectize-input")
   s.div$clickElement()
   remDr$sendKeysToActiveElement(list("Afg"))
