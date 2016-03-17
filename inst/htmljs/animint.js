@@ -141,6 +141,7 @@ var animint = function (to_select, json_file) {
   dirs.pop(); //if a directory path exists, remove the JSON file from dirs
   var element = d3.select(to_select);
   this.element = element;
+  var viz_id = element.attr("id");
   var Widgets = {};
   this.Widgets = Widgets;
   var Selectors = {};
@@ -224,8 +225,14 @@ var animint = function (to_select, json_file) {
     var plot_tr = plot_table.append("tr");
     var tdLeft = plot_tr.append("td");
     var tdRight = plot_tr.append("td").attr("class", p_name+"_legend");
+    var plot_id;
+    if(viz_id === null){
+      plot_id = p_name;
+    }else{
+      plot_id = viz_id + "_" + p_name;
+    }
     var svg = tdLeft.append("svg")
-      .attr("id", p_name)
+      .attr("id", plot_id)
       .attr("height", p_info.options.height)
       .attr("width", p_info.options.width);
 

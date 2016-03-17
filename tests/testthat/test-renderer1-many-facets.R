@@ -30,8 +30,8 @@ test_that("points have positive positions", {
 })
 
 test_that("no horizontal space between border_rects", {
-  rect.list <-
-    getNodeSet(info$html, '//svg[@id="horizontal"]//rect[@class="border_rect"]')
+  rect.list <- getNodeSet(
+    info$html, '//svg[@id="plot_horizontal"]//rect[@class="border_rect"]')
   expect_equal(length(rect.list), n.circles)
   first <- xmlAttrs(rect.list[[1]])
   first.right <- as.numeric(first[["x"]])+as.numeric(first[["width"]])
@@ -41,8 +41,8 @@ test_that("no horizontal space between border_rects", {
 })
 
 test_that("no vertical space between border_rects", {
-  rect.list <-
-    getNodeSet(info$html, '//svg[@id="vertical"]//rect[@class="border_rect"]')
+  rect.list <- getNodeSet(
+    info$html, '//svg[@id="plot_vertical"]//rect[@class="border_rect"]')
   expect_equal(length(rect.list), n.circles)
   first <- xmlAttrs(rect.list[[1]])
   first.bottom <- as.numeric(first[["y"]])+as.numeric(first[["height"]])
@@ -52,8 +52,8 @@ test_that("no vertical space between border_rects", {
 })
 
 test_that("right strips all at the same x position", {
-  text.list <-
-    getNodeSet(info$html, '//svg[@id="vertical"]//g[@class="rightStrip"]//text')
+  text.list <- getNodeSet(
+    info$html, '//svg[@id="plot_vertical"]//g[@class="rightStrip"]//text')
   expect_equal(length(text.list), n.circles)
   translate.vec <- sapply(text.list, function(x)xmlAttrs(x)[["transform"]])
   translate.mat <- str_match_perl(translate.vec, translatePattern)

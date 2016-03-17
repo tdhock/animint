@@ -2,7 +2,7 @@ acontext("Interactive Legends")
 
 ## extract all <circle> elements under a particular <svg> element.
 get_circles <- function(id) {
-  getNodeSet(getHTML(), paste0("//svg[@id='", id, "']//circle"))
+  getNodeSet(getHTML(), paste0("//svg[@id='plot_", id, "']//circle"))
 }
 
 iris$id <- 1:nrow(iris)

@@ -19,7 +19,7 @@ info <- animint2HTML(viz)
 ## "border_rect"! Even though they both should appear, only
 ## background_rect appears on travis/wercker... is this because we
 ## don't wait long enough before calling getHTML()?
-panel.rect.xpath.tmp <- '//svg[@id="%s"]//rect[@class="background_rect"]'
+panel.rect.xpath.tmp <- '//svg[@id="plot_%s"]//rect[@class="background_rect"]'
 
 test_that("some horizontal space between panels", {
   for(plot.name in names(viz)){
@@ -35,7 +35,7 @@ test_that("some horizontal space between panels", {
     expect_less_than(first.right, second.left)
     ## Also make sure the xtitle is placed in the middle of the
     ## plotting region.
-    xpath <- sprintf('//svg[@id="%s"]//text[@class="xtitle"]', plot.name)
+    xpath <- sprintf('//svg[@id="plot_%s"]//text[@class="xtitle"]', plot.name)
     text.list <- getNodeSet(info$html, xpath)
     expect_equal(length(text.list), 1)
     transform.str <- xmlAttrs(text.list[[1]])[["transform"]]
@@ -48,7 +48,7 @@ test_that("some horizontal space between panels", {
 
 test_that("each plot has two x axes and 1 y axis", {
   for(plot.name in names(viz)){
-    svg.xpath <- sprintf("//svg[@id='%s']", plot.name)
+    svg.xpath <- sprintf("//svg[@id='plot_%s']", plot.name)
     x.xpath <- paste0(svg.xpath, "//g[contains(@class, 'xaxis')]")
     x.axes <- getNodeSet(info$html, x.xpath)
     y.xpath <- paste0(svg.xpath, "//g[contains(@class, 'yaxis')]")
@@ -59,7 +59,8 @@ test_that("each plot has two x axes and 1 y axis", {
 
 test_that("top strips present in each plot", {
   for(plot.name in names(viz)){ 
-    xpath <- sprintf("//svg[@id='%s']//g[@class='topStrip']//text", plot.name)
+    xpath <- sprintf(
+      "//svg[@id='plot_%s']//g[@class='topStrip']//text", plot.name)
     strip.text <- getNodeSet(info$html, xpath)
     expect_equal(length(strip.text), 2)
     text.values <- sapply(strip.text, xmlValue)
@@ -71,21 +72,21 @@ test_that("pixels between 15 and 20 is constant or variable", {
   ## scale="fixed" means the distance between ticks 15 and 20 should
   ## be the same across the 2 panels.
   x.axes <- getNodeSet(
-    info$html, "//svg[@id='fixed']//g[contains(@class, 'xaxis')]")
+    info$html, "//svg[@id='plot_fixed']//g[contains(@class, 'xaxis')]")
   expect_equal(length(x.axes), 2)
   xdiff <- lapply(x.axes, getTickDiff)
   expect_true(both.equal(xdiff))
   ## scale="free" means the distance between ticks 15 and 20 should
   ## be different across the 2 panels.
   x.axes <- getNodeSet(
-    info$html, "//svg[@id='freeScale']//g[contains(@class, 'xaxis')]")
+    info$html, "//svg[@id='plot_freeScale']//g[contains(@class, 'xaxis')]")
   expect_equal(length(x.axes), 2)
   xdiff <- lapply(x.axes, getTickDiff)
   expect_true(!both.equal(xdiff))
   ## scale="free" and space="free" means the distance between ticks 15
   ## and 20 should be the same across the 2 panels.
   x.axes <- getNodeSet(
-    info$html, "//svg[@id='freeBoth']//g[contains(@class, 'xaxis')]")
+    info$html, "//svg[@id='plot_freeBoth']//g[contains(@class, 'xaxis')]")
   expect_equal(length(x.axes), 2)
   xdiff <- lapply(x.axes, getTickDiff)
   expect_true(both.equal(xdiff))
@@ -126,7 +127,7 @@ test_that("some vertical space between panels", {
     expect_less_than(first.bottom, second.top)
     ## Also check that ytitle is placed in the middle of the plotting
     ## region.
-    xpath <- sprintf('//svg[@id="%s"]//text[@class="ytitle"]', plot.name)
+    xpath <- sprintf('//svg[@id="plot_%s"]//text[@class="ytitle"]', plot.name)
     text.list <- getNodeSet(info$html, xpath)
     expect_equal(length(text.list), 1)
     transform.str <- xmlAttrs(text.list[[1]])[["transform"]]
@@ -140,7 +141,7 @@ test_that("some vertical space between panels", {
 test_that("right strips present in each plot", {
   for(plot.name in names(viz)){ 
     xpath <- sprintf(
-      "//svg[@id='%s']//g[@class='rightStrip']//text", plot.name)
+      "//svg[@id='plot_%s']//g[@class='rightStrip']//text", plot.name)
     strip.text <- getNodeSet(info$html, xpath)
     expect_equal(length(strip.text), 2)
     text.values <- sapply(strip.text, xmlValue)
@@ -152,21 +153,21 @@ test_that("y pixels between 15 and 20 is constant or variable", {
   ## scale="fixed" means the distance between ticks 15 and 20 should
   ## be the same across the 2 panels.
   y.axes <- getNodeSet(
-    info$html, "//svg[@id='fixed']//g[contains(@class, 'yaxis')]")
+    info$html, "//svg[@id='plot_fixed']//g[contains(@class, 'yaxis')]")
   expect_equal(length(y.axes), 2)
   ydiff <- lapply(y.axes, getTickDiff, axis="y")
   expect_true(both.equal(ydiff))
   ## scale="free" means the distance between ticks 15 and 20 should
   ## be different across the 2 panels.
   y.axes <- getNodeSet(
-    info$html, "//svg[@id='freeScale']//g[contains(@class, 'yaxis')]")
+    info$html, "//svg[@id='plot_freeScale']//g[contains(@class, 'yaxis')]")
   expect_equal(length(y.axes), 2)
   ydiff <- lapply(y.axes, getTickDiff, axis="y")
   expect_true(!both.equal(ydiff))
   ## scale="free" and space="free" means the distance between ticks 15
   ## and 20 should be the same across the 2 panels.
   y.axes <- getNodeSet(
-    info$html, "//svg[@id='freeBoth']//g[contains(@class, 'yaxis')]")
+    info$html, "//svg[@id='plot_freeBoth']//g[contains(@class, 'yaxis')]")
   expect_equal(length(y.axes), 2)
   ydiff <- lapply(y.axes, getTickDiff, axis="y")
   expect_true(both.equal(ydiff))

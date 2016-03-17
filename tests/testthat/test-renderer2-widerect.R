@@ -106,7 +106,7 @@ wb.facets <-
 info <- animint2HTML(wb.facets)
 
 rect.list <-
-  getNodeSet(info$html, '//svg[@id="ts"]//rect[@class="border_rect"]')
+  getNodeSet(info$html, '//svg[@id="plot_ts"]//rect[@class="border_rect"]')
 expect_equal(length(rect.list), 4)
 at.mat <- sapply(rect.list, xmlAttrs)
 
