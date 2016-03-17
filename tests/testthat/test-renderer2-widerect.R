@@ -106,7 +106,7 @@ wb.facets <-
 info <- animint2HTML(wb.facets)
 
 rect.list <-
-  getNodeSet(info$html, '//svg[@id="ts"]//rect[@class="border_rect"]')
+  getNodeSet(info$html, '//svg[@id="plot_ts"]//rect[@class="border_rect"]')
 expect_equal(length(rect.list), 4)
 at.mat <- sapply(rect.list, xmlAttrs)
 
@@ -278,44 +278,30 @@ test_that("play restarts animation (second time)", {
   expect_true(old.year != new.year)
 })
 
-legend.td.xpath <- '//td[@id="North America" and @class="legend_entry_label"]'
+legend.td.xpath <-
+  '//tr[@class="region_variable"]//td[@class="legend_entry_label"]'
 rects_and_legends <- function(){
   html <- getHTML()
   list(rects=getNodeSet(html, '//rect[@id="United States"]'),
-       legends=getNodeSet(html, legend.td.xpath))
+       legends=getStyleValue(html, legend.td.xpath, "opacity"))
 }
-
-opacityPattern <-
-  paste0("opacity:",
-         "(?<value>.*?)",
-         ";")
-
-expect_opacity <- function(node.list, expected.opacity){
-  style.strs <- sapply(node.list, function(x) xmlAttrs(x)["style"])
-  match.mat <- str_match_perl(style.strs, opacityPattern)
-  opacity.chr <- match.mat[, "value"]
-  opacity.num <- as.numeric(opacity.chr)
-  opacity.num[is.na(opacity.num)] <- 1 ## no transparency if not specified.
-  expected.vec <- rep(expected.opacity, l=length(opacity.num))
-  expect_equal(opacity.num, expected.vec)
-}
-
 test_that("clicking legend removes/adds countries", {
   before <- rects_and_legends()
   expect_equal(length(before$rects), 1)
-  expect_opacity(before$legends, 1)
-  
+  expect_equal(sum(before$legends=="1"), 14)
+  expect_equal(sum(before$legends=="0.5"), 0)
   clickID("North America")
   Sys.sleep(1)
   oneclick <- rects_and_legends()
   expect_equal(length(oneclick$rects), 0)
-  expect_opacity(oneclick$legends, 0.5)
-
+  expect_equal(sum(oneclick$legends=="1"), 12)
+  expect_equal(sum(oneclick$legends=="0.5"), 2)
   clickID("North America")
   Sys.sleep(1)
   twoclicks <- rects_and_legends()
   expect_equal(length(twoclicks$rects), 1)
-  expect_opacity(twoclicks$legends, 1)
+  expect_equal(sum(twoclicks$legends=="1"), 14)
+  expect_equal(sum(twoclicks$legends=="0.5"), 0)
 })
 
 # skip these tests if the browser is phantomjs 
@@ -338,7 +324,7 @@ if (Sys.getenv("ANIMINT_BROWSER") != "phantomjs") {
   e <- remDr$findElement("class name", "show_hide_selector_widgets")
   e$clickElement()
 
-  s.tr <- remDr$findElement("class name", "year_selector_widget")
+  s.tr <- remDr$findElement("class name", "year_variable_selector_widget")
   s.div <- s.tr$findChildElement("class name", "selectize-input")
   s.div$clickElement()
   remDr$sendKeysToActiveElement(list(key="backspace"))
@@ -368,7 +354,7 @@ if (Sys.getenv("ANIMINT_BROWSER") != "phantomjs") {
     expect_identical(sort(country.vec), sort(wb.facets$first$country))
   })
   
-  s.tr <- remDr$findElement("class name", "country_selector_widget")
+  s.tr <- remDr$findElement("class name", "country_variable_selector_widget")
   s.div <- s.tr$findChildElement("class name", "selectize-input")
   s.div$clickElement()
   remDr$sendKeysToActiveElement(list("Afg"))

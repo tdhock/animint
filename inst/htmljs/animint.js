@@ -42,7 +42,7 @@ var animint = function (to_select, json_file) {
   // replacing periods in variable with an underscore this makes sure
   // that selector doesn't confuse . in name with css selectors
   function safe_name(unsafe_name){
-    return unsafe_name.replace(/\./g, '_');
+    return unsafe_name.replace(/\./g, '_') + "_variable";
   }
 
   function is_interactive_aes(v_name){
@@ -141,6 +141,7 @@ var animint = function (to_select, json_file) {
   dirs.pop(); //if a directory path exists, remove the JSON file from dirs
   var element = d3.select(to_select);
   this.element = element;
+  var viz_id = element.attr("id");
   var Widgets = {};
   this.Widgets = Widgets;
   var Selectors = {};
@@ -206,7 +207,8 @@ var animint = function (to_select, json_file) {
     if(g_info.hasOwnProperty("columns") && g_info.columns.common){
       var common_tsv = get_tsv(g_info, "_common");
       g_info.common_tsv = common_tsv;
-      d3.tsv(common_tsv, function (error, response) {
+      var common_path = getTSVpath(common_tsv);
+      d3.tsv(common_path, function (error, response) {
 	var converted = convert_R_types(response, g_info.types);
 	g_info.data[common_tsv] = nest_by_group.map(converted);
       });
@@ -224,8 +226,13 @@ var animint = function (to_select, json_file) {
     var plot_tr = plot_table.append("tr");
     var tdLeft = plot_tr.append("td");
     var tdRight = plot_tr.append("td").attr("class", p_name+"_legend");
+    if(viz_id === null){
+      p_info.plot_id = p_name;
+    }else{
+      p_info.plot_id = viz_id + "_" + p_name;
+    }
     var svg = tdLeft.append("svg")
-      .attr("id", p_name)
+      .attr("id", p_info.plot_id)
       .attr("height", p_info.options.height)
       .attr("width", p_info.options.width);
 
@@ -796,9 +803,12 @@ var animint = function (to_select, json_file) {
     update_legend_opacity(s_name);
   }; //end of add_selector()
 
-  var get_tsv = function(g_info, chunk_id){
+  function get_tsv(g_info, chunk_id){
     return g_info.classed + "_chunk" + chunk_id + ".tsv";
-  };
+  }
+  function getTSVpath(tsv_name){
+    return dirs.concat(tsv_name).join("/");
+  }
   
   /**
    * copy common chunk tsv to varied chunk tsv, returning an array of
@@ -914,7 +924,7 @@ var animint = function (to_select, json_file) {
     }
     g_info.download_status[tsv_name] = "downloading";
     // prefix tsv file with appropriate path
-    var tsv_file = dirs.concat(tsv_name).join("/");
+    var tsv_file = getTSVpath(tsv_name);
     d3.tsv(tsv_file, function (error, response) {
       // First convert to correct types.
       g_info.download_status[tsv_name] = "processing";
@@ -1781,6 +1791,7 @@ var animint = function (to_select, json_file) {
 	.attr("class", "legend")
       ;
       var legend_class = safe_name(l_info["class"]);
+      var legend_id = p_info.plot_id + "_" + legend_class;
       // the legend table with breaks/value/label .
       var legendgeoms = l_info.geoms;
       // TODO: variable and value should be set in the compiler! What
@@ -1797,7 +1808,7 @@ var animint = function (to_select, json_file) {
       // in a good data viz there should not be more than one legend
       // that shows the same thing, so there should be no duplicate
       // id.
-        .attr("id", function(d) { return d["label"]; })
+        .attr("id", function(d) { return legend_id+"_"+d["label"]; })
 	.attr("class", legend_class)
       ;
       if(l_info.selector != null){
@@ -1820,7 +1831,7 @@ var animint = function (to_select, json_file) {
       ;
       var legend_svgs = legend_rows.append("td")
         .append("svg")
-  	    .attr("id", function(d){return "legend-"+d["label"];})
+  	    .attr("id", function(d){return legend_id+"_"+d["label"]+"_svg";})
   	    .attr("height", 14)
   	    .attr("width", 20);
       var pointscale = d3.scale.linear().domain([0,7]).range([1,4]);

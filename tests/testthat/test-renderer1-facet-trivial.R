@@ -17,7 +17,7 @@ viz <-
 test_that("facet_grid(1 row and/or 1 column) is fine", {
   info <- animint2HTML(viz)
   expect_axes <- function(plot.name, expected.x, expected.y){
-    svg.xpath <- sprintf("//svg[@id='%s']", plot.name)
+    svg.xpath <- sprintf("//svg[@id='plot_%s']", plot.name)
     x.xpath <- paste0(svg.xpath, "//g[contains(@class, 'xaxis')]")
     x.axes <- getNodeSet(info$html, x.xpath)
     expect_equal(length(x.axes), expected.x)

@@ -180,85 +180,57 @@ info <- animint2HTML(viz)
 expected.dot.df <- 
   subset(malaria$error.variants,
          filterVar.thresh==malaria$filterVar$best.thresh)
-
 test_that("expected number of <circle> rendered", {
   circle.list <-
     getNodeSet(info$html, '//g[@class="geom13_point_variants"]//circle')
   expect_equal(length(circle.list), nrow(expected.dot.df))
 })
 
-style.pattern <-
-  paste0("(?<name>\\S+?)",
-         ": *",
-         "(?<value>.+?)",
-         ";")
-
-get.style.vec <- function(xpath){
-  node.set <- getNodeSet(getHTML(), xpath)
-  expect_equal(length(node.set), 1)
-  node <- node.set[[1]]
-  attr.vec <- xmlAttrs(node)
-  if("style" %in% names(attr.vec)){
-    style <- attr.vec[["style"]]
-    style.mat <- str_match_all_perl(style, style.pattern)[[1]]
-    style.vec <- style.mat[, "value"]
-    names(style.vec) <- rownames(style.mat)
-    style.vec
-  }else{
-    character()
-  }
-}
-
 region.lines <-
   getNodeSet(info$html, '//g[@class="geom12_segment_variants"]//line')
-
 test_that("one line is rendered for each region", {
   expect_equal(length(region.lines), nrow(malaria$regions))
 })
 
-some <- get.style.vec('//tr[@id="some"]//circle')
-none <- get.style.vec('//tr[@id="none"]//circle')
-
+getFillStroke <- function(value){
+  xpath <- sprintf(
+    '//tr[@id="plot_chroms_highly_divergent_regions_variable_%s"]//circle',
+    value)
+  getStyleValue(info$html, xpath, c("stroke", "fill"))
+}
+some <- getFillStroke("some")
+none <- getFillStroke("none")
 test_that("geom_point(aes(color)) legend shows as circle stroke", {
-  expect_true(some[["stroke"]] != none[["stroke"]])
-  expect_true(some[["fill"]] == none[["fill"]])
+  expect_true(some["stroke",] != none["stroke",])
+  expect_true(some["fill",] == none["fill",])
 })
 
-get.opacity <- function(xpath){
-  style.vec <- get.style.vec(xpath)
-  if("opacity" %in% names(style.vec)){
-    as.numeric(style.vec[["opacity"]])
-  }else{
-    1
-  }
+get.opacity <- function(class.name){
+  xpath <- sprintf(
+    '//tr[@class="%s"]//td[@class="legend_entry_label"]',
+    class.name)
+  getStyleValue(getHTML(), xpath, "opacity")
 }
-
-intergenic.before <- get.opacity('//td[@id="INTERGENIC"]')
-
+before.vec <- get.opacity("annotation_variable")
 test_that("INTERGENIC legend entry opacity 1 before clicking", {
-  expect_equal(intergenic.before, 1)
+  expect_identical(before.vec, c("1", "1", "1", "1"))
 })
 
 clickID("INTERGENIC")
-
-intergenic.after <- get.opacity('//td[@id="INTERGENIC"]')
-
+after.vec <- get.opacity("annotation_variable")
 test_that("INTERGENIC legend entry opacity 0.5 after clicking", {
-  expect_equal(intergenic.after, 0.5)
+  expect_identical(after.vec, c("1", "0.5", "1", "1"))
 })
 
-none.before <- get.opacity('//td[@id="none"]')
-
+before.vec <- get.opacity("highly_divergent_regions_variable")
 test_that("none legend entry opacity 1 before clicking", {
-  expect_equal(none.before, 1)
+  expect_identical(before.vec, c("1", "1"))
 })
 
 clickID("none")
-
-none.after <- get.opacity('//td[@id="none"]')
-
+after.vec <- get.opacity("highly_divergent_regions_variable")
 test_that("none legend entry opacity 0.5 after clicking", {
-  expect_equal(none.after, 0.5)
+  expect_identical(after.vec, c("0.5", "1"))
 })
 
 ## TODO: test number of geoms rendered in chroms and variants plots,
