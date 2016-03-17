@@ -232,17 +232,17 @@ test_that("selectize option respected", {
 })
 
 test_that("rects rendered in fill legend", {
-  rect.list <- getNodeSet(info$html, '//tr[@class="log10(count)"]//rect')
+  rect.list <- getNodeSet(info$html, '//tr[@class="log10(count)_legend"]//rect')
   expect_equal(length(rect.list), 5)
 })
 
 test_that("no lines rendered in fill legend", {
-  line.list <- getNodeSet(info$html, '//tr[@class="log10(count)"]//line')
+  line.list <- getNodeSet(info$html, '//tr[@class="log10(count)_legend"]//line')
   expect_equal(length(line.list), 0)
 })
 
 test_that("lines in color legend", {
-  line.list <- getNodeSet(info$html, '//tr[@class="thresh_type"]//line')
+  line.list <- getNodeSet(info$html, '//tr[@class="thresh_type_legend"]//line')
   expect_equal(length(line.list), 2)
 })
 
