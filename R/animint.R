@@ -96,6 +96,7 @@ parsePlot <- function(meta){
         ## it to multiple.
         if(is.null(meta$selector.types[[s.name]])) {
           meta$selector.types[[s.name]] <- "multiple"
+          meta$selectors[[s.name]]$type <- "multiple"
         }
         ## if first is not specified, create it
         if(is.null(meta$first)) {
