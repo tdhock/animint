@@ -6,7 +6,8 @@ get_circles <- function(id) {
 }
 
 iris$id <- 1:nrow(iris)
-p1 <- ggplot() + 
+p1 <- ggplot() +
+  guides(color="none")+
   geom_point(aes(Sepal.Length, Sepal.Width, colour = Species, 
                  size = Petal.Width, clickSelects = Species, id = id), 
              data = iris) + 
@@ -22,7 +23,7 @@ viz <- list(sepal = p1,
 info <- animint2HTML(viz)
 
 test_that("compiler adds selector.types and first", {
-  expect_match(info$selector.types, "multiple")
+  expect_match(info$selector.types$Species, "multiple")
   expect_true(all(info$first$Species %in% c("setosa", "virginica", "versicolor")))
 })
 
@@ -35,8 +36,7 @@ test_that("clicking species legend adds and removes points", {
   # virginica points are removed
   clickID("virginica")
   expect_equal(length(get_circles("sepal")), 150)
-  expect_equal(length(get_circles("petal")), 100)
-  
+  expect_equal(length(get_circles("petal")), 100)  
   # virginica points are added back
   clickID("virginica")
   expect_equal(length(get_circles("sepal")), 150)
