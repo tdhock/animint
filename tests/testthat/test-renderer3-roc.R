@@ -60,7 +60,7 @@ test_that("path before params, 5 paths rendered", {
   path.list <- getNodeSet(info$html, '//g[@class="geom1_path_roc"]//path')
   expect_equal(length(path.list), 5)
   stroke.vec <- getStyleValue(
-    info$html, '//td[@class="roc_variable"]//line', "stroke")
+    info$html, '//td[@class="roc_legend"]//line', "stroke")
   expect_color(stroke.vec, algo.colors)
 })
 
@@ -111,7 +111,7 @@ test_that("path after params, 5 paths rendered", {
   path.list <- getNodeSet(info$html, '//g[@class="geom3_path_roc"]//path')
   expect_equal(length(path.list), 5)
   stroke.vec <- getStyleValue(
-    info$html, '//td[@class="roc_variable"]//line', "stroke")
+    info$html, '//td[@class="roc_legend"]//line', "stroke")
   expect_color(stroke.vec, algo.colors)
 })
 
