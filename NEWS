@@ -193,6 +193,9 @@ BUGFIX: plots in the same Rmd are now guaranteed to have different id.
 
 BUGFIX: animints with common chunk tsv files now work in Rmd.
 
+RENDER: selector.types defaults to multiple selection for variables
+which have legends somewhere in the data viz.
+
 2016.03.15 PR#141
 
 TEST: Added the test for Lilac Chaser Visual Illusion.
