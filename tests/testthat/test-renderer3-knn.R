@@ -2,9 +2,11 @@ acontext("mixtureKNN data set")
 
 data(mixtureKNN)
 
-text.V1.prop <- 0
-text.V2.bottom <- -2
-text.V1.error <- -2.6
+mixtureKNN$Bayes.error$text.V1.prop <- 0
+mixtureKNN$Bayes.error$text.V2.bottom <- -2
+mixtureKNN$other.error$text.V1.prop <- 0
+mixtureKNN$Bayes.error$text.V1.error <- -2.6
+mixtureKNN$other.error$text.V1.error <- -2.6
 classifier.linetypes <- c(
   Bayes="dashed",
   KNN="solid")
