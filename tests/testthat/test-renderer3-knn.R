@@ -121,42 +121,90 @@ viz.neighbors <- list(
   )
 info <- animint2HTML(viz.neighbors)
 
-test_that("1 <path> rendered for validation error band", {
-  path.list <- getNodeSet(info$html, "//g[@class='geom3_ribbon_error']//path")
-  expect_equal(length(path.list), 1)
-})
-
-test_that("1 <path> rendered for validation error mean", {
-  path.list <- getNodeSet(info$html, "//g[@class='geom4_line_error']//path")
-  expect_equal(length(path.list), 1)
-})
-
-test_that("2 <path> rendered for train/test error", {
-  path.list <- getNodeSet(info$html, "//g[@class='geom5_line_error']//path")
-  expect_equal(length(path.list), 2)
-})
-
-test_that("1 <line> rendered for Bayes error", {
-  line.list <- getNodeSet(info$html, "//g[@class='geom2_segment_error']//line")
-  expect_equal(length(line.list), 1)
+get_nodes <- function(html=getHTML()){
+  line.list <- getNodeSet(html, "//g[@class='geom2_segment_error']//line")
   rect.list <- getNodeSet(
-    info$html, "//svg[@id='plot_error']//rect[@class='border_rect']")
-  expect_equal(length(rect.list), 1)
-  rect.attr.vec <- xmlAttrs(rect.list[[1]])
-  rect.x <- as.numeric(rect.attr.vec[["x"]])
-  rect.width <- as.numeric(rect.attr.vec[["width"]])
+    html, "//svg[@id='plot_error']//rect[@class='border_rect']")
+  rect.attr.mat <- sapply(rect.list, xmlAttrs)
+  rect.x <- as.numeric(rect.attr.mat["x",])
+  rect.width <- as.numeric(rect.attr.mat["width",])
   rect.right <- rect.x + rect.width
-  line.attr.vec <- xmlAttrs(line.list[[1]])
-  line.x2 <- as.numeric(line.attr.vec[["x2"]])
-  expect_less_than(line.x2, rect.right)
-})
+  line.attr.mat <- sapply(line.list, xmlAttrs)
+  list(
+    ribbon=getNodeSet(html, "//g[@class='geom3_ribbon_error']//path"),
+    validation=getNodeSet(html, "//g[@class='geom4_line_error']//path"),
+    train.test=getNodeSet(html, "//g[@class='geom5_line_error']//path"),
+    Bayes=line.list,
+    Bayes.x2=if(is.matrix(line.attr.mat))as.numeric(line.attr.mat["x2",]),
+    border.right=rect.right,
+    boundary.KNN=getNodeSet(html, "//g[@class='geom8_path_data']//path"),
+    boundary.Bayes=getNodeSet(html, "//g[@class='geom9_path_data']//path")
+    )
+}
 
+before <- get_nodes(info$html)
+test_that("1 <path> rendered for validation error band", {
+  expect_equal(length(before$ribbon), 1)
+})
+test_that("1 <path> rendered for validation error mean", {
+  expect_equal(length(before$validation), 1)
+})
+test_that("2 <path> rendered for train/test error", {
+  expect_equal(length(before$train.test), 2)
+})
+test_that("1 <line> rendered for Bayes error", {
+  expect_equal(length(before$Bayes), 1)
+})
+test_that("Bayes error <line> inside of border_rect", {
+  expect_less_than(before$Bayes.x2, before$border.right)
+})
 test_that("6 <path> rendered for KNN boundary", {
-  path.list <- getNodeSet(info$html, "//g[@class='geom8_path_data']//path")
-  expect_equal(length(path.list), 6)
+  expect_equal(length(before$boundary.KNN), 6)
+})
+test_that("2 <path> rendered for Bayes boundary", {
+  expect_equal(length(before$boundary.Bayes), 2)
 })
 
-test_that("2 <path> rendered for Bayes boundary", {
-  path.list <- getNodeSet(info$html, "//g[@class='geom9_path_data']//path")
-  expect_equal(length(path.list), 2)
+clickID("plot_data_classifier_variable_Bayes")
+
+click1 <- get_nodes()
+test_that("first click, 1 <path> rendered for validation error band", {
+  expect_equal(length(click1$ribbon), 1)
+})
+test_that("first click, 1 <path> rendered for validation error mean", {
+  expect_equal(length(click1$validation), 1)
+})
+test_that("first click, 2 <path> rendered for train/test error", {
+  expect_equal(length(click1$train.test), 2)
+})
+test_that("first click, Bayes error disappears", {
+  expect_equal(length(click1$Bayes), 0)
+})
+test_that("first click, 6 <path> rendered for KNN boundary", {
+  expect_equal(length(click1$boundary.KNN), 6)
+})
+test_that("first click, Bayes boundary disappears", {
+  expect_equal(length(click1$boundary.Bayes), 0)
+})
+
+clickID("plot_data_classifier_variable_KNN")
+
+click2 <- get_nodes()
+test_that("second click, validation error band disappears", {
+  expect_equal(length(click2$ribbon), 0)
+})
+test_that("second click, validation error mean disappears", {
+  expect_equal(length(click2$validation), 0)
+})
+test_that("second click, train/test error disappears", {
+  expect_equal(length(click2$train.test), 0)
+})
+test_that("second click, Bayes error still gone", {
+  expect_equal(length(click2$Bayes), 0)
+})
+test_that("second click, KNN boundary disappears", {
+  expect_equal(length(click2$boundary.KNN), 0)
+})
+test_that("second click, Bayes boundary still gone", {
+  expect_equal(length(click2$boundary.Bayes), 0)
 })
