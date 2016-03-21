@@ -34,17 +34,17 @@ test_that("all points are initially drawn", {
 
 test_that("clicking species legend adds and removes points", {
   # virginica points are removed
-  clickID("virginica")
+  clickID("plot_petal_Species_variable_virginica")
   expect_equal(length(get_circles("sepal")), 150)
   expect_equal(length(get_circles("petal")), 100)  
   # virginica points are added back
-  clickID("virginica")
+  clickID("plot_petal_Species_variable_virginica")
   expect_equal(length(get_circles("sepal")), 150)
   expect_equal(length(get_circles("petal")), 150)
 })
 
 test_that("clicking sepal.width legend does nothing", {
-  clickID("2.5")
+  clickID("plot_petal_Sepal_Width_variable_2.5")
   expect_equal(length(get_circles("sepal")), 150)
   expect_equal(length(get_circles("petal")), 150)
 })
@@ -61,9 +61,9 @@ info <- animint2HTML(list(p = p))
 
 test_that("A plot with no show/click aes and a legend should be clickable", {
   expect_equal(length(get_circles("p")), 32)
-  clickID("0")
+  clickID("plot_p_am_variable_0")
   expect_equal(length(get_circles("p")), 13)
-  clickID("0")
+  clickID("plot_p_am_variable_0")
   expect_equal(length(get_circles("p")), 32)
 })
 
@@ -95,9 +95,9 @@ viz <- list(
 test_that("Two plots with both color and fill", {
   info <- animint2HTML(viz)
   expect_equal(length(get_circles("factor")), 32)
-  clickID("0")
+  clickID("plot_factor_vs_fac_variable_0")
   expect_equal(length(get_circles("factor")), 14)
-  clickID("0")
+  clickID("plot_factor_vs_fac_variable_0")
   expect_equal(length(get_circles("factor")), 32)
   td.list <- getNodeSet(
     info$html, '//tr[@class="vs_variable"]//td[@class="legend_entry_label"]')
@@ -182,9 +182,9 @@ viz <- list(
 test_that('aes(color=vs, fill=vs.fac) aes(color=vs.num, fill=vs.fac) is OK"', {
   info <- animint2HTML(viz)
   expect_equal(length(get_circles("p")), 32)
-  clickID("0")
+  clickID("plot_p_vs_fac_variable_0")
   expect_equal(length(get_circles("p")), 14)
-  clickID("0")
+  clickID("plot_p_vs_fac_variable_0")
   expect_equal(length(get_circles("p")), 32)
   ## Stroke should be constant in the fill legend:
   style.mat <- getStyleValue(
@@ -208,9 +208,9 @@ viz <- list(
 test_that('aes(color=vs.fac) is OK"', {
   info <- animint2HTML(viz)
   expect_equal(length(get_circles("p")), 32)
-  clickID("0")
+  clickID("plot_p_vs_fac_variable_0")
   expect_equal(length(get_circles("p")), 14)
-  clickID("0")
+  clickID("plot_p_vs_fac_variable_0")
   expect_equal(length(get_circles("p")), 32)  
 })
 

@@ -216,7 +216,7 @@ test_that("INTERGENIC legend entry opacity 1 before clicking", {
   expect_identical(before.vec, c("1", "1", "1", "1"))
 })
 
-clickID("INTERGENIC")
+clickID("plot_chroms_annotation_variable_INTERGENIC")
 after.vec <- get.opacity("annotation_variable")
 test_that("INTERGENIC legend entry opacity 0.5 after clicking", {
   expect_identical(after.vec, c("1", "0.5", "1", "1"))
@@ -227,7 +227,7 @@ test_that("none legend entry opacity 1 before clicking", {
   expect_identical(before.vec, c("1", "1"))
 })
 
-clickID("none")
+clickID("plot_chroms_highly_divergent_regions_variable_none")
 after.vec <- get.opacity("highly_divergent_regions_variable")
 test_that("none legend entry opacity 0.5 after clicking", {
   expect_identical(after.vec, c("0.5", "1"))

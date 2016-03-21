@@ -227,8 +227,8 @@ test_that("pause stops animation (second time)", {
   expect_true(old.year == new.year)
 })
 
-clickID("even")
-clickID("odd")
+clickID("plot_ts_status_variable_even")
+clickID("plot_ts_status_variable_odd")
 html.no.rects <- getHTML()
 
 test_that("clicking status legend hides tallrects", {
@@ -245,8 +245,8 @@ test_that("clicking status legend does not hide text", {
   expect_equal(length(node.set), 1)
 })
 
-clickID("even")
-clickID("odd")
+clickID("plot_ts_status_variable_even")
+clickID("plot_ts_status_variable_odd")
 html.with.rects <- getHTML()
 
 test_that("clicking status legend brings back tallrects", {
