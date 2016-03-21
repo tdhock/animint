@@ -17,7 +17,7 @@ path <- do.call(rbind, path.list)
 viz <- list(
   point=ggplot()+
     geom_point(aes(showSelected.i, showSelected.i,
-                   id=paste("point", showSelected.i),
+                   id=paste0("point", showSelected.i),
                    clickSelects=showSelected.i),
                size=10,
                data=point),
