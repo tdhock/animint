@@ -742,7 +742,7 @@ saveLayer <- function(l, d, meta){
   }
   ## Get unique values of time variable.
   if(length(time.col)){ # if this layer/geom is animated,
-    g$timeValues <- unique(g.data[[time.col]])
+    meta$timeValues[[paste(g$classed)]] <- unique(g.data[[time.col]])
   }
 
   ## Determine which showSelected values to use for breaking the data
@@ -917,11 +917,6 @@ saveLayer <- function(l, d, meta){
   meta$g <- g
   g$chunks <- saveChunks(g.data.varied, meta)
   g$total <- length(unlist(g$chunks))
-
-  ## Get unique values of time variable.
-  if(length(time.col)){ # if this layer/geom is animated,
-    g$timeValues <- unique(g.data[[time.col]])
-  }
 
   ## Finally save to the master geom list.
   meta$geoms[[g$classed]] <- g
@@ -1327,10 +1322,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
       meta$plot.name <- list.name
       ggplot.list[[list.name]] <- parsePlot(meta) # calls ggplot_build.
     }else if(is.list(p)){ ## for options.
-      ## combine the current option with p
-      # necessary because legends create their own list of selectors and first
-      # have to be careful not to overwrite these
-      meta[[list.name]] <- c(meta[[list.name]], p)
+      meta[[list.name]] <- p
     }else{
       stop("list items must be ggplots or option lists, problem: ", list.name)
     }
@@ -1342,23 +1334,23 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
     ggplot.info <- ggplot.list[[p.name]]
     meta$prev.class <- NULL # first geom of any plot should not be next.
     for(layer.i in seq_along(ggplot.info$ggplot$layers)){
-      ## for each layer, there is a correpsonding data.frame which
-      ## evaluates the aesthetic mapping.
       L <- ggplot.info$ggplot$layers[[layer.i]]
       df <- ggplot.info$built$data[[layer.i]]
-      ## This extracts essential info for this geom/layer.
-      cat(sprintf(
-        "saving layer %4d / %4d of ggplot %s\n",
-        layer.i, length(ggplot.info$built$data),
-        p.name))
-      ## This is a total hack, we should clean up the internal
-      ## compiler so that it no longer relies on this meta object
-      ## which makes it super confusing to know which functions need
-      ## which data.
+      ## cat(sprintf(
+      ##   "saving layer %4d / %4d of ggplot %s\n",
+      ##   layer.i, length(ggplot.info$built$data),
+      ##   p.name))
+      
+      ## This is a total hack, we should clean up the internals
+      ## (parsePlot, saveLayer) so that they no longer rely on this
+      ## meta object which makes it super confusing to know which
+      ## functions need which data.
       meta$plot.name <- p.name
       meta$plot <- ggplot.info$ggplot
       meta$built <- ggplot.info$built
       g <- saveLayer(L, df, meta)
+
+      ## Every plot has a list of geom names.
       meta$plots[[p.name]]$geoms <- c(
         meta$plots[[p.name]]$geoms, list(g$classed))
     }#layer.i
@@ -1456,7 +1448,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
   ## all the values used in those geoms.
   if("time" %in% ls(meta)){
     meta$selectors[[meta$time$variable]]$type <- "single"
-    anim.values <- lapply(meta$geoms, "[[", "timeValues")
+    anim.values <- meta$timeValues
     anim.not.null <- anim.values[!sapply(anim.values, is.null)]
     time.classes <- sapply(anim.not.null, function(x) class(x)[1])
     time.class <- time.classes[[1]]
