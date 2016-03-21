@@ -44,7 +44,7 @@ test_that("clicking species legend adds and removes points", {
 })
 
 test_that("clicking sepal.width legend does nothing", {
-  clickID("plot_petal_Sepal_Width_variable_2.5")
+  clickID("plot_petal_Sepal_Width_variable_2_5")
   expect_equal(length(get_circles("sepal")), 150)
   expect_equal(length(get_circles("petal")), 150)
 })
