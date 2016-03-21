@@ -133,12 +133,22 @@ test_that("1 <path> rendered for validation error mean", {
 
 test_that("2 <path> rendered for train/test error", {
   path.list <- getNodeSet(info$html, "//g[@class='geom5_line_error']//path")
-  expect_equal(length(path.list), 1)
+  expect_equal(length(path.list), 2)
 })
 
-test_that("2 <path> rendered for train/test error", {
-  path.list <- getNodeSet(info$html, "//g[@class='geom5_line_error']//path")
-  expect_equal(length(path.list), 1)
+test_that("1 <line> rendered for Bayes error", {
+  line.list <- getNodeSet(info$html, "//g[@class='geom2_segment_error']//line")
+  expect_equal(length(line.list), 1)
+  rect.list <- getNodeSet(
+    info$html, "//svg[@id='plot_error']//rect[@class='border_rect']")
+  expect_equal(length(rect.list), 1)
+  rect.attr.vec <- xmlAttrs(rect.list[[1]])
+  rect.x <- as.numeric(rect.attr.vec[["x"]])
+  rect.width <- as.numeric(rect.attr.vec[["width"]])
+  rect.right <- rect.x + rect.width
+  line.attr.vec <- xmlAttrs(line.list[[1]])
+  line.x2 <- as.numeric(line.attr.vec[["x2"]])
+  expect_less_than(line.x2, rect.right)
 })
 
 test_that("6 <path> rendered for KNN boundary", {
