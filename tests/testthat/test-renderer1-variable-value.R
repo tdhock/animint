@@ -153,7 +153,7 @@ test_that("No widgets for .variable .value selectors", {
   expect_identical(sort(computed.vec), sort(expected.vec))
 })
 
-circle.xpath <- '//svg[@id="peaks"]//circle'
+circle.xpath <- '//svg[@id="plot_peaks"]//circle'
 title.xpath <- paste0(circle.xpath, '//title')
 
 test_that("clickSelects.variable tooltip/title", {
@@ -165,9 +165,8 @@ test_that("clickSelects.variable tooltip/title", {
 })
 
 test_that("two lines rendered in first plot", {
-  path.list <-
-    getNodeSet(info$html,
-               '//svg[@id="errorLines"]//g[@class="PANEL1"]//path')
+  path.list <- getNodeSet(
+    info$html, '//svg[@id="plot_errorLines"]//g[@class="PANEL1"]//path')
   style.strs <- sapply(path.list, function(x) xmlAttrs(x)["style"])
   pattern <-
     paste0("(?<name>\\S+?)",

@@ -2,19 +2,17 @@
 % Please edit documentation in R/animint.R
 \name{merge_recurse}
 \alias{merge_recurse}
-\title{Function to merge a list of data frames (from the reshape package)}
+\title{Merge a list of data frames.}
 \usage{
-merge_recurse(dfs, ...)
+merge_recurse(dfs)
 }
 \arguments{
 \item{dfs}{list of data frames}
-
-\item{...}{other arguments to merge}
 }
 \value{
-data frame of merged lists
+data frame
 }
 \description{
-Function to merge a list of data frames (from the reshape package)
+Merge a list of data frames.
 }
 

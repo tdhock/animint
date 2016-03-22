@@ -2,11 +2,12 @@ acontext("Interactive Legends")
 
 ## extract all <circle> elements under a particular <svg> element.
 get_circles <- function(id) {
-  getNodeSet(getHTML(), paste0("//svg[@id='", id, "']//circle"))
+  getNodeSet(getHTML(), paste0("//svg[@id='plot_", id, "']//circle"))
 }
 
 iris$id <- 1:nrow(iris)
-p1 <- ggplot() + 
+p1 <- ggplot() +
+  guides(color="none")+
   geom_point(aes(Sepal.Length, Sepal.Width, colour = Species, 
                  size = Petal.Width, clickSelects = Species, id = id), 
              data = iris) + 
@@ -22,7 +23,7 @@ viz <- list(sepal = p1,
 info <- animint2HTML(viz)
 
 test_that("compiler adds selector.types and first", {
-  expect_match(info$selector.types, "multiple")
+  expect_match(info$selector.types$Species, "multiple")
   expect_true(all(info$first$Species %in% c("setosa", "virginica", "versicolor")))
 })
 
@@ -33,18 +34,17 @@ test_that("all points are initially drawn", {
 
 test_that("clicking species legend adds and removes points", {
   # virginica points are removed
-  clickID("virginica")
+  clickID("plot_petal_Species_variable_virginica")
   expect_equal(length(get_circles("sepal")), 150)
-  expect_equal(length(get_circles("petal")), 100)
-  
+  expect_equal(length(get_circles("petal")), 100)  
   # virginica points are added back
-  clickID("virginica")
+  clickID("plot_petal_Species_variable_virginica")
   expect_equal(length(get_circles("sepal")), 150)
   expect_equal(length(get_circles("petal")), 150)
 })
 
 test_that("clicking sepal.width legend does nothing", {
-  clickID("2.5")
+  clickID("plot_petal_Sepal_Width_variable_2_5")
   expect_equal(length(get_circles("sepal")), 150)
   expect_equal(length(get_circles("petal")), 150)
 })
@@ -61,9 +61,9 @@ info <- animint2HTML(list(p = p))
 
 test_that("A plot with no show/click aes and a legend should be clickable", {
   expect_equal(length(get_circles("p")), 32)
-  clickID("0")
+  clickID("plot_p_am_variable_0")
   expect_equal(length(get_circles("p")), 13)
-  clickID("0")
+  clickID("plot_p_am_variable_0")
   expect_equal(length(get_circles("p")), 32)
 })
 
@@ -95,23 +95,24 @@ viz <- list(
 test_that("Two plots with both color and fill", {
   info <- animint2HTML(viz)
   expect_equal(length(get_circles("factor")), 32)
-  clickID("0")
+  clickID("plot_factor_vs_fac_variable_0")
   expect_equal(length(get_circles("factor")), 14)
-  clickID("0")
+  clickID("plot_factor_vs_fac_variable_0")
   expect_equal(length(get_circles("factor")), 32)
-  td.list <-
-    getNodeSet(info$html, '//tr[@class="vs"]//td[@class="legend_entry_label"]')
+  td.list <- getNodeSet(
+    info$html, '//tr[@class="vs_variable"]//td[@class="legend_entry_label"]')
   value.vec <- sapply(td.list, xmlValue)
   expect_identical(value.vec, c("1.00", "0.75", "0.50", "0.25", "0.00"))
   style.mat <- getStyleValue(
     info$html, '//table[@class="legend"]//circle', c("fill", "stroke"))
   expect_identical(style.mat["fill", ], style.mat["stroke", ])
   ## Make sure lines are rendered in the first but not second legend:
-  left.lines <- getNodeSet(info$html, '//tr[@class="vs"]//line')
+  left.lines <- getNodeSet(info$html, '//tr[@class="vs_variable"]//line')
   expect_equal(length(left.lines), 5)
-  right.lines <- getNodeSet(info$html, '//tr[@class="vs_fac"]//line')
+  right.lines <- getNodeSet(info$html, '//tr[@class="vs_fac_variable"]//line')
   expect_equal(length(right.lines), 0)
-  right.circles <- getNodeSet(info$html, '//tr[@class="vs_fac"]//circle')
+  right.circles <- getNodeSet(
+    info$html, '//tr[@class="vs_fac_variable"]//circle')
   expect_equal(length(right.circles), 2)
   ## Lines should be rendered in both plots:
   left.lines <-
@@ -161,11 +162,10 @@ viz <- list(
                data=vs0)+
     geom_point(aes(mpg, hp, color = vs),
                data=vs1))
-
 test_that('aes(color=vs) aes(color=vs.num) is OK"', {
   info <- animint2HTML(viz)
   expect_equal(length(get_circles("p")), 32)
-  tr.list <- getNodeSet(info$html, '//tr[@class="vs_num"]')
+  tr.list <- getNodeSet(info$html, '//tr[@class="vs_num_legend"]')
   attr.mat <- sapply(tr.list, "xmlAttrs")
   expect_false("title" %in% rownames(attr.mat))
   expect_false("style" %in% rownames(attr.mat))
@@ -179,22 +179,21 @@ viz <- list(
     geom_point(aes(mpg, hp, color = vs, fill=vs.fac),
                shape=21,
                data=vs1))
-
 test_that('aes(color=vs, fill=vs.fac) aes(color=vs.num, fill=vs.fac) is OK"', {
   info <- animint2HTML(viz)
   expect_equal(length(get_circles("p")), 32)
-  clickID("0")
+  clickID("plot_p_vs_fac_variable_0")
   expect_equal(length(get_circles("p")), 14)
-  clickID("0")
+  clickID("plot_p_vs_fac_variable_0")
   expect_equal(length(get_circles("p")), 32)
   ## Stroke should be constant in the fill legend:
   style.mat <- getStyleValue(
-    info$html, '//tr[@class="vs_fac"]//circle', c("fill", "stroke"))
+    info$html, '//tr[@class="vs_fac_variable"]//circle', c("fill", "stroke"))
   expected.stroke <- rep(style.mat[["stroke", 1]], ncol(style.mat))
   expect_identical(style.mat["stroke", ], expected.stroke)
   ## Fill should be constant in the stroke legend:
   style.mat <- getStyleValue(
-    info$html, '//tr[@class="vs_num"]//circle', c("fill", "stroke"))
+    info$html, '//tr[@class="vs_num_variable"]//circle', c("fill", "stroke"))
   expected.fill <- rep(style.mat[["fill", 1]], ncol(style.mat))
   expect_identical(style.mat["fill", ], expected.fill)
 })
@@ -206,13 +205,12 @@ viz <- list(
                data=vs0)+
     geom_point(aes(mpg, hp, color = vs.fac),
                data=vs1))
-
 test_that('aes(color=vs.fac) is OK"', {
   info <- animint2HTML(viz)
   expect_equal(length(get_circles("p")), 32)
-  clickID("0")
+  clickID("plot_p_vs_fac_variable_0")
   expect_equal(length(get_circles("p")), 14)
-  clickID("0")
+  clickID("plot_p_vs_fac_variable_0")
   expect_equal(length(get_circles("p")), 32)  
 })
 
@@ -223,7 +221,6 @@ viz <- list(
                data=vs0)+
     geom_point(aes(mpg, hp, color = vs.fac2),
                data=vs1))
-
 test_that('aes(color=something), aes(color=something.else) is an error"', {
   expect_error({
     info <- animint2HTML(viz)

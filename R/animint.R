@@ -55,13 +55,11 @@ parsePlot <- function(meta){
     getLegendList(meta$built)
   }
   
-  ## save each layer
+  ## scan for legends in each layer.
   for(layer.i in seq_along(meta$plot$layers)){
     ##cat(sprintf("%4d / %4d layers\n", layer.i, length(meta$plot$layers)))
-
     ## This is the layer from the original ggplot object.
     L <- meta$plot$layers[[layer.i]]
-    
     ## If any legends are specified, add showSelected aesthetic
     for(legend.i in seq_along(plot.meta$legend)) {
       one.legend <- plot.meta$legend[[legend.i]]
@@ -96,6 +94,7 @@ parsePlot <- function(meta){
         ## it to multiple.
         if(is.null(meta$selector.types[[s.name]])) {
           meta$selector.types[[s.name]] <- "multiple"
+          meta$selectors[[s.name]]$type <- "multiple"
         }
         ## if first is not specified, create it
         if(is.null(meta$first)) {
@@ -111,39 +110,25 @@ parsePlot <- function(meta){
         meta$selectors[[s.name]]$legend <- TRUE
       }#length(s.name)
     }#legend.i
+  }#layer.i
     
-    ## need to call ggplot_build again because we've added to the plot
-    # I'm sure that there is a way around this, but not immediately sure how. 
-    # There's sort of a Catch-22 here because to create the interactivity, 
-    # we need to specify the variable corresponding to each legend. 
-    # To do this, we need to have the legend. 
-    # And to have the legend, I think that we need to use ggplot_build
-    meta$built <- ggplot2::ggplot_build(meta$plot)
-
-    ## for each layer, there is a correpsonding data.frame which
-    ## evaluates the aesthetic mapping.
-    df <- meta$built$data[[layer.i]]
-
-    ## This extracts essential info for this geom/layer.
-    g <- saveLayer(L, df, meta)
-
-    ## 'strips' are really titles for the different facet panels
-    plot.meta$strips <- with(meta$built, getStrips(plot$facet, panel))
-    ## the layout tells us how to subset and where to plot on the JS side
-    plot.meta$layout <- with(meta$built, flag_axis(plot$facet, panel$layout))
-    plot.meta$layout <- with(meta$built, train_layout(plot$facet, plot$coordinates, plot.meta$layout,
-                                                     panel$ranges))
-    plot.meta$geoms <- c(plot.meta$geoms, list(g$classed))
-  }
-  ## For each geom, save the nextgeom to preserve drawing order.
-  n.next <- length(plot.meta$geoms) - 1
-  if(n.next){
-    for(geom.i in 1:n.next){
-      geom.prev <- plot.meta$geoms[[geom.i]]
-      geom.next <- plot.meta$geoms[[geom.i + 1]]
-      meta$geoms[[geom.prev]]$nextgeom <- meta$geoms[[geom.next]]$classed
-    }
-  }
+  ## need to call ggplot_build again because we've added to the plot.
+  
+  ## I'm sure that there is a way around this, but not immediately sure how. 
+  ## There's sort of a Catch-22 here because to create the interactivity, 
+  ## we need to specify the variable corresponding to each legend. 
+  ## To do this, we need to have the legend. 
+  ## And to have the legend, I think that we need to use ggplot_build
+  meta$built <- ggplot2::ggplot_build(meta$plot)
+  ## TODO: implement a compiler that does not call ggplot_build at
+  ## all, and instead does all of the relevant computations in animint
+  ## code.
+  ## 'strips' are really titles for the different facet panels
+  plot.meta$strips <- with(meta$built, getStrips(plot$facet, panel))
+  ## the layout tells us how to subset and where to plot on the JS side
+  plot.meta$layout <- with(meta$built, flag_axis(plot$facet, panel$layout))
+  plot.meta$layout <- with(meta$built, train_layout(
+    plot$facet, plot$coordinates, plot.meta$layout, panel$ranges))
 
   ## Export axis specification as a combination of breaks and
   ## labels, on the relevant axis scale (i.e. so that it can
@@ -322,6 +307,10 @@ parsePlot <- function(meta){
   }
 
   meta$plots[[meta$plot.name]] <- plot.meta
+
+  list(
+    ggplot=meta$plot,
+    built=meta$built)
 }
 
 hjust2anchor <- function(hjust){
@@ -354,6 +343,11 @@ saveLayer <- function(l, d, meta){
   g$classed <-
     sprintf("geom%d_%s_%s",
             meta$geom.count, g$geom, meta$plot.name)
+  ## For each geom, save the nextgeom to preserve drawing order.
+  if(is.character(meta$prev.class)){
+    meta$geoms[[meta$prev.class]]$nextgeom <- g$classed
+  }
+  
   meta$geom.count <- meta$geom.count + 1
   ## needed for when group, etc. is an expression:
   g$aes <- sapply(l$mapping, function(k) as.character(as.expression(k)))
@@ -748,7 +742,7 @@ saveLayer <- function(l, d, meta){
   }
   ## Get unique values of time variable.
   if(length(time.col)){ # if this layer/geom is animated,
-    g$timeValues <- unique(g.data[[time.col]])
+    meta$timeValues[[paste(g$classed)]] <- unique(g.data[[time.col]])
   }
 
   ## Determine which showSelected values to use for breaking the data
@@ -923,11 +917,6 @@ saveLayer <- function(l, d, meta){
   meta$g <- g
   g$chunks <- saveChunks(g.data.varied, meta)
   g$total <- length(unlist(g$chunks))
-
-  ## Get unique values of time variable.
-  if(length(time.col)){ # if this layer/geom is animated,
-    g$timeValues <- unique(g.data[[time.col]])
-  }
 
   ## Finally save to the master geom list.
   meta$geoms[[g$classed]] <- g
@@ -1292,6 +1281,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
   }
 
   ## Extract essential info from ggplots, reality checks.
+  ggplot.list <- list()
   for(list.name in names(plot.list)){
     p <- plot.list[[list.name]]
     if(is.ggplot(p)){
@@ -1330,17 +1320,42 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
       }
       meta$plot <- p
       meta$plot.name <- list.name
-      parsePlot(meta) # calls ggplot_build.
+      ggplot.list[[list.name]] <- parsePlot(meta) # calls ggplot_build.
     }else if(is.list(p)){ ## for options.
-      ## combine the current option with p
-      # necessary because legends create their own list of selectors and first
-      # have to be careful not to overwrite these
-      meta[[list.name]] <- c(meta[[list.name]], p)
+      meta[[list.name]] <- p
     }else{
       stop("list items must be ggplots or option lists, problem: ", list.name)
     }
   }
 
+  ## After going through all of the meta-data in all of the ggplots,
+  ## now we have enough info to save the TSV file database.
+  for(p.name in names(ggplot.list)){
+    ggplot.info <- ggplot.list[[p.name]]
+    meta$prev.class <- NULL # first geom of any plot should not be next.
+    for(layer.i in seq_along(ggplot.info$ggplot$layers)){
+      L <- ggplot.info$ggplot$layers[[layer.i]]
+      df <- ggplot.info$built$data[[layer.i]]
+      ## cat(sprintf(
+      ##   "saving layer %4d / %4d of ggplot %s\n",
+      ##   layer.i, length(ggplot.info$built$data),
+      ##   p.name))
+      
+      ## This is a total hack, we should clean up the internals
+      ## (parsePlot, saveLayer) so that they no longer rely on this
+      ## meta object which makes it super confusing to know which
+      ## functions need which data.
+      meta$plot.name <- p.name
+      meta$plot <- ggplot.info$ggplot
+      meta$built <- ggplot.info$built
+      g <- saveLayer(L, df, meta)
+
+      ## Every plot has a list of geom names.
+      meta$plots[[p.name]]$geoms <- c(
+        meta$plots[[p.name]]$geoms, list(g$classed))
+    }#layer.i
+  }
+  
   ## Selector levels and update were stored in saveLayer, so now
   ## compute the unique values to store in meta$selectors.
   for(selector.name in names(meta$selector.values)){
@@ -1433,7 +1448,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
   ## all the values used in those geoms.
   if("time" %in% ls(meta)){
     meta$selectors[[meta$time$variable]]$type <- "single"
-    anim.values <- lapply(meta$geoms, "[[", "timeValues")
+    anim.values <- meta$timeValues
     anim.not.null <- anim.values[!sapply(anim.values, is.null)]
     time.classes <- sapply(anim.not.null, function(x) class(x)[1])
     time.class <- time.classes[[1]]

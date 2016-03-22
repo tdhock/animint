@@ -180,6 +180,23 @@ RENDER: multiple animints inside of a single shiny app? This is
 probably just a theoretical issue. (why not just make a single
 animint?)
 
+2016.03.22 PR#138
+
+structure(viz, class="animint") works on the R command line (before,
+it only worked in Rmd files).
+
+BUGFIX: now we can render legends called "label" in Rmd (before, there
+was a conflict with bootstrap.js which is used to render Rmd, and
+defines a css style for a class called "label")
+
+BUGFIX: plots, legends, and legend entries in the same Rmd are now
+guaranteed to have different id.
+
+BUGFIX: animints with common chunk tsv files now work in Rmd.
+
+RENDER: selector.types defaults to multiple selection for variables
+which have legends somewhere in the data viz.
+
 2016.03.15 PR#141
 
 TEST: Added the test for Lilac Chaser Visual Illusion.

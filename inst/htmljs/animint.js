@@ -42,7 +42,10 @@ var animint = function (to_select, json_file) {
   // replacing periods in variable with an underscore this makes sure
   // that selector doesn't confuse . in name with css selectors
   function safe_name(unsafe_name){
-    return unsafe_name.replace(/\./g, '_');
+    return unsafe_name.replace(/[ .]/g, '_');
+  }
+  function legend_class_name(selector_name){
+    return safe_name(selector_name) + "_variable";
   }
 
   function is_interactive_aes(v_name){
@@ -141,6 +144,7 @@ var animint = function (to_select, json_file) {
   dirs.pop(); //if a directory path exists, remove the JSON file from dirs
   var element = d3.select(to_select);
   this.element = element;
+  var viz_id = element.attr("id");
   var Widgets = {};
   this.Widgets = Widgets;
   var Selectors = {};
@@ -206,7 +210,8 @@ var animint = function (to_select, json_file) {
     if(g_info.hasOwnProperty("columns") && g_info.columns.common){
       var common_tsv = get_tsv(g_info, "_common");
       g_info.common_tsv = common_tsv;
-      d3.tsv(common_tsv, function (error, response) {
+      var common_path = getTSVpath(common_tsv);
+      d3.tsv(common_path, function (error, response) {
 	var converted = convert_R_types(response, g_info.types);
 	g_info.data[common_tsv] = nest_by_group.map(converted);
       });
@@ -224,8 +229,13 @@ var animint = function (to_select, json_file) {
     var plot_tr = plot_table.append("tr");
     var tdLeft = plot_tr.append("td");
     var tdRight = plot_tr.append("td").attr("class", p_name+"_legend");
+    if(viz_id === null){
+      p_info.plot_id = p_name;
+    }else{
+      p_info.plot_id = viz_id + "_" + p_name;
+    }
     var svg = tdLeft.append("svg")
-      .attr("id", p_name)
+      .attr("id", p_info.plot_id)
       .attr("height", p_info.options.height)
       .attr("width", p_info.options.width);
 
@@ -791,14 +801,17 @@ var animint = function (to_select, json_file) {
       }
     }
     s_info.legend_tds = 
-      element.selectAll("tr."+safe_name(s_name)+" td.legend_entry_label")
+      element.selectAll("tr."+legend_class_name(s_name)+" td.legend_entry_label")
     ;
     update_legend_opacity(s_name);
   }; //end of add_selector()
 
-  var get_tsv = function(g_info, chunk_id){
+  function get_tsv(g_info, chunk_id){
     return g_info.classed + "_chunk" + chunk_id + ".tsv";
-  };
+  }
+  function getTSVpath(tsv_name){
+    return dirs.concat(tsv_name).join("/");
+  }
   
   /**
    * copy common chunk tsv to varied chunk tsv, returning an array of
@@ -914,7 +927,7 @@ var animint = function (to_select, json_file) {
     }
     g_info.download_status[tsv_name] = "downloading";
     // prefix tsv file with appropriate path
-    var tsv_file = dirs.concat(tsv_name).join("/");
+    var tsv_file = getTSVpath(tsv_name);
     d3.tsv(tsv_file, function (error, response) {
       // First convert to correct types.
       g_info.download_status[tsv_name] = "processing";
@@ -1780,15 +1793,16 @@ var animint = function (to_select, json_file) {
       var legend_table = tdRight.append("table")
 	.attr("class", "legend")
       ;
-      var legend_class = safe_name(l_info["class"]);
+      var legend_class = legend_class_name(l_info["class"]);
+      var legend_id = p_info.plot_id + "_" + legend_class;
       // the legend table with breaks/value/label .
-      var legendgeoms = l_info.geoms;
       // TODO: variable and value should be set in the compiler! What
       // if label is different from the data value?
       for(var entry_i=0; entry_i < l_info.entries.length; entry_i++){
 	var entry = l_info.entries[entry_i];
 	entry.variable = l_info.selector;
 	entry.value = entry.label;
+	entry.id = safe_name(legend_id + "_" + entry["label"]);
       }
       var legend_rows = legend_table.selectAll("tr")
         .data(l_info.entries)
@@ -1797,7 +1811,7 @@ var animint = function (to_select, json_file) {
       // in a good data viz there should not be more than one legend
       // that shows the same thing, so there should be no duplicate
       // id.
-        .attr("id", function(d) { return d["label"]; })
+        .attr("id", function(d) { return d["id"]; })
 	.attr("class", legend_class)
       ;
       if(l_info.selector != null){
@@ -1820,7 +1834,7 @@ var animint = function (to_select, json_file) {
       ;
       var legend_svgs = legend_rows.append("td")
         .append("svg")
-  	    .attr("id", function(d){return "legend-"+d["label"];})
+  	    .attr("id", function(d){return d["id"]+"_svg";})
   	    .attr("height", 14)
   	    .attr("width", 20);
       var pointscale = d3.scale.linear().domain([0,7]).range([1,4]);
@@ -1829,7 +1843,7 @@ var animint = function (to_select, json_file) {
       var linescale = d3.scale.linear().domain([0,6]).range([1,4]);
       // scale lines so they are visible in the legend. (does not
       // affect plot scaling)
-      if(legendgeoms.indexOf("polygon")>-1){
+      if(l_info.geoms.indexOf("polygon")>-1){
         // aesthetics that would draw a rect
         legend_svgs.append("rect")
           .attr("x", 2)
@@ -1844,7 +1858,7 @@ var animint = function (to_select, json_file) {
           .style("fill", function(d){return d["polygonfill"] || "#FFFFFF";})
           .style("opacity", function(d){return d["polygonalpha"]||1;});
       }
-      if(legendgeoms.indexOf("text")>-1){
+      if(l_info.geoms.indexOf("text")>-1){
         // aesthetics that would draw a rect
         legend_svgs.append("text")
 	        .attr("x", 10)
@@ -1854,7 +1868,7 @@ var animint = function (to_select, json_file) {
 	        .attr("font-size", function(d){return d["textsize"]||1;})
 	        .text("a");
       }
-      if(legendgeoms.indexOf("path")>-1){
+      if(l_info.geoms.indexOf("path")>-1){
         // aesthetics that would draw a line
         legend_svgs.append("line")
           .attr("x1", 1).attr("x2", 19).attr("y1", 7).attr("y2", 7)
@@ -1867,7 +1881,7 @@ var animint = function (to_select, json_file) {
           .style("stroke", function(d){return d["pathcolour"] || "#000000";})
           .style("opacity", function(d){return d["pathalpha"]||1;});
       }
-      if(legendgeoms.indexOf("point")>-1){
+      if(l_info.geoms.indexOf("point")>-1){
         // aesthetics that would draw a point
         legend_svgs.append("circle")
           .attr("cx", 10)
@@ -1882,7 +1896,7 @@ var animint = function (to_select, json_file) {
       legend_rows.append("td")
 	.attr("align", "left") // TODO: right for numbers?
 	.attr("class", "legend_entry_label")
-	.attr("id", function(d){ return d["label"]; })
+	.attr("id", function(d){ return d["id"]+"_label"; })
 	.text(function(d){ return d["label"];});
     }
   }
@@ -2074,7 +2088,7 @@ var animint = function (to_select, json_file) {
 	  show_or_hide_fun.apply(node);
 	}
 	// removing "." from name so it can be used in ids
-	var s_name_id = safe_name(s_name);
+	var s_name_id = legend_class_name(s_name);
 
 	// adding a row for each selector
 	var selector_widget_row = selector_table

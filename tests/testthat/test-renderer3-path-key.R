@@ -17,7 +17,7 @@ path <- do.call(rbind, path.list)
 viz <- list(
   point=ggplot()+
     geom_point(aes(showSelected.i, showSelected.i,
-                   id=showSelected.i,
+                   id=paste0("point", showSelected.i),
                    clickSelects=showSelected.i),
                size=10,
                data=point),
@@ -46,7 +46,7 @@ getD <- function(html=getHTML()){
 
 test_that("transitions only for equivalent keys", {
   d.before <- getD()
-  clickID("2")
+  clickID("point2")
   Sys.sleep(1)
   d.during <- getD()
   Sys.sleep(3)

@@ -10,7 +10,28 @@ fg <- ggplot() +
 sg <- ggplot() +
   stat_summary(data=ss, aes(Year, Year, clickSelects=Year),
                fun.y=length, geom="bar")
-
+## This getTicks function is only used in this file.
+getTicks <- function(html, p.name){
+  xp <- sprintf(
+    '//svg[@id="plot_%s"]//g[contains(@class, "xaxis")]//text', p.name)
+  nodes <- getNodeSet(html, xp)
+  stopifnot(length(nodes) > 0)
+  sapply(nodes, xmlAttrs)
+}
+## This expect_ function is only used in this file, and it depends on
+## a viz with plot names "rotated" and "not"
+expect_rotate_anchor <- function(info, rotate, anchor){
+  not <- getTicks(info$html, 'not')
+  expect_match(not["style", ], "text-anchor: middle", fixed=TRUE)
+  expect_match(not["transform", ], "rotate(0", fixed=TRUE)
+  rotated <- getTicks(info$html, 'rotated')
+  expect_match(rotated["style", ], paste("text-anchor:", anchor), fixed=TRUE)
+  expect_match(rotated["transform", ], paste0("rotate(", rotate), fixed=TRUE)
+  # http://stackoverflow.com/questions/442404/retrieve-the-position-x-y-of-an-html-element
+  tick_box <- remDr$executeScript('return document.getElementsByClassName("xaxis")[0].firstChild.getBoundingClientRect()')
+  title_box <- remDr$executeScript('return document.getElementsByClassName("xtitle")[0].getBoundingClientRect()')
+  expect_true(title_box$top >= tick_box$bottom)
+}
 test_that('no axis rotation is fine', {
   map <-
     list(rotated=fg,
