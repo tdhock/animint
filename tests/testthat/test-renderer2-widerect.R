@@ -93,7 +93,7 @@ wb.facets <-
        theme_animint(height=2400)+
        geom_bar(aes(country, life.expectancy, fill=region,
                     showSelected=year, clickSelects=country,
-                    key=country, id=country),
+                    key=country, id=gsub(" ", "_", country)),
                 data=not.na, stat="identity", position="identity")+
        coord_flip(),
 
@@ -282,7 +282,7 @@ legend.td.xpath <-
   '//tr[@class="region_variable"]//td[@class="legend_entry_label"]'
 rects_and_legends <- function(){
   html <- getHTML()
-  list(rects=getNodeSet(html, '//rect[@id="United States"]'),
+  list(rects=getNodeSet(html, '//rect[@id="United_States"]'),
        legends=getStyleValue(html, legend.td.xpath, "opacity"))
 }
 test_that("clicking legend removes/adds countries", {
