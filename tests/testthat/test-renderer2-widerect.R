@@ -304,119 +304,119 @@ test_that("clicking legend removes/adds countries", {
   expect_equal(sum(twoclicks$legends=="0.5"), 0)
 })
 
-# skip these tests if the browser is phantomjs 
-# (version 1.9.8 seems to stall on some machines)
-if (Sys.getenv("ANIMINT_BROWSER") != "phantomjs") {
-  
-  e <- remDr$findElement("id", "updates_ms")
-  e$clickElement()
-  e$clearElement()
-  e$sendKeysToElement(list("3000", key="enter"))
-  
-  test_that("pause stops animation (third time)", {
-    clickID("play_pause")
-    old.year <- getYear()
-    Sys.sleep(4)
-    new.year <- getYear()
-    expect_true(old.year == new.year)
-  })
+e <- remDr$findElement("id", "updates_ms")
+e$clickElement()
+e$clearElement()
+e$sendKeysToElement(list("3000", key="enter"))
 
-  e <- remDr$findElement("class name", "show_hide_selector_widgets")
-  e$clickElement()
+test_that("pause stops animation (third time)", {
+  clickID("play_pause")
+  old.year <- getYear()
+  Sys.sleep(4)
+  new.year <- getYear()
+  expect_true(old.year == new.year)
+})
 
-  s.tr <- remDr$findElement("class name", "year_variable_selector_widget")
-  s.div <- s.tr$findChildElement("class name", "selectize-input")
-  s.div$clickElement()
-  remDr$sendKeysToActiveElement(list(key="backspace"))
-  remDr$sendKeysToActiveElement(list("1962", key="enter"))
+e <- remDr$findElement("class name", "show_hide_selector_widgets")
+e$clickElement()
+s.tr <- remDr$findElement("class name", "year_variable_selector_widget")
+s.div <- s.tr$findChildElement("class name", "selectize-input")
+s.div$clickElement()
+remDr$sendKeysToActiveElement(list(key="backspace"))
+remDr$sendKeysToActiveElement(list("1962"))
+remDr$sendKeysToActiveElement(list(key="enter"))
+Sys.sleep(1)
 
-  test_that("typing into selectize widget changes year to 1962", {
-    current.year <- getYear()
-    expect_identical(current.year, "1962")
-  })
-  
-  s.div$clickElement()
-  remDr$sendKeysToActiveElement(list(key="down_arrow"))
-  remDr$sendKeysToActiveElement(list(key="enter"))
-  
-  test_that("down arrow key changes year to 1963", {
-    current.year <- getYear()
-    expect_identical(current.year, "1963")
-  })
+test_that("typing into selectize widget changes year to 1962", {
+  current.year <- getYear()
+  expect_identical(current.year, "1962")
+})
 
-  getCountries <- function(){
-    country.labels <- getNodeSet(getHTML(), '//g[@class="geom8_text_ts"]//text')
-    sapply(country.labels, xmlValue)
-  }
+s.div$clickElement()
+remDr$sendKeysToActiveElement(list(key="down_arrow"))
+remDr$sendKeysToActiveElement(list(key="enter"))
+Sys.sleep(1)
 
-  test_that("initial countries same as first", {
-    country.vec <- getCountries()
-    expect_identical(sort(country.vec), sort(wb.facets$first$country))
-  })
-  
-  s.tr <- remDr$findElement("class name", "country_variable_selector_widget")
-  s.div <- s.tr$findChildElement("class name", "selectize-input")
-  s.div$clickElement()
-  remDr$sendKeysToActiveElement(list("Afg"))
-  remDr$sendKeysToActiveElement(list(key="enter"))
+test_that("down arrow key changes year to 1963", {
+  current.year <- getYear()
+  expect_identical(current.year, "1963")
+})
 
-  test_that("Afg autocompletes to Afghanistan", {
-    country.vec <- getCountries()
-    expected.countries <- c("United States", "Vietnam", "Afghanistan")
-    expect_identical(sort(country.vec), sort(expected.countries))
-  })
-  
-  div.list <- s.tr$findChildElements("class name", "item")
-  names(div.list) <- sapply(div.list, function(e)e$getElementText()[[1]])
-  us.div <- div.list[["United States"]]
-  us.div$clickElement()
-  remDr$sendKeysToActiveElement(list(key="backspace"))
-  
-  test_that("backspace removes US from selected countries", {
-    country.vec <- getCountries()
-    expected.countries <- c("Vietnam", "Afghanistan")
-    expect_identical(sort(country.vec), sort(expected.countries))
-  })
-  
-  getWidth <- function(){
-    node.set <-
-      getNodeSet(getHTML(), '//g[@class="geom10_bar_bar"]//rect[@id="Vietnam"]')
-    expect_equal(length(node.set), 1)
-    alist <- xmlAttrs(node.set[[1]])
-    alist[["width"]]
-  }
-  
-  test_that("middle of transition != after when duration=2000", {
-    clickID("year1960")
-    Sys.sleep(1)
-    before.width <- getWidth()
-    clickID("year2010")
-    during.width <- getWidth()
-    Sys.sleep(0.1)
-    after.width <- getWidth()
-    rbind(before=before.width,
-          during=during.width,
-          after=after.width)
-    expect_true(during.width != after.width)
-  })
-  
-  e <- remDr$findElement("id", "duration_ms_year")
-  e$clickElement()
-  e$clearElement()
-  e$sendKeysToElement(list("0", key="enter"))
-  
-  test_that("middle of transition == after when duration=0", {
-    clickID("year1960")
-    Sys.sleep(1)
-    before.width <- getWidth()
-    clickID("year2010")
-    during.width <- getWidth()
-    Sys.sleep(0.1)
-    after.width <- getWidth()
-    rbind(before=before.width,
-          during=during.width,
-          after=after.width)
-    expect_true(before.width != after.width)
-    expect_true(during.width == after.width)
-  })
+getCountries <- function(){
+  country.labels <- getNodeSet(getHTML(), '//g[@class="geom8_text_ts"]//text')
+  sapply(country.labels, xmlValue)
 }
+
+test_that("initial countries same as first", {
+  country.vec <- getCountries()
+  expect_identical(sort(country.vec), sort(wb.facets$first$country))
+})
+
+s.tr <- remDr$findElement("class name", "country_variable_selector_widget")
+s.div <- s.tr$findChildElement("class name", "selectize-input")
+s.div$clickElement()
+remDr$sendKeysToActiveElement(list("Afg"))
+remDr$sendKeysToActiveElement(list(key="enter"))
+Sys.sleep(1)
+
+test_that("Afg autocompletes to Afghanistan", {
+  country.vec <- getCountries()
+  expected.countries <- c("United States", "Vietnam", "Afghanistan")
+  expect_identical(sort(country.vec), sort(expected.countries))
+})
+
+div.list <- s.tr$findChildElements("class name", "item")
+names(div.list) <- sapply(div.list, function(e)e$getElementText()[[1]])
+us.div <- div.list[["United States"]]
+us.div$clickElement()
+remDr$sendKeysToActiveElement(list(key="backspace"))
+Sys.sleep(1)
+
+test_that("backspace removes US from selected countries", {
+  country.vec <- getCountries()
+  expected.countries <- c("Vietnam", "Afghanistan")
+  expect_identical(sort(country.vec), sort(expected.countries))
+})
+
+getWidth <- function(){
+  node.set <-
+    getNodeSet(getHTML(), '//g[@class="geom10_bar_bar"]//rect[@id="Vietnam"]')
+  expect_equal(length(node.set), 1)
+  alist <- xmlAttrs(node.set[[1]])
+  alist[["width"]]
+}
+
+test_that("middle of transition != after when duration=2000", {
+  clickID("year1960")
+  Sys.sleep(1)
+  before.width <- getWidth()
+  clickID("year2010")
+  during.width <- getWidth()
+  Sys.sleep(0.1)
+  after.width <- getWidth()
+  rbind(before=before.width,
+        during=during.width,
+        after=after.width)
+  expect_true(during.width != after.width)
+})
+
+e <- remDr$findElement("id", "duration_ms_year")
+e$clickElement()
+e$clearElement()
+e$sendKeysToElement(list("0", key="enter"))
+Sys.sleep(1)
+
+test_that("middle of transition == after when duration=0", {
+  clickID("year1960")
+  Sys.sleep(1)
+  before.width <- getWidth()
+  clickID("year2010")
+  during.width <- getWidth()
+  Sys.sleep(0.1)
+  after.width <- getWidth()
+  rbind(before=before.width,
+        during=during.width,
+        after=after.width)
+  expect_true(before.width != after.width)
+  expect_true(during.width == after.width)
+})
