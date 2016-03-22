@@ -1,6 +1,7 @@
 Package: animint
 Maintainer: Toby Dylan Hocking <tdhock5@gmail.com>
-Author: Toby Dylan Hocking, Susan VanderPlas, Carson Sievert, Kevin Ferris, Tony Tsai
+Author: Toby Dylan Hocking, Susan VanderPlas, Carson Sievert, Kevin Ferris, Tony
+    Tsai
 Version: 2016.03.14
 License: GPL-3
 Title: Interactive animations
@@ -30,7 +31,7 @@ Suggests:
     devtools,
     httr,
     maps
-Remotes:
-    tdhock/ggplot2,
+Remotes: tdhock/ggplot2,
     ropensci/RSelenium,
     hadley/scales@2c3edf45de56d617444dc38e47e0404173817886
+RoxygenNote: 5.0.1
