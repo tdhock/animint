@@ -180,6 +180,14 @@ RENDER: multiple animints inside of a single shiny app? This is
 probably just a theoretical issue. (why not just make a single
 animint?)
 
+2016.03.23 PR#143
+
+DSL: informative error when time option but no interactive aes
+specified.
+
+RENDER: "Show selection menus" instead of "Toggle selected variables"
+to be more consistent with the other buttons.
+
 2016.03.22 PR#138
 
 structure(viz, class="animint") works on the R command line (before,

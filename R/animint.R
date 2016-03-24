@@ -1449,6 +1449,9 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
   if("time" %in% ls(meta)){
     meta$selectors[[meta$time$variable]]$type <- "single"
     anim.values <- meta$timeValues
+    if(length(meta$timeValues)==0){
+      stop("no interactive aes for time variable ", meta$time$variable)
+    }
     anim.not.null <- anim.values[!sapply(anim.values, is.null)]
     time.classes <- sapply(anim.not.null, function(x) class(x)[1])
     time.class <- time.classes[[1]]
