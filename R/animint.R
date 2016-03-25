@@ -349,8 +349,11 @@ hjust2anchor <- function(hjust){
 #' @return list representing a layer, with corresponding aesthetics, ranges, and groups.
 #' @export
 saveLayer <- function(l, d, meta){
+  get_obj_gg2_class <- function(obj) {
+    tolower(substr(class(obj)[[1]], 5, nchar(class(obj)[[1]])))
+  }
   ranges <- meta$built$panel$ranges
-  g <- list(geom=l$geom$objname)
+  g <- list(geom=get_obj_gg2_class(l$geom))
   g$classed <-
     sprintf("geom%d_%s_%s",
             meta$geom.count, g$geom, meta$plot.name)
@@ -497,7 +500,7 @@ saveLayer <- function(l, d, meta){
   ## clickSelects/showSelected values may show up in the same bin.
   stat <- l$stat
   if(!is.null(stat)){
-    is.bin <- stat$objname=="bin"
+    is.bin <- get_obj_gg2_class(stat)=="bin"
     is.animint.aes <- grepl("clickSelects|showSelected", names(g$aes))
     if(is.bin & any(is.animint.aes)){
       warning(paste0("stat_bin is unpredictable ",
