@@ -395,6 +395,7 @@ saveLayer <- function(l, d, meta){
   ## plot.Selectors.
 
   s.aes <- selector.aes(g$aes)
+  meta$selector.aes[[g$classed]] <- s.aes
 
   ## Do not copy group unless it is specified in aes, and do not copy
   ## showSelected variables which are specified multiple times.
@@ -1398,6 +1399,24 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
       as.list(unique(unlist(lapply(values.update, "[[", "update"))))
   }
 
+  ## Now that selectors are all defined, go back through geoms to
+  ## check if there are any warnings to issue.
+  for(g.name in names(meta$geoms)){
+    g.info <- meta$geoms[[g.name]]
+    g.selectors <- meta$selector.aes[[g.name]]
+    show.vars <- g.info$aes[g.selectors$showSelected$one]
+    duration.vars <- names(meta$duration)
+    show.with.duration <- show.vars[show.vars %in% duration.vars]
+    no.key <- ! "key" %in% names(g.info$aes)
+    if(length(show.with.duration) && no.key){
+      warning(
+        "to ensure that smooth transitions are interpretable, ",
+        "aes(key) should be specifed for geoms with aes(showSelected=",
+        show.with.duration[1],
+        "), problem: ", g.name)
+    }
+  }
+  
   ## For a static data viz with no interactive aes, no need to check
   ## for trivial showSelected variables with only 1 level.
   if(0 < length(meta$selectors)){

@@ -87,7 +87,7 @@ test_that("warn no key for geom_text with showSelected=duration var", {
   viz.duration$duration <- list(year=2000)
   expect_warning({
     info <- animint2dir(viz.duration, open.browser=FALSE)
-  }, "to ensure that smooth transitions are interpretable, aes(key) should be specifed for geoms with aes(showSelected=year)")
+  }, "to ensure that smooth transitions are interpretable, aes(key) should be specifed for geoms with aes(showSelected=year), problem: geom2_text_scatter", fixed=TRUE)
 })
 
 viz.key.duration <- list(
