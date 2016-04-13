@@ -1960,7 +1960,7 @@ var animint = function (to_select, json_file) {
     // add a button to view the animation widgets
     var show_hide_animation_controls = element.append("button")
       .text(show_message)
-      .attr("id", "show_hide_animation_controls")
+      .attr("id", viz_id + "_show_hide_animation_controls")
       .on("click", function(){
         if(this.textContent == show_message){
           time_table.style("display", "");
@@ -2027,7 +2027,7 @@ var animint = function (to_select, json_file) {
     var duration_inputs = duration_tds
       .append("input")
       .attr("id", function(s_name){
-        return "duration_ms_" + s_name;
+        return viz_id + "_duration_ms_" + s_name;
       })
       .attr("type", "text")
       .on("change", function(s_name){

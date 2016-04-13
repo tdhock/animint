@@ -201,7 +201,7 @@ test_that("animation updates", {
   expect_true(old.year != new.year)
 })
 
-clickID("show_hide_animation_controls")
+clickID("plot_show_hide_animation_controls")
 
 test_that("pause stops animation", {
   clickID("play_pause")
@@ -400,7 +400,7 @@ test_that("middle of transition != after when duration=2000", {
   expect_true(during.width != after.width)
 })
 
-e <- remDr$findElement("id", "duration_ms_year")
+e <- remDr$findElement("id", "plot_duration_ms_year")
 e$clickElement()
 e$clearElement()
 e$sendKeysToElement(list("0", key="enter"))
