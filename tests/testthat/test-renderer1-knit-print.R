@@ -40,6 +40,32 @@ test_that("svg id property is unique", {
   expect_true(all(id.counts==1))
 })
 
+all.list <- getNodeSet(html, "//*")
+id.na.vec <- sapply(all.list, function(e){
+  attr.vec.or.null <- xmlAttrs(e)
+  if("id" %in% names(attr.vec.or.null)){
+    attr.vec.or.null[["id"]]
+  }else{
+    NA
+  }
+})
+## In HTML, all values are case-insensitive
+## http://www.w3schools.com/tags/att_global_id.asp
+lower.id.vec <- tolower(id.na.vec)
+id.counts <- table(lower.id.vec)
+(not.unique <- id.counts[1 < id.counts])
+test_that("id property is unique over entire page", {
+  expect_equal(length(not.unique), 0)
+})
+
+test_that("id must contain at least one character", {
+  expect_true(all(0 < nchar(names(id.counts))))
+})
+
+test_that("id must not contain any space characters", {
+  expect_false(any(grepl(" ", names(id.counts))))
+})
+
 ## function to extract all circles from an HTML page
 get_circles <- function(html=getHTML()) {
   plot.names <- c("plot1top", "plot1bottom")
