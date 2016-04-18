@@ -116,3 +116,96 @@ test_that("no warning when key specified", {
     info <- animint2dir(viz.key.duration, open.browser=FALSE)
   })
 })
+
+test_that("warning for position=stack and showSelected", {
+  set.seed(1)
+  df <- data.frame(
+    letter = c(replicate(4, LETTERS[1:5])),
+    count = c(replicate(4, rbinom(5, 50, 0.5))),
+    stack = rep(rep(1:2, each = 5), 2),
+    facet = rep(1:2, each = 10)
+  )
+  gg <- ggplot() +
+    theme_bw()+
+    theme(panel.margin=grid::unit(0, "lines"))+
+    geom_bar(
+      aes(letter, count, fill = stack, showSelected=facet),
+      data = df,
+      stat = "identity",
+      position="stack"
+    )
+  complicated <- list(
+    plot = gg,
+    time = list(variable = "facet", ms = 1000),
+    duration = list(facet = 1000)
+  )
+  expect_warning({
+    animint2dir(complicated, open.browser=FALSE)
+  }, "showSelected only works with position=identity and stat=identity")
+})
+
+test_that("no warning for position=stack without showSelected", {
+  set.seed(1)
+  df <- data.frame(
+    letter = c(replicate(4, LETTERS[1:5])),
+    count = c(replicate(4, rbinom(5, 50, 0.5))),
+    stack = rep(rep(1:2, each = 5), 2),
+    facet = rep(1:2, each = 10)
+  )
+  gg <- ggplot() +
+    theme_bw()+
+    theme(panel.margin=grid::unit(0, "lines"))+
+    geom_bar(
+      aes(letter, count, fill = stack),
+      data = df,
+      stat = "identity",
+      position="stack"
+    )
+  no.show <- list(
+    plot = gg
+  )
+  expect_no_warning({
+    animint2dir(no.show)
+  })
+})
+
+test_that("warning for stat=bin and showSelected", {
+  set.seed(1)
+  make <- function(count, stack, facet){
+    data.frame(count, row=1:count, stack, facet)
+  }
+  df <- rbind(
+    make(2, 1, 1),
+    make(5, 1, 1),
+    make(3, 2, 1),
+    make(4, 2, 1),
+    make(2, 2, 2),
+    make(5, 2, 2),
+    make(3, 1, 2),
+    make(4, 1, 2)
+  )
+  
+  gg <- ggplot() +
+    theme_bw()+
+    theme(panel.margin=grid::unit(0, "lines"))+
+    geom_bar(
+      aes(count, group=stack, fill=stack),
+      binwidth=1,
+      data = df,
+      stat = "bin",
+      position="identity"
+    )
+  gg+facet_grid(facet~.)
+  
+  ## complicated <- list(
+  ##   plot = gg,
+  ##   time = list(variable = "facet", ms = 1000),
+  ##   duration = list(facet = 1000)
+  ## )
+  ## expect_warning({
+  ##   animint2dir(complicated, open.browser=FALSE)
+  ## }, "showSelected only works with position=identity and stat=identity")
+})
+
+test_that("no warning for stat=bin without showSelected", {
+})
