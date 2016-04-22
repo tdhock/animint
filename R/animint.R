@@ -1321,15 +1321,16 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
         }
         iaes <- selector.aes(L$mapping)
         one.names <- with(iaes, c(clickSelects$one, showSelected$one))
-        update.vars <- L$mapping[one.names]
+        update.vars <- as.character(L$mapping[[one.names]])
         # if the layer has a defined data set
-        if(!is.null(L$data)) {
+        if(length(L$data) > 0) {
           # check whether the variable is in that layer
           has.var <- update.vars %in% names(L$data)
         } else {
           # check whether the variable is in the global data
           has.var <- update.vars %in% names(p$data)
         }
+        
         if(!all(has.var)){
           print(L)
           print(list(problem.aes=update.vars[!has.var],
