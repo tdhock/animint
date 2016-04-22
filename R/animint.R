@@ -69,6 +69,7 @@ parsePlot <- function(meta){
       s.name <- one.legend$selector
       is.variable.name <- is.character(s.name) && length(s.name) == 1
       layer.has.variable <- s.name %in% names(L$data)
+      
       if(is.variable.name && layer.has.variable) {
         ## grabbing the variable from the data
         var <- L$data[, s.name]
@@ -1321,7 +1322,14 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
         iaes <- selector.aes(L$mapping)
         one.names <- with(iaes, c(clickSelects$one, showSelected$one))
         update.vars <- L$mapping[one.names]
-        has.var <- update.vars %in% names(L$data)
+        # if the layer has a defined data set
+        if(!is.null(L$data)) {
+          # check whether the variable is in that layer
+          has.var <- update.vars %in% names(L$data)
+        } else {
+          # check whether the variable is in the global data
+          has.var <- update.vars %in% names(p$data)
+        }
         if(!all(has.var)){
           print(L)
           print(list(problem.aes=update.vars[!has.var],
