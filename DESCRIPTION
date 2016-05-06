@@ -30,4 +30,7 @@ Suggests:
     devtools,
     httr,
     maps
+Remotes: tdhock/ggplot2,
+    ropensci/RSelenium,
+    hadley/scales@2c3edf45de56d617444dc38e47e0404173817886
 RoxygenNote: 5.0.1
