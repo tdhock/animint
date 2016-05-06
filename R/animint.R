@@ -977,7 +977,8 @@ getCommonChunk <- function(built, chunk.vars, aes.list){
   is.common.mat <-
     matrix(NA, length(values.by.group), length(col.name.vec),
            dimnames=list(group=names(values.by.group),
-             col.name=col.name.vec))
+                         col.name=col.name.vec))
+  group.info.list <- list()
   for(group.name in names(values.by.group)){
     values.by.chunk <- values.by.group[[group.name]]
     row.count.vec <- sapply(values.by.chunk, nrow)
@@ -992,18 +993,17 @@ getCommonChunk <- function(built, chunk.vars, aes.list){
         length(value.tab) == 1
       }
     }
+    ## For every group, save values for creating common tsv later.
+    group.info.list[[group.name]] <- values.by.chunk[[1]]
   }
   is.common <- apply(is.common.mat, 2, all, na.rm=TRUE)
   ## TODO: another criterion could be used to save disk space even if
   ## there is only 1 chunk.
   if(is.common[["group"]] && sum(is.common) >= 2){
     common.cols <- names(is.common)[is.common]
-    one.chunk <- built.by.chunk[[1]]
-    ## Should each chunk have the same info about each group? 
-    common.not.na <- na.omit(one.chunk[common.cols])
-    ## TODO: does this still work if not all groups are present in the
-    ## first chunk? probably not...
-    common.unique <- unique(built[, names(which(is.common))])
+    group.info <- do.call(rbind, group.info.list)
+    group.info.common <- group.info[, names(which(is.common))]
+    common.unique <- unique(group.info.common)
     ## For geom_polygon and geom_path we may have two rows that should
     ## both be kept (the start and the end of each group may be the
     ## same if the shape is closed), so we define common.data as all
@@ -1013,11 +1013,12 @@ getCommonChunk <- function(built, chunk.vars, aes.list){
     common.data <- if(all(data.per.group == 1)){
       common.unique
     }else{
-      common.not.na
+      na.omit(group.info.common)
     }
     built.group <- do.call(rbind, built.by.chunk)
-    built.has.common <- subset(built.group, group %in% common.data$group)
-    varied.df.list <- split.x(built.has.common, chunk.vars)
+    ##built.has.common <- subset(built.group, group %in% common.data$group)
+    ##varied.df.list <- split.x(built.has.common, chunk.vars)
+    varied.df.list <- split.x(built.group, chunk.vars)
     varied.cols <- c("group", names(is.common)[!is.common])
     varied.data <- varied.chunk(varied.df.list, varied.cols)
     return(list(common=common.data,
