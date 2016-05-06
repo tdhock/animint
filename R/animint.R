@@ -903,7 +903,7 @@ saveLayer <- function(l, d, meta){
   g.data.varied <- if(is.null(data.or.null)){
     split.x(g.data, chunk.cols)
   }else{
-    g$columns <- lapply(data.or.null, names)
+    g$columns$common <- as.list(names(data.or.null$common))
     tsv.name <- sprintf("%s_chunk_common.tsv", g$classed)
     tsv.path <- file.path(meta$out.dir, tsv.name)
     write.table(data.or.null$common, tsv.path,

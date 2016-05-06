@@ -20,6 +20,7 @@ min.bug.viz <- list(
   data=ggplot()+
     geom_tile(aes(timestep, total.segments,
                   fill=optimal.cost,
+                  id=paste0("segs", total.segments, "time", timestep),
                   clickSelects=minimization),
               data=FunctionalPruning$grid),
   first=list(minimization="2 segments up to data point 4")
@@ -41,3 +42,20 @@ test_that("four lines rendered for cost candidates", {
     '//g[@class="geom2_line_pruning"]//path')
   expect_equal(length(path.list), 4)
 })
+
+html <- clickHTML(id="segs1time4")
+
+test_that("min envelope line disappears", {
+  path.list <- getNodeSet(
+    info$html, 
+    '//g[@class="geom1_line_pruning"]//path')
+  expect_equal(length(path.list), 0)
+})
+
+test_that("cost candidates lines disappear", {
+  path.list <- getNodeSet(
+    info$html, 
+    '//g[@class="geom2_line_pruning"]//path')
+  expect_equal(length(path.list), 0)
+})
+
