@@ -18,7 +18,7 @@ install:
   - $HOME/opt/pandoc/pandoc --version
   # install uninstalled packages which this pkg depends on/links to/suggests.
   - ./travis-tool.sh install_deps
-  - ./travis-tool.sh install_github hadley/scales@2c3edf45de56d617444dc38e47e0404173817886 tdhock/ggplot2@a8b06ddb680acdcdbd927773b1011c562134e4d2 tdhock/RSelenium@7a70f57ea4b4ac7a14cefa5d650265efe04ab209 jimhester/covr
+  - ./travis-tool.sh install_github hadley/scales@2c3edf45de56d617444dc38e47e0404173817886 tdhock/ggplot2@a8b06ddb680acdcdbd927773b1011c562134e4d2 tdhock/RSelenium@7a70f57ea4b4ac7a14cefa5d650265efe04ab209 jimhester/covr@6fb5d546de0488f4de19487dc80bc04aa18d1b15
 
 script:
   - Rscript -e "devtools::install(upgrade_dependencies=FALSE, dependencies=FALSE)"
