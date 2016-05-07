@@ -13,7 +13,15 @@ build:
     - script:
       name: echo install animint dependencies
       code: |
-        Rscript -e "devtools::install(upgrade_dependencies=FALSE, dependencies=TRUE)"
+        Rscript -e "devtools::install_deps()"
+    - script:
+      name: echo install animint dependencies
+      code: |
+        Rscript -e 'devtools::install_github("hadley/scales@2c3edf45de56d617444dc38e47e0404173817886", "tdhock/ggplot2@a8b06ddb680acdcdbd927773b1011c562134e4d2", upgrade_dependencies=FALSE, dependencies=FALSE)'
+    - script:
+      name: echo install animint 
+      code: |
+        Rscript -e "devtools::install(upgrade_dependencies=FALSE, dependencies=FALSE)"
     - script:
       name: copy source to animint 
       code: |
