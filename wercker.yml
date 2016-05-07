@@ -13,7 +13,7 @@ build:
     - script:
       name: echo install_deps
       code: |
-        Rscript -e "devtools::install_deps()"
+        Rscript -e "devtools::install_deps(dependencies=TRUE)"
     - script:
       name: echo install RSelenium+dependencies
       code: |
