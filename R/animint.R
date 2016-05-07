@@ -983,18 +983,24 @@ getCommonChunk <- function(built, chunk.vars, aes.list){
     values.by.chunk <- values.by.group[[group.name]]
     row.count.vec <- sapply(values.by.chunk, nrow)
     same.size.chunks <- all(row.count.vec[1] == row.count.vec)
+    ## For every group, save values for creating common tsv later.
+    one.group.info <- values.by.chunk[[1]]
     for(col.name in col.name.vec){
       value.list <- lapply(values.by.chunk, function(df)df[[col.name]])
       is.common.mat[group.name, col.name] <- if(same.size.chunks){
         value.mat <- do.call(cbind, value.list)
-        all(value.mat[, 1] == value.mat)
+        least.missing <- which.min(colSums(is.na(value.mat)))
+        value.vec <- value.mat[, least.missing]
+        one.group.info[[col.name]] <- value.vec
+        all(value.vec == value.mat)
       }else{
-        value.tab <- table(unlist(value.list))
+        value.vec <- unlist(value.list)
+        one.group.info[[col.name]] <- value.vec[[1]]
+        value.tab <- table(value.vec)
         length(value.tab) == 1
       }
     }
-    ## For every group, save values for creating common tsv later.
-    group.info.list[[group.name]] <- values.by.chunk[[1]]
+    group.info.list[[group.name]] <- one.group.info
   }
   is.common <- apply(is.common.mat, 2, all, na.rm=TRUE)
   ## TODO: another criterion could be used to save disk space even if
@@ -1013,15 +1019,13 @@ getCommonChunk <- function(built, chunk.vars, aes.list){
     common.data <- if(all(data.per.group == 1)){
       common.unique
     }else{
-      na.omit(group.info.common)
+      group.info.common
     }
     built.group <- do.call(rbind, built.by.chunk)
-    ##built.has.common <- subset(built.group, group %in% common.data$group)
-    ##varied.df.list <- split.x(built.has.common, chunk.vars)
-    varied.df.list <- split.x(built.group, chunk.vars)
+    varied.df.list <- split.x(na.omit(built.group), chunk.vars)
     varied.cols <- c("group", names(is.common)[!is.common])
     varied.data <- varied.chunk(varied.df.list, varied.cols)
-    return(list(common=common.data,
+    return(list(common=na.omit(common.data),
                 varied=varied.data))
   }
 }
