@@ -129,7 +129,8 @@ test_that("warning for position=stack and showSelected", {
     theme_bw()+
     theme(panel.margin=grid::unit(0, "lines"))+
     geom_bar(
-      aes(letter, count, fill = stack, showSelected=facet),
+      aes(letter, count, fill = stack, showSelected=facet,
+          key=paste(stack, letter)),
       data = df,
       stat = "identity",
       position="stack"
@@ -165,47 +166,7 @@ test_that("no warning for position=stack without showSelected", {
     plot = gg
   )
   expect_no_warning({
-    animint2dir(no.show)
+    animint2dir(no.show, open.browser=FALSE)
   })
 })
 
-test_that("warning for stat=bin and showSelected", {
-  set.seed(1)
-  make <- function(count, stack, facet){
-    data.frame(count, row=1:count, stack, facet)
-  }
-  df <- rbind(
-    make(2, 1, 1),
-    make(5, 1, 1),
-    make(3, 2, 1),
-    make(4, 2, 1),
-    make(2, 2, 2),
-    make(5, 2, 2),
-    make(3, 1, 2),
-    make(4, 1, 2)
-  )
-  
-  gg <- ggplot() +
-    theme_bw()+
-    theme(panel.margin=grid::unit(0, "lines"))+
-    geom_bar(
-      aes(count, group=stack, fill=stack),
-      binwidth=1,
-      data = df,
-      stat = "bin",
-      position="identity"
-    )
-  gg+facet_grid(facet~.)
-  
-  ## complicated <- list(
-  ##   plot = gg,
-  ##   time = list(variable = "facet", ms = 1000),
-  ##   duration = list(facet = 1000)
-  ## )
-  ## expect_warning({
-  ##   animint2dir(complicated, open.browser=FALSE)
-  ## }, "showSelected only works with position=identity and stat=identity")
-})
-
-test_that("no warning for stat=bin without showSelected", {
-})
