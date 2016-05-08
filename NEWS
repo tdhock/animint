@@ -180,6 +180,11 @@ RENDER: multiple animints inside of a single shiny app? This is
 probably just a theoretical issue. (why not just make a single
 animint?)
 
+2016.05.07 PR#151
+
+BUGFIX: common chunk data were not computed correctly when some chunks
+did not have all groups.
+
 2016.03.23 PR#143
 
 DSL: informative error when time option but no interactive aes

@@ -11,9 +11,21 @@ build:
           sudo ln -sf /usr/local/share/$PHANTOM_JS/bin/phantomjs /usr/local/bin
           phantomjs --version
     - script:
-      name: echo install animint dependencies
+      name: echo install_deps
       code: |
-        Rscript -e "devtools::install(upgrade_dependencies=FALSE, dependencies=TRUE)"
+        Rscript -e "devtools::install_deps(dependencies=TRUE)"
+    - script:
+      name: echo install RSelenium+dependencies
+      code: |
+        Rscript -e 'devtools::install_github("tdhock/RSelenium@7a70f57ea4b4ac7a14cefa5d650265efe04ab209", upgrade_dependencies=FALSE, dependencies=TRUE)'
+    - script:
+      name: echo install old dependencies
+      code: |
+        Rscript -e 'devtools::install_github(c("hadley/scales@2c3edf45de56d617444dc38e47e0404173817886", "tdhock/ggplot2@a8b06ddb680acdcdbd927773b1011c562134e4d2"), upgrade_dependencies=FALSE, dependencies=FALSE)'
+    - script:
+      name: echo install animint 
+      code: |
+        Rscript -e "devtools::install(upgrade_dependencies=FALSE, dependencies=FALSE)"
     - script:
       name: copy source to animint 
       code: |
