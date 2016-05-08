@@ -903,7 +903,7 @@ saveLayer <- function(l, d, meta){
   g.data.varied <- if(is.null(data.or.null)){
     split.x(g.data, chunk.cols)
   }else{
-    g$columns <- lapply(data.or.null, names)
+    g$columns$common <- as.list(names(data.or.null$common))
     tsv.name <- sprintf("%s_chunk_common.tsv", g$classed)
     tsv.path <- file.path(meta$out.dir, tsv.name)
     write.table(data.or.null$common, tsv.path,
@@ -977,31 +977,39 @@ getCommonChunk <- function(built, chunk.vars, aes.list){
   is.common.mat <-
     matrix(NA, length(values.by.group), length(col.name.vec),
            dimnames=list(group=names(values.by.group),
-             col.name=col.name.vec))
+                         col.name=col.name.vec))
+  group.info.list <- list()
   for(group.name in names(values.by.group)){
     values.by.chunk <- values.by.group[[group.name]]
     row.count.vec <- sapply(values.by.chunk, nrow)
     same.size.chunks <- all(row.count.vec[1] == row.count.vec)
+    ## For every group, save values for creating common tsv later.
+    one.group.info <- values.by.chunk[[1]]
     for(col.name in col.name.vec){
       value.list <- lapply(values.by.chunk, function(df)df[[col.name]])
       is.common.mat[group.name, col.name] <- if(same.size.chunks){
         value.mat <- do.call(cbind, value.list)
-        all(value.mat[, 1] == value.mat)
+        least.missing <- which.min(colSums(is.na(value.mat)))
+        value.vec <- value.mat[, least.missing]
+        one.group.info[[col.name]] <- value.vec
+        all(value.vec == value.mat)
       }else{
-        value.tab <- table(unlist(value.list))
+        value.vec <- unlist(value.list)
+        one.group.info[[col.name]] <- value.vec[[1]]
+        value.tab <- table(value.vec)
         length(value.tab) == 1
       }
     }
+    group.info.list[[group.name]] <- one.group.info
   }
   is.common <- apply(is.common.mat, 2, all, na.rm=TRUE)
   ## TODO: another criterion could be used to save disk space even if
   ## there is only 1 chunk.
   if(is.common[["group"]] && sum(is.common) >= 2){
     common.cols <- names(is.common)[is.common]
-    one.chunk <- built.by.chunk[[1]]
-    ## Should each chunk have the same info about each group? 
-    common.not.na <- na.omit(one.chunk[common.cols])
-    common.unique <- unique(common.not.na)
+    group.info <- do.call(rbind, group.info.list)
+    group.info.common <- group.info[, names(which(is.common))]
+    common.unique <- unique(group.info.common)
     ## For geom_polygon and geom_path we may have two rows that should
     ## both be kept (the start and the end of each group may be the
     ## same if the shape is closed), so we define common.data as all
@@ -1011,14 +1019,13 @@ getCommonChunk <- function(built, chunk.vars, aes.list){
     common.data <- if(all(data.per.group == 1)){
       common.unique
     }else{
-      common.not.na
+      group.info.common
     }
     built.group <- do.call(rbind, built.by.chunk)
-    built.has.common <- subset(built.group, group %in% common.data$group)
-    varied.df.list <- split.x(built.has.common, chunk.vars)
+    varied.df.list <- split.x(na.omit(built.group), chunk.vars)
     varied.cols <- c("group", names(is.common)[!is.common])
     varied.data <- varied.chunk(varied.df.list, varied.cols)
-    return(list(common=common.data,
+    return(list(common=na.omit(common.data),
                 varied=varied.data))
   }
 }
