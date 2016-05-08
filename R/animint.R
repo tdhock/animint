@@ -395,6 +395,7 @@ saveLayer <- function(l, d, meta){
   ## plot.Selectors.
 
   s.aes <- selector.aes(g$aes)
+  meta$selector.aes[[g$classed]] <- s.aes
 
   ## Do not copy group unless it is specified in aes, and do not copy
   ## showSelected variables which are specified multiple times.
@@ -486,19 +487,30 @@ saveLayer <- function(l, d, meta){
     }
   }
 
-  ## Warn if stat_bin is used with animint aes. geom_bar + stat_bin
-  ## doesn't make sense with clickSelects/showSelected, since two
+  not.identity <- function(stat.or.position){
+    x <- stat.or.position$objname
+    is.character(x) && length(x)==1 && x != "identity"
+  }
+  is.show <- grepl("showSelected", names(g$aes))
+  has.show <- any(is.show)
+  ## Error if non-identity stat is used with showSelected, since
+  ## typically the stats will delete the showSelected column from the
+  ## built data set. For example geom_bar + stat_bin doesn't make
+  ## sense with clickSelects/showSelected, since two
   ## clickSelects/showSelected values may show up in the same bin.
-  stat <- l$stat
-  if(!is.null(stat)){
-    is.bin <- stat$objname=="bin"
-    is.animint.aes <- grepl("clickSelects|showSelected", names(g$aes))
-    if(is.bin & any(is.animint.aes)){
-      warning(paste0("stat_bin is unpredictable ",
-                    "when used with clickSelects/showSelected.\n",
-                     "Use plyr::ddply() to do the binning ",
-                     "or use make_bar if using geom_bar/geom_histogram."))
-    }
+  if(has.show && not.identity(l$stat)){
+    show.names <- names(g$aes)[is.show]
+    data.has.show <- show.names %in% names(g.data)
+    signal <- if(all(data.has.show))warning else stop
+    print(l)
+    signal("showSelected only works with stat=identity, problem: ",
+           g$classed)
+  }
+  ## Warn if non-identity position is used with animint aes. 
+  if(has.show && not.identity(l$position)){
+    print(l)
+    warning("showSelected only works with position=identity, problem: ",
+            g$classed)
   }
 
   ##print("before pre-processing")
@@ -893,7 +905,8 @@ saveLayer <- function(l, d, meta){
   }
     
   ## group should be the last thing in nest_order, if it is present.
-  if("group" %in% names(g$aes)){
+  data.object.geoms <- c("line", "path", "ribbon", "polygon")
+  if("group" %in% names(g$aes) && g$geom %in% data.object.geoms){
     g$nest_order <- c(g$nest_order, "group")
   }
 
@@ -1405,6 +1418,24 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
       as.list(unique(unlist(lapply(values.update, "[[", "update"))))
   }
 
+  ## Now that selectors are all defined, go back through geoms to
+  ## check if there are any warnings to issue.
+  for(g.name in names(meta$geoms)){
+    g.info <- meta$geoms[[g.name]]
+    g.selectors <- meta$selector.aes[[g.name]]
+    show.vars <- g.info$aes[g.selectors$showSelected$one]
+    duration.vars <- names(meta$duration)
+    show.with.duration <- show.vars[show.vars %in% duration.vars]
+    no.key <- ! "key" %in% names(g.info$aes)
+    if(length(show.with.duration) && no.key){
+      warning(
+        "to ensure that smooth transitions are interpretable, ",
+        "aes(key) should be specifed for geoms with aes(showSelected=",
+        show.with.duration[1],
+        "), problem: ", g.name)
+    }
+  }
+  
   ## For a static data viz with no interactive aes, no need to check
   ## for trivial showSelected variables with only 1 level.
   if(0 < length(meta$selectors)){

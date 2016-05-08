@@ -180,6 +180,14 @@ RENDER: multiple animints inside of a single shiny app? This is
 probably just a theoretical issue. (why not just make a single
 animint?)
 
+2016.05.08 PR#146
+
+GGPLOT: the compiler now stops with an informative error when stats
+are used with showSelected. New warning when position is used with
+showSelected.
+
+RENDER: aes(href) works when data_is_object (e.g. geom_polygon)
+
 2016.05.07 PR#151
 
 BUGFIX: common chunk data were not computed correctly when some chunks

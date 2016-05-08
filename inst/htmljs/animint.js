@@ -1132,7 +1132,7 @@ var animint = function (to_select, json_file) {
       }
     }
 
-    var eActions, eAppend;
+    var eActions, eAppend, linkActions;
     var key_fun = null;
     var id_fun = function(d){
       return d.id;
@@ -1246,6 +1246,17 @@ var animint = function (to_select, json_file) {
 	      return one_row.id;
       };
       elements = elements.data(kv, key_fun);
+      linkActions = function(a_elements){
+	a_elements
+	  .attr("xlink:href", function(group_info){
+            var one_group = keyed_data[group_info.value];
+            var one_row = one_group[0];
+	    return one_row.href;
+	  })
+          .attr("target", "_blank")
+          .attr("class", "geom")
+	;
+      };
       eActions = function (e) {
         e.attr("d", function (d) {
           var one_group = keyed_data[d.value];
@@ -1294,7 +1305,14 @@ var animint = function (to_select, json_file) {
           });
       };
       eAppend = "path";
-    } else if (g_info.geom == "segment") {
+    }else{
+      linkActions = function(a_elements){
+	a_elements.attr("xlink:href", function(d){ return d.href; })
+          .attr("target", "_blank")
+          .attr("class", "geom");
+      };
+    }
+    if (g_info.geom == "segment") {
       elements = elements.data(data, key_fun);
       eActions = function (e) {
         e.attr("x1", function (d) {
@@ -1314,7 +1332,8 @@ var animint = function (to_select, json_file) {
           .style("stroke", get_colour);
       };
       eAppend = "line";
-    } else if (g_info.geom == "linerange") {
+    }
+    if (g_info.geom == "linerange") {
       elements = elements.data(data, key_fun);
       eActions = function (e) {
         e.attr("x1", function (d) {
@@ -1334,7 +1353,8 @@ var animint = function (to_select, json_file) {
           .style("stroke", get_colour);
       };
       eAppend = "line";
-    } else if (g_info.geom == "vline") {
+    }
+    if (g_info.geom == "vline") {
       elements = elements.data(data, key_fun);
       eActions = function (e) {
         e.attr("x1", toXY("x", "xintercept"))
@@ -1346,7 +1366,8 @@ var animint = function (to_select, json_file) {
           .style("stroke", get_colour);
       };
       eAppend = "line";
-    } else if (g_info.geom == "hline") {
+    }
+    if (g_info.geom == "hline") {
       // pretty much a copy of geom_vline with obvious modifications
       elements = elements.data(data, key_fun);
       eActions = function (e) {
@@ -1359,7 +1380,8 @@ var animint = function (to_select, json_file) {
           .style("stroke", get_colour);
       };
       eAppend = "line";
-    } else if (g_info.geom == "text") {
+    }
+    if (g_info.geom == "text") {
       elements = elements.data(data, key_fun);
       // TODO: how to support vjust? firefox doensn't support
       // baseline-shift... use paths?
@@ -1375,7 +1397,8 @@ var animint = function (to_select, json_file) {
           });
       };
       eAppend = "text";
-    } else if (g_info.geom == "point") {
+    }
+    if (g_info.geom == "point") {
       elements = elements.data(data, key_fun);
       eActions = function (e) {
         e.attr("cx", toXY("x", "x"))
@@ -1385,7 +1408,8 @@ var animint = function (to_select, json_file) {
           .style("stroke", get_colour);
       };
       eAppend = "circle";
-    } else if (g_info.geom == "jitter") {
+    }
+    if (g_info.geom == "jitter") {
       elements = elements.data(data, key_fun);
       eActions = function (e) {
         e.attr("cx", toXY("x", "x"))
@@ -1395,7 +1419,8 @@ var animint = function (to_select, json_file) {
           .style("stroke", get_colour);
       };
       eAppend = "circle";
-    } else if (g_info.geom == "tallrect") {
+    }
+    if (g_info.geom == "tallrect") {
       elements = elements.data(data, key_fun);
       eActions = function (e) {
         e.attr("x", toXY("x", "xmin"))
@@ -1410,7 +1435,8 @@ var animint = function (to_select, json_file) {
           .style("stroke", get_colour);
       };
       eAppend = "rect";
-    } else if (g_info.geom == "widerect") {
+    }
+    if (g_info.geom == "widerect") {
       elements = elements.data(data, key_fun);
       eActions = function (e) {
         e.attr("y", toXY("y", "ymax"))
@@ -1425,7 +1451,8 @@ var animint = function (to_select, json_file) {
           .style("stroke", get_colour);
       };
       eAppend = "rect";
-    } else if (g_info.geom == "rect") {
+    }
+    if (g_info.geom == "rect") {
       elements = elements.data(data, key_fun);
       eActions = function (e) {
         e.attr("x", toXY("x", "xmin"))
@@ -1444,7 +1471,8 @@ var animint = function (to_select, json_file) {
         }
       };
       eAppend = "rect";
-    } else if (g_info.geom == "boxplot") {
+    }
+    if (g_info.geom == "boxplot") {
 
       // TODO: currently boxplots are unsupported (we intentionally
       // stop with an error in the R code). The reason why is that
@@ -1524,16 +1552,9 @@ var animint = function (to_select, json_file) {
           .style("stroke-width", get_size)
           .style("stroke", get_colour);
       };
-    } else {
-      return "unsupported geom " + g_info.geom;
     }
     elements.exit().remove();
     var enter = elements.enter();
-    var linkActions = function(a_elements){
-      a_elements.attr("xlink:href", function(d){ return d.href; })
-        .attr("target", "_blank")
-        .attr("class", "geom");
-    };
     if(g_info.aes.hasOwnProperty("href")){
       enter = enter.append("svg:a")
         .append("svg:"+eAppend);
@@ -1960,7 +1981,7 @@ var animint = function (to_select, json_file) {
     // add a button to view the animation widgets
     var show_hide_animation_controls = element.append("button")
       .text(show_message)
-      .attr("id", "show_hide_animation_controls")
+      .attr("id", viz_id + "_show_hide_animation_controls")
       .on("click", function(){
         if(this.textContent == show_message){
           time_table.style("display", "");
@@ -2027,7 +2048,7 @@ var animint = function (to_select, json_file) {
     var duration_inputs = duration_tds
       .append("input")
       .attr("id", function(s_name){
-        return "duration_ms_" + s_name;
+        return viz_id + "_duration_ms_" + s_name;
       })
       .attr("type", "text")
       .on("change", function(s_name){

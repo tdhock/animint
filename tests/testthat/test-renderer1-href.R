@@ -52,3 +52,19 @@ test_that("clicking updates href (again)", {
                c("http://en.wikipedia.org/wiki/orange",
                  "http://en.wikipedia.org/wiki/black"))
 })
+
+test_that("aes(href) works with geom_polygon", {
+  USpolygons <- map_data("state")
+  USpolygons$href <- paste0("https://en.wikipedia.org/wiki/", USpolygons$region)
+  viz.href <- list(
+    map=ggplot()+
+      ggtitle("click a state to read its Wikipedia page")+
+      coord_equal()+
+      geom_polygon(
+        aes(x=long, y=lat, group=group, href=href),
+        data=USpolygons, fill="black", colour="grey")
+  )
+  info <- animint2HTML(viz.href)
+  (expected.vec <- unique(USpolygons$href))
+  expect_links(info$html, expected.vec)
+})
