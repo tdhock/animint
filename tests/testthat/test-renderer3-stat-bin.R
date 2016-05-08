@@ -15,7 +15,7 @@ df <- rbind(
   make(4, 1, 2)
 )
 
-test_that("warning for stat=bin and showSelected", {
+test_that("error for stat=bin and showSelected", {
   gg <- ggplot() +
     theme_bw()+
     theme(panel.margin=grid::unit(0, "lines"))+
@@ -30,14 +30,9 @@ test_that("warning for stat=bin and showSelected", {
   complicated <- list(
     plot = gg
   )
-  expect_warning({
-    info <- animint2HTML(complicated)
+  expect_error({
+    animint2HTML(complicated)
   }, "showSelected only works with stat=identity, problem: geom1_bar_plot")
-  xpath <- '//g[@class="geom1_bar_plot"]//rect'
-  style.vec <- getStyleValue(info$html, xpath, "fill")
-  fill.counts <- table(style.vec)
-  expect_equal(length(fill.counts), 2)
-  expect_true(all(fill.counts==2))
 })
 
 test_that("no warning for stat=bin without showSelected", {
@@ -61,6 +56,5 @@ test_that("no warning for stat=bin without showSelected", {
     style.vec <- getStyleValue(info$html, xpath, "fill")
     fill.counts <- table(style.vec)
     expect_equal(length(fill.counts), 2)
-    expect_true(all(fill.counts==2))
   }
 })

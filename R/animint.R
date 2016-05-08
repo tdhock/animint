@@ -487,35 +487,30 @@ saveLayer <- function(l, d, meta){
     }
   }
 
-  ## Warn if non-identity stat or position is used with animint
-  ## aes. For example geom_bar + stat_bin doesn't make sense with
-  ## clickSelects/showSelected, since two clickSelects/showSelected
-  ## values may show up in the same bin.
   not.identity <- function(stat.or.position){
     x <- stat.or.position$objname
     is.character(x) && length(x)==1 && x != "identity"
   }
   is.show <- grepl("showSelected", names(g$aes))
   has.show <- any(is.show)
+  ## Error if non-identity stat is used with showSelected, since
+  ## typically the stats will delete the showSelected column from the
+  ## built data set. For example geom_bar + stat_bin doesn't make
+  ## sense with clickSelects/showSelected, since two
+  ## clickSelects/showSelected values may show up in the same bin.
   if(has.show && not.identity(l$stat)){
+    show.names <- names(g$aes)[is.show]
+    data.has.show <- show.names %in% names(g.data)
+    signal <- if(all(data.has.show))warning else stop
     print(l)
-    warning("showSelected only works with stat=identity, problem: ",
-            g$classed)
+    signal("showSelected only works with stat=identity, problem: ",
+           g$classed)
   }
+  ## Warn if non-identity position is used with animint aes. 
   if(has.show && not.identity(l$position)){
     print(l)
     warning("showSelected only works with position=identity, problem: ",
             g$classed)
-  }
-  if(!is.null(l$stat)){
-    is.bin <- l$stat$objname=="bin"
-    is.animint.aes <- grepl("clickSelects|showSelected", names(g$aes))
-    if(is.bin & any(is.animint.aes)){
-      warning(paste0("stat_bin is unpredictable ",
-                    "when used with clickSelects/showSelected.\n",
-                     "Use plyr::ddply() to do the binning ",
-                     "or use make_bar if using geom_bar/geom_histogram."))
-    }
   }
 
   ##print("before pre-processing")
@@ -910,7 +905,8 @@ saveLayer <- function(l, d, meta){
   }
     
   ## group should be the last thing in nest_order, if it is present.
-  if("group" %in% names(g$aes)){
+  data.object.geoms <- c("line", "path", "ribbon", "polygon")
+  if("group" %in% names(g$aes) && g$geom %in% data.object.geoms){
     g$nest_order <- c(g$nest_order, "group")
   }
 
