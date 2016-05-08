@@ -487,12 +487,28 @@ saveLayer <- function(l, d, meta){
     }
   }
 
-  ## Warn if stat_bin is used with animint aes. geom_bar + stat_bin
-  ## doesn't make sense with clickSelects/showSelected, since two
-  ## clickSelects/showSelected values may show up in the same bin.
-  stat <- l$stat
-  if(!is.null(stat)){
-    is.bin <- stat$objname=="bin"
+  ## Warn if non-identity stat or position is used with animint
+  ## aes. For example geom_bar + stat_bin doesn't make sense with
+  ## clickSelects/showSelected, since two clickSelects/showSelected
+  ## values may show up in the same bin.
+  not.identity <- function(stat.or.position){
+    x <- stat.or.position$objname
+    is.character(x) && length(x)==1 && x != "identity"
+  }
+  is.show <- grepl("showSelected", names(g$aes))
+  has.show <- any(is.show)
+  if(has.show && not.identity(l$stat)){
+    print(l)
+    warning("showSelected only works with stat=identity, problem: ",
+            g$classed)
+  }
+  if(has.show && not.identity(l$position)){
+    print(l)
+    warning("showSelected only works with position=identity, problem: ",
+            g$classed)
+  }
+  if(!is.null(l$stat)){
+    is.bin <- l$stat$objname=="bin"
     is.animint.aes <- grepl("clickSelects|showSelected", names(g$aes))
     if(is.bin & any(is.animint.aes)){
       warning(paste0("stat_bin is unpredictable ",

@@ -32,7 +32,7 @@ test_that("warning for stat=bin and showSelected", {
   )
   expect_warning({
     info <- animint2HTML(complicated)
-  }, "showSelected only works with position=identity and stat=identity")
+  }, "showSelected only works with stat=identity, problem: geom1_bar_plot")
   xpath <- '//g[@class="geom1_bar_plot"]//rect'
   style.vec <- getStyleValue(info$html, xpath, "fill")
   fill.counts <- table(style.vec)
