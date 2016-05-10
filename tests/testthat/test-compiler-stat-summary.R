@@ -1,4 +1,4 @@
-acontext("stat")
+acontext("stat_summary")
 
 test_that("stat_summary does not infinitely recurse", {
   data(UStornadoes)
