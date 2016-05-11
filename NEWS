@@ -180,6 +180,11 @@ RENDER: multiple animints inside of a single shiny app? This is
 probably just a theoretical issue. (why not just make a single
 animint?)
 
+2016.05.11 PR#152
+
+GGPLOT: no warning when showSelected is used with stats which are
+known to work (hline, vline, abline).
+
 2016.05.08 PR#146
 
 GGPLOT: the compiler now stops with an informative error when stats
