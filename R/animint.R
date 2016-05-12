@@ -501,10 +501,15 @@ saveLayer <- function(l, d, meta){
   if(has.show && not.identity(l$stat)){
     show.names <- names(g$aes)[is.show]
     data.has.show <- show.names %in% names(g.data)
-    signal <- if(all(data.has.show))warning else stop
-    print(l)
-    signal("showSelected only works with stat=identity, problem: ",
-           g$classed)
+    if(!l$stat$objname %in% c("vline", "identity", "hline", "abline")){
+      signal <- if(all(data.has.show))warning else stop
+      print(l)
+      signal(
+        "showSelected does not work with stat=",
+        l$stat$objname,
+        ", problem: ",
+        g$classed)
+    }
   }
   ## Warn if non-identity position is used with animint aes. 
   if(has.show && not.identity(l$position)){

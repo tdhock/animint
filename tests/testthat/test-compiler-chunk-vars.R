@@ -107,7 +107,9 @@ test_that("default chunks are at least 4KB", {
   dir.create(tdir)
   tsv.files <- Sys.glob(file.path(tdir, "*.tsv"))
   expect_equal(length(tsv.files), 0)
-  animint2dir(breakpointError, tdir, open.browser=FALSE)
+  expect_no_warning({
+    animint2dir(breakpointError, tdir, open.browser=FALSE)
+  })
   tsv.files <- Sys.glob(file.path(tdir, ".+chunk[0-9]+.tsv"))  # exclude common tsv
   geom <- sub("_.*", "", basename(tsv.files))
   files.by.geom <- split(tsv.files, geom)
