@@ -366,7 +366,8 @@ saveLayer <- function(l, d, meta){
   ## use un-named parameters so that they will not be exported
   ## to JSON as a named object, since that causes problems with
   ## e.g. colour.
-  g$params <- c(l$geom_params, l$stat_params)
+  ## 'colour', 'size' etc. have been moved to aes_params
+  g$params <- c(l$geom_params, l$stat_params, l$aes_params)
   for(p.name in names(g$params)){
     if("chunk_vars" %in% names(g$params) && is.null(g$params[["chunk_vars"]])){
       g$params[["chunk_vars"]] <- character()
@@ -1321,7 +1322,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
         }
         iaes <- selector.aes(L$mapping)
         one.names <- with(iaes, c(clickSelects$one, showSelected$one))
-        update.vars <- as.character(L$mapping[[one.names]])
+        update.vars <- as.character(L$mapping[one.names])
         # if the layer has a defined data set
         if(length(L$data) > 0) {
           # check whether the variable is in that layer
