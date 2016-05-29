@@ -547,7 +547,11 @@ saveLayer <- function(l, d, meta){
     g$geom <- "segment"
   } else if(g$geom=="point"){
     # Fill set to match ggplot2 default of filled in circle.
-    if(!"fill"%in%names(g.data) & "colour"%in%names(g.data)){
+    # Check for fill in both data and params
+    fill.in.data <- ("fill" %in% names(g.data) && any(!is.na(g.data[["fill"]])))
+    fill.in.params <- "fill" %in% names(g$params)
+    fill.specified <- fill.in.data || fill.in.params
+    if(!fill.specified & "colour"%in%names(g.data)){
       g.data[["fill"]] <- g.data[["colour"]]
     }
   } else if(g$geom=="text"){
