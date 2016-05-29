@@ -48,7 +48,13 @@ parsePlot <- function(meta){
 
   ## Interpret panel.margin as the number of lines between facets
   ## (ignoring whatever grid::unit such as cm that was specified).
-  plot.meta$panel_margin_lines <- as.numeric(theme.pars$panel.margin)
+  
+  ## Now ggplot specifies panel.margin in 'pt' instead of 'lines'
+  ## So I used a converting factor from the examples. Looks fine for now
+  pt.to.lines <- function(pt.value){
+      return(pt.value * (0.25/6))
+  }
+  plot.meta$panel_margin_lines <- pt.to.lines(as.numeric(theme.pars$panel.margin))
   
   ## No legend if theme(legend.postion="none").
   plot.meta$legend <- if(theme.pars$legend.position != "none"){
