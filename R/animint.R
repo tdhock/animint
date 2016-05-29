@@ -706,9 +706,20 @@ saveLayer <- function(l, d, meta){
   # Note the plotly implementation does not use
   # coord_transform...do they take care of the transformation
   # at a different point in time?
-  # temporary fix - will not work in the future
-  g.data$x <- scales::rescale(g.data$x, 0:1, ranges[[1]]$x.range)
-  g.data$y <- scales::rescale(g.data$y, 0:1, ranges[[1]]$y.range)
+  # Edited the fix to work for more cases and avoid some errors
+  # Needs to be modified further, but works for now
+  for(col.name in names(g.data)){
+    ignore.col <- c("showSelected", "PANEL", "shape", 
+                    "colour", "size", "fill", "alpha", 
+                    "stroke", "linetype")
+    if(!(col.name %in% ignore.col)){
+      if(startsWith(col.name, "x") || startsWith(col.name, "X")){
+        g.data[[col.name]] <- scales::rescale(g.data[[col.name]], 0:1, ranges[[1]]$x.range)
+      } else if(startsWith(col.name, "y") || startsWith(col.name, "Y")){
+        g.data[[col.name]] <- scales::rescale(g.data[[col.name]], 0:1, ranges[[1]]$y.range)
+      }
+    }
+  }
 #   g.data <- do.call("rbind", mapply(function(x, y) {
 #     ggplot2:::coord_trans(meta$plot$coord, x, y)
 #   }, split(g.data, g.data[["PANEL"]]), ranges, SIMPLIFY = FALSE))
