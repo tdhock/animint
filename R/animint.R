@@ -52,7 +52,7 @@ parsePlot <- function(meta){
   ## Now ggplot specifies panel.margin in 'pt' instead of 'lines'
   ## So I used a converting factor from the examples. Looks fine for now
   pt.to.lines <- function(pt.value){
-      return(pt.value * (0.25/6))
+    return(round(pt.value * (0.25/5.5), digits = 2))
   }
   plot.meta$panel_margin_lines <- pt.to.lines(as.numeric(theme.pars$panel.margin))
   
@@ -715,9 +715,11 @@ saveLayer <- function(l, d, meta){
   # Edited the fix to work for more cases and avoid some errors
   # Needs to be modified further, but works for now
   for(col.name in names(g.data)){
-    ignore.col <- c("showSelected", "PANEL", "shape", 
-                    "colour", "size", "fill", "alpha", 
-                    "stroke", "linetype")
+    ignore.col <- c("showSelected", "PANEL", "shape",
+                    "colour", "size", "fill", "alpha",
+                    "stroke", "linetype", "showSelectedlegendcolour",
+                    "showSelectedlegendshape", "showSelectedlegendfill",
+                    "weight", "group")
     if(!(col.name %in% ignore.col)){
       if(startsWith(col.name, "x") || startsWith(col.name, "X")){
         g.data[[col.name]] <- scales::rescale(g.data[[col.name]], 0:1, ranges[[1]]$x.range)
