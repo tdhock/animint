@@ -1648,13 +1648,21 @@ getLegendList <- function(plistextra){
   } else (ggplot2:::zeroGrob())
   names(gdefs) <- sapply(gdefs, function(i) i$title)
   
+  ## Get the names of geoms from layers since gdefs no longer 
+  ## returns a geom name
+  ggtype <- function (x, y = "geom") {
+    sub(y, "", tolower(class(x[[y]])[1]))
+  }
+  
+  geom.name.list <- lapply(layers, ggtype)
+  
   ## adding the variable used to each LegendList
   for(leg in seq_along(gdefs)) {
     legend_type <- names(gdefs[[leg]]$key)
     legend_type <- legend_type[legend_type != ".label"]
     gdefs[[leg]]$legend_type <- legend_type
     scale.list <- scales$scales[which(scales$find(legend_type))]
-    discrete.vec <- sapply(scale.list, inherits, "discrete")
+    discrete.vec <- sapply(scale.list, inherits, "ScaleDiscrete")
     is.discrete <- all(discrete.vec)
     gdefs[[leg]]$is.discrete <- is.discrete
     ## get the name of the legend/selection variable.
@@ -1684,6 +1692,28 @@ getLegendList <- function(plistextra){
     geom.unique.rows <- sapply(geom.unique.list, nrow)
     is.ignored <- 1 < geom.data.rows & geom.unique.rows == 1
     gdefs[[leg]]$geoms <- geom.list[!is.ignored]
+    
+    ## Add geom names to be used in getLegend function
+    if(length(geom.name.list) > 0){
+      len.list <- length(geom.list)
+      geom.name.list <- geom.name.list[1:len.list]
+    }
+    # only use geoms not ignored earlier
+    geom.name.list <- geom.name.list[!is.ignored]
+    
+    ## guides_geom() earlier returned geom names that are not
+    ## reflected by the ggtype function
+    ## convert these to get proper geom names for legends
+    for(geom.num in seq_along(geom.name.list)){
+      if(geom.name.list[[geom.num]] %in% c("ribbon", "density", 
+                                           "tile", "bar", "violin")){
+        geom.name.list[[geom.num]] <- "polygon"
+      }else if(geom.name.list[[geom.num]] %in% c("line")){
+        geom.name.list[[geom.num]] <- "path"
+      }
+    }
+    
+    gdefs[[leg]]$geom.name.list <- geom.name.list
   }
   
   ## Add a flag to specify whether or not breaks was manually
@@ -1738,7 +1768,6 @@ getLegend <- function(mb){
   ## 2. In add_legend in the JS code I create a <table> for every
   ## legend, and then I bind the legend entries to <tr>, <td>, and
   ## <svg> elements.
-  geoms <- sapply(mb$geoms, function(i) i$geom$objname)
   cleanData <- function(data, key, geom, params) {
     nd <- nrow(data)
     nk <- nrow(key)
@@ -1757,7 +1786,8 @@ getLegend <- function(mb){
     data$label <- paste(data$label) # otherwise it is AsIs.
     data
   }
-  dataframes <- lapply(mb$geoms, function(i) cleanData(i$data, mb$key, i$geom$objname, i$params))
+  dataframes <- mapply(function(i, j) cleanData(i$data, mb$key, j, i$params),
+                       mb$geoms, mb$geom.name.list, SIMPLIFY = FALSE)
   dataframes <- dataframes[which(sapply(dataframes, nrow)>0)]
   # Check to make sure datframes is non-empty. If it is empty, return NULL.
   if(length(dataframes)>0) {
@@ -1779,7 +1809,7 @@ getLegend <- function(mb){
     NULL
   }else{
     list(guide = guidetype,
-         geoms = geoms,
+         geoms = unlist(mb$geom.name.list),
          title = mb$title,
          class = if(mb$is.discrete)mb$selector else mb$title,
          selector = mb$selector,
