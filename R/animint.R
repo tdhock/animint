@@ -975,6 +975,13 @@ getCommonChunk <- function(built, chunk.vars, aes.list){
     ## group for deciding common data.
     built$group <- NULL
   }
+  
+  ## Remove columns with all NA values
+  ## so that common.not.na is not empty
+  ## due to the plot's alpha, stroke or other columns
+  all.nas <- sapply(built, function(x){all(is.na(x))})
+  built <- built[, !all.nas]
+  
   ## Treat factors as characters, to avoid having them be coerced to
   ## integer later.
   for(col.name in names(built)){
@@ -1085,6 +1092,13 @@ varied.chunk <- function(df.or.list, cols){
 split.x <- function(x, vars){
   if(length(vars)==0)return(x)
   if(is.data.frame(x)){
+    
+    ## Remove columns with all NA values
+    ## so that x is not empty due to
+    ## the plot's alpha, stroke or other columns
+    all.nas <- sapply(x, function(col.m){all(is.na(col.m))})
+    x <- x[, !all.nas]
+    
     # rows with NA should not be saved
     x <- na.omit(x)
     if(length(vars) == 1){
