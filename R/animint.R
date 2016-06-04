@@ -259,15 +259,9 @@ parsePlot <- function(meta){
     plot.meta[[s("%stitle")]] <- if(is.blank(s("axis.title.%s"))){
       ""
     } else {
-      scale.i <- which(meta$plot$scales$find(xy))
-      lab.or.null <- if(length(scale.i) == 1){
-        meta$plot$scales$scales[[scale.i]]$name
-      }
-      if(is.null(lab.or.null)){
-        meta$plot$labels[[xy]]
-      }else{
-        lab.or.null
-      }
+      ## scales no longer has the label information
+      ## so take it from labels by default???
+      meta$plot$labels[[xy]]
     }
     # theme settings are shared across panels
     axis.text <- theme.pars[[s("axis.text.%s")]]
@@ -1710,6 +1704,9 @@ getLegendList <- function(plistextra){
         geom.name.list[[geom.num]] <- "polygon"
       }else if(geom.name.list[[geom.num]] %in% c("line")){
         geom.name.list[[geom.num]] <- "path"
+      }else if(geom.name.list[[geom.num]] %in% c("path") && 
+               !"point" %in% geom.name.list){
+        geom.name.list[[geom.num]] <- "point"
       }
     }
     
