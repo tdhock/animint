@@ -233,7 +233,7 @@ parsePlot <- function(meta){
   ## Flip labels if coords are flipped - transform does not take care
   ## of this. Do this BEFORE checking if it is blank or not, so that
   ## individual axes can be hidden appropriately, e.g. #1.
-  if("flip"%in%attr(meta$plot$coordinates, "class")){
+  if("CoordFlip"%in%attr(meta$plot$coordinates, "class")){
     temp <- meta$plot$labels$x
     meta$plot$labels$x <- meta$plot$labels$y
     meta$plot$labels$y <- temp
@@ -708,17 +708,26 @@ saveLayer <- function(l, d, meta){
   # at a different point in time?
   # Edited the fix to work for more cases and avoid some errors
   # Needs to be modified further, but works for now
+  
+  ## Choose ranges for different Panels
+  ## May want to use layout to make it more robust
+  choose.range <- function(){
+    unique(g.data$PANEL[1])
+  }
+  
   for(col.name in names(g.data)){
-    ignore.col <- c("showSelected", "PANEL", "shape",
-                    "colour", "size", "fill", "alpha",
-                    "stroke", "linetype", "showSelectedlegendcolour",
-                    "showSelectedlegendshape", "showSelectedlegendfill",
-                    "weight", "group")
+    ignore.col <- c("showSelected", "PANEL", "shape", 
+                    "colour", "size", "fill", "alpha", 
+                    "stroke", "linetype")
     if(!(col.name %in% ignore.col)){
       if(startsWith(col.name, "x") || startsWith(col.name, "X")){
-        g.data[[col.name]] <- scales::rescale(g.data[[col.name]], 0:1, ranges[[1]]$x.range)
+        i <- choose.range()
+        g.data[[col.name]] <- scales::rescale(g.data[[col.name]], 
+                                              0:1, ranges[[i]]$x.range)
       } else if(startsWith(col.name, "y") || startsWith(col.name, "Y")){
-        g.data[[col.name]] <- scales::rescale(g.data[[col.name]], 0:1, ranges[[1]]$y.range)
+        i <- choose.range()
+        g.data[[col.name]] <- scales::rescale(g.data[[col.name]], 
+                                              0:1, ranges[[i]]$y.range)
       }
     }
   }
