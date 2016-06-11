@@ -76,29 +76,61 @@ geom_tallrect <- function(mapping = NULL, data = NULL,
 #'  \dontrun{ 
 #'    source(system.file("examples/WorldBank.R", package = "animint"))
 #'  }
-geom_widerect <- function(mapping=NULL, data=NULL, stat="identity", position="identity", ...){
-  GeomWideRect <- proto(ggplot2:::GeomRect,{
-    objname <- "widerect"
-    required_aes <- c("ymin", "ymax")
-    draw <- draw_groups <- function(.,data,scales,coordinates,
-                                    xmin=0,xmax=1,...){
-      xmin <- grid::unit(xmin,"npc")
-      xmax <- grid::unit(xmax,"npc")
-      with(ggplot2:::coord_transform(coordinates, data, scales),
-           ggplot2:::ggname(.$my_name(), {
-             grid::rectGrob(xmin, ymin, xmax - xmin, ymax-ymin,
-                 default.units = "native", just = c("left", "bottom"), 
-                 gp=grid::gpar(
-                   col=colour, fill=scales::alpha(fill, alpha), 
-                   lwd=size * .pt, lty=linetype, lineend="butt"
-                   )
-              )
-      }))
-    }
-  })
-  GeomWideRect$new(mapping = mapping, data = data, stat = stat,
-                   position = position, ...)
+GeomWideRect <- ggplot2::ggproto("GeomWideRect", ggplot2::Geom,
+                                 default_aes = aes(colour = "grey35", 
+                                                   fill = "grey35", 
+                                                   size = 0.5, 
+                                                   linetype = 1,
+                                                   alpha = 0.5),
+                                 
+                                 required_aes = c("ymin", "ymax"),
+                                 
+                                 draw_panel = function(self, data, 
+                                                       panel_scales, coord) {
+                                   coords <- coord$transform(data, panel_scales)
+                                   xmax <- grid::unit(1, "npc")
+                                   xmin <- grid::unit(0, "npc")
+                                   grid::rectGrob(
+                                     xmin, coords$ymin,
+                                     width = xmax - xmin,
+                                     height = coords$ymax - coords$ymin,
+                                     default.units = "native",
+                                     just = c("left", "bottom"),
+                                     gp = grid::gpar(
+                                       col = coords$colour,
+                                       fill = scales::alpha(coords$fill, 
+                                                            coords$alpha), 
+                                       lwd = coords$size * .pt,
+                                       lty = coords$linetype,
+                                       lineend = "butt"
+                                     )
+                                   )
+                                 },
+                                 
+                                 draw_key = draw_key_rect
+)
+
+geom_widerect <- function(mapping = NULL, data = NULL,
+                          stat = "identity", position = "identity",
+                          ...,
+                          na.rm = FALSE,
+                          show.legend = NA,
+                          inherit.aes = TRUE) {
+  ggplot2::layer(
+    geom = GeomWideRect,
+    data = data,
+    mapping = mapping,
+    stat = stat,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(
+      na.rm = na.rm,
+      ...
+    )
+  )
 }
+
 
 #' Make a clickSelects geom_tallrect that completely tiles the x
 #' range. This makes it easy to construct tallrects for the common
