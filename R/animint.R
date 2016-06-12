@@ -1665,14 +1665,6 @@ getLegendList <- function(plistextra){
   } else (ggplot2:::zeroGrob())
   names(gdefs) <- sapply(gdefs, function(i) i$title)
   
-  ## Get the names of geoms from layers since gdefs no longer 
-  ## returns a geom name
-  ggtype <- function (x, y = "geom") {
-    sub(y, "", tolower(class(x[[y]])[1]))
-  }
-  
-  geom.name.list <- lapply(layers, ggtype)
-  
   ## adding the variable used to each LegendList
   for(leg in seq_along(gdefs)) {
     legend_type <- names(gdefs[[leg]]$key)
@@ -1701,6 +1693,7 @@ getLegendList <- function(plistextra){
              paste(legend_type, collapse=", "))
       }
     }
+    
     ## do not draw geoms which are constant:
     geom.list <- gdefs[[leg]]$geoms
     geom.data.list <- lapply(geom.list, "[[", "data")
@@ -1710,30 +1703,35 @@ getLegendList <- function(plistextra){
     is.ignored <- 1 < geom.data.rows & geom.unique.rows == 1
     gdefs[[leg]]$geoms <- geom.list[!is.ignored]
     
-    ## Add geom names to be used in getLegend function
-    if(length(geom.name.list) > 0){
-      len.list <- length(geom.list)
-      geom.name.list <- geom.name.list[1:len.list]
+    ## Pass a geom.legend.list to be used by the
+    ## GetLegend function
+    geom.legend.list <- list()
+    for(geom.i in seq_along(gdefs[[leg]]$geoms)){
+      data.geom.i <- gdefs[[leg]]$geoms[[geom.i]]$data
+      params.geom.i <- gdefs[[leg]]$geoms[[geom.i]]$params
+      size.geom.i <- gdefs[[leg]]$geoms[[geom.i]]$size
+      
+      suppressWarnings(draw.key.used <- 
+                         gdefs[[leg]]$geoms[[geom.i]]$draw_key(
+                           data.geom.i, params.geom.i, size.geom.i)
+      )
+      geom.legend <- class(draw.key.used)[[1]]
+      geom.legend.list <- c(geom.legend.list, geom.legend)
     }
-    # only use geoms not ignored earlier
-    geom.name.list <- geom.name.list[!is.ignored]
     
-    ## guides_geom() earlier returned geom names that are not
-    ## reflected by the ggtype function
-    ## convert these to get proper geom names for legends
-    for(geom.num in seq_along(geom.name.list)){
-      if(geom.name.list[[geom.num]] %in% c("ribbon", "density", 
-                                           "tile", "bar", "violin")){
-        geom.name.list[[geom.num]] <- "polygon"
-      }else if(geom.name.list[[geom.num]] %in% c("line")){
-        geom.name.list[[geom.num]] <- "path"
-      }else if(geom.name.list[[geom.num]] %in% c("path") && 
-               !"point" %in% geom.name.list){
-        geom.name.list[[geom.num]] <- "point"
+    ## Process names to be used by the CleanData function
+    for(i in seq_along(geom.legend.list)){
+      if(geom.legend.list[[i]] %in% c("points")){
+        geom.legend.list[[i]] <- substr(geom.legend.list[[i]], 1,
+                                        nchar(geom.legend.list[[i]])-1)
+      }else if(geom.legend.list[[i]] %in% c("segments")){
+        geom.legend.list[[i]] <- "path"
+      }else if(geom.legend.list[[i]] %in% c("rect")){
+        geom.legend.list[[i]] <- "polygon"
       }
     }
     
-    gdefs[[leg]]$geom.name.list <- geom.name.list
+    gdefs[[leg]]$geom.legend.list <- geom.legend.list
   }
   
   ## Add a flag to specify whether or not breaks was manually
@@ -1807,7 +1805,7 @@ getLegend <- function(mb){
     data
   }
   dataframes <- mapply(function(i, j) cleanData(i$data, mb$key, j, i$params),
-                       mb$geoms, mb$geom.name.list, SIMPLIFY = FALSE)
+                       mb$geoms, mb$geom.legend.list, SIMPLIFY = FALSE)
   dataframes <- dataframes[which(sapply(dataframes, nrow)>0)]
   # Check to make sure datframes is non-empty. If it is empty, return NULL.
   if(length(dataframes)>0) {
@@ -1829,7 +1827,7 @@ getLegend <- function(mb){
     NULL
   }else{
     list(guide = guidetype,
-         geoms = unlist(mb$geom.name.list),
+         geoms = unlist(mb$geom.legend.list),
          title = mb$title,
          class = if(mb$is.discrete)mb$selector else mb$title,
          selector = mb$selector,
