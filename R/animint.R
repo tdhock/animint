@@ -720,11 +720,11 @@ saveLayer <- function(l, d, meta){
                     "colour", "size", "fill", "alpha", 
                     "stroke", "linetype")
     if(!(col.name %in% ignore.col)){
-      if(startsWith(col.name, "x") || startsWith(col.name, "X")){
+      if(grepl("^x", col.name) || grepl("^X", col.name)){
         i <- choose.range()
         g.data[[col.name]] <- scales::rescale(g.data[[col.name]], 
                                               0:1, ranges[[i]]$x.range)
-      } else if(startsWith(col.name, "y") || startsWith(col.name, "Y")){
+      } else if(grepl("^y", col.name) || grepl("^Y", col.name)){
         i <- choose.range()
         g.data[[col.name]] <- scales::rescale(g.data[[col.name]], 
                                               0:1, ranges[[i]]$y.range)
