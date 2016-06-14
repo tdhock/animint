@@ -1,6 +1,6 @@
 acontext("facet lines")
 
-data(WorldBank)
+data(WorldBank, package = "animint")
 not.na <- subset(WorldBank, !(is.na(life.expectancy) | is.na(fertility.rate)))
 TS <- function(df)data.frame(df, facet="Years")
 SCATTER <- function(df)data.frame(df, facet="Fertility rate")

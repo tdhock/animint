@@ -41,7 +41,7 @@ test_that("produce informative errors for bad chunk_vars", {
            "use chunk_vars=character() to specify 1 chunk"), fixed=TRUE)
 })
 
-data(breakpoints)
+data(breakpoints, package = "animint")
 only.error <- subset(breakpoints$error,type=="E")
 only.segments <- subset(only.error,bases.per.probe==bases.per.probe[1])
 signal.colors <- c(estimate="#0adb0a",

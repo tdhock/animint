@@ -1,4 +1,3 @@
-library(animint)
 library(testthat)
 
 acontext("many facets")

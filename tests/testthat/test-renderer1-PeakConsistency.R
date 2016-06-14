@@ -1,6 +1,6 @@
 acontext("PeakConsistency")
 
-data(PeakConsistency)
+data(PeakConsistency, package = "animint")
 
 color.code <-
   c(truth="#1B9E77", #teal

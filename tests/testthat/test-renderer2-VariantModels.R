@@ -1,6 +1,6 @@
 acontext("VariantModels data viz")
 
-data(VariantModels)
+data(VariantModels, package = "animint")
 
 auc.min.error <- subset(VariantModels$auc, metric.name=="min.error")
 

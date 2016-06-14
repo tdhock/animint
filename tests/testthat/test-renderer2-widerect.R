@@ -33,7 +33,7 @@ test_that("bottom of widerect is above line", {
   expect_less_than(rect.bounds$bottom, line.bounds$top)
 })
 
-data(WorldBank)
+data(WorldBank, package = "animint")
 not.na <- subset(WorldBank, !(is.na(life.expectancy) | is.na(fertility.rate)))
 BOTH <- function(df, top, side){
   data.frame(df,

@@ -1,8 +1,7 @@
 library(testthat)
 acontext("malaria data viz")
 
-library(animint)
-data(malaria)
+data(malaria, package = "animint")
 
 fp.fn.colors <- c(FP="skyblue",
                   fp="skyblue",

@@ -1,6 +1,6 @@
 acontext("ChromHMMiterations data set")
 
-data(ChromHMMiterations)
+data(ChromHMMiterations, package = "animint")
 
 emission <- data.frame(ChromHMMiterations$emission, parameters="emission")
 transition <- data.frame(ChromHMMiterations$transition, parameters="transition")

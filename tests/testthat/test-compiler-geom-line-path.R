@@ -1,8 +1,7 @@
 library(testthat)
 acontext("geom line")
-library(animint)
 
-data(intreg)
+data(intreg, package = "animint")
 min.logratio <- min(intreg$signals$logratio)-0.2
 max.logratio <- max(intreg$signals$logratio)
 intreg$breaks$min.logratio <- min.logratio
@@ -136,7 +135,7 @@ result.list <- list()
 for(g.class in names(expected.list)){
   expected <- expected.list[[g.class]]
   tsv.path <- Sys.glob(file.path("intreg-selection", paste0(g.class, "*")))
-  g.data <- read.table(tsv.path, header=TRUE)
+  g.data <- read.table(tsv.path, header=TRUE, comment.char = "")
   tsv.by.signal <- split(g.data, g.data$clickSelects)
   for(signal.name in names(tsv.by.signal)){
     one.signal <- tsv.by.signal[[signal.name]]
