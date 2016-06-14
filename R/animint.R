@@ -1150,6 +1150,17 @@ split.x <- function(x, vars){
 ##' @author Toby Dylan Hocking
 saveChunks <- function(x, meta){
   if(is.data.frame(x)){
+    # Only save columns including x/y data & PANEL to avoid
+    # error in reading colour/fill values while using read.table
+    getSaveCols <- function(col.names){
+      save.cols <- grepl("^x", col.names) | grepl("^y", col.names) |
+        grepl("PANEL", col.names) | grepl("^X", col.names) | 
+        grepl("^Y", col.names)
+    }
+    
+    save.cols <- getSaveCols(names(x))
+    x <- x[save.cols]
+    
     this.i <- meta$chunk.i
     csv.name <- sprintf("%s_chunk%d.tsv", meta$g$classed, this.i)
     write.table(x, file.path(meta$out.dir, csv.name), quote=FALSE, 
