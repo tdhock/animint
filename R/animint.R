@@ -706,31 +706,48 @@ saveLayer <- function(l, d, meta){
   # Note the plotly implementation does not use
   # coord_transform...do they take care of the transformation
   # at a different point in time?
-  # Edited the fix to work for more cases and avoid some errors
-  # Needs to be modified further, but works for now
-  
-  ## Choose ranges for different Panels
-  ## May want to use layout to make it more robust
-  choose.range <- function(){
-    unique(g.data$PANEL[1])
-  }
-  
-  for(col.name in names(g.data)){
-    ignore.col <- c("showSelected", "PANEL", "shape", 
-                    "colour", "size", "fill", "alpha", 
-                    "stroke", "linetype")
-    if(!(col.name %in% ignore.col)){
-      if(grepl("^x", col.name) || grepl("^X", col.name)){
-        i <- choose.range()
-        g.data[[col.name]] <- scales::rescale(g.data[[col.name]], 
-                                              0:1, ranges[[i]]$x.range)
-      } else if(grepl("^y", col.name) || grepl("^Y", col.name)){
-        i <- choose.range()
-        g.data[[col.name]] <- scales::rescale(g.data[[col.name]], 
-                                              0:1, ranges[[i]]$y.range)
+
+  # Flip axes in case of coord_flip
+  # Switches column names. Eg. xmin to ymin, 
+  # yntercept to xintercept etc.
+  switch_axes <- function(col.names){
+    for(elem in seq_along(col.names)){
+      if(grepl("^x", col.names[elem])){
+        col.names[elem] <- sub("^x", "y", col.names[elem])
+      } else if(grepl("^y", col.names[elem])){
+        col.names[elem] <- sub("^y", "x", col.names[elem])
+      } else if(grepl("^X", col.names[elem])){
+        col.names[elem] <- sub("^X", "Y", col.names[elem])
+      } else if(grepl("^Y", col.names[elem])){
+        col.names[elem] <- sub("^Y", "X", col.names[elem])
       }
     }
+    col.names
   }
+
+  if(inherits(meta$plot$coordinates, "CoordFlip")){
+    names(g.data) <- switch_axes(names(g.data))
+  }
+
+  # Rescale data to range 0:1 like the coord_trans function
+  # in ggplot v1.0.1
+  rescale_data <- function(g.data.i, ranges.i){
+    for(col.name in names(g.data.i)){
+      if(grepl("^x", col.name) || grepl("^X", col.name)){
+        g.data.i[[col.name]] <- scales::rescale(g.data.i[[col.name]], 
+                                                0:1, ranges.i$x.range)
+      } else if(grepl("^y", col.name) || grepl("^Y", col.name)){
+        g.data.i[[col.name]] <- scales::rescale(g.data.i[[col.name]], 
+                                                0:1, ranges.i$y.range)
+      }
+    }
+    g.data.i
+  }
+
+  g.data <- do.call("rbind", mapply(rescale_data, 
+                                    split(g.data, g.data[["PANEL"]]), 
+                                    ranges, SIMPLIFY = FALSE))
+
 #   g.data <- do.call("rbind", mapply(function(x, y) {
 #     ggplot2:::coord_trans(meta$plot$coord, x, y)
 #   }, split(g.data, g.data[["PANEL"]]), ranges, SIMPLIFY = FALSE))
