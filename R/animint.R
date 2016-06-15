@@ -259,9 +259,15 @@ parsePlot <- function(meta){
     plot.meta[[s("%stitle")]] <- if(is.blank(s("axis.title.%s"))){
       ""
     } else {
-      ## scales no longer has the label information
-      ## so take it from labels by default???
-      meta$plot$labels[[xy]]
+      scale.i <- which(meta$plot$scales$find(xy))
+      lab.or.null <- if(length(scale.i) == 1){
+        meta$plot$scales$scales[[scale.i]]$name
+      }
+      if(is.null(unlist(lab.or.null))){
+        meta$plot$labels[[xy]]
+      }else{
+        lab.or.null
+      }
     }
     # theme settings are shared across panels
     axis.text <- theme.pars[[s("axis.text.%s")]]
