@@ -22,7 +22,7 @@ viz <- list(sepal = p1,
 info <- animint2HTML(viz)
 
 test_that("compiler adds selector.types and first", {
-  expect_match(info$selector.types, "multiple")
+  expect_match(unlist(info$selector.types), "multiple")
   expect_true(all(info$first$Species %in% c("setosa", "virginica", "versicolor")))
 })
 
