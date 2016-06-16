@@ -91,11 +91,12 @@ viz <- list(
     theme_bw()+
     theme_animint(width=500, height=500)+
     theme(panel.margin=grid::unit(0, "cm"))+
-    facet_grid(test.fold ~ type, labeller=function(var, val){
-      if(var=="test.fold"){
-        paste("test fold", val)
+    facet_grid(test.fold ~ type, labeller=function(label_df){
+      if(names(label_df)=="test.fold"){
+        label_names <- mapply(paste, "test fold", label_df, SIMPLIFY = FALSE)
+        label_context(labels = label_names)
       }else{
-        paste(val)
+        lapply(label_df, paste)
       }
     })+
     geom_path(aes(FPR, TPR, clickSelects=test.fold,
@@ -139,8 +140,10 @@ viz <- list(
     theme_animint(width=1800, height=500)+
     theme(panel.margin=grid::unit(0, "cm"))+
     theme(axis.text.x=element_text(angle=90))+
-    facet_grid(. ~ filterVar.fac, labeller=function(var, val){
-      sub("balanced", "b", sub("one", "1", val))
+    facet_grid(. ~ filterVar.fac, labeller=function(label_df){
+      label_df <- mapply(sub, "balanced", "b", label_df, SIMPLIFY = FALSE)
+      label_df <- mapply(sub, "one", "1", label_df, SIMPLIFY = FALSE)
+      label_value(label_df)
     }, scales="free", space="fixed")+
     scale_color_manual(values=fp.fn.colors)+
     geom_line(aes(threshold, error.value,
@@ -173,11 +176,12 @@ viz <- list(
 info <- animint2HTML(viz)
 
 viz$error+
-  facet_grid(test.fold ~ filterVar.fac, labeller=function(var, val){
-    if(var=="test.fold"){
-      paste("test fold", val)
+  facet_grid(test.fold ~ filterVar.fac, labeller=function(label_df){
+    if(names(label_df)=="test.fold"){
+      label_names <- mapply(paste, "test fold", label_df, SIMPLIFY = FALSE)
+      label_context(labels = label_names)
     }else{
-      paste(val)
+      lapply(label_df, paste)
     }
   }, scales="free", space="fixed")
 
