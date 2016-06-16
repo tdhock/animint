@@ -17,8 +17,8 @@ second.small <-
          theme_bw()+
          theme_animint(width=1000, height=800)+
          theme(panel.margin=grid::unit(0, "cm"))+
-         facet_grid(sample.id ~ ., labeller=function(var, val){
-           paste("sample", val)
+         facet_grid(sample.id ~ ., labeller=function(val){
+           mapply(paste, "sample", val, SIMPLIFY = FALSE)
          })+
          guides(size="none")+
          geom_segment(aes(chromStart+0.5, mean,
@@ -71,8 +71,8 @@ viz <-
          theme_bw()+
          theme_animint(width=1000, height=800)+
          theme(panel.margin=grid::unit(0, "cm"))+
-         facet_grid(sample.id ~ ., labeller=function(var, val){
-           paste("sample", val)
+         facet_grid(sample.id ~ ., labeller=function(val){
+           mapply(paste, "sample", val, SIMPLIFY = FALSE)
          })+
          geom_point(aes(chromEnd, count,
                         showSelected3=increase,
