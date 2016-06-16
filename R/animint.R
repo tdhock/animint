@@ -581,7 +581,7 @@ saveLayer <- function(l, d, meta){
     } 
     if("vjust" %in% names(g$params)) {
       vjustWarning(g$params$vjust)
-    } else if ("vjust" %in% names(g.data)) { 
+    } else if ("vjust" %in% names(g$aes)) {
       vjustWarning(g.data$vjust)
     } 
   } else if(g$geom=="ribbon"){
