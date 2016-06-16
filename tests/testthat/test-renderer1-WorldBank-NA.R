@@ -67,7 +67,7 @@ test_that("common chunk contains expected columns", {
   expected.cols <-
     c("ymin", "ymax", "xmin", "fill", "key",
       "clickSelects", "showSelectedlegendfill",
-      "group")
+      "group", "size", "colour", "linetype")
   expect_identical(sort(names(common)), sort(expected.cols))
 })
 
