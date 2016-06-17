@@ -127,6 +127,26 @@ parsePlot <- function(meta){
     # And to have the legend, I think that we need to use ggplot_build
     meta$built <- ggplot2::ggplot_build(meta$plot)
 
+    ## Data now contains redundant columns with fill, alpha, colour etc.
+    ## Add them to aes_params and remove from data if they have a single
+    ## unique value to reduce tsv file size
+    for(i in seq_along(meta$built$plot$layers)){
+      for(col.name in names(meta$built$data[[i]])){
+        if(grepl("^fill", col.name) | grepl("^shape", col.name) |
+           grepl("^color", col.name) | grepl("^colour", col.name) |
+           grepl("^stroke", col.name) | grepl("^alpha", col.name) |
+           grepl("^linetype", col.name) | grepl("^size", col.name)){
+          all.vals <- unique(meta$built$data[[i]][[col.name]])
+          if(length(all.vals) == 1){
+            if(!is.null(meta$built$plot$layers[[i]]$aes_params[[col.name]])){
+              meta$built$plot$layers[[i]]$aes_params[[col.name]] <- all.vals
+            }
+            meta$built$data[[i]][[col.name]] <- NULL
+          }
+        }
+      }
+    }
+
     ## for each layer, there is a correpsonding data.frame which
     ## evaluates the aesthetic mapping.
     df <- meta$built$data[[layer.i]]
