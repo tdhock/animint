@@ -130,19 +130,17 @@ parsePlot <- function(meta){
     ## Data now contains redundant columns with fill, alpha, colour etc.
     ## Remove from data if they have a single unique value and
     ## are NOT used in mapping to reduce tsv file size
-    for(i in seq_along(meta$built$plot$layers)){
-      for(col.name in names(meta$built$data[[i]])){
-        if(grepl("^fill", col.name) | grepl("^shape", col.name) |
-           grepl("^color", col.name) | grepl("^colour", col.name) |
-           grepl("^stroke", col.name) | grepl("^alpha", col.name) |
-           grepl("^linetype", col.name) | grepl("^size", col.name)){
-          all.vals <- unique(meta$built$data[[i]][[col.name]])
-          if(length(all.vals) == 1){
-            in.mapping <-
-              !is.null(meta$built$plot$layers[[i]]$mapping[[col.name]])
-            if(!in.mapping){
-              meta$built$data[[i]][[col.name]] <- NULL
-            }
+    for(col.name in names(meta$built$data[[layer.i]])){
+      if(grepl("^fill", col.name) | grepl("^shape", col.name) |
+         grepl("^color", col.name) | grepl("^colour", col.name) |
+         grepl("^stroke", col.name) | grepl("^alpha", col.name) |
+         grepl("^linetype", col.name) | grepl("^size", col.name)){
+        all.vals <- unique(meta$built$data[[layer.i]][[col.name]])
+        if(length(all.vals) == 1){
+          in.mapping <-
+            !is.null(meta$built$plot$layers[[layer.i]]$mapping[[col.name]])
+          if(!in.mapping){
+            meta$built$data[[layer.i]][[col.name]] <- NULL
           }
         }
       }
