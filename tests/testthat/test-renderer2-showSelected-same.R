@@ -25,9 +25,7 @@ test_that("redundant aes not saved to tsv", {
   geom.tsv <- Sys.glob(
     file.path("animint-htmltest", "geom1_point_points_*.tsv"))
   expect_equal(length(geom.tsv), 1)
-  expected.names <- sort(c("x", "y", ss.vec,
-                           "alpha", "colour", "fill",
-                           "shape", "size", "stroke"))
+  expected.names <- sort(c("x", "y", ss.vec))
   tsv.data <- read.table(geom.tsv, header=TRUE, comment.char = "")
   computed.names <- sort(names(tsv.data))
   expect_identical(computed.names, expected.names)
