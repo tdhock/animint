@@ -130,11 +130,12 @@ parsePlot <- function(meta){
     ## Data now contains redundant columns with fill, alpha, colour etc.
     ## Remove from data if they have a single unique value and
     ## are NOT used in mapping to reduce tsv file size
+    redundant.cols <- c("fill", "shape", "color", "colour", "stroke", "alpha",
+                        "linetype", "size", "angle", "vjust", "family",
+                        "fontface", "lineheight", "anchor")
+
     for(col.name in names(meta$built$data[[layer.i]])){
-      if(grepl("^fill", col.name) | grepl("^shape", col.name) |
-         grepl("^color", col.name) | grepl("^colour", col.name) |
-         grepl("^stroke", col.name) | grepl("^alpha", col.name) |
-         grepl("^linetype", col.name) | grepl("^size", col.name)){
+      if(col.name %in% redundant.cols){
         all.vals <- unique(meta$built$data[[layer.i]][[col.name]])
         if(length(all.vals) == 1){
           in.mapping <-
