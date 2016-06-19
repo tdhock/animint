@@ -50,11 +50,14 @@ parsePlot <- function(meta){
   ## (ignoring whatever grid::unit such as cm that was specified).
   
   ## Now ggplot specifies panel.margin in 'pt' instead of 'lines'
-  ## So I used a converting factor from the examples. Looks fine for now
-  pt.to.lines <- function(pt.value){
-    return(round(pt.value * (0.25/5.5), digits = 2))
+  ## Maybe use a standard converting factor in the future?
+  pt.to.lines <- function(margin.value){
+    if(attributes(margin.value)$unit == "pt"){
+      margin.value <- round(as.numeric(margin.value) * (0.25/5.5), digits = 2)
+    }
+    as.numeric(margin.value)
   }
-  plot.meta$panel_margin_lines <- pt.to.lines(as.numeric(theme.pars$panel.margin))
+  plot.meta$panel_margin_lines <- pt.to.lines(theme.pars$panel.margin)
   
   ## No legend if theme(legend.postion="none").
   plot.meta$legend <- if(theme.pars$legend.position != "none"){
