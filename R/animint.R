@@ -396,7 +396,7 @@ saveLayer <- function(l, d, meta){
   ## to JSON as a named object, since that causes problems with
   ## e.g. colour.
   ## 'colour', 'size' etc. have been moved to aes_params
-  g$params <- c(l$geom_params, l$stat_params, l$aes_params)
+  g$params <- c(l$geom_params, l$stat_params, l$aes_params, l$extra_params)
   for(p.name in names(g$params)){
     if("chunk_vars" %in% names(g$params) && is.null(g$params[["chunk_vars"]])){
       g$params[["chunk_vars"]] <- character()
