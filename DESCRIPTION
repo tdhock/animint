@@ -31,5 +31,5 @@ Suggests:
     httr,
     maps
 Remotes:
-    ropensci/RSelenium
+    ropensci/RSelenium,
     hadley/ggplot2#1649
