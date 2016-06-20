@@ -135,7 +135,8 @@ test_that("save separate chunks for geom_point without specifying group", {
                data = flu.points,                
                color = "black",
                size = 10,
-               chunk_vars = "WEEKEND")
+               chunk_vars = "WEEKEND",
+               validate_params = FALSE)
   viz <-
     list(levelHeatmap = level.heatmap,
          stateMap = state.map,
@@ -204,7 +205,8 @@ scatter <- ggplot()+
   geom_text(aes(life.expectancy, fertility.rate, label=country,
                 showSelected=country, showSelected2=year,
                 key=country), # also use key here!
-            data=no.israel, chunk_vars=c("year", "country"))+
+            data=no.israel, chunk_vars=c("year", "country"),
+            validate_params = FALSE)+
   scale_size_animint(breaks=10^(5:9))+
   make_text(no.israel, 55, 9, "year")
 

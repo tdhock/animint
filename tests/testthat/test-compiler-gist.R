@@ -57,14 +57,16 @@ viz.chunk.none <-
                         showSelected=year, colour=region, size=population,
                         key=country), # key aesthetic for animated transitions!
                     chunk_vars=c(),
-                    data=SCATTER(not.na))+
+                    data=SCATTER(not.na),
+                    validate_params = FALSE)+
          geom_text(aes(fertility.rate, life.expectancy, label=country,
                        showSelected=country, showSelected2=year,
                        showSelected3=region,
                        clickSelects=country,
                        key=country), #also use key here!
                    chunk_vars=c(), 
-                   data=SCATTER(not.na))+
+                   data=SCATTER(not.na),
+                   validate_params = FALSE)+
          scale_size_animint(breaks=10^(5:9))+
          facet_grid(side ~ top, scales="free")+
          geom_text(aes(5, 85, label=paste0("year = ", year),
@@ -103,7 +105,8 @@ viz.too.many <-
                   chunk_vars=c("row"),
                   stat="identity",
                   position="identity",
-                  data=too.tall))
+                  data=too.tall,
+                  validate_params = FALSE))
     
 test_that("too many files error", {
   expect_error({

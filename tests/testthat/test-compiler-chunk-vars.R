@@ -3,7 +3,7 @@ acontext("chunk vars")
 test_that("produce as many chunk files as specified", {
   viz <- list(iris=ggplot()+
     geom_point(aes(Petal.Width, Sepal.Length, showSelected=Species),
-               data=iris, chunk_vars="Species"))
+               data=iris, chunk_vars="Species", validate_params = FALSE))
   tdir <- tempfile()
   dir.create(tdir)
   tsv.files <- Sys.glob(file.path(tdir, "*.tsv"))
@@ -14,7 +14,7 @@ test_that("produce as many chunk files as specified", {
   
   viz <- list(iris=ggplot()+
     geom_point(aes(Petal.Width, Sepal.Length, showSelected=Species),
-               data=iris, chunk_vars=character()))
+               data=iris, chunk_vars=character(), validate_params = FALSE))
   tdir <- tempfile()
   dir.create(tdir)
   tsv.files <- Sys.glob(file.path(tdir, "*.tsv"))
@@ -27,14 +27,14 @@ test_that("produce as many chunk files as specified", {
 test_that("produce informative errors for bad chunk_vars", {
   viz <- list(iris=ggplot()+
     geom_point(aes(Petal.Width, Sepal.Length, showSelected=Species),
-               data=iris, chunk_vars="species"))
+               data=iris, chunk_vars="species", validate_params = FALSE))
   expect_error({
     animint2dir(viz, open.browser=FALSE)
   }, "invalid chunk_vars species; possible showSelected variables: Species")
   
   viz <- list(iris=ggplot()+
     geom_point(aes(Petal.Width, Sepal.Length, showSelected=Species),
-               data=iris, chunk_vars=NA))
+               data=iris, chunk_vars=NA, validate_params = FALSE))
   expect_error({
     animint2dir(viz, open.browser=FALSE)
   }, paste("chunk_vars must be a character vector;",
