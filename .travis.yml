@@ -18,7 +18,7 @@ install:
   - $HOME/opt/pandoc/pandoc --version
   # install uninstalled packages which this pkg depends on/links to/suggests.
   - ./travis-tool.sh install_deps
-  - ./travis-tool.sh install_github jimhester/covr
+  - ./travis-tool.sh install_github jimhester/covr hadley/ggplot2#1649
 
 script:
   - Rscript -e "devtools::install(dep=FALSE)"

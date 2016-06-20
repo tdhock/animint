@@ -32,3 +32,4 @@ Suggests:
     maps
 Remotes:
     ropensci/RSelenium
+    hadley/ggplot2#1649
