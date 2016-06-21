@@ -135,7 +135,7 @@ parsePlot <- function(meta){
     ## are NOT used in mapping to reduce tsv file size
     redundant.cols <- c("fill", "shape", "color", "colour", "stroke", "alpha",
                         "linetype", "size", "angle", "vjust", "family",
-                        "fontface", "lineheight", "anchor")
+                        "fontface", "lineheight", "anchor", "hjust")
 
     for(col.name in names(meta$built$data[[layer.i]])){
       if(col.name %in% redundant.cols){
