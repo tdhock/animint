@@ -16,8 +16,8 @@ dasharrayPattern <-
          ";")
 
 rect.xpaths <- 
-  c('//svg[@id="numeric"]//g[@class="PANEL1"]//rect',
-    '//svg[@id="character"]//g[@class="PANEL1"]//rect',
+  c('//svg[@id="plot_numeric"]//g[@class="PANEL1"]//rect',
+    '//svg[@id="plot_character"]//g[@class="PANEL1"]//rect',
     '//td[@class="numeric_legend"]//rect',
     '//td[@class="character_legend"]//rect')
 

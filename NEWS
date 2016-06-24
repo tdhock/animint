@@ -180,6 +180,65 @@ RENDER: multiple animints inside of a single shiny app? This is
 probably just a theoretical issue. (why not just make a single
 animint?)
 
+2016.05.11 PR#152
+
+GGPLOT: no warning when showSelected is used with stats which are
+known to work (hline, vline, abline).
+
+2016.05.08 PR#146
+
+GGPLOT: the compiler now stops with an informative error when stats
+are used with showSelected. New warning when position is used with
+showSelected.
+
+RENDER: aes(href) works when data_is_object (e.g. geom_polygon)
+
+2016.05.07 PR#151
+
+BUGFIX: common chunk data were not computed correctly when some chunks
+did not have all groups.
+
+2016.03.23 PR#143
+
+DSL: informative error when time option but no interactive aes
+specified.
+
+RENDER: "Show selection menus" instead of "Toggle selected variables"
+to be more consistent with the other buttons.
+
+2016.03.22 PR#138
+
+structure(viz, class="animint") works on the R command line (before,
+it only worked in Rmd files).
+
+BUGFIX: now we can render legends called "label" in Rmd (before, there
+was a conflict with bootstrap.js which is used to render Rmd, and
+defines a css style for a class called "label")
+
+BUGFIX: plots, legends, and legend entries in the same Rmd are now
+guaranteed to have different id.
+
+BUGFIX: animints with common chunk tsv files now work in Rmd.
+
+RENDER: selector.types defaults to multiple selection for variables
+which have legends somewhere in the data viz.
+
+2016.03.15 PR#141
+
+TEST: Added the test for Lilac Chaser Visual Illusion.
+test-renderer3-lilac_chaser.R
+
+2016.03.14 PR#140
+
+BUGFIX for geom_point(aes(color), fill=NA), new ensure_rgba for test
+infrastructure that can convert arbitrary colors to rgba format
+(respecting alpha opacity).
+
+2016.03.08 PR#137
+
+BUGFIX for geom_path(aes(group, key)) with animated transitions, see
+test-renderer3-path-key.R.
+
 2016.03.01 PR#133
 
 BUGFIX for an animint inside of shiny. Thanks to @lrmelt who brought

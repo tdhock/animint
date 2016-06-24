@@ -29,5 +29,5 @@ breakpointError <-
          geom_line(aes(segments, error, group=bases.per.probe,
                        clickSelects=bases.per.probe),
                    data=only.error, lwd=4))
-gg2animint(breakpointError)
+animint2dir(breakpointError)
 

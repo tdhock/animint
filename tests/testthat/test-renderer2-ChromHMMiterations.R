@@ -44,8 +44,8 @@ expect_no_warning({
 })
 
 test_that("no vertical space between border_rects", {
-  rect.list <-
-    getNodeSet(info$html, '//svg[@id="parameters"]//rect[@class="border_rect"]')
+  rect.list <- getNodeSet(
+    info$html, '//svg[@id="plot_parameters"]//rect[@class="border_rect"]')
   expect_equal(length(rect.list), 2)
   first <- xmlAttrs(rect.list[[1]])
   first.bottom <- as.numeric(first[["y"]])+as.numeric(first[["height"]])
@@ -56,10 +56,10 @@ test_that("no vertical space between border_rects", {
 
 test_that("fill not constant in probability legend and circles", {
   fill.vec <- getStyleValue(
-    info$html, '//svg[@id="parameters"]//circle', "fill")
+    info$html, '//svg[@id="plot_parameters"]//circle', "fill")
   expect_true(1 < length(table(fill.vec)))
   fill.vec <- getStyleValue(
-    info$html, '//tr[@class="probability"]//circle', "fill")
+    info$html, '//tr[@class="probability_variable"]//circle', "fill")
   expect_true(1 < length(table(fill.vec)))
 })
 

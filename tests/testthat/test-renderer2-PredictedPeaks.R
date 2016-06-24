@@ -232,17 +232,20 @@ test_that("selectize option respected", {
 })
 
 test_that("rects rendered in fill legend", {
-  rect.list <- getNodeSet(info$html, '//tr[@class="log10(count)"]//rect')
+  rect.list <- getNodeSet(
+    info$html, '//tr[@class="log10(count)_variable"]//rect')
   expect_equal(length(rect.list), 5)
 })
 
 test_that("no lines rendered in fill legend", {
-  line.list <- getNodeSet(info$html, '//tr[@class="log10(count)"]//line')
+  line.list <- getNodeSet(
+    info$html, '//tr[@class="log10(count)_variable"]//line')
   expect_equal(length(line.list), 0)
 })
 
 test_that("lines in color legend", {
-  line.list <- getNodeSet(info$html, '//tr[@class="thresh_type"]//line')
+  line.list <- getNodeSet(
+    info$html, '//tr[@class="thresh_type_variable"]//line')
   expect_equal(length(line.list), 2)
 })
 
@@ -250,8 +253,10 @@ specific_hlines <- function(html=getHTML()){
   getNodeSet(html, '//g[@class="geom7_hline_scatter"]//line')
 }
 
+specific.id <- "plot_scatter_thresh_type_variable_specific"
+xpath <- sprintf('//td[@id="%s_label"]', specific.id)
 specific_opacity <- function(html=getHTML()){
-  as.numeric(getStyleValue(html, '//td[@id="specific"]', "opacity"))
+  as.numeric(getStyleValue(html, xpath, "opacity"))
 }
 
 test_that("initially rendered hlines", {
@@ -262,7 +267,7 @@ test_that("initially rendered hlines", {
 })
 
 test_that("hlines after clicking specific", {
-  html <- clickHTML(id="specific")
+  html <- clickHTML(id=specific.id)
   line.list <- specific_hlines(html)
   expect_equal(length(line.list), 0)
   computed.opacity <- specific_opacity(html)
@@ -270,7 +275,7 @@ test_that("hlines after clicking specific", {
 })
 
 test_that("hlines after clicking specific again", {
-  html <- clickHTML(id="specific")
+  html <- clickHTML(id=specific.id)
   line.list <- specific_hlines(html)
   expect_equal(length(line.list), 2)
   computed.opacity <- specific_opacity(html)

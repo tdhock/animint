@@ -21,7 +21,6 @@ install:
   - ./travis-tool.sh install_github jimhester/covr hadley/ggplot2#1649
 
 script:
-  - Rscript -e "devtools::install(dep=FALSE)"
   - Rscript -e "source('tests/testthat.R', chdir=TRUE)"
 
 after_success:

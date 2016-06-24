@@ -64,13 +64,11 @@ parsePlot <- function(meta){
     getLegendList(meta$built)
   }
   
-  ## save each layer
+  ## scan for legends in each layer.
   for(layer.i in seq_along(meta$plot$layers)){
     ##cat(sprintf("%4d / %4d layers\n", layer.i, length(meta$plot$layers)))
-
     ## This is the layer from the original ggplot object.
     L <- meta$plot$layers[[layer.i]]
-    
     ## If any legends are specified, add showSelected aesthetic
     for(legend.i in seq_along(plot.meta$legend)) {
       one.legend <- plot.meta$legend[[legend.i]]
@@ -106,6 +104,7 @@ parsePlot <- function(meta){
         ## it to multiple.
         if(is.null(meta$selector.types[[s.name]])) {
           meta$selector.types[[s.name]] <- "multiple"
+          meta$selectors[[s.name]]$type <- "multiple"
         }
         ## if first is not specified, create it
         if(is.null(meta$first)) {
@@ -121,7 +120,6 @@ parsePlot <- function(meta){
         meta$selectors[[s.name]]$legend <- TRUE
       }#length(s.name)
     }#legend.i
-    
     ## need to call ggplot_build again because we've added to the plot
     # I'm sure that there is a way around this, but not immediately sure how. 
     # There's sort of a Catch-22 here because to create the interactivity, 
@@ -130,37 +128,30 @@ parsePlot <- function(meta){
     # And to have the legend, I think that we need to use ggplot_build
     meta$built <- ggplot2::ggplot_build(meta$plot)
 
-    ## Data now contains redundant columns with fill, alpha, colour etc.
-    ## Remove from data if they have a single unique value and
-    ## are NOT used in mapping to reduce tsv file size
-    redundant.cols <- names(meta$built$plot$layers[[layer.i]]$geom$default_aes)
-
-    for(col.name in names(meta$built$data[[layer.i]])){
-      if(col.name %in% redundant.cols){
-        all.vals <- unique(meta$built$data[[layer.i]][[col.name]])
-        if(length(all.vals) == 1){
-          in.mapping <-
-            !is.null(meta$built$plot$layers[[layer.i]]$mapping[[col.name]])
-          if(!in.mapping){
-            meta$built$data[[layer.i]][[col.name]] <- NULL
-          }
-        }
-      }
-    }
-
     ## for each layer, there is a correpsonding data.frame which
     ## evaluates the aesthetic mapping.
     df <- meta$built$data[[layer.i]]
 
+    ## Data now contains columns with fill, alpha, colour etc.
+    ## Remove from data if they have a single unique value and
+    ## are NOT used in mapping to reduce tsv file size
+    redundant.cols <- names(meta$built$plot$layers[[layer.i]]$geom$default_aes)
+    for(col.name in names(df)){
+      if(col.name %in% redundant.cols){
+        all.vals <- unique(df[[col.name]])
+        if(length(all.vals) == 1){
+          in.mapping <-
+            !is.null(meta$built$plot$layers[[layer.i]]$mapping[[col.name]])
+          if(!in.mapping){
+            df[[col.name]] <- NULL
+          }
+        }
+      }
+    }
+  
     ## This extracts essential info for this geom/layer.
     g <- saveLayer(L, df, meta)
 
-    ## 'strips' are really titles for the different facet panels
-    plot.meta$strips <- with(meta$built, getStrips(plot$facet, panel))
-    ## the layout tells us how to subset and where to plot on the JS side
-    plot.meta$layout <- with(meta$built, flag_axis(plot$facet, panel$layout))
-    plot.meta$layout <- with(meta$built, train_layout(plot$facet, plot$coordinates, plot.meta$layout,
-                                                     panel$ranges))
     plot.meta$geoms <- c(plot.meta$geoms, list(g$classed))
   }
   ## For each geom, save the nextgeom to preserve drawing order.
@@ -172,6 +163,22 @@ parsePlot <- function(meta){
       meta$geoms[[geom.prev]]$nextgeom <- meta$geoms[[geom.next]]$classed
     }
   }
+  ## need to call ggplot_build again because we've added to the plot.
+  ## I'm sure that there is a way around this, but not immediately sure how. 
+  ## There's sort of a Catch-22 here because to create the interactivity, 
+  ## we need to specify the variable corresponding to each legend. 
+  ## To do this, we need to have the legend. 
+  ## And to have the legend, I think that we need to use ggplot_build
+  meta$built <- ggplot2::ggplot_build(meta$plot)
+  ## TODO: implement a compiler that does not call ggplot_build at
+  ## all, and instead does all of the relevant computations in animint
+  ## code.
+  ## 'strips' are really titles for the different facet panels
+  plot.meta$strips <- with(meta$built, getStrips(plot$facet, panel))
+  ## the layout tells us how to subset and where to plot on the JS side
+  plot.meta$layout <- with(meta$built, flag_axis(plot$facet, panel$layout))
+  plot.meta$layout <- with(meta$built, train_layout(
+    plot$facet, plot$coordinates, plot.meta$layout, panel$ranges))
 
   ## Export axis specification as a combination of breaks and
   ## labels, on the relevant axis scale (i.e. so that it can
@@ -350,6 +357,10 @@ parsePlot <- function(meta){
   }
 
   meta$plots[[meta$plot.name]] <- plot.meta
+
+  list(
+    ggplot=meta$plot,
+    built=meta$built)
 }
 
 hjust2anchor <- function(hjust){
@@ -386,6 +397,11 @@ saveLayer <- function(l, d, meta){
   g$classed <-
     sprintf("geom%d_%s_%s",
             meta$geom.count, g$geom, meta$plot.name)
+  ## For each geom, save the nextgeom to preserve drawing order.
+  if(is.character(meta$prev.class)){
+    meta$geoms[[meta$prev.class]]$nextgeom <- g$classed
+  }
+  
   meta$geom.count <- meta$geom.count + 1
   ## needed for when group, etc. is an expression:
   g$aes <- sapply(l$mapping, function(k) as.character(as.expression(k)))
@@ -434,6 +450,7 @@ saveLayer <- function(l, d, meta){
   ## plot.Selectors.
 
   s.aes <- selector.aes(g$aes)
+  meta$selector.aes[[g$classed]] <- s.aes
 
   ## Do not copy group unless it is specified in aes, and do not copy
   ## showSelected variables which are specified multiple times.
@@ -525,19 +542,31 @@ saveLayer <- function(l, d, meta){
     }
   }
 
-  ## Warn if stat_bin is used with animint aes. geom_bar + stat_bin
-  ## doesn't make sense with clickSelects/showSelected, since two
+  is.show <- grepl("showSelected", names(g$aes))
+  has.show <- any(is.show)
+  ## Error if non-identity stat is used with showSelected, since
+  ## typically the stats will delete the showSelected column from the
+  ## built data set. For example geom_bar + stat_bin doesn't make
+  ## sense with clickSelects/showSelected, since two
   ## clickSelects/showSelected values may show up in the same bin.
-  stat <- l$stat
-  if(!is.null(stat)){
-    is.bin <- ggtype(l, "stat")=="bin"
-    is.animint.aes <- grepl("clickSelects|showSelected", names(g$aes))
-    if(is.bin & any(is.animint.aes)){
-      warning(paste0("stat_bin is unpredictable ",
-                    "when used with clickSelects/showSelected.\n",
-                     "Use plyr::ddply() to do the binning ",
-                     "or use make_bar if using geom_bar/geom_histogram."))
-    }
+  stat.type <- class(l$stat)[[1]]
+  if(has.show && stat.type != "StatIdentity"){
+    show.names <- names(g$aes)[is.show]
+    data.has.show <- show.names %in% names(g.data)
+    signal <- if(all(data.has.show))warning else stop
+    print(l)
+    signal(
+      "showSelected does not work with ",
+      stat.type,
+      ", problem: ",
+      g$classed)
+  }
+  ## Warn if non-identity position is used with animint aes.
+  position.type <- class(l$position)[[1]]
+  if(has.show && position.type != "PositionIdentity"){
+    print(l)
+    warning("showSelected only works with position=identity, problem: ",
+            g$classed)
   }
 
   ##print("before pre-processing")
@@ -578,7 +607,7 @@ saveLayer <- function(l, d, meta){
     fill.in.data <- ("fill" %in% names(g.data) && any(!is.na(g.data[["fill"]])))
     fill.in.params <- "fill" %in% names(g$params)
     fill.specified <- fill.in.data || fill.in.params
-    if(!fill.specified & "colour"%in%names(g.data)){
+    if(!fill.specified & "colour" %in% names(g.data)){
       g.data[["fill"]] <- g.data[["colour"]]
     }
   } else if(g$geom=="text"){
@@ -826,7 +855,7 @@ saveLayer <- function(l, d, meta){
   }
   ## Get unique values of time variable.
   if(length(time.col)){ # if this layer/geom is animated,
-    g$timeValues <- unique(g.data[[time.col]])
+    meta$timeValues[[paste(g$classed)]] <- unique(g.data[[time.col]])
   }
 
   ## Determine which showSelected values to use for breaking the data
@@ -977,7 +1006,8 @@ saveLayer <- function(l, d, meta){
   }
     
   ## group should be the last thing in nest_order, if it is present.
-  if("group" %in% names(g$aes)){
+  data.object.geoms <- c("line", "path", "ribbon", "polygon")
+  if("group" %in% names(g$aes) && g$geom %in% data.object.geoms){
     g$nest_order <- c(g$nest_order, "group")
   }
 
@@ -987,7 +1017,7 @@ saveLayer <- function(l, d, meta){
   g.data.varied <- if(is.null(data.or.null)){
     split.x(g.data, chunk.cols)
   }else{
-    g$columns <- lapply(data.or.null, names)
+    g$columns$common <- as.list(names(data.or.null$common))
     tsv.name <- sprintf("%s_chunk_common.tsv", g$classed)
     tsv.path <- file.path(meta$out.dir, tsv.name)
     write.table(data.or.null$common, tsv.path,
@@ -1001,11 +1031,6 @@ saveLayer <- function(l, d, meta){
   meta$g <- g
   g$chunks <- saveChunks(g.data.varied, meta)
   g$total <- length(unlist(g$chunks))
-
-  ## Get unique values of time variable.
-  if(length(time.col)){ # if this layer/geom is animated,
-    g$timeValues <- unique(g.data[[time.col]])
-  }
 
   ## Finally save to the master geom list.
   meta$geoms[[g$classed]] <- g
@@ -1073,31 +1098,39 @@ getCommonChunk <- function(built, chunk.vars, aes.list){
   is.common.mat <-
     matrix(NA, length(values.by.group), length(col.name.vec),
            dimnames=list(group=names(values.by.group),
-             col.name=col.name.vec))
+                         col.name=col.name.vec))
+  group.info.list <- list()
   for(group.name in names(values.by.group)){
     values.by.chunk <- values.by.group[[group.name]]
     row.count.vec <- sapply(values.by.chunk, nrow)
     same.size.chunks <- all(row.count.vec[1] == row.count.vec)
+    ## For every group, save values for creating common tsv later.
+    one.group.info <- values.by.chunk[[1]]
     for(col.name in col.name.vec){
       value.list <- lapply(values.by.chunk, function(df)df[[col.name]])
       is.common.mat[group.name, col.name] <- if(same.size.chunks){
         value.mat <- do.call(cbind, value.list)
-        all(value.mat[, 1] == value.mat)
+        least.missing <- which.min(colSums(is.na(value.mat)))
+        value.vec <- value.mat[, least.missing]
+        one.group.info[[col.name]] <- value.vec
+        all(value.vec == value.mat)
       }else{
-        value.tab <- table(unlist(value.list))
+        value.vec <- unlist(value.list)
+        one.group.info[[col.name]] <- value.vec[[1]]
+        value.tab <- table(value.vec)
         length(value.tab) == 1
       }
     }
+    group.info.list[[group.name]] <- one.group.info
   }
   is.common <- apply(is.common.mat, 2, all, na.rm=TRUE)
   ## TODO: another criterion could be used to save disk space even if
   ## there is only 1 chunk.
   if(is.common[["group"]] && sum(is.common) >= 2){
     common.cols <- names(is.common)[is.common]
-    one.chunk <- built.by.chunk[[1]]
-    ## Should each chunk have the same info about each group? 
-    common.not.na <- na.omit(one.chunk[common.cols])
-    common.unique <- unique(common.not.na)
+    group.info <- do.call(rbind, group.info.list)
+    group.info.common <- group.info[, names(which(is.common))]
+    common.unique <- unique(group.info.common)
     ## For geom_polygon and geom_path we may have two rows that should
     ## both be kept (the start and the end of each group may be the
     ## same if the shape is closed), so we define common.data as all
@@ -1107,14 +1140,13 @@ getCommonChunk <- function(built, chunk.vars, aes.list){
     common.data <- if(all(data.per.group == 1)){
       common.unique
     }else{
-      common.not.na
+      group.info.common
     }
     built.group <- do.call(rbind, built.by.chunk)
-    built.has.common <- subset(built.group, group %in% common.data$group)
-    varied.df.list <- split.x(built.has.common, chunk.vars)
+    varied.df.list <- split.x(na.omit(built.group), chunk.vars)
     varied.cols <- c("group", names(is.common)[!is.common])
     varied.data <- varied.chunk(varied.df.list, varied.cols)
-    return(list(common=common.data,
+    return(list(common=na.omit(common.data),
                 varied=varied.data))
   }
 }
@@ -1384,6 +1416,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
   }
 
   ## Extract essential info from ggplots, reality checks.
+  ggplot.list <- list()
   for(list.name in names(plot.list)){
     p <- plot.list[[list.name]]
     if(is.ggplot(p)){
@@ -1430,17 +1463,42 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
       }
       meta$plot <- p
       meta$plot.name <- list.name
-      parsePlot(meta) # calls ggplot_build.
+      ggplot.list[[list.name]] <- parsePlot(meta) # calls ggplot_build.
     }else if(is.list(p)){ ## for options.
-      ## combine the current option with p
-      # necessary because legends create their own list of selectors and first
-      # have to be careful not to overwrite these
-      meta[[list.name]] <- c(meta[[list.name]], p)
+      meta[[list.name]] <- p
     }else{
       stop("list items must be ggplots or option lists, problem: ", list.name)
     }
   }
 
+  ## After going through all of the meta-data in all of the ggplots,
+  ## now we have enough info to save the TSV file database.
+  for(p.name in names(ggplot.list)){
+    ggplot.info <- ggplot.list[[p.name]]
+    meta$prev.class <- NULL # first geom of any plot should not be next.
+    for(layer.i in seq_along(ggplot.info$ggplot$layers)){
+      L <- ggplot.info$ggplot$layers[[layer.i]]
+      df <- ggplot.info$built$data[[layer.i]]
+      ## cat(sprintf(
+      ##   "saving layer %4d / %4d of ggplot %s\n",
+      ##   layer.i, length(ggplot.info$built$data),
+      ##   p.name))
+      
+      ## This is a total hack, we should clean up the internals
+      ## (parsePlot, saveLayer) so that they no longer rely on this
+      ## meta object which makes it super confusing to know which
+      ## functions need which data.
+      meta$plot.name <- p.name
+      meta$plot <- ggplot.info$ggplot
+      meta$built <- ggplot.info$built
+      g <- saveLayer(L, df, meta)
+
+      ## Every plot has a list of geom names.
+      meta$plots[[p.name]]$geoms <- c(
+        meta$plots[[p.name]]$geoms, list(g$classed))
+    }#layer.i
+  }
+  
   ## Selector levels and update were stored in saveLayer, so now
   ## compute the unique values to store in meta$selectors.
   for(selector.name in names(meta$selector.values)){
@@ -1483,6 +1541,24 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
       as.list(unique(unlist(lapply(values.update, "[[", "update"))))
   }
 
+  ## Now that selectors are all defined, go back through geoms to
+  ## check if there are any warnings to issue.
+  for(g.name in names(meta$geoms)){
+    g.info <- meta$geoms[[g.name]]
+    g.selectors <- meta$selector.aes[[g.name]]
+    show.vars <- g.info$aes[g.selectors$showSelected$one]
+    duration.vars <- names(meta$duration)
+    show.with.duration <- show.vars[show.vars %in% duration.vars]
+    no.key <- ! "key" %in% names(g.info$aes)
+    if(length(show.with.duration) && no.key){
+      warning(
+        "to ensure that smooth transitions are interpretable, ",
+        "aes(key) should be specifed for geoms with aes(showSelected=",
+        show.with.duration[1],
+        "), problem: ", g.name)
+    }
+  }
+  
   ## For a static data viz with no interactive aes, no need to check
   ## for trivial showSelected variables with only 1 level.
   if(0 < length(meta$selectors)){
@@ -1533,7 +1609,10 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
   ## all the values used in those geoms.
   if("time" %in% ls(meta)){
     meta$selectors[[meta$time$variable]]$type <- "single"
-    anim.values <- lapply(meta$geoms, "[[", "timeValues")
+    anim.values <- meta$timeValues
+    if(length(meta$timeValues)==0){
+      stop("no interactive aes for time variable ", meta$time$variable)
+    }
     anim.not.null <- anim.values[!sapply(anim.values, is.null)]
     time.classes <- sapply(anim.not.null, function(x) class(x)[1])
     time.class <- time.classes[[1]]

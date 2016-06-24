@@ -39,8 +39,8 @@ p4 <- p2 +
 
 info <- animint2HTML(list(sepal = p1, petal = p2, blank = p3, gg538 = p4))
 
-rect.list <-
-  getNodeSet(info$html, '//svg[@id="sepal"]//rect[@class="border_rect"]')
+rect.list <- getNodeSet(
+  info$html, '//svg[@id="plot_sepal"]//rect[@class="border_rect"]')
 expect_equal(length(rect.list), 3)
 at.mat <- sapply(rect.list, xmlAttrs)
 
@@ -55,42 +55,55 @@ test_that("four unique border_rect x values (some horiz space)", {
 # extracting html from plots --------------------------------------
 
 # background rectangle for each panel
-background_sepal <- getNodeSet(info$html, '//svg[@id="sepal"]//rect[@class="background_rect"]')
+background_sepal <- getNodeSet(
+  info$html, '//svg[@id="plot_sepal"]//rect[@class="background_rect"]')
 attr_back_sepal <- sapply(background_sepal, xmlAttrs)
 
-background_petal <- getNodeSet(info$html, '//svg[@id="petal"]//rect[@class="background_rect"]')
+background_petal <- getNodeSet(
+  info$html, '//svg[@id="plot_petal"]//rect[@class="background_rect"]')
 attr_back_petal <- sapply(background_petal, xmlAttrs)
 
-blank_petal <- getNodeSet(info$html, '//svg[@id="blank"]//rect[@class="background_rect"]')
+blank_petal <- getNodeSet(
+  info$html, '//svg[@id="plot_blank"]//rect[@class="background_rect"]')
 
-gg538 <- getNodeSet(info$html, '//svg[@id="gg538"]//rect[@class="background_rect"]')
+gg538 <- getNodeSet(
+  info$html, '//svg[@id="plot_gg538"]//rect[@class="background_rect"]')
 attr_gg538 <- sapply(gg538, xmlAttrs)
 
 # border rectangle for each panel
-border_sepal <- getNodeSet(info$html, '//svg[@id="sepal"]//rect[@class="border_rect"]')
+border_sepal <- getNodeSet(
+  info$html, '//svg[@id="plot_sepal"]//rect[@class="border_rect"]')
 attr_border_sepal <- sapply(border_sepal, xmlAttrs)
 
-border_petal <- getNodeSet(info$html, '//svg[@id="petal"]//rect[@class="border_rect"]')
+border_petal <- getNodeSet(
+  info$html, '//svg[@id="plot_petal"]//rect[@class="border_rect"]')
 attr_border_petal <- sapply(border_petal, xmlAttrs)
 
 # major grid lines
-grid_major_sepal <- getNodeSet(info$html, '//svg[@id="sepal"]//g[@class="grid_major"]//line')
+grid_major_sepal <- getNodeSet(
+  info$html, '//svg[@id="plot_sepal"]//g[@class="grid_major"]//line')
 attr_major_sepal <- sapply(grid_major_sepal, xmlAttrs)
 
-grid_major_petal <- getNodeSet(info$html, '//svg[@id="petal"]//g[@class="grid_major"]//line')
+grid_major_petal <- getNodeSet(
+  info$html, '//svg[@id="plot_petal"]//g[@class="grid_major"]//line')
 attr_major_petal <- sapply(grid_major_petal, xmlAttrs)
 
-grid_major_blank <- getNodeSet(info$html, '//svg[@id="blank"]//g[@class="grid_major"]//line')
+grid_major_blank <- getNodeSet(
+  info$html, '//svg[@id="plot_blank"]//g[@class="grid_major"]//line')
 
-grid_major_gg538 <- getNodeSet(info$html, '//svg[@id="gg538"]//g[@class="grid_major"]//line')
+grid_major_gg538 <- getNodeSet(
+  info$html, '//svg[@id="plot_gg538"]//g[@class="grid_major"]//line')
 attr_major_gg538 <- sapply(grid_major_gg538, xmlAttrs)
 
 # minor grid lines
-grid_minor_sepal <- getNodeSet(info$html, '//svg[@id="sepal"]//g[@class="grid_minor"]//line')
+grid_minor_sepal <- getNodeSet(
+  info$html, '//svg[@id="plot_sepal"]//g[@class="grid_minor"]//line')
 
-grid_minor_petal <- getNodeSet(info$html, '//svg[@id="petal"]//g[@class="grid_minor"]//line')
+grid_minor_petal <- getNodeSet(
+  info$html, '//svg[@id="plot_petal"]//g[@class="grid_minor"]//line')
 
-grid_minor_blank <- getNodeSet(info$html, '//svg[@id="blank"]//g[@class="grid_minor"]//line')
+grid_minor_blank <- getNodeSet(
+  info$html, '//svg[@id="plot_blank"]//g[@class="grid_minor"]//line')
 
 # different patterns to access
 fillPattern <- paste0("fill: ",
@@ -181,8 +194,10 @@ ss.viz <- list(
 test_that("renderer can handle no grid lines", {
   info <- animint2HTML(ss.viz)
   # extract grids
-  grid_major_p1 <- getNodeSet(info$html, '//svg[@id="p1"]//g[@class="grid_major"]//line')
-  grid_minor_p1 <- getNodeSet(info$html, '//svg[@id="p1"]//g[@class="grid_minor"]//line')
+  grid_major_p1 <- getNodeSet(
+    info$html, '//svg[@id="plot_p1"]//g[@class="grid_major"]//line')
+  grid_minor_p1 <- getNodeSet(
+    info$html, '//svg[@id="plot_p1"]//g[@class="grid_minor"]//line')
   expect_equal(length(grid_major_p1), 4)
   expect_equal(length(grid_minor_p1), 0)
 })
@@ -190,7 +205,8 @@ test_that("renderer can handle no grid lines", {
 test_that("multiple selection sex_smoker plot", {
   ss.viz$selector.types$sex_smoker <- "multiple"
   info <- animint2HTML(ss.viz)
-  circle.list <- getNodeSet(info$html, '//svg[@id="p2"]//circle')
+  circle.list <- getNodeSet(
+    info$html, '//svg[@id="plot_p2"]//circle')
   expect_equal(length(circle.list), nrow(tips))
 })
 

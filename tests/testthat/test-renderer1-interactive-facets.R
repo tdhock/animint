@@ -70,7 +70,7 @@ getTransform <- function(tick)xmlAttrs(tick)[["transform"]]
 
 test_that("y axes align in facet_grid(variable~.)", {
   g.list <- getNodeSet(
-    info$html, "//svg[@id='penalty']//g[contains(@class, 'yaxis')]")
+    info$html, "//svg[@id='plot_penalty']//g[contains(@class, 'yaxis')]")
   expect_equal(length(g.list), 3)
   transform.txt <- sapply(g.list, getTransform)
   x.txt <- sub("translate[(](.*?),.*", "\\1", transform.txt)
@@ -81,7 +81,7 @@ test_that("y axes align in facet_grid(variable~.)", {
 
 test_that("red lines are only drawn in panel 2", {
   panelPath <- function(panel.i){
-    paste0("//svg[@id='penalty']",
+    paste0("//svg[@id='plot_penalty']",
            "//g[@class='geom9_segment_penalty']",
            "//g[@class='PANEL", panel.i, "']",
            "//line")

@@ -58,7 +58,7 @@ wb.facets <-
                        clickSelects=country,
                        key=country), #also use key here!
                    data=SCATTER(not.na))+
-         scale_size_animint(breaks=10^(5:9))+
+         scale_size_animint(breaks=10^(9:5))+
          facet_grid(side ~ top, scales="free")+
          geom_text(aes(5, 85, label=paste0("year = ", year),
                        showSelected=year),
