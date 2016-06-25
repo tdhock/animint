@@ -120,49 +120,8 @@ parsePlot <- function(meta){
         meta$selectors[[s.name]]$legend <- TRUE
       }#length(s.name)
     }#legend.i
-    ## need to call ggplot_build again because we've added to the plot
-    # I'm sure that there is a way around this, but not immediately sure how. 
-    # There's sort of a Catch-22 here because to create the interactivity, 
-    # we need to specify the variable corresponding to each legend. 
-    # To do this, we need to have the legend. 
-    # And to have the legend, I think that we need to use ggplot_build
-    meta$built <- ggplot2::ggplot_build(meta$plot)
+  }#layer.i
 
-    ## for each layer, there is a correpsonding data.frame which
-    ## evaluates the aesthetic mapping.
-    df <- meta$built$data[[layer.i]]
-
-    ## Data now contains columns with fill, alpha, colour etc.
-    ## Remove from data if they have a single unique value and
-    ## are NOT used in mapping to reduce tsv file size
-    redundant.cols <- names(meta$built$plot$layers[[layer.i]]$geom$default_aes)
-    for(col.name in names(df)){
-      if(col.name %in% redundant.cols){
-        all.vals <- unique(df[[col.name]])
-        if(length(all.vals) == 1){
-          in.mapping <-
-            !is.null(meta$built$plot$layers[[layer.i]]$mapping[[col.name]])
-          if(!in.mapping){
-            df[[col.name]] <- NULL
-          }
-        }
-      }
-    }
-  
-    ## This extracts essential info for this geom/layer.
-    g <- saveLayer(L, df, meta)
-
-    plot.meta$geoms <- c(plot.meta$geoms, list(g$classed))
-  }
-  ## For each geom, save the nextgeom to preserve drawing order.
-  n.next <- length(plot.meta$geoms) - 1
-  if(n.next){
-    for(geom.i in 1:n.next){
-      geom.prev <- plot.meta$geoms[[geom.i]]
-      geom.next <- plot.meta$geoms[[geom.i + 1]]
-      meta$geoms[[geom.prev]]$nextgeom <- meta$geoms[[geom.next]]$classed
-    }
-  }
   ## need to call ggplot_build again because we've added to the plot.
   ## I'm sure that there is a way around this, but not immediately sure how. 
   ## There's sort of a Catch-22 here because to create the interactivity, 
@@ -1491,6 +1450,24 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
       meta$plot.name <- p.name
       meta$plot <- ggplot.info$ggplot
       meta$built <- ggplot.info$built
+      
+      ## Data now contains columns with fill, alpha, colour etc.
+      ## Remove from data if they have a single unique value and
+      ## are NOT used in mapping to reduce tsv file size
+      redundant.cols <- names(L$geom$default_aes)
+      for(col.name in names(df)){
+        if(col.name %in% redundant.cols){
+          all.vals <- unique(df[[col.name]])
+          if(length(all.vals) == 1){
+            in.mapping <-
+              !is.null(L$mapping[[col.name]])
+            if(!in.mapping){
+              df[[col.name]] <- NULL
+            }
+          }
+        }
+      }
+      
       g <- saveLayer(L, df, meta)
 
       ## Every plot has a list of geom names.
