@@ -731,10 +731,6 @@ saveLayer <- function(l, d, meta){
         col.names[elem] <- sub("^x", "y", col.names[elem])
       } else if(grepl("^y", col.names[elem])){
         col.names[elem] <- sub("^y", "x", col.names[elem])
-      } else if(grepl("^X", col.names[elem])){
-        col.names[elem] <- sub("^X", "Y", col.names[elem])
-      } else if(grepl("^Y", col.names[elem])){
-        col.names[elem] <- sub("^Y", "X", col.names[elem])
       }
     }
     col.names
@@ -748,10 +744,10 @@ saveLayer <- function(l, d, meta){
   # in ggplot v1.0.1
   rescale_data <- function(g.data.i, ranges.i){
     for(col.name in names(g.data.i)){
-      if(grepl("^x", col.name) || grepl("^X", col.name)){
+      if(grepl("^x", col.name)){
         g.data.i[[col.name]] <- scales::rescale(g.data.i[[col.name]], 
                                                 0:1, ranges.i$x.range)
-      } else if(grepl("^y", col.name) || grepl("^Y", col.name)){
+      } else if(grepl("^y", col.name)){
         g.data.i[[col.name]] <- scales::rescale(g.data.i[[col.name]], 
                                                 0:1, ranges.i$y.range)
       }
