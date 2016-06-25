@@ -1816,16 +1816,10 @@ getLegendList <- function(plistextra){
     }
     
     ## Process names to be used by the CleanData function
-    for(i in seq_along(geom.legend.list)){
-      if(geom.legend.list[[i]] %in% c("points")){
-        geom.legend.list[[i]] <- substr(geom.legend.list[[i]], 1,
-                                        nchar(geom.legend.list[[i]])-1)
-      }else if(geom.legend.list[[i]] %in% c("segments")){
-        geom.legend.list[[i]] <- "path"
-      }else if(geom.legend.list[[i]] %in% c("rect")){
-        geom.legend.list[[i]] <- "polygon"
-      }
-    }
+    convert.names.list <- list(points="point", segments="path", rect="polygon")
+    names.to.change <- geom.legend.list %in% names(convert.names.list)
+    geom.legend.list[names.to.change] <- 
+      convert.names.list[unlist(geom.legend.list)]
     
     gdefs[[leg]]$geom.legend.list <- geom.legend.list
   }
