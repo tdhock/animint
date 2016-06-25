@@ -6,8 +6,28 @@
 #' @param ... other arguments
 #' @return ggplot2 layer
 #' @export
-#' @import proto
 #' @example inst/examples/breakpoints.R
+geom_tallrect <- function(mapping = NULL, data = NULL,
+                          stat = "identity", position = "identity",
+                          ...,
+                          na.rm = FALSE,
+                          show.legend = NA,
+                          inherit.aes = TRUE) {
+  ggplot2::layer(
+    geom = GeomTallRect,
+    data = data,
+    mapping = mapping,
+    stat = stat,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(
+      na.rm = na.rm,
+      ...
+    )
+  )
+}
+
 GeomTallRect <- ggplot2::ggproto("GeomTallRect", ggplot2::Geom,
                                  default_aes = aes(colour = "grey35",
                                                    fill = "grey35", 
@@ -42,27 +62,6 @@ GeomTallRect <- ggplot2::ggproto("GeomTallRect", ggplot2::Geom,
                                  draw_key = draw_key_rect
 )
 
-geom_tallrect <- function(mapping = NULL, data = NULL,
-                          stat = "identity", position = "identity",
-                          ...,
-                          na.rm = FALSE,
-                          show.legend = NA,
-                          inherit.aes = TRUE) {
-  ggplot2::layer(
-    geom = GeomTallRect,
-    data = data,
-    mapping = mapping,
-    stat = stat,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      na.rm = na.rm,
-      ...
-    )
-  )
-}
-
 
 #' ggplot2 geom with ymin and ymax aesthetics that covers the entire x range, useful for clickSelects background elements.
 #' @param mapping aesthetic mapping
@@ -76,6 +75,27 @@ geom_tallrect <- function(mapping = NULL, data = NULL,
 #'  \dontrun{ 
 #'    source(system.file("examples/WorldBank.R", package = "animint"))
 #'  }
+geom_widerect <- function(mapping = NULL, data = NULL,
+                          stat = "identity", position = "identity",
+                          ...,
+                          na.rm = FALSE,
+                          show.legend = NA,
+                          inherit.aes = TRUE) {
+  ggplot2::layer(
+    geom = GeomWideRect,
+    data = data,
+    mapping = mapping,
+    stat = stat,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(
+      na.rm = na.rm,
+      ...
+    )
+  )
+}
+
 GeomWideRect <- ggplot2::ggproto("GeomWideRect", ggplot2::Geom,
                                  default_aes = aes(colour = "grey35", 
                                                    fill = "grey35", 
@@ -109,27 +129,6 @@ GeomWideRect <- ggplot2::ggproto("GeomWideRect", ggplot2::Geom,
                                  
                                  draw_key = draw_key_rect
 )
-
-geom_widerect <- function(mapping = NULL, data = NULL,
-                          stat = "identity", position = "identity",
-                          ...,
-                          na.rm = FALSE,
-                          show.legend = NA,
-                          inherit.aes = TRUE) {
-  ggplot2::layer(
-    geom = GeomWideRect,
-    data = data,
-    mapping = mapping,
-    stat = stat,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      na.rm = na.rm,
-      ...
-    )
-  )
-}
 
 
 #' Make a clickSelects geom_tallrect that completely tiles the x

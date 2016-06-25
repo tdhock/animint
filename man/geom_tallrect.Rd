@@ -5,7 +5,8 @@
 \title{ggplot2 geom with xmin and xmax aesthetics that covers the entire y range, useful for clickSelects background elements.}
 \usage{
 geom_tallrect(mapping = NULL, data = NULL, stat = "identity",
-  position = "identity", ...)
+  position = "identity", ..., na.rm = FALSE, show.legend = NA,
+  inherit.aes = TRUE)
 }
 \arguments{
 \item{mapping}{aesthetic mapping}
@@ -56,7 +57,7 @@ breakpointError <-
          geom_line(aes(segments, error, group=bases.per.probe,
                        clickSelects=bases.per.probe),
                    data=only.error, lwd=4))
-gg2animint(breakpointError)
+animint2dir(breakpointError)
 
 }
 

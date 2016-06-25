@@ -5,7 +5,8 @@
 \title{ggplot2 geom with ymin and ymax aesthetics that covers the entire x range, useful for clickSelects background elements.}
 \usage{
 geom_widerect(mapping = NULL, data = NULL, stat = "identity",
-  position = "identity", ...)
+  position = "identity", ..., na.rm = FALSE, show.legend = NA,
+  inherit.aes = TRUE)
 }
 \arguments{
 \item{mapping}{aesthetic mapping}
