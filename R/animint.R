@@ -1819,7 +1819,7 @@ getLegendList <- function(plistextra){
     convert.names.list <- list(points="point", segments="path", rect="polygon")
     names.to.change <- geom.legend.list %in% names(convert.names.list)
     geom.legend.list[names.to.change] <- 
-      convert.names.list[unlist(geom.legend.list)]
+      convert.names.list[unlist(geom.legend.list[names.to.change])]
     
     gdefs[[leg]]$geom.legend.list <- geom.legend.list
   }
