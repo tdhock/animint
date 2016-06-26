@@ -26,11 +26,11 @@ test_that('breaks are respected', {
   expect_equal(sort(label.num), sort(breaks))
 })
 
-test_that('hiding both legends works with geom_point(show_guide=FALSE)', {
+test_that('hiding both legends works with geom_point(show.legend=FALSE)', {
   viz$scatter <- ggplot()+
     geom_point(aes(fertility.rate, life.expectancy, clickSelects=country,
                    showSelected=year, colour=region, size=population),
-               data=WorldBank, show_guide=FALSE)+
+               data=WorldBank, show.legend=FALSE)+
     geom_text(aes(fertility.rate, life.expectancy, label=country,
                   showSelected=country, showSelected2=year),
               data=WorldBank)+
