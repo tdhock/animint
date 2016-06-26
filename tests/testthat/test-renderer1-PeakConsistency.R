@@ -82,7 +82,7 @@ viz <-
          geom_vline(aes(xintercept=chromStart+0.5, color=model,
                         showSelected=increase,
                         showSelected2=seed),
-                    show_guide=TRUE,
+                    show.legend=TRUE,
                     linetype="dashed",
                     data=PeakConsistency$truth)+
          guides(size="none")+
@@ -96,7 +96,7 @@ viz <-
                         showSelected=seed, showSelected2=sample.size,
                         showSelected3=increase,
                         color=model, size=model),
-                    show_guide=TRUE,
+                    show.legend=TRUE,
                     linetype="dashed",
                     data=PeakConsistency$guess)+
          scale_size_manual(values=c(PeakSegJoint=1, PeakSeg=2))+
