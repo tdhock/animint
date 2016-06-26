@@ -174,7 +174,15 @@ viz <-
 
        title="Malaria parasite NextGenSeq variant calling errors")
 
-info <- animint2HTML(viz)
+## we got this warning on the compile below:
+
+## Warning message:
+## In geom.legend.list[names.to.change] <- convert.names.list[unlist(geom.legend.list)] :
+##   number of items to replace is not a multiple of replacement length
+
+expect_no_warning({
+  info <- animint2HTML(viz)
+})
 
 expected.dot.df <- 
   subset(malaria$error.variants,
