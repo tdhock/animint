@@ -1,7 +1,7 @@
 acontext("Interactive facets")
 
 ## Example: 4 plots, 2 selectors.
-data(intreg)
+data(intreg, package = "animint")
 signal.colors <- c(estimate="#0adb0a", latent="#0098ef")
 breakpoint.colors <- c("1breakpoint"="#ff7d7d", "0breakpoints"='#f6f4bf')
 model.linetypes <- c(margin="dotted",limit="dashed",regression="solid")

@@ -1,8 +1,7 @@
 library(testthat)
 acontext("malaria data viz")
 
-library(animint)
-data(malaria)
+data(malaria, package = "animint")
 
 fp.fn.colors <- c(FP="skyblue",
                   fp="skyblue",
@@ -175,7 +174,9 @@ viz <-
 
        title="Malaria parasite NextGenSeq variant calling errors")
 
-info <- animint2HTML(viz)
+expect_no_warning({
+  info <- animint2HTML(viz)
+})
 
 expected.dot.df <- 
   subset(malaria$error.variants,

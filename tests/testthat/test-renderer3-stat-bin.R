@@ -32,7 +32,7 @@ test_that("error for stat=bin and showSelected", {
   )
   expect_error({
     animint2HTML(complicated)
-  }, "showSelected does not work with stat=bin, problem: geom1_bar_plot")
+  }, "showSelected does not work with StatBin, problem: geom1_bar_plot")
 })
 
 test_that("no warning for stat=bin without showSelected", {

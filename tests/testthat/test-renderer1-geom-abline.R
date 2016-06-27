@@ -6,7 +6,7 @@ p <- qplot(wt, mpg, data = mtcars) +
 info <- animint2HTML(list(p = p))
 
 tsv.file <- file.path("animint-htmltest", "geom2_abline_p_chunk1.tsv")
-tsv.data <- read.table(tsv.file, header=TRUE)
+tsv.data <- read.table(tsv.file, header=TRUE, comment.char = "")
 
 test_that("columns of abline tsv", {
   expected.names <- sort(c("PANEL", "x", "xend", "y", "yend"))

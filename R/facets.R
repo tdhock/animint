@@ -34,9 +34,9 @@ build_strip <- function(panel, label_df, labeller, side = "right", ...) {
   }
   # Create matrix of labels
   labels <- matrix(list(), nrow = nrow(label_df), ncol = ncol(label_df))
-  for (i in seq_len(ncol(label_df))) {
-    labels[, i] <- labeller(names(label_df)[i], label_df[, i])
-  }
+  labels <- lapply(labeller(label_df), cbind)
+  labels <- do.call("cbind", labels)
+  
   # unlike ggplot2, we collapse "layers" of strips into 1 layer
   apply(labels, 1, paste, collapse = "; ")
 }

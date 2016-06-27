@@ -1,6 +1,6 @@
 acontext("Text")
 
-data(WorldBank)
+data(WorldBank, package = "animint")
 wb  <- WorldBank[WorldBank$year == 2010,]
 viz <- list(scatter=ggplot()+
   geom_text(aes(y=fertility.rate, x=life.expectancy,

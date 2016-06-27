@@ -17,18 +17,20 @@ only [about 60 lines of R code](inst/examples/WorldBank-facets.R).
 
 ## Installation
 
-```s
+```r
 if (!require(devtools)) install.packages("devtools")
 devtools::install_github("tdhock/animint", upgrade_dependencies=FALSE)
 library(animint)
 example(animint)
 ```
 
-NOTE: [tdhock/ggplot2](https://github.com/tdhock/ggplot2) is required
-since [hadley/ggplot2](https://github.com/hadley/ggplot2) introduced
-some backwards-incompatible changes in Aug 2015. We would be more than
-willing to accept code contributions via a Pull Request that gets
-Animint working with the most recent version of ggplot2.
+NOTE: animint now works with standard ggplot2 >= 2.0 thanks to
+[Faizan](https://github.com/faizan-khan-iit) and
+[Kevin](https://github.com/kferris10)! If you want to use the animint
+[chunk\_vars option](https://github.com/tdhock/animint/wiki/Advanced-features-present-animint-but-not-in-ggplot2#use-chunk_varscvar1-var2-to-specify-how-much-data-to-load-at-a-time)
+then you will need to install
+[hadley/ggplot2#1649](https://github.com/hadley/ggplot2/pull/1649) (it
+permits non-standard geom options).
 
 ## Learning animint through examples
 

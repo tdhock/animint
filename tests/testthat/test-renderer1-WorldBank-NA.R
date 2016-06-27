@@ -1,6 +1,6 @@
 acontext("WorldBank-NA")
 
-data(WorldBank)
+data(WorldBank, package = "animint")
 
 ## This example is good because it uses constancy
 ## http://bost.ocks.org/mike/constancy/

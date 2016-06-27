@@ -1,7 +1,7 @@
 acontext("interactivity")
 
 ## Example: 2 plots, 2 selectors, but only interacting with 1 plot.
-data(breakpoints)
+data(breakpoints, package = "animint")
 only.error <- subset(breakpoints$error,type=="E")
 only.segments <- subset(only.error, samples==samples[1])
 signal.colors <- c(estimate="#0adb0a",
@@ -173,7 +173,7 @@ test_that("clickSelects 1 removes all <line> elements and all <circle>", {
 })
 
 ## Tornado multiple selection.
-data(UStornadoes)
+data(UStornadoes, package = "animint")
 stateOrder <- data.frame(state = unique(UStornadoes$state)[order(unique(UStornadoes$TornadoesSqMile), decreasing=T)], rank = 1:49) # order states by tornadoes per square mile
 UStornadoes$state <- factor(UStornadoes$state, levels=stateOrder$state, ordered=TRUE)
 UStornadoes$weight <- 1/UStornadoes$LandArea

@@ -1,6 +1,6 @@
 acontext("aes(tooltip)")
 
-data(WorldBank)
+data(WorldBank, package = "animint")
 not.na <- subset(WorldBank, !(is.na(life.expectancy) | is.na(fertility.rate)))
 country.counts <- table(not.na$year)
 years <- data.frame(year=as.numeric(names(country.counts)),

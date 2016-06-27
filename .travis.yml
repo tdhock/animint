@@ -18,11 +18,10 @@ install:
   - $HOME/opt/pandoc/pandoc --version
   # install uninstalled packages which this pkg depends on/links to/suggests.
   - ./travis-tool.sh install_deps
-  - Rscript -e 'devtools::install_github("tdhock/RSelenium@7a70f57ea4b4ac7a14cefa5d650265efe04ab209", upgrade_dependencies=FALSE, dependencies=TRUE)'
-  - Rscript -e 'devtools::install_github(c("hadley/scales@2c3edf45de56d617444dc38e47e0404173817886", "tdhock/ggplot2@a8b06ddb680acdcdbd927773b1011c562134e4d2"), upgrade_dependencies=FALSE, dependencies=FALSE)'
-  - Rscript -e "devtools::install(upgrade_dependencies=FALSE, dependencies=FALSE)"
+  - ./travis-tool.sh install_github jimhester/covr hadley/ggplot2#1649
 
 script:
+  - Rscript -e "devtools::install(dep=FALSE)"
   - Rscript -e "source('tests/testthat.R', chdir=TRUE)"
 
 after_success:

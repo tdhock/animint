@@ -48,7 +48,16 @@ parsePlot <- function(meta){
 
   ## Interpret panel.margin as the number of lines between facets
   ## (ignoring whatever grid::unit such as cm that was specified).
-  plot.meta$panel_margin_lines <- as.numeric(theme.pars$panel.margin)
+  
+  ## Now ggplot specifies panel.margin in 'pt' instead of 'lines'
+  ## Maybe use a standard converting factor in the future?
+  pt.to.lines <- function(margin.value){
+    if(attributes(margin.value)$unit == "pt"){
+      margin.value <- round(as.numeric(margin.value) * (0.25/5.5), digits = 2)
+    }
+    as.numeric(margin.value)
+  }
+  plot.meta$panel_margin_lines <- pt.to.lines(theme.pars$panel.margin)
   
   ## No legend if theme(legend.postion="none").
   plot.meta$legend <- if(theme.pars$legend.position != "none"){
@@ -67,6 +76,7 @@ parsePlot <- function(meta){
       s.name <- one.legend$selector
       is.variable.name <- is.character(s.name) && length(s.name) == 1
       layer.has.variable <- s.name %in% names(L$data)
+      
       if(is.variable.name && layer.has.variable) {
         ## grabbing the variable from the data
         var <- L$data[, s.name]
@@ -111,9 +121,8 @@ parsePlot <- function(meta){
       }#length(s.name)
     }#legend.i
   }#layer.i
-    
+
   ## need to call ggplot_build again because we've added to the plot.
-  
   ## I'm sure that there is a way around this, but not immediately sure how. 
   ## There's sort of a Catch-22 here because to create the interactivity, 
   ## we need to specify the variable corresponding to each legend. 
@@ -211,7 +220,7 @@ parsePlot <- function(meta){
   ## Flip labels if coords are flipped - transform does not take care
   ## of this. Do this BEFORE checking if it is blank or not, so that
   ## individual axes can be hidden appropriately, e.g. #1.
-  if("flip"%in%attr(meta$plot$coordinates, "class")){
+  if("CoordFlip"%in%attr(meta$plot$coordinates, "class")){
     temp <- meta$plot$labels$x
     meta$plot$labels$x <- meta$plot$labels$y
     meta$plot$labels$y <- temp
@@ -241,7 +250,7 @@ parsePlot <- function(meta){
       lab.or.null <- if(length(scale.i) == 1){
         meta$plot$scales$scales[[scale.i]]$name
       }
-      if(is.null(lab.or.null)){
+      if(is.null(unlist(lab.or.null))){
         meta$plot$labels[[xy]]
       }else{
         lab.or.null
@@ -338,8 +347,12 @@ hjust2anchor <- function(hjust){
 #' @return list representing a layer, with corresponding aesthetics, ranges, and groups.
 #' @export
 saveLayer <- function(l, d, meta){
+  # carson's approach to getting layer types
+  ggtype <- function (x, y = "geom") {
+    sub(y, "", tolower(class(x[[y]])[1]))
+  }
   ranges <- meta$built$panel$ranges
-  g <- list(geom=l$geom$objname)
+  g <- list(geom=ggtype(l))
   g$classed <-
     sprintf("geom%d_%s_%s",
             meta$geom.count, g$geom, meta$plot.name)
@@ -355,7 +368,8 @@ saveLayer <- function(l, d, meta){
   ## use un-named parameters so that they will not be exported
   ## to JSON as a named object, since that causes problems with
   ## e.g. colour.
-  g$params <- c(l$geom_params, l$stat_params)
+  ## 'colour', 'size' etc. have been moved to aes_params
+  g$params <- c(l$geom_params, l$stat_params, l$aes_params, l$extra_params)
   for(p.name in names(g$params)){
     if("chunk_vars" %in% names(g$params) && is.null(g$params[["chunk_vars"]])){
       g$params[["chunk_vars"]] <- character()
@@ -487,10 +501,6 @@ saveLayer <- function(l, d, meta){
     }
   }
 
-  not.identity <- function(stat.or.position){
-    x <- stat.or.position$objname
-    is.character(x) && length(x)==1 && x != "identity"
-  }
   is.show <- grepl("showSelected", names(g$aes))
   has.show <- any(is.show)
   ## Error if non-identity stat is used with showSelected, since
@@ -498,21 +508,21 @@ saveLayer <- function(l, d, meta){
   ## built data set. For example geom_bar + stat_bin doesn't make
   ## sense with clickSelects/showSelected, since two
   ## clickSelects/showSelected values may show up in the same bin.
-  if(has.show && not.identity(l$stat)){
+  stat.type <- class(l$stat)[[1]]
+  if(has.show && stat.type != "StatIdentity"){
     show.names <- names(g$aes)[is.show]
     data.has.show <- show.names %in% names(g.data)
-    if(!l$stat$objname %in% c("vline", "identity", "hline", "abline")){
-      signal <- if(all(data.has.show))warning else stop
-      print(l)
-      signal(
-        "showSelected does not work with stat=",
-        l$stat$objname,
-        ", problem: ",
-        g$classed)
-    }
+    signal <- if(all(data.has.show))warning else stop
+    print(l)
+    signal(
+      "showSelected does not work with ",
+      stat.type,
+      ", problem: ",
+      g$classed)
   }
-  ## Warn if non-identity position is used with animint aes. 
-  if(has.show && not.identity(l$position)){
+  ## Warn if non-identity position is used with animint aes.
+  position.type <- class(l$position)[[1]]
+  if(has.show && position.type != "PositionIdentity"){
     print(l)
     warning("showSelected only works with position=identity, problem: ",
             g$classed)
@@ -552,7 +562,10 @@ saveLayer <- function(l, d, meta){
     g$geom <- "segment"
   } else if(g$geom=="point"){
     # Fill set to match ggplot2 default of filled in circle.
-    fill.specified <- "fill" %in% names(g.data) || "fill" %in% names(g$params)
+    # Check for fill in both data and params
+    fill.in.data <- ("fill" %in% names(g.data) && any(!is.na(g.data[["fill"]])))
+    fill.in.params <- "fill" %in% names(g$params)
+    fill.specified <- fill.in.data || fill.in.params
     if(!fill.specified & "colour" %in% names(g.data)){
       g.data[["fill"]] <- g.data[["colour"]]
     }
@@ -577,7 +590,7 @@ saveLayer <- function(l, d, meta){
     } 
     if("vjust" %in% names(g$params)) {
       vjustWarning(g$params$vjust)
-    } else if ("vjust" %in% names(g.data)) { 
+    } else if ("vjust" %in% names(g$aes)) {
       vjustWarning(g.data$vjust)
     } 
   } else if(g$geom=="ribbon"){
@@ -708,9 +721,47 @@ saveLayer <- function(l, d, meta){
   # Note the plotly implementation does not use
   # coord_transform...do they take care of the transformation
   # at a different point in time?
-  g.data <- do.call("rbind", mapply(function(x, y) {
-    ggplot2:::coord_transform(meta$plot$coord, x, y)
-  }, split(g.data, g.data[["PANEL"]]), ranges, SIMPLIFY = FALSE))
+
+  # Flip axes in case of coord_flip
+  # Switches column names. Eg. xmin to ymin, 
+  # yntercept to xintercept etc.
+  switch_axes <- function(col.names){
+    for(elem in seq_along(col.names)){
+      if(grepl("^x", col.names[elem])){
+        col.names[elem] <- sub("^x", "y", col.names[elem])
+      } else if(grepl("^y", col.names[elem])){
+        col.names[elem] <- sub("^y", "x", col.names[elem])
+      }
+    }
+    col.names
+  }
+
+  if(inherits(meta$plot$coordinates, "CoordFlip")){
+    names(g.data) <- switch_axes(names(g.data))
+  }
+
+  # Rescale data to range 0:1 like the coord_trans function
+  # in ggplot v1.0.1
+  rescale_data <- function(g.data.i, ranges.i){
+    for(col.name in names(g.data.i)){
+      if(grepl("^x", col.name)){
+        g.data.i[[col.name]] <- scales::rescale(g.data.i[[col.name]], 
+                                                0:1, ranges.i$x.range)
+      } else if(grepl("^y", col.name)){
+        g.data.i[[col.name]] <- scales::rescale(g.data.i[[col.name]], 
+                                                0:1, ranges.i$y.range)
+      }
+    }
+    g.data.i
+  }
+
+  g.data <- do.call("rbind", mapply(rescale_data, 
+                                    split(g.data, g.data[["PANEL"]]), 
+                                    ranges, SIMPLIFY = FALSE))
+
+#   g.data <- do.call("rbind", mapply(function(x, y) {
+#     ggplot2:::coord_trans(meta$plot$coord, x, y)
+#   }, split(g.data, g.data[["PANEL"]]), ranges, SIMPLIFY = FALSE))
 
   ## Output types
   ## Check to see if character type is d3's rgb type.
@@ -957,6 +1008,13 @@ getCommonChunk <- function(built, chunk.vars, aes.list){
     ## group for deciding common data.
     built$group <- NULL
   }
+  
+  ## Remove columns with all NA values
+  ## so that common.not.na is not empty
+  ## due to the plot's alpha, stroke or other columns
+  all.nas <- sapply(built, function(x){all(is.na(x))})
+  built <- built[, !all.nas]
+  
   ## Treat factors as characters, to avoid having them be coerced to
   ## integer later.
   for(col.name in names(built)){
@@ -1074,6 +1132,13 @@ varied.chunk <- function(df.or.list, cols){
 split.x <- function(x, vars){
   if(length(vars)==0)return(x)
   if(is.data.frame(x)){
+    
+    ## Remove columns with all NA values
+    ## so that x is not empty due to
+    ## the plot's alpha, stroke or other columns
+    all.nas <- sapply(x, function(col.m){all(is.na(col.m))})
+    x <- x[, !all.nas]
+    
     # rows with NA should not be saved
     x <- na.omit(x)
     if(length(vars) == 1){
@@ -1329,8 +1394,16 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
         }
         iaes <- selector.aes(L$mapping)
         one.names <- with(iaes, c(clickSelects$one, showSelected$one))
-        update.vars <- L$mapping[one.names]
-        has.var <- update.vars %in% names(L$data)
+        update.vars <- as.character(L$mapping[one.names])
+        # if the layer has a defined data set
+        if(length(L$data) > 0) {
+          # check whether the variable is in that layer
+          has.var <- update.vars %in% names(L$data)
+        } else {
+          # check whether the variable is in the global data
+          has.var <- update.vars %in% names(p$data)
+        }
+        
         if(!all(has.var)){
           print(L)
           print(list(problem.aes=update.vars[!has.var],
@@ -1373,6 +1446,24 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
       meta$plot.name <- p.name
       meta$plot <- ggplot.info$ggplot
       meta$built <- ggplot.info$built
+      
+      ## Data now contains columns with fill, alpha, colour etc.
+      ## Remove from data if they have a single unique value and
+      ## are NOT used in mapping to reduce tsv file size
+      redundant.cols <- names(L$geom$default_aes)
+      for(col.name in names(df)){
+        if(col.name %in% redundant.cols){
+          all.vals <- unique(df[[col.name]])
+          if(length(all.vals) == 1){
+            in.mapping <-
+              !is.null(L$mapping[[col.name]])
+            if(!in.mapping){
+              df[[col.name]] <- NULL
+            }
+          }
+        }
+      }
+      
       g <- saveLayer(L, df, meta)
 
       ## Every plot has a list of geom names.
@@ -1676,7 +1767,7 @@ getLegendList <- function(plistextra){
     legend_type <- legend_type[legend_type != ".label"]
     gdefs[[leg]]$legend_type <- legend_type
     scale.list <- scales$scales[which(scales$find(legend_type))]
-    discrete.vec <- sapply(scale.list, inherits, "discrete")
+    discrete.vec <- sapply(scale.list, inherits, "ScaleDiscrete")
     is.discrete <- all(discrete.vec)
     gdefs[[leg]]$is.discrete <- is.discrete
     ## get the name of the legend/selection variable.
@@ -1698,6 +1789,7 @@ getLegendList <- function(plistextra){
              paste(legend_type, collapse=", "))
       }
     }
+    
     ## do not draw geoms which are constant:
     geom.list <- gdefs[[leg]]$geoms
     geom.data.list <- lapply(geom.list, "[[", "data")
@@ -1706,6 +1798,30 @@ getLegendList <- function(plistextra){
     geom.unique.rows <- sapply(geom.unique.list, nrow)
     is.ignored <- 1 < geom.data.rows & geom.unique.rows == 1
     gdefs[[leg]]$geoms <- geom.list[!is.ignored]
+    
+    ## Pass a geom.legend.list to be used by the
+    ## GetLegend function
+    geom.legend.list <- list()
+    for(geom.i in seq_along(gdefs[[leg]]$geoms)){
+      data.geom.i <- gdefs[[leg]]$geoms[[geom.i]]$data
+      params.geom.i <- gdefs[[leg]]$geoms[[geom.i]]$params
+      size.geom.i <- gdefs[[leg]]$geoms[[geom.i]]$size
+      
+      suppressWarnings(draw.key.used <- 
+                         gdefs[[leg]]$geoms[[geom.i]]$draw_key(
+                           data.geom.i, params.geom.i, size.geom.i)
+      )
+      geom.legend <- class(draw.key.used)[[1]]
+      geom.legend.list <- c(geom.legend.list, geom.legend)
+    }
+    
+    ## Process names to be used by the CleanData function
+    convert.names.list <- list(points="point", segments="path", rect="polygon")
+    names.to.change <- geom.legend.list %in% names(convert.names.list)
+    geom.legend.list[names.to.change] <- 
+      convert.names.list[unlist(geom.legend.list[names.to.change])]
+    
+    gdefs[[leg]]$geom.legend.list <- geom.legend.list
   }
   
   ## Add a flag to specify whether or not breaks was manually
@@ -1760,7 +1876,6 @@ getLegend <- function(mb){
   ## 2. In add_legend in the JS code I create a <table> for every
   ## legend, and then I bind the legend entries to <tr>, <td>, and
   ## <svg> elements.
-  geoms <- sapply(mb$geoms, function(i) i$geom$objname)
   cleanData <- function(data, key, geom, params) {
     nd <- nrow(data)
     nk <- nrow(key)
@@ -1779,7 +1894,8 @@ getLegend <- function(mb){
     data$label <- paste(data$label) # otherwise it is AsIs.
     data
   }
-  dataframes <- lapply(mb$geoms, function(i) cleanData(i$data, mb$key, i$geom$objname, i$params))
+  dataframes <- mapply(function(i, j) cleanData(i$data, mb$key, j, i$params),
+                       mb$geoms, mb$geom.legend.list, SIMPLIFY = FALSE)
   dataframes <- dataframes[which(sapply(dataframes, nrow)>0)]
   # Check to make sure datframes is non-empty. If it is empty, return NULL.
   if(length(dataframes)>0) {
@@ -1801,7 +1917,7 @@ getLegend <- function(mb){
     NULL
   }else{
     list(guide = guidetype,
-         geoms = geoms,
+         geoms = unlist(mb$geom.legend.list),
          title = mb$title,
          class = if(mb$is.discrete)mb$selector else mb$title,
          selector = mb$selector,

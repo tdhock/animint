@@ -1,7 +1,7 @@
 acontext("selectors")
 
 test_that("first options are copied to selectors", {
-  data(WorldBank)
+  data(WorldBank, package = "animint")
   gapminder <-
     list(ts=ggplot()+
          make_tallrect(WorldBank, "year")+

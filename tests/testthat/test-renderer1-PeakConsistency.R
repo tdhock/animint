@@ -1,6 +1,6 @@
 acontext("PeakConsistency")
 
-data(PeakConsistency)
+data(PeakConsistency, package = "animint")
 
 color.code <-
   c(truth="#1B9E77", #teal
@@ -17,8 +17,8 @@ second.small <-
          theme_bw()+
          theme_animint(width=1000, height=800)+
          theme(panel.margin=grid::unit(0, "cm"))+
-         facet_grid(sample.id ~ ., labeller=function(var, val){
-           paste("sample", val)
+         facet_grid(sample.id ~ ., labeller=function(val){
+           mapply(paste, "sample", val, SIMPLIFY = FALSE)
          })+
          guides(size="none")+
          geom_segment(aes(chromStart+0.5, mean,
@@ -71,8 +71,8 @@ viz <-
          theme_bw()+
          theme_animint(width=1000, height=800)+
          theme(panel.margin=grid::unit(0, "cm"))+
-         facet_grid(sample.id ~ ., labeller=function(var, val){
-           paste("sample", val)
+         facet_grid(sample.id ~ ., labeller=function(val){
+           mapply(paste, "sample", val, SIMPLIFY = FALSE)
          })+
          geom_point(aes(chromEnd, count,
                         showSelected3=increase,
@@ -82,7 +82,7 @@ viz <-
          geom_vline(aes(xintercept=chromStart+0.5, color=model,
                         showSelected=increase,
                         showSelected2=seed),
-                    show_guide=TRUE,
+                    show.legend=TRUE,
                     linetype="dashed",
                     data=PeakConsistency$truth)+
          guides(size="none")+
@@ -96,7 +96,7 @@ viz <-
                         showSelected=seed, showSelected2=sample.size,
                         showSelected3=increase,
                         color=model, size=model),
-                    show_guide=TRUE,
+                    show.legend=TRUE,
                     linetype="dashed",
                     data=PeakConsistency$guess)+
          scale_size_manual(values=c(PeakSegJoint=1, PeakSeg=2))+

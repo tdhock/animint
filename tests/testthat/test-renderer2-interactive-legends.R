@@ -24,7 +24,9 @@ info <- animint2HTML(viz)
 
 test_that("compiler adds selector.types and first", {
   expect_match(info$selector.types$Species, "multiple")
-  expect_true(all(info$first$Species %in% c("setosa", "virginica", "versicolor")))
+  expect_true(all({
+    info$first$Species %in% c("setosa", "virginica", "versicolor")
+  }))
 })
 
 test_that("all points are initially drawn", {

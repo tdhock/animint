@@ -22,10 +22,15 @@ p3 <- p2 +
         panel.grid.minor = element_blank())
 p4 <- p2 + 
   ## recreating theme_fivethirtyeight from ggthemes package
-  theme(rect = element_rect(fill = "#F0F0F0", colour = NA, size = 0.5, linetype = 0), 
-        line = element_line(colour = "#D2D2D2", size = 0.5, linetype = 1, lineend = "butt"), 
-        text = element_text(family = "sans", face = "plain", colour = "#3C3C3C", 
-                            size = 12, hjust = 0.5, vjust = 0.5, angle = 0, lineheight = 0.9), 
+  theme(rect = element_rect(fill = "#F0F0F0", colour = NA,
+                            size = 0.5, linetype = 0),
+        line = element_line(colour = "#D2D2D2", size = 0.5, linetype = 1,
+                            lineend = "butt"),
+        text = element_text(family = "sans", face = "plain",
+                            colour = "#3C3C3C", size = 12,
+                            hjust = 0.5, vjust = 0.5, angle = 0,
+                            lineheight = 0.9, margin = c(0, 0, 0, 0),
+                            debug = FALSE),
         panel.background = element_rect(), 
         panel.grid = element_line(), 
         panel.grid.major = element_line(), 

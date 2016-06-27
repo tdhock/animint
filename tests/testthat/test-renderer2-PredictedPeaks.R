@@ -196,10 +196,10 @@ viz <- list(
                                       "max samples"="grey",
                                       specific="grey30"))+
     geom_hline(aes(yintercept=max.input.samples+0.5, color=thresh.type),
-               show_guide=TRUE,
+               show.legend=TRUE,
                data=thresh.df)+
     geom_hline(aes(yintercept=N, color=thresh.type),
-               show_guide=TRUE,
+               show.legend=TRUE,
                data=PredictedPeaks$counts.Input)+
     scale_x_continuous("number of samples with a peak")+
     facet_grid(nonInputType ~ .)+
