@@ -180,6 +180,11 @@ RENDER: multiple animints inside of a single shiny app? This is
 probably just a theoretical issue. (why not just make a single
 animint?)
 
+2016.06.26 PR#135
+
+GGPLOT: compiler works with ggplot2 >= 2.0 thanks to Kevin and
+(especially) Faizan!
+
 2016.05.11 PR#152
 
 GGPLOT: no warning when showSelected is used with stats which are
