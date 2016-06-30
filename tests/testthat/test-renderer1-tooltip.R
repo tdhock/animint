@@ -95,3 +95,79 @@ test_that("line tooltip renders as title", {
   value.vec <- sapply(title.nodes, xmlValue)
   expect_identical(value.vec, c("group 1", "group 2"))
 })
+
+WorldBank1975 <- WorldBank[WorldBank$year == 1975, ]
+ex_plot <- ggplot() +
+  geom_point(aes(fertility.rate, life.expectancy, color = region,
+                 tooltip = country, href = "https://github.com"),
+             data = WorldBank1975)
+
+viz <- list(ex = ex_plot)
+info <- animint2HTML(viz)
+
+test_that("tooltip works with href",{
+  # Test for bug when points are not rendered with both href + tooltip
+  
+  # See that points are rendered for every country. This test may need to be
+  # changed soon!!! See the viz on the link below:
+  # http://bl.ocks.org/faizan-khan-iit/449b84b2e6b55ca5e39ea9aaad97e27e
+  # You may notice a point on the very top-left of the viz, outside the plot.
+  # These are the points that have NaN as their value in the DOM, arriving from
+  # NA values in the tsv. Should be an easy fix. But leaving a comment here
+  point_nodes <-
+    getNodeSet(info$html, '//g[@class="geom1_point_ex"]//a//circle')
+  
+  expect_equal(length(point_nodes), length(WorldBank1975$country))
+  
+  # See that every <a> element has a title (the country name) initially
+  title_nodes <-
+    getNodeSet(info$html, '//g[@class="geom1_point_ex"]//a//title')
+  rendered_titles <- sapply(title_nodes, xmlValue)
+  expected_titles <- unique(WorldBank1975$country)
+  expect_identical(sort(rendered_titles), sort(expected_titles))
+})
+
+test_that("Interactivity does not mess up tooltip titles",{
+  # Hide some points first and check rendered titles
+  hide_these_first <- 
+    c("plot_ex_region_variable_East_Asia_&_Pacific_(all_income_levels)",
+      "plot_ex_region_variable_Europe_&_Central_Asia_(all_income_levels)",
+      "plot_ex_region_variable_Latin_America_&_Caribbean_(all_income_levels)",
+      "plot_ex_region_variable_Middle_East_&_North_Africa_(all_income_levels)",
+      "plot_ex_region_variable_Sub-Saharan_Africa_(all_income_levels)")
+  
+  sapply(hide_these_first, clickID)
+  
+  info$html <- getHTML()
+  
+  displayed_regions <- WorldBank1975$region == "North America" | 
+    WorldBank1975$region == "South Asia"
+  displayed_countries <- unique(WorldBank1975$country[displayed_regions])
+  
+  title_nodes1 <-
+    getNodeSet(info$html, '//g[@class="geom1_point_ex"]//a//title')
+  rendered_titles1 <- sapply(title_nodes1, xmlValue)
+  expect_identical(sort(rendered_titles1), sort(displayed_countries))
+  
+  # Hide all countries -> No titles
+  hide_these_second <- 
+    c("plot_ex_region_variable_North_America",
+    "plot_ex_region_variable_South_Asia")
+  sapply(hide_these_second, clickID)
+  
+  info$html <- getHTML()
+  
+  title_nodes2 <-
+    getNodeSet(info$html, '//g[@class="geom1_point_ex"]//a//title')
+  expect_equal(length(title_nodes2), 0)
+  
+  # Show previous points again and compare titles
+  sapply(hide_these_second, clickID)
+  
+  info$html <- getHTML()
+  
+  title_nodes3 <-
+    getNodeSet(info$html, '//g[@class="geom1_point_ex"]//a//title')
+  rendered_titles3 <- sapply(title_nodes3, xmlValue)
+  expect_identical(sort(rendered_titles3), sort(displayed_countries))
+})
