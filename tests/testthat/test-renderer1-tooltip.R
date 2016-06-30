@@ -136,8 +136,9 @@ test_that("Interactivity does not mess up tooltip titles",{
       "plot_ex_region_variable_Middle_East_&_North_Africa_(all_income_levels)",
       "plot_ex_region_variable_Sub-Saharan_Africa_(all_income_levels)")
   
-  sapply(hide_these_first, clickID)
+  b <- sapply(hide_these_first, clickID)
   
+  Sys.sleep(2)
   info$html <- getHTML()
   
   displayed_regions <- WorldBank1975$region == "North America" | 
@@ -153,8 +154,9 @@ test_that("Interactivity does not mess up tooltip titles",{
   hide_these_second <- 
     c("plot_ex_region_variable_North_America",
     "plot_ex_region_variable_South_Asia")
-  sapply(hide_these_second, clickID)
+  b <- sapply(hide_these_second, clickID)
   
+  Sys.sleep(2)
   info$html <- getHTML()
   
   title_nodes2 <-
@@ -162,8 +164,9 @@ test_that("Interactivity does not mess up tooltip titles",{
   expect_equal(length(title_nodes2), 0)
   
   # Show previous points again and compare titles
-  sapply(hide_these_second, clickID)
+  b <- sapply(hide_these_second, clickID)
   
+  Sys.sleep(1)
   info$html <- getHTML()
   
   title_nodes3 <-
