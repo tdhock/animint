@@ -1696,6 +1696,7 @@ var animint = function (to_select, json_file) {
 	  return d["clickSelects.variable"] + " " + d["clickSelects.value"];
 	};
       }
+      // If elements have <title>, remove it
       if(elements.select("title")[0][0]!== null){
           elements.selectAll("title")
             .remove()
