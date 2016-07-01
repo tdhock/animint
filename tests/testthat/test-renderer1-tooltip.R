@@ -128,6 +128,13 @@ test_that("tooltip works with href",{
 })
 
 test_that("Interactivity does not mess up tooltip titles",{
+  # Apply clickID with some time difference
+  apply_with_interval <- function(func, list, interval){
+    for (elem in list){
+      Sys.sleep(interval)
+      func(elem)
+    }
+  }
   # Hide some points first and check rendered titles
   hide_these_first <- 
     c("plot_ex_region_variable_East_Asia_&_Pacific_(all_income_levels)",
@@ -136,7 +143,7 @@ test_that("Interactivity does not mess up tooltip titles",{
       "plot_ex_region_variable_Middle_East_&_North_Africa_(all_income_levels)",
       "plot_ex_region_variable_Sub-Saharan_Africa_(all_income_levels)")
   
-  b <- sapply(hide_these_first, clickID)
+  b <- apply_with_interval(clickID, hide_these_first, 1)
   
   Sys.sleep(2)
   info$html <- getHTML()
@@ -154,7 +161,7 @@ test_that("Interactivity does not mess up tooltip titles",{
   hide_these_second <- 
     c("plot_ex_region_variable_North_America",
     "plot_ex_region_variable_South_Asia")
-  b <- sapply(hide_these_second, clickID)
+  b <- apply_with_interval(clickID, hide_these_second, 1)
   
   Sys.sleep(2)
   info$html <- getHTML()
@@ -164,7 +171,7 @@ test_that("Interactivity does not mess up tooltip titles",{
   expect_equal(length(title_nodes2), 0)
   
   # Show previous points again and compare titles
-  b <- sapply(hide_these_second, clickID)
+  b <- apply_with_interval(clickID, hide_these_second, 1)
   
   Sys.sleep(1)
   info$html <- getHTML()
