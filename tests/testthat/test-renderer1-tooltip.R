@@ -128,6 +128,18 @@ test_that("tooltip works with href",{
 })
 
 test_that("Interactivity does not mess up tooltip titles",{
+  WorldBank1975$region <- as.character(WorldBank1975$region)
+  only_alphanums <- function(x, pat, repl){gsub(pat, replacement = repl, x)}
+  WorldBank1975$region <- sapply(WorldBank1975$region, only_alphanums, 
+                                 "[&()]", "_")
+  ex_plot <- ggplot() +
+    geom_point(aes(fertility.rate, life.expectancy, color = region,
+                   tooltip = country, href = "https://github.com"),
+               data = WorldBank1975)
+  
+  viz <- list(ex = ex_plot)
+  info <- animint2HTML(viz)
+  
   # Apply clickID with some time difference
   apply_with_interval <- function(func, list, interval){
     for (elem in list){
@@ -137,13 +149,13 @@ test_that("Interactivity does not mess up tooltip titles",{
   }
   # Hide some points first and check rendered titles
   hide_these_first <- 
-    c("plot_ex_region_variable_East_Asia_&_Pacific_(all_income_levels)",
-      "plot_ex_region_variable_Europe_&_Central_Asia_(all_income_levels)",
-      "plot_ex_region_variable_Latin_America_&_Caribbean_(all_income_levels)",
-      "plot_ex_region_variable_Middle_East_&_North_Africa_(all_income_levels)",
-      "plot_ex_region_variable_Sub-Saharan_Africa_(all_income_levels)")
+    c("plot_ex_region_variable_East_Asia___Pacific__all_income_levels_",
+      "plot_ex_region_variable_Europe___Central_Asia__all_income_levels_",
+      "plot_ex_region_variable_Latin_America___Caribbean__all_income_levels_",
+      "plot_ex_region_variable_Middle_East___North_Africa__all_income_levels_",
+      "plot_ex_region_variable_Sub-Saharan_Africa__all_income_levels_")
   
-  b <- apply_with_interval(clickID, hide_these_first, 1)
+  b <- apply_with_interval(clickID, hide_these_first, 3)
   
   Sys.sleep(2)
   info$html <- getHTML()
@@ -161,9 +173,9 @@ test_that("Interactivity does not mess up tooltip titles",{
   hide_these_second <- 
     c("plot_ex_region_variable_North_America",
     "plot_ex_region_variable_South_Asia")
-  b <- apply_with_interval(clickID, hide_these_second, 1)
+  b <- apply_with_interval(clickID, hide_these_second, 2)
   
-  Sys.sleep(2)
+  Sys.sleep(3)
   info$html <- getHTML()
   
   title_nodes2 <-
@@ -171,9 +183,9 @@ test_that("Interactivity does not mess up tooltip titles",{
   expect_equal(length(title_nodes2), 0)
   
   # Show previous points again and compare titles
-  b <- apply_with_interval(clickID, hide_these_second, 1)
+  b <- apply_with_interval(clickID, hide_these_second, 2)
   
-  Sys.sleep(1)
+  Sys.sleep(3)
   info$html <- getHTML()
   
   title_nodes3 <-
