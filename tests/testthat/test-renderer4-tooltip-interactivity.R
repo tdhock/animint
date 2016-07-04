@@ -4,10 +4,10 @@ data("WorldBank", package = "animint")
 WorldBank1975 <- WorldBank[WorldBank$year == 1975, ]
 
 test_that("Interactivity does not mess up tooltip titles",{
-  WorldBank1975$region <- as.character(WorldBank1975$region)
-  only_alphanums <- function(x, pat, repl){gsub(pat, replacement = repl, x)}
-  WorldBank1975$region <- sapply(WorldBank1975$region, only_alphanums, 
-                                 "[&()]", "_")
+  ## Take only first 3 chars of region names. Avoid non-alphanumerics
+  WorldBank1975$region <- tolower(
+    substring(as.character(WorldBank1975$region), 1, 3))
+  
   ex_plot <- ggplot() +
     geom_point(aes(fertility.rate, life.expectancy, color = region,
                    tooltip = country, href = "https://github.com"),
@@ -19,25 +19,26 @@ test_that("Interactivity does not mess up tooltip titles",{
   # Apply clickID with some time difference
   apply_with_interval <- function(func, list, interval){
     for (elem in list){
+      acontext(paste0("id - ", elem))
       Sys.sleep(interval)
       func(elem)
     }
   }
   # Hide some points first and check rendered titles
   hide_these_first <- 
-    c("plot_ex_region_variable_East_Asia___Pacific__all_income_levels_",
-      "plot_ex_region_variable_Europe___Central_Asia__all_income_levels_",
-      "plot_ex_region_variable_Latin_America___Caribbean__all_income_levels_",
-      "plot_ex_region_variable_Middle_East___North_Africa__all_income_levels_",
-      "plot_ex_region_variable_Sub-Saharan_Africa__all_income_levels_")
+    c("plot_ex_region_variable_eas",
+      "plot_ex_region_variable_eur",
+      "plot_ex_region_variable_lat",
+      "plot_ex_region_variable_mid",
+      "plot_ex_region_variable_sub")
   
-  b <- apply_with_interval(clickID, hide_these_first, 0.01)
+  b <- apply_with_interval(clickID, hide_these_first, 1)
   
-  Sys.sleep(0.5)
+  Sys.sleep(1)
   info$html <- getHTML()
   
-  displayed_regions <- WorldBank1975$region == "North America" | 
-    WorldBank1975$region == "South Asia"
+  displayed_regions <- WorldBank1975$region == "nor" | 
+    WorldBank1975$region == "sou"
   displayed_countries <- unique(WorldBank1975$country[displayed_regions])
   
   title_nodes1 <-
@@ -47,8 +48,8 @@ test_that("Interactivity does not mess up tooltip titles",{
   
   # Hide all countries -> No titles
   hide_these_second <- 
-    c("plot_ex_region_variable_North_America",
-      "plot_ex_region_variable_South_Asia")
+    c("plot_ex_region_variable_nor",
+      "plot_ex_region_variable_sou")
   b <- apply_with_interval(clickID, hide_these_second, 1)
   
   Sys.sleep(1)
