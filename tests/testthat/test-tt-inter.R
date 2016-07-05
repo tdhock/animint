@@ -1,5 +1,5 @@
 acontext("tooltip-interactivity")
-
+## !!! wercker has some problem with this test, so not using this !!!
 data("WorldBank", package = "animint")
 WorldBank1975 <- WorldBank[WorldBank$year == 1975, ]
 
