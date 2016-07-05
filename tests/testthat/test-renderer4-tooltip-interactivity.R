@@ -26,11 +26,11 @@ test_that("Interactivity does not mess up tooltip titles",{
   }
   # Hide some points first and check rendered titles
   hide_these_first <- 
-    c("plot_ex_region_variable_eas",
-      "plot_ex_region_variable_eur",
-      "plot_ex_region_variable_lat",
-      "plot_ex_region_variable_mid",
-      "plot_ex_region_variable_sub")
+    c("plot_ex_region_variable_eas_label",
+      "plot_ex_region_variable_eur_label",
+      "plot_ex_region_variable_lat_label",
+      "plot_ex_region_variable_mid_label",
+      "plot_ex_region_variable_sub_label")
   
   b <- apply_with_interval(clickID, hide_these_first, 1)
   
@@ -48,8 +48,8 @@ test_that("Interactivity does not mess up tooltip titles",{
   
   # Hide all countries -> No titles
   hide_these_second <- 
-    c("plot_ex_region_variable_nor",
-      "plot_ex_region_variable_sou")
+    c("plot_ex_region_variable_nor_label",
+      "plot_ex_region_variable_sou_label")
   b <- apply_with_interval(clickID, hide_these_second, 1)
   
   Sys.sleep(1)
