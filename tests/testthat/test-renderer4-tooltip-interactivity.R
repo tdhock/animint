@@ -52,7 +52,7 @@ test_that("Interactivity does not mess up tooltip titles",{
       "plot_ex_region_variable_sou_label")
   b <- apply_with_interval(clickID, hide_these_second, 1)
   
-  Sys.sleep(1)
+  Sys.sleep(2)
   info$html <- getHTML()
   
   title_nodes2 <-
@@ -60,9 +60,9 @@ test_that("Interactivity does not mess up tooltip titles",{
   expect_equal(length(title_nodes2), 0)
   
   # Show previous points again and compare titles
-  b <- apply_with_interval(clickID, hide_these_second, 0.01)
+  b <- apply_with_interval(clickID, hide_these_second, 1)
   
-  Sys.sleep(0.5)
+  Sys.sleep(1)
   info$html <- getHTML()
   
   title_nodes3 <-
