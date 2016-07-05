@@ -19,6 +19,11 @@ build:
       code: |
         cp -r /pipeline/source /pipeline/animint
     - script:
+      name: echo renderer0 tests
+      code: |
+        export TEST_SUITE=renderer0
+        Rscript -e "setwd('/pipeline/animint/tests'); source('testthat.R')"
+    - script:
       name: echo renderer1 tests
       code: |
         export TEST_SUITE=renderer1
@@ -32,11 +37,6 @@ build:
       name: echo renderer3 tests
       code: |
         export TEST_SUITE=renderer3
-        Rscript -e "setwd('/pipeline/animint/tests'); source('testthat.R')"
-    - script:
-      name: echo renderer4 tests
-      code: |
-        export TEST_SUITE=renderer4
         Rscript -e "setwd('/pipeline/animint/tests'); source('testthat.R')"
     - script:
       name: echo compiler tests

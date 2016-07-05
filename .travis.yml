@@ -40,9 +40,9 @@ env:
   global:
     - secure: "KBHQwH4LExvV/rXagTdBa89VKAfC8aYVNUANrklJ6KCoOWQ4Jh3qIWwSDM8ModcR9Oq8JR9I3N/ObatIN/finjgDdCNUndUQcWaT6YNfnbznTQhR0PgthoCmvb0NWJwC2nEYC13XB5hwBMvq65vEkXu4uwthIBDhl5l56RN2+Rc="
   matrix:
+    - TEST_SUITE=renderer0
     - TEST_SUITE=renderer1
     - TEST_SUITE=renderer2
     - TEST_SUITE=renderer3
-    - TEST_SUITE=renderer4
     - TEST_SUITE=compiler
     
