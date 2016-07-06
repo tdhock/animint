@@ -15,7 +15,8 @@ test_that("Interactivity does not mess up tooltip titles", {
   rendered_titles1 <- sapply(title_nodes1, xmlValue)
   
   expect_equal(length(rendered_titles1), length(CO2$Plant))
-  expect_identical(length(unique(rendered_titles1)), length(unique(CO2$Plant)))
+  expect_identical(sort(unique(rendered_titles1)), 
+                   sort(sapply(unique(CO2$Plant), as.character)))
   
   # Hide titles with Treatment = "nonchilled" 
   clickID(c("plot_p_Treatment_variable_nonchilled"))
@@ -28,7 +29,7 @@ test_that("Interactivity does not mess up tooltip titles", {
   actual_titles2 <- c("Qc1", "Qc2", "Qc3", "Mc1", "Mc2", "Mc3")
   
   expect_equal(length(rendered_titles2), sum(CO2$Treatment == "chilled"))
-  expect_identical(rendered_titles2_unique, actual_titles2)
+  expect_identical(sort(rendered_titles2_unique), sort(actual_titles2))
   
   # Hide all titles
   clickID(c("plot_p_Treatment_variable_chilled"))
@@ -50,5 +51,5 @@ test_that("Interactivity does not mess up tooltip titles", {
   actual_titles4 <- c("Qn1", "Qn2", "Qn3", "Mn1", "Mn2", "Mn3")
   
   expect_equal(length(rendered_titles4), sum(CO2$Treatment == "nonchilled"))
-  expect_identical(rendered_titles4_unique, actual_titles4)
+  expect_identical(sort(rendered_titles4_unique), sort(actual_titles4))
 })
