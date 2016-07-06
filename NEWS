@@ -180,6 +180,11 @@ RENDER: multiple animints inside of a single shiny app? This is
 probably just a theoretical issue. (why not just make a single
 animint?)
 
+2016.07.06 PR#156
+
+BUGFIX: tooltip and href now work properly when used together
+fixes #100 and #155 (test-renderer4-tooltip-interactivity.R)
+
 2016.06.26 PR#135
 
 GGPLOT: compiler works with ggplot2 >= 2.0 thanks to Kevin and

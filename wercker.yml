@@ -11,6 +11,10 @@ build:
           sudo ln -sf /usr/local/share/$PHANTOM_JS/bin/phantomjs /usr/local/bin
           phantomjs --version
     - script:
+      name: echo install ggplot2
+      code: |
+        Rscript -e 'devtools::install_github("hadley/ggplot2#1649")'
+    - script:
       name: echo install animint dependencies
       code: |
         Rscript -e "devtools::install(upgrade_dependencies=FALSE, dependencies=TRUE)"
@@ -32,6 +36,11 @@ build:
       name: echo renderer3 tests
       code: |
         export TEST_SUITE=renderer3
+        Rscript -e "setwd('/pipeline/animint/tests'); source('testthat.R')"
+    - script:
+      name: echo renderer4 tests
+      code: |
+        export TEST_SUITE=renderer4
         Rscript -e "setwd('/pipeline/animint/tests'); source('testthat.R')"
     - script:
       name: echo compiler tests

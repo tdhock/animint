@@ -95,3 +95,34 @@ test_that("line tooltip renders as title", {
   value.vec <- sapply(title.nodes, xmlValue)
   expect_identical(value.vec, c("group 1", "group 2"))
 })
+
+WorldBank1975 <- WorldBank[WorldBank$year == 1975, ]
+ex_plot <- ggplot() +
+  geom_point(aes(fertility.rate, life.expectancy, color = region,
+                 tooltip = country, href = "https://github.com"),
+             data = WorldBank1975)
+
+viz <- list(ex = ex_plot)
+info <- animint2HTML(viz)
+
+test_that("tooltip works with href",{
+  # Test for bug when points are not rendered with both href + tooltip
+  
+  # See that points are rendered for every country. This test may need to be
+  # changed soon!!! See the viz on the link below:
+  # http://bl.ocks.org/faizan-khan-iit/449b84b2e6b55ca5e39ea9aaad97e27e
+  # You may notice a point on the very top-left of the viz, outside the plot.
+  # These are the points that have NaN as their value in the DOM, arriving from
+  # NA values in the tsv. Should be an easy fix. But leaving a comment here
+  point_nodes <-
+    getNodeSet(info$html, '//g[@class="geom1_point_ex"]//a//circle')
+  
+  expect_equal(length(point_nodes), length(WorldBank1975$country))
+  
+  # See that every <a> element has a title (the country name) initially
+  title_nodes <-
+    getNodeSet(info$html, '//g[@class="geom1_point_ex"]//a//title')
+  rendered_titles <- sapply(title_nodes, xmlValue)
+  expected_titles <- unique(WorldBank1975$country)
+  expect_identical(sort(rendered_titles), sort(expected_titles))
+})
