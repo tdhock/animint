@@ -1082,7 +1082,7 @@ var animint = function (to_select, json_file) {
     };
     
     // stroke_width for geom_point
-    var stroke_width = 0.5;  // by default ggplot2 has 0.5
+    var stroke_width = 1;  // by default ggplot2 has 0.5, animint has 1
     if (g_info.params.hasOwnProperty("stroke")) {
       stroke_width = g_info.params.stroke;
     }
