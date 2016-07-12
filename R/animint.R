@@ -760,9 +760,9 @@ saveLayer <- function(l, d, meta){
     g.data.i
   }
 
-  g.data <- do.call("rbind", mapply(rescale_data, 
-                                    split(g.data, g.data[["PANEL"]]), 
-                                    ranges, SIMPLIFY = FALSE))
+  # g.data <- do.call("rbind", mapply(rescale_data, 
+  #                                   split(g.data, g.data[["PANEL"]]), 
+  #                                   ranges, SIMPLIFY = FALSE))
 
 #   g.data <- do.call("rbind", mapply(function(x, y) {
 #     ggplot2:::coord_trans(meta$plot$coord, x, y)
