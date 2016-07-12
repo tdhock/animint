@@ -180,6 +180,11 @@ RENDER: multiple animints inside of a single shiny app? This is
 probably just a theoretical issue. (why not just make a single
 animint?)
 
+2016.07.12 PR#157
+
+GGPLOT: added support for stroke aesthetic in geom_point
+Covers #127 (test-renderer4-geom-point-stroke.R)
+
 2016.07.06 PR#156
 
 BUGFIX: tooltip and href now work properly when used together

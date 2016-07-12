@@ -1080,7 +1080,19 @@ var animint = function (to_select, json_file) {
       }
       return size;
     };
-
+    
+    // stroke_width for geom_point
+    var stroke_width = 1;  // by default ggplot2 has 0.5, animint has 1
+    if (g_info.params.hasOwnProperty("stroke")) {
+      stroke_width = g_info.params.stroke;
+    }
+    var get_stroke_width = function (d) {
+      if (aes.hasOwnProperty("stroke") && d.hasOwnProperty("stroke")) {
+        return d["stroke"];
+      }
+      return stroke_width;
+    }
+    
     var linetype = "solid";
     if (g_info.params.linetype) {
       linetype = g_info.params.linetype;
@@ -1405,7 +1417,8 @@ var animint = function (to_select, json_file) {
           .attr("cy", toXY("y", "y"))
           .attr("r", get_size)
           .style("fill", get_fill)
-          .style("stroke", get_colour);
+          .style("stroke", get_colour)
+          .style("stroke-width", get_stroke_width);
       };
       eAppend = "circle";
     }
