@@ -1638,7 +1638,39 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
       stop("missing first selector variable")
     }
   }
-
+  
+  ## Compute ranges of different subsets, to be used by update_scales
+  ## in the renderer
+  compute_ranges <- function(built_data, axes=c("x", "y"), 
+                             var="showSelected"){
+    range_vals <- list()
+    for(col.name in names(built_data)){
+      range_vals[[col.name]] <-if(grepl("^[y]$", col.name)){
+        calc_range <- lapply(split(built_data[[col.name]],
+                                   built_data[[var]]), range)
+        unique_vals <- unique(calc_range)
+        if(length(unique_vals) == 1){
+          # If there is only one unique range, no need to save
+          calc_range <- unique_vals
+        }
+        calc_range
+      }else{
+        NULL
+      }
+    }
+    range_vals
+  }
+  
+  ## Get ranges of data subsets if theme_animint(update_axes) is used
+  for(p.name in names(ggplot.list)){
+    if(!is.null(meta$plots[[p.name]]$options$update_axes)){
+      subset_ranges <- lapply(ggplot.list[[p.name]]$built$data, 
+                              compute_ranges, axes="y")
+      names(subset_ranges) <- meta$plots[[p.name]]$geoms
+      meta$plots[[p.name]]$axis_ranges <- subset_ranges
+    }
+  }
+  
   ## Finally, copy html/js/json files to out.dir.
   src.dir <- system.file("htmljs",package="animint")
   to.copy <- Sys.glob(file.path(src.dir, "*"))
