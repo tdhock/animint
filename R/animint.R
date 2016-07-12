@@ -315,6 +315,11 @@ parsePlot <- function(meta){
     }
   }
 
+  update_axes <- "animint.update_axes"
+  if(update_axes %in% names(theme)){
+    plot.meta$options$update_axes <- theme[[update_axes]]
+  }
+
   meta$plots[[meta$plot.name]] <- plot.meta
 
   list(
