@@ -1771,6 +1771,17 @@ var animint = function (to_select, json_file) {
       // event will be fired on the original input.
       selectized_array[v_name].setValue(selected_ids, true);
     }
+
+    // For each updated geom, check if the axes of the plot need to be
+    // updated and update them
+    s_info.update.forEach(function(g_name){
+      var plot_name = g_name.split("_").pop();
+      var axes = Plots[plot_name]["options"]["update_axes"];
+      if(axes != null){
+        update_scales(plot_name, g_name, axes, v_name, value);
+      }
+    });
+
     update_legend_opacity(v_name);
     s_info.update.forEach(function(g_name){
       update_geom(g_name, v_name);
