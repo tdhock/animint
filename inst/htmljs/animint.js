@@ -573,15 +573,9 @@ var animint = function (to_select, json_file) {
       // axes.
       scales[panel_i] = {};
       scales[panel_i].x = d3.scale.linear()
-        .domain([0, 1])
-        .range([plotdim.xstart, plotdim.xend]);
-      scales[panel_i].x_fake = d3.scale.linear()
         .domain(axis.xrange)
         .range([plotdim.xstart, plotdim.xend]);
       scales[panel_i].y = d3.scale.linear()
-        .domain([0, 1])
-        .range([plotdim.yend, plotdim.ystart]);
-      scales[panel_i].y_fake = d3.scale.linear()
         .domain([axis.yrange[1], axis.yrange[0]])
         .range([plotdim.ystart, plotdim.yend]);
       if(draw_x){
