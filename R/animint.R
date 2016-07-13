@@ -1651,7 +1651,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
         unique_vals <- unique(calc_range)
         if(length(unique_vals) == 1){
           # If there is only one unique range, no need to save
-          calc_range <- unique_vals
+          calc_range <- NULL
         }
         calc_range
       }else{
@@ -1663,10 +1663,21 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
   
   ## Get ranges of data subsets if theme_animint(update_axes) is used
   for(p.name in names(ggplot.list)){
-    if(!is.null(meta$plots[[p.name]]$options$update_axes)){
-      subset_ranges <- lapply(ggplot.list[[p.name]]$built$data, 
-                              compute_ranges, axes="y")
-      names(subset_ranges) <- meta$plots[[p.name]]$geoms
+    axis_to_update <- meta$plots[[p.name]]$options$update_axes
+    if(!is.null(axis_to_update)){
+      p_geoms <- meta$plots[[p.name]]$geoms
+      subset_ranges <- list()
+      for(num in seq_along(p_geoms)){
+        selector <- meta$geoms[[ p_geoms[[num]] ]]$aes[["showSelected"]]
+        # Do not calculate ranges for multiple selectors
+        if(meta$selectors[[selector]]$type == "single"){
+          subset_ranges[num] <- compute_ranges(
+            ggplot.list[[p.name]]$built$data[[num]],
+            axis_to_update)
+        }
+      }
+      subset_ranges <- subset_ranges[!sapply(subset_ranges, is.null)]
+      names(subset_ranges) <- paste(selector,axis_to_update, sep = "_")
       meta$plots[[p.name]]$axis_ranges <- subset_ranges
     }
   }
