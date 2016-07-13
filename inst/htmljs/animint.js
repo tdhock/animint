@@ -1730,7 +1730,9 @@ var animint = function (to_select, json_file) {
   function update_scales(p_name, axes, v_name, value){
     // Get pre-computed range
     var axis_range = Plots[p_name]["axis_ranges"][v_name+"_"+axes];
-    var use_range = axis_range[value];
+    if(axis_range != null){
+      var use_range = axis_range[value];
+    }
     if(use_range != null){
       Plots[p_name]["scales"]["1"][axes].domain([use_range[1], use_range[0]]);
     }
