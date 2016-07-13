@@ -1727,9 +1727,9 @@ var animint = function (to_select, json_file) {
 
   // update scales for the plots that have update_axes option in
   // theme_animint
-  function update_scales(p_name, g_name, axes, v_name, value){
+  function update_scales(p_name, axes, v_name, value){
     // Get pre-computed range
-    var axis_range = Plots[p_name]["axis_ranges"][g_name][axes];
+    var axis_range = Plots[p_name]["axis_ranges"][v_name+"_"+axes];
     var use_range = axis_range[value];
     if(use_range != null){
       Plots[p_name]["scales"]["1"][axes].domain([use_range[1], use_range[0]]);
@@ -1778,7 +1778,7 @@ var animint = function (to_select, json_file) {
       var plot_name = g_name.split("_").pop();
       var axes = Plots[plot_name]["options"]["update_axes"];
       if(axes != null){
-        update_scales(plot_name, g_name, axes, v_name, value);
+        update_scales(plot_name, axes, v_name, value);
       }
     });
 
