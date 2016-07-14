@@ -1729,7 +1729,7 @@ var animint = function (to_select, json_file) {
   // theme_animint
   function update_scales(p_name, axes, v_name, value){
     // Get pre-computed range
-    var axis_range = Plots[p_name]["axis_ranges"][v_name+"_"+axes];
+    var axis_range = Plots[p_name]["axis_ranges"];
     if(axis_range != null){
       var use_range = axis_range[value];
     }

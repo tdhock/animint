@@ -1646,19 +1646,23 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
     range_vals <- list()
     for(col.name in names(built_data)){
       range_vals[[col.name]] <-if(grepl("^[y]$", col.name)){
-        calc_range <- lapply(split(built_data[[col.name]],
-                                   built_data[[var]]), range)
-        unique_vals <- unique(calc_range)
-        if(length(unique_vals) == 1){
-          # If there is only one unique range, no need to save
-          calc_range <- NULL
-        }
-        calc_range
+        lapply(split(built_data[[col.name]], built_data[[var]]), range)
       }else{
         NULL
       }
     }
     range_vals
+  }
+  
+  get_range <- function(subset_ranges){
+    use_range <- list()
+    for(i in names(subset_ranges[[1]])){
+      all_vals <- lapply(subset_ranges, "[[", i)
+      min_val <- min(sapply(all_vals, "[[", 1))
+      max_val <- max(sapply(all_vals, "[[", 2))
+      use_range[[i]] <- c(min_val, max_val)
+    }
+    use_range
   }
   
   ## Get ranges of data subsets if theme_animint(update_axes) is used
@@ -1677,8 +1681,8 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
         }
       }
       subset_ranges <- subset_ranges[!sapply(subset_ranges, is.null)]
-      names(subset_ranges) <- paste(selector,axis_to_update, sep = "_")
-      meta$plots[[p.name]]$axis_ranges <- subset_ranges
+      use_range <- get_range(subset_ranges)
+      meta$plots[[p.name]]$axis_ranges <- use_range
     }
   }
   
