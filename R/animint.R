@@ -1641,15 +1641,25 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
   
   ## Compute ranges of different subsets, to be used by update_scales
   ## in the renderer
-  compute_ranges <- function(built_data, axes=c("x", "y"), 
+  compute_ranges <- function(built_data, axes, geom_name,
                              var="showSelected"){
+    range_cols <- list(bar=c(paste0(axes, "min"), paste0(axes, "max")),
+                       point = c(axes))
+    use_cols <- range_cols[[geom_name]]
     range_vals <- list()
-    for(col.name in names(built_data)){
-      range_vals[[col.name]] <-if(grepl("^[y]$", col.name)){
-        lapply(split(built_data[[col.name]], built_data[[var]]), range)
+    if(length(use_cols) == 1){
+      range_vals[[use_cols[1]]] <-if(use_cols[1] %in% names(built_data)){
+        lapply(split(built_data[[use_cols[1]]], built_data[[var]]),
+               range)
       }else{
         NULL
       }
+    }else{
+      min_vals <- lapply(split(built_data[[use_cols[1]]],
+                               built_data[[var]]), min)
+      max_vals <- lapply(split(built_data[[use_cols[2]]],
+                               built_data[[var]]), max)
+      range_vals <- list(mapply(c, min_vals, max_vals, SIMPLIFY = FALSE))
     }
     range_vals
   }
@@ -1677,7 +1687,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
         if(meta$selectors[[selector]]$type == "single"){
           subset_ranges[num] <- compute_ranges(
             ggplot.list[[p.name]]$built$data[[num]],
-            axis_to_update)
+            axis_to_update, strsplit(p_geoms[[num]], "_")[[1]][[2]])
         }
       }
       subset_ranges <- subset_ranges[!sapply(subset_ranges, is.null)]
