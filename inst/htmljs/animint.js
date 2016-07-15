@@ -1736,6 +1736,24 @@ var animint = function (to_select, json_file) {
     if(use_range != null){
       Plots[p_name]["scales"]["1"][axes].domain([use_range[1], use_range[0]]);
     }
+    update_axes(p_name, axes);
+  }
+
+  function update_axes(p_name, axes){
+    var orientation;
+    if(axes == "x"){
+      orientation = "bottom";
+    }else{
+      orientation = "left";
+    }
+    var xyaxis = d3.svg.axis()
+          .scale(Plots[p_name]["scales"]["1"][axes])
+          .orient(orientation)
+          .ticks(5);
+    var xyaxis_g = element.select("#plot_"+p_name).select("."+axes+"axis")
+          .transition()
+          .duration(1000)
+          .call(xyaxis);
   }
 
   var update_selector = function (v_name, value) {
