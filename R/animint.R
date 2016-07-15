@@ -1643,6 +1643,9 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
   ## in the renderer
   compute_domains <- function(built_data, axes, geom_name,
                              var="showSelected"){
+    # Different geoms will use diff columns to calculate domains for
+    # showSelected subsets. Eg. geom_bar will use 'xmin', 'xmax', 'ymin',
+    # 'ymax' etc. while geom_point will use 'x', 'y'
     domain_cols <- list(bar=c(paste0(axes, "min"), paste0(axes, "max")),
                        point = c(axes))
     use_cols <- domain_cols[[geom_name]]
@@ -1655,6 +1658,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
         NULL
       }
     }else{
+      # Calculate min and max values of each subset separately
       min_vals <- lapply(split(built_data[[use_cols[1]]],
                                built_data[[var]]), min)
       max_vals <- lapply(split(built_data[[use_cols[2]]],
@@ -1664,6 +1668,8 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
     domain_vals
   }
   
+  ## Out of all the possible geoms, get the min/max value which will
+  ## determine the domain to be used in the renderer
   get_domain <- function(subset_domains){
     use_domain <- list()
     ## ggplot gives a margin of 5% at all four sides which does not
@@ -1689,6 +1695,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
       for(num in seq_along(p_geoms)){
         selector <- meta$geoms[[ p_geoms[[num]] ]]$aes[["showSelected"]]
         # Do not calculate domains for multiple selectors
+        # What if there are more than one single selectors in a plot???
         if(meta$selectors[[selector]]$type == "single"){
           subset_domains[num] <- compute_domains(
             ggplot.list[[p.name]]$built$data[[num]],
@@ -1697,6 +1704,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
       }
       subset_domains <- subset_domains[!sapply(subset_domains, is.null)]
       use_domain <- get_domain(subset_domains)
+      # Save for renderer
       meta$plots[[p.name]]$axis_domains <- use_domain
     }
   }

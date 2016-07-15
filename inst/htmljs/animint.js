@@ -1736,9 +1736,13 @@ var animint = function (to_select, json_file) {
     if(use_domain != null){
       Plots[p_name]["scales"]["1"][axes].domain([use_domain[1], use_domain[0]]);
     }
+    // Once scales are updated, update the axis ticks etc.
     update_axes(p_name, axes);
   }
 
+  // Update the axis ticks etc. once plot is zoomed in/out
+  // currently called from update_scales.
+  // Would it be better to implement separately??
   function update_axes(p_name, axes){
     var orientation;
     if(axes == "x"){
@@ -1749,10 +1753,12 @@ var animint = function (to_select, json_file) {
     var xyaxis = d3.svg.axis()
           .scale(Plots[p_name]["scales"]["1"][axes])
           .orient(orientation)
-          .ticks(5);
+          .ticks(5); // Need to calculate tickValues instead of using d3's
+                     // important to draw grid lines!!!
+    // update existing axis
     var xyaxis_g = element.select("#plot_"+p_name).select("."+axes+"axis")
           .transition()
-          .duration(1000)
+          .duration(1000) // What should be the default duration?
           .call(xyaxis);
   }
 
