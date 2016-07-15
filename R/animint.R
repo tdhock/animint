@@ -1666,11 +1666,16 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
   
   get_range <- function(subset_ranges){
     use_range <- list()
+    ## ggplot gives a margin of 5% at all four sides which does not
+    ## have any plotted data. So axis ranges are 10% bigger than the
+    ## actual ranges of data. We do the same here
+    extra_margin = 0.05
     for(i in names(subset_ranges[[1]])){
       all_vals <- lapply(subset_ranges, "[[", i)
       min_val <- min(sapply(all_vals, "[[", 1))
       max_val <- max(sapply(all_vals, "[[", 2))
-      use_range[[i]] <- c(min_val, max_val)
+      use_range[[i]] <- c(min_val - (extra_margin *(max_val-min_val)),
+                          max_val + (extra_margin *(max_val-min_val)))
     }
     use_range
   }
