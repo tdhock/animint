@@ -1728,13 +1728,13 @@ var animint = function (to_select, json_file) {
   // update scales for the plots that have update_axes option in
   // theme_animint
   function update_scales(p_name, axes, v_name, value){
-    // Get pre-computed range
-    var axis_range = Plots[p_name]["axis_ranges"];
-    if(axis_range != null){
-      var use_range = axis_range[value];
+    // Get pre-computed domain
+    var axis_domains = Plots[p_name]["axis_domains"];
+    if(axis_domains != null){
+      var use_domain = axis_domains[value];
     }
-    if(use_range != null){
-      Plots[p_name]["scales"]["1"][axes].domain([use_range[1], use_range[0]]);
+    if(use_domain != null){
+      Plots[p_name]["scales"]["1"][axes].domain([use_domain[1], use_domain[0]]);
     }
     update_axes(p_name, axes);
   }

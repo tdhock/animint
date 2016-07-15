@@ -1639,16 +1639,16 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
     }
   }
   
-  ## Compute ranges of different subsets, to be used by update_scales
+  ## Compute domains of different subsets, to be used by update_scales
   ## in the renderer
-  compute_ranges <- function(built_data, axes, geom_name,
+  compute_domains <- function(built_data, axes, geom_name,
                              var="showSelected"){
-    range_cols <- list(bar=c(paste0(axes, "min"), paste0(axes, "max")),
+    domain_cols <- list(bar=c(paste0(axes, "min"), paste0(axes, "max")),
                        point = c(axes))
-    use_cols <- range_cols[[geom_name]]
-    range_vals <- list()
+    use_cols <- domain_cols[[geom_name]]
+    domain_vals <- list()
     if(length(use_cols) == 1){
-      range_vals[[use_cols[1]]] <-if(use_cols[1] %in% names(built_data)){
+      domain_vals[[use_cols[1]]] <-if(use_cols[1] %in% names(built_data)){
         lapply(split(built_data[[use_cols[1]]], built_data[[var]]),
                range)
       }else{
@@ -1659,45 +1659,45 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
                                built_data[[var]]), min)
       max_vals <- lapply(split(built_data[[use_cols[2]]],
                                built_data[[var]]), max)
-      range_vals <- list(mapply(c, min_vals, max_vals, SIMPLIFY = FALSE))
+      domain_vals <- list(mapply(c, min_vals, max_vals, SIMPLIFY = FALSE))
     }
-    range_vals
+    domain_vals
   }
   
-  get_range <- function(subset_ranges){
-    use_range <- list()
+  get_domain <- function(subset_domains){
+    use_domain <- list()
     ## ggplot gives a margin of 5% at all four sides which does not
     ## have any plotted data. So axis ranges are 10% bigger than the
     ## actual ranges of data. We do the same here
     extra_margin = 0.05
-    for(i in names(subset_ranges[[1]])){
-      all_vals <- lapply(subset_ranges, "[[", i)
+    for(i in names(subset_domains[[1]])){
+      all_vals <- lapply(subset_domains, "[[", i)
       min_val <- min(sapply(all_vals, "[[", 1))
       max_val <- max(sapply(all_vals, "[[", 2))
-      use_range[[i]] <- c(min_val - (extra_margin *(max_val-min_val)),
+      use_domain[[i]] <- c(min_val - (extra_margin *(max_val-min_val)),
                           max_val + (extra_margin *(max_val-min_val)))
     }
-    use_range
+    use_domain
   }
   
-  ## Get ranges of data subsets if theme_animint(update_axes) is used
+  ## Get domains of data subsets if theme_animint(update_axes) is used
   for(p.name in names(ggplot.list)){
     axis_to_update <- meta$plots[[p.name]]$options$update_axes
     if(!is.null(axis_to_update)){
       p_geoms <- meta$plots[[p.name]]$geoms
-      subset_ranges <- list()
+      subset_domains <- list()
       for(num in seq_along(p_geoms)){
         selector <- meta$geoms[[ p_geoms[[num]] ]]$aes[["showSelected"]]
-        # Do not calculate ranges for multiple selectors
+        # Do not calculate domains for multiple selectors
         if(meta$selectors[[selector]]$type == "single"){
-          subset_ranges[num] <- compute_ranges(
+          subset_domains[num] <- compute_domains(
             ggplot.list[[p.name]]$built$data[[num]],
             axis_to_update, strsplit(p_geoms[[num]], "_")[[1]][[2]])
         }
       }
-      subset_ranges <- subset_ranges[!sapply(subset_ranges, is.null)]
-      use_range <- get_range(subset_ranges)
-      meta$plots[[p.name]]$axis_ranges <- use_range
+      subset_domains <- subset_domains[!sapply(subset_domains, is.null)]
+      use_domain <- get_domain(subset_domains)
+      meta$plots[[p.name]]$axis_domains <- use_domain
     }
   }
   
