@@ -1694,13 +1694,16 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
       p_geoms <- meta$plots[[p.name]]$geoms
       subset_domains <- list()
       for(num in seq_along(p_geoms)){
-        selector <- meta$geoms[[ p_geoms[[num]] ]]$aes[["showSelected"]]
+        aesthetic_names <- names(meta$geoms[[ p_geoms[[num]] ]]$aes)
+        choose_ss <- grepl("^showSelected", aesthetic_names)
+        selector <- meta$geoms[[ p_geoms[[num]] ]]$aes[choose_ss]
         # Do not calculate domains for multiple selectors
         # What if there are more than one single selectors in a plot???
         if(meta$selectors[[selector]]$type == "single"){
           subset_domains[num] <- compute_domains(
             ggplot.list[[p.name]]$built$data[[num]],
-            axis_to_update, strsplit(p_geoms[[num]], "_")[[1]][[2]])
+            axis_to_update, strsplit(p_geoms[[num]], "_")[[1]][[2]],
+            names(selector))
         }
       }
       subset_domains <- subset_domains[!sapply(subset_domains, is.null)]
