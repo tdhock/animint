@@ -587,8 +587,9 @@ var animint = function (to_select, json_file) {
           })
           .orient("bottom")
 	;
+  var axis_panel = "xaxis" + "_" + panel_i;
 	var xaxis_g = svg.append("g")
-          .attr("class", "xaxis axis")
+          .attr("class", "xaxis axis " + axis_panel)
           .attr("transform", "translate(0," + plotdim.yend + ")")
           .call(xaxis);
 	if(axis["xline"] == false){
@@ -607,8 +608,9 @@ var animint = function (to_select, json_file) {
             return yaxislabs[yaxisvals.indexOf(d)].toString();
           })
           .orient("left");
+  var axis_panel = "yaxis" + "_" + panel_i;
 	var yaxis_g = svg.append("g")
-          .attr("class", "yaxis axis")
+          .attr("class", "yaxis axis " + axis_panel)
           .attr("transform", "translate(" + (plotdim.xstart) + ",0)")
           .call(yaxis);
 	if(axis["yline"] == false){
@@ -1731,19 +1733,27 @@ var animint = function (to_select, json_file) {
     // Get pre-computed domain
     var axis_domains = Plots[p_name]["axis_domains"];
     if(axis_domains != null){
-      var use_domain = axis_domains[value];
+      // For Each PANEL, update the axes
+      Plots[p_name].layout.PANEL.forEach(function(panel_i){
+        var use_domain = axis_domains[panel_i+"."+value];
+        if(use_domain != null){
+          if(axes == "x"){
+            Plots[p_name]["scales"][panel_i][axes].domain(use_domain);
+          }else{
+            // Reverse domains for y-axis
+            Plots[p_name]["scales"][panel_i][axes].domain([use_domain[1], use_domain[0]]);
+          }
+        // Once scales are updated, update the axis ticks etc.
+        update_axes(p_name, axes, panel_i);
+      }
+    });
     }
-    if(use_domain != null){
-      Plots[p_name]["scales"]["1"][axes].domain([use_domain[1], use_domain[0]]);
-    }
-    // Once scales are updated, update the axis ticks etc.
-    update_axes(p_name, axes);
   }
 
   // Update the axis ticks etc. once plot is zoomed in/out
   // currently called from update_scales.
   // Would it be better to implement separately??
-  function update_axes(p_name, axes){
+  function update_axes(p_name, axes, panel_i){
     var orientation;
     if(axes == "x"){
       orientation = "bottom";
@@ -1751,12 +1761,12 @@ var animint = function (to_select, json_file) {
       orientation = "left";
     }
     var xyaxis = d3.svg.axis()
-          .scale(Plots[p_name]["scales"]["1"][axes])
+          .scale(Plots[p_name]["scales"][panel_i][axes])
           .orient(orientation)
           .ticks(5); // Need to calculate tickValues instead of using d3's
                      // important to draw grid lines!!!
     // update existing axis
-    var xyaxis_g = element.select("#plot_"+p_name).select("."+axes+"axis")
+    var xyaxis_g = element.select("#plot_"+p_name).select("."+axes+"axis_"+panel_i)
           .transition()
           .duration(1000) // What should be the default duration?
           .call(xyaxis);
