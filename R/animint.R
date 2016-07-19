@@ -1647,7 +1647,8 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
     # showSelected subsets. Eg. geom_bar will use 'xmin', 'xmax', 'ymin',
     # 'ymax' etc. while geom_point will use 'x', 'y'
     domain_cols <- list(bar=c(paste0(axes, "min"), paste0(axes, "max")),
-                       point = c(axes))
+                       point = c(axes),
+                       path = c(axes))
     use_cols <- domain_cols[[geom_name]]
     domain_vals <- list()
     if(length(use_cols) == 1){
