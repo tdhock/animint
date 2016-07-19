@@ -1694,27 +1694,29 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
   
   ## Get domains of data subsets if theme_animint(update_axes) is used
   for(p.name in names(ggplot.list)){
-    axis_to_update <- meta$plots[[p.name]]$options$update_axes
-    if(!is.null(axis_to_update)){
+    axes_to_update <- meta$plots[[p.name]]$options$update_axes
+    if(!is.null(axes_to_update)){
       p_geoms <- meta$plots[[p.name]]$geoms
       subset_domains <- list()
-      for(num in seq_along(p_geoms)){
-        aesthetic_names <- names(meta$geoms[[ p_geoms[[num]] ]]$aes)
-        choose_ss <- grepl("^showSelected", aesthetic_names)
-        selector <- meta$geoms[[ p_geoms[[num]] ]]$aes[choose_ss]
-        # Do not calculate domains for multiple selectors
-        # What if there are more than one single selectors in a plot???
-        if(meta$selectors[[selector]]$type == "single"){
-          subset_domains[num] <- compute_domains(
-            ggplot.list[[p.name]]$built$data[[num]],
-            axis_to_update, strsplit(p_geoms[[num]], "_")[[1]][[2]],
-            names(selector))
+      for (axis in axes_to_update){
+        for(num in seq_along(p_geoms)){
+          aesthetic_names <- names(meta$geoms[[ p_geoms[[num]] ]]$aes)
+          choose_ss <- grepl("^showSelected", aesthetic_names)
+          selector <- meta$geoms[[ p_geoms[[num]] ]]$aes[choose_ss]
+          # Do not calculate domains for multiple selectors
+          # What if there are more than one single selectors in a plot???
+          if(meta$selectors[[selector]]$type == "single"){
+            subset_domains[num] <- compute_domains(
+              ggplot.list[[p.name]]$built$data[[num]],
+              axis, strsplit(p_geoms[[num]], "_")[[1]][[2]],
+              names(selector))
+          }
         }
+        subset_domains <- subset_domains[!sapply(subset_domains, is.null)]
+        use_domain <- get_domain(subset_domains)
+        # Save for renderer
+        meta$plots[[p.name]]$axis_domains[[axis]] <- use_domain
       }
-      subset_domains <- subset_domains[!sapply(subset_domains, is.null)]
-      use_domain <- get_domain(subset_domains)
-      # Save for renderer
-      meta$plots[[p.name]]$axis_domains <- use_domain
     }
   }
   

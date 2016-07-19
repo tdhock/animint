@@ -1733,20 +1733,22 @@ var animint = function (to_select, json_file) {
     // Get pre-computed domain
     var axis_domains = Plots[p_name]["axis_domains"];
     if(axis_domains != null){
-      // For Each PANEL, update the axes
-      Plots[p_name].layout.PANEL.forEach(function(panel_i){
-        var use_domain = axis_domains[panel_i+"."+value];
-        if(use_domain != null){
-          if(axes == "x"){
-            Plots[p_name]["scales"][panel_i][axes].domain(use_domain);
-          }else{
-            // Reverse domains for y-axis
-            Plots[p_name]["scales"][panel_i][axes].domain([use_domain[1], use_domain[0]]);
+      axes.forEach(function(xyaxis){
+        // For Each PANEL, update the axes
+        Plots[p_name].layout.PANEL.forEach(function(panel_i){
+          var use_domain = axis_domains[xyaxis][panel_i+"."+value];
+          if(use_domain != null){
+            if(xyaxis == "x"){
+              Plots[p_name]["scales"][panel_i][xyaxis].domain(use_domain);
+            }else{
+              // Reverse domains for y-axis
+              Plots[p_name]["scales"][panel_i][xyaxis].domain([use_domain[1], use_domain[0]]);
+            }
+            // Once scales are updated, update the axis ticks etc.
+            update_axes(p_name, xyaxis, panel_i);
           }
-        // Once scales are updated, update the axis ticks etc.
-        update_axes(p_name, axes, panel_i);
-      }
-    });
+        });
+      });
     }
   }
 
