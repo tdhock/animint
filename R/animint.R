@@ -1653,16 +1653,16 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
     if(length(use_cols) == 1){
       domain_vals[[use_cols[1]]] <-if(use_cols[1] %in% names(built_data)){
         lapply(split(built_data[[use_cols[1]]], built_data[[var]]),
-               range)
+               range, na.rm=TRUE)
       }else{
         NULL
       }
     }else{
       # Calculate min and max values of each subset separately
       min_vals <- lapply(split(built_data[[use_cols[1]]],
-                               built_data[[var]]), min)
+                               built_data[[var]]), min, na.rm=TRUE)
       max_vals <- lapply(split(built_data[[use_cols[2]]],
-                               built_data[[var]]), max)
+                               built_data[[var]]), max, na.rm=TRUE)
       domain_vals <- list(mapply(c, min_vals, max_vals, SIMPLIFY = FALSE))
     }
     domain_vals
