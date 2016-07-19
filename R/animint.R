@@ -1642,7 +1642,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
   ## Compute domains of different subsets, to be used by update_scales
   ## in the renderer
   compute_domains <- function(built_data, axes, geom_name,
-                             var="showSelected"){
+                             var, split_by_panel){
     # Different geoms will use diff columns to calculate domains for
     # showSelected subsets. Eg. geom_bar will use 'xmin', 'xmax', 'ymin',
     # 'ymax' etc. while geom_point will use 'x', 'y'
@@ -1651,10 +1651,17 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
                        path = c(axes))
     use_cols <- domain_cols[[geom_name]]
     domain_vals <- list()
+    split_by <- if(split_by_panel){
+      interaction(built_data$PANEL, built_data[[var]])
+    }else{
+      levels(built_data[[var]]) <- paste0(unique(built_data$PANEL[[1]]),
+                                          ".", levels(built_data[[var]]))
+      built_data[[var]]
+    }
     if(length(use_cols) == 1){
       domain_vals[[use_cols[1]]] <-if(use_cols[1] %in% names(built_data)){
         lapply(split(built_data[[use_cols[1]]],
-                     interaction(built_data$PANEL, built_data[[var]])),
+                     split_by),
                range, na.rm=TRUE)
       }else{
         NULL
@@ -1662,12 +1669,10 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
     }else{
       # Calculate min and max values of each subset separately
       min_vals <- lapply(split(built_data[[use_cols[1]]],
-                               interaction(built_data$PANEL,
-                                           built_data[[var]])),
+                               split_by),
                          min, na.rm=TRUE)
       max_vals <- lapply(split(built_data[[use_cols[2]]],
-                               interaction(built_data$PANEL,
-                                           built_data[[var]])),
+                               split_by),
                          max, na.rm=TRUE)
       domain_vals <- list(mapply(c, min_vals, max_vals, SIMPLIFY = FALSE))
     }
@@ -1699,6 +1704,11 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
       p_geoms <- meta$plots[[p.name]]$geoms
       subset_domains <- list()
       for (axis in axes_to_update){
+        panels <- meta$plots[[p.name]]$layout$PANEL
+        axes_drawn <- 
+          meta$plots[[p.name]]$layout[[paste0("AXIS_", toupper(axis))]]
+        panels_used <- panels[axes_drawn]
+        split_by_panel <- all(panels == panels_used)
         for(num in seq_along(p_geoms)){
           aesthetic_names <- names(meta$geoms[[ p_geoms[[num]] ]]$aes)
           choose_ss <- grepl("^showSelected", aesthetic_names)
@@ -1709,7 +1719,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
             subset_domains[num] <- compute_domains(
               ggplot.list[[p.name]]$built$data[[num]],
               axis, strsplit(p_geoms[[num]], "_")[[1]][[2]],
-              names(selector))
+              names(selector), split_by_panel)
           }
         }
         subset_domains <- subset_domains[!sapply(subset_domains, is.null)]

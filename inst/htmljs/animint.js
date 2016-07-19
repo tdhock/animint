@@ -1735,8 +1735,14 @@ var animint = function (to_select, json_file) {
     if(axis_domains != null){
       axes.forEach(function(xyaxis){
         // For Each PANEL, update the axes
-        Plots[p_name].layout.PANEL.forEach(function(panel_i){
-          var use_domain = axis_domains[xyaxis][panel_i+"."+value];
+        Plots[p_name].layout.PANEL.forEach(function(panel_i, i){
+          var draw_axes = Plots[p_name].layout["AXIS_"+ xyaxis.toUpperCase()][i];
+          if(draw_axes){
+            var use_panel = panel_i;
+          }else{
+            var use_panel = Plots[p_name].layout.PANEL[0];
+          }
+          var use_domain = axis_domains[xyaxis][use_panel+"."+value];
           if(use_domain != null){
             if(xyaxis == "x"){
               Plots[p_name]["scales"][panel_i][xyaxis].domain(use_domain);
@@ -1745,7 +1751,9 @@ var animint = function (to_select, json_file) {
               Plots[p_name]["scales"][panel_i][xyaxis].domain([use_domain[1], use_domain[0]]);
             }
             // Once scales are updated, update the axis ticks etc.
-            update_axes(p_name, xyaxis, panel_i);
+            if(draw_axes){
+              update_axes(p_name, xyaxis, panel_i);
+            }
           }
         });
       });
