@@ -1651,6 +1651,8 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
                        path = c(axes))
     use_cols <- domain_cols[[geom_name]]
     domain_vals <- list()
+    # Split by PANEL only when specified, else use first value of PANEL
+    # It is a hack and must be handled in a better way
     split_by <- if(split_by_panel){
       interaction(built_data$PANEL, built_data[[var]])
     }else{
@@ -1704,12 +1706,18 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
       p_geoms <- meta$plots[[p.name]]$geoms
       subset_domains <- list()
       for (axis in axes_to_update){
+        # Determine if every panel needs a different domain or not
+        # We conclude here if we want to split the data by PANEL
+        # for the axes updates. Else every panel uses the same
+        # domain
         panels <- meta$plots[[p.name]]$layout$PANEL
         axes_drawn <- 
           meta$plots[[p.name]]$layout[[paste0("AXIS_", toupper(axis))]]
         panels_used <- panels[axes_drawn]
         split_by_panel <- all(panels == panels_used)
         for(num in seq_along(p_geoms)){
+          # handle cases for showSelected: showSelectedlegendfill,
+          # showSelectedlegendcolour etc.
           aesthetic_names <- names(meta$geoms[[ p_geoms[[num]] ]]$aes)
           choose_ss <- grepl("^showSelected", aesthetic_names)
           selector <- meta$geoms[[ p_geoms[[num]] ]]$aes[choose_ss]

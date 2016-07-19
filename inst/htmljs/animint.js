@@ -1736,6 +1736,9 @@ var animint = function (to_select, json_file) {
       axes.forEach(function(xyaxis){
         // For Each PANEL, update the axes
         Plots[p_name].layout.PANEL.forEach(function(panel_i, i){
+          // Determine whether this panel has a scale or not
+          // If not we just update the scales according to the common
+          // scale and skip the updating of axis
           var draw_axes = Plots[p_name].layout["AXIS_"+ xyaxis.toUpperCase()][i];
           if(draw_axes){
             var use_panel = panel_i;
@@ -1750,7 +1753,7 @@ var animint = function (to_select, json_file) {
               // Reverse domains for y-axis
               Plots[p_name]["scales"][panel_i][xyaxis].domain([use_domain[1], use_domain[0]]);
             }
-            // Once scales are updated, update the axis ticks etc.
+            // Once scales are updated, update the axis ticks etc., if needed
             if(draw_axes){
               update_axes(p_name, xyaxis, panel_i);
             }
