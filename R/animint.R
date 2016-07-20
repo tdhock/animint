@@ -196,11 +196,11 @@ parsePlot <- function(meta){
     
     ## x and y locations
     if(major) {
-      pars$loc$x <- as.list(meta$built$panel$ranges[[1]]$x.major)
-      pars$loc$y <- as.list(meta$built$panel$ranges[[1]]$y.major)
+      pars$loc$x <- as.list(meta$built$panel$ranges[[1]]$x.major_source)
+      pars$loc$y <- as.list(meta$built$panel$ranges[[1]]$y.major_source)
     } else {
-      pars$loc$x <- as.list(meta$built$panel$ranges[[1]]$x.minor)
-      pars$loc$y <- as.list(meta$built$panel$ranges[[1]]$y.minor)
+      pars$loc$x <- as.list(meta$built$panel$ranges[[1]]$x.minor_source)
+      pars$loc$y <- as.list(meta$built$panel$ranges[[1]]$y.minor_source)
       ## remove minor lines when major lines are already drawn
       pars$loc$x <- pars$loc$x[
         !(pars$loc$x %in% plot.meta$grid_major$loc$x)
@@ -280,7 +280,7 @@ parsePlot <- function(meta){
     for (axis in names(axes)) {
       ctr <- ctr + 1
       range <- ranges[[ctr]]
-      plot.meta[[axis]][[xy]] <- as.list(range[[s("%s.major")]])
+      plot.meta[[axis]][[xy]] <- as.list(range[[s("%s.major_source")]])
       plot.meta[[axis]][[s("%slab")]] <- if(is.blank(s("axis.text.%s"))){
         NULL
       } else {
