@@ -1732,6 +1732,9 @@ var animint = function (to_select, json_file) {
   function update_scales(p_name, axes, v_name, value){
     // Get pre-computed domain
     var axis_domains = Plots[p_name]["axis_domains"];
+    if(typeof(axes) == "string"){
+      axes = [axes];
+    }
     if(axis_domains != null){
       axes.forEach(function(xyaxis){
         // For Each PANEL, update the axes

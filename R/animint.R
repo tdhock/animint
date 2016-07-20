@@ -1723,7 +1723,8 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
           selector <- meta$geoms[[ p_geoms[[num]] ]]$aes[choose_ss]
           # Do not calculate domains for multiple selectors
           # What if there are more than one single selectors in a plot???
-          if(meta$selectors[[selector]]$type == "single"){
+          if(length(selector) > 0 &&
+             meta$selectors[[selector]]$type == "single"){
             subset_domains[num] <- compute_domains(
               ggplot.list[[p.name]]$built$data[[num]],
               axis, strsplit(p_geoms[[num]], "_")[[1]][[2]],
