@@ -1732,7 +1732,7 @@ var animint = function (to_select, json_file) {
   function update_scales(p_name, axes, v_name, value){
     // Get pre-computed domain
     var axis_domains = Plots[p_name]["axis_domains"];
-    if(typeof(axes) == "string"){
+    if(!isArray(axes)){
       axes = [axes];
     }
     if(axis_domains != null){
@@ -1748,7 +1748,7 @@ var animint = function (to_select, json_file) {
           }else{
             var use_panel = Plots[p_name].layout.PANEL[0];
           }
-          var use_domain = axis_domains[xyaxis][use_panel+"."+value];
+          var use_domain = axis_domains[xyaxis]["domains"][use_panel+"."+value];
           if(use_domain != null){
             if(xyaxis == "x"){
               Plots[p_name]["scales"][panel_i][xyaxis].domain(use_domain);
@@ -1758,7 +1758,9 @@ var animint = function (to_select, json_file) {
             }
             // Once scales are updated, update the axis ticks etc., if needed
             if(draw_axes){
-              update_axes(p_name, xyaxis, panel_i);
+              // Tick values are same as major grid lines
+              var grid_vals = Plots[p_name]["axis_domains"][xyaxis]["grids"][use_panel+"."+value];
+              update_axes(p_name, xyaxis, panel_i, grid_vals[1]);
             }
           }
         });
@@ -1769,18 +1771,20 @@ var animint = function (to_select, json_file) {
   // Update the axis ticks etc. once plot is zoomed in/out
   // currently called from update_scales.
   // Would it be better to implement separately??
-  function update_axes(p_name, axes, panel_i){
+  function update_axes(p_name, axes, panel_i, tick_vals){
     var orientation;
     if(axes == "x"){
       orientation = "bottom";
     }else{
       orientation = "left";
     }
+    if(!isArray(tick_vals)){
+      tick_vals = [tick_vals];
+    }
     var xyaxis = d3.svg.axis()
           .scale(Plots[p_name]["scales"][panel_i][axes])
           .orient(orientation)
-          .ticks(5); // Need to calculate tickValues instead of using d3's
-                     // important to draw grid lines!!!
+          .tickValues(tick_vals);
     // update existing axis
     var xyaxis_g = element.select("#plot_"+p_name).select("."+axes+"axis_"+panel_i)
           .transition()
