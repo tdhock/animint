@@ -635,7 +635,7 @@ var animint = function (to_select, json_file) {
       // creating g element for background, grid lines, and border
       // uses insert to draw it right before plot title
       var background = svg.insert("g", ".plottitle")
-        .attr("class", "background");
+        .attr("class", "background bgr" + panel_i);
       
       // drawing background
       if(Object.keys(p_info.panel_background).length > 1) {
@@ -1756,12 +1756,17 @@ var animint = function (to_select, json_file) {
               // Reverse domains for y-axis
               Plots[p_name]["scales"][panel_i][xyaxis].domain([use_domain[1], use_domain[0]]);
             }
-            // Once scales are updated, update the axis ticks etc., if needed
+            var scales = Plots[p_name]["scales"][panel_i][xyaxis];
+            // major and minor grid lines as calculated in the compiler
+            var grid_vals = Plots[p_name]["axis_domains"][xyaxis]["grids"][use_panel+"."+value];
+
+            // Once scales are updated, update the axis ticks if needed
             if(draw_axes){
               // Tick values are same as major grid lines
-              var grid_vals = Plots[p_name]["axis_domains"][xyaxis]["grids"][use_panel+"."+value];
               update_axes(p_name, xyaxis, panel_i, grid_vals[1]);
             }
+            // Update major and minor grid lines
+            update_grids(p_name, xyaxis, panel_i, grid_vals, scales);
           }
         });
       });
@@ -1790,6 +1795,79 @@ var animint = function (to_select, json_file) {
           .transition()
           .duration(1000) // What should be the default duration?
           .call(xyaxis);
+  }
+
+  // Update major/minor grids once axes ticks have been updated
+  function update_grids(p_name, axes, panel_i, grid_vals, scales){
+    // Select panel to update
+    var bgr = element.select("#plot_"+p_name).select(".bgr"+panel_i);
+
+    var orient;
+    if(axes == "x"){
+      orient = "vert";
+    }else{
+      orient = "hor";
+    }
+    
+    // Update major and minor grid lines
+    ["minor", "major"].forEach(function(grid_class, j){
+      var lines = bgr.select(".grid_"+grid_class).select("."+orient);
+      var xy1, xy2;
+      if(axes == "x"){
+        xy1 = lines.select("line").attr("y1");
+        xy2 = lines.select("line").attr("y2");
+      }else{
+        xy1 = lines.select("line").attr("x1");
+        xy2 = lines.select("line").attr("x2");
+      }
+      
+      // Get default values for grid lines like colour, stroke etc.
+      var grid_background = Plots[p_name]["grid_"+grid_class];
+      var col = grid_background.colour;
+      var lt = grid_background.linetype;
+      var size = grid_background.size;
+      var cap = grid_background.lineend;
+
+      // Remove old lines
+      lines.selectAll("line")
+        .remove();
+
+      if(!isArray(grid_vals[j])){
+        grid_vals[j] = [grid_vals[j]];
+      }
+
+      if(axes == "x"){
+        lines.selectAll("line")
+          .data(grid_vals[j])
+          .enter()
+          .append("line")
+          .attr("y1", xy1)
+          .attr("y2", xy2)
+          .attr("x1", function(d) { return scales(d); })
+          .attr("x2", function(d) { return scales(d); })
+          .style("stroke", col)
+          .style("stroke-linecap", cap)
+          .style("stroke-width", size)
+          .style("stroke-dasharray", function() {
+            return linetypesize2dasharray(lt, size);
+          });
+      }else{
+        lines.selectAll("line")
+          .data(grid_vals[j])
+          .enter()
+          .append("line")
+          .attr("x1", xy1)
+          .attr("x2", xy2)
+          .attr("y1", function(d) { return scales(d); })
+          .attr("y2", function(d) { return scales(d); })
+          .style("stroke", col)
+          .style("stroke-linecap", cap)
+          .style("stroke-width", size)
+          .style("stroke-dasharray", function() {
+            return linetypesize2dasharray(lt, size);
+          });
+      }
+    });
   }
 
   var update_selector = function (v_name, value) {
