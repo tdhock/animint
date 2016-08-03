@@ -1586,38 +1586,37 @@ var legend_decode_helper=function(index,legend_keys,plot_id){
     
 }      
       
-var legend_decode_in=function(d){   
-    for (viz in Plots){
-        var plot_id=Plots[viz].plot_id
-        var legendkeys = d3.keys(Plots[viz].legend);
-        for(var i=0; i<legendkeys.length; i++){
+  var legend_decode_in=function(d){   
+      for (viz in Plots){
+          var plot_id=Plots[viz].plot_id
+          var legendkeys = d3.keys(Plots[viz].legend);
+          for(var i=0; i<legendkeys.length; i++){
              legend_id=legend_decode_helper(i,legendkeys,plot_id)
              if(d.hasOwnProperty("showSelectedlegendcolour")){
                 var legend_str="#"+legend_id+'_'+safe_name(d["showSelectedlegendcolour"])+"_label";
                 $(legend_str).css({"font-weight":"bold","font-size":"115%"});                    
-            }
-        }
-    }        
-}
-var legend_decode_out=function(d){   
-    for (viz in Plots){
-        var plot_id=Plots[viz].plot_id
-        var legendkeys = d3.keys(Plots[viz].legend);
-        for(var i=0; i<legendkeys.length; i++){
-            legend_id=legend_decode_helper(i,legendkeys,plot_id)
-            if(d.hasOwnProperty("showSelectedlegendcolour")){
+             }
+         }
+     }        
+ }
+  var legend_decode_out=function(d){   
+      for (viz in Plots){
+          var plot_id=Plots[viz].plot_id
+          var legendkeys = d3.keys(Plots[viz].legend);
+          for(var i=0; i<legendkeys.length; i++){
+             legend_id=legend_decode_helper(i,legendkeys,plot_id)
+             if(d.hasOwnProperty("showSelectedlegendcolour")){
                 var legend_str="#"+legend_id+'_'+safe_name(d["showSelectedlegendcolour"])+"_label";
                 $(legend_str).css({"font-weight":"normal","font-size":"100%"});                    
             }
-        }
-    }        
-}   
-   
- elements.on("mouseover", function (d) {
-           legend_decode_in(d);          
+         }
+     }        
+ }   
+  elements.on("mouseover", function (d) {
+          legend_decode_in(d);          
 })
-     .on("mouseout", function (d) {
-        legend_decode_out(d)            
+         .on("mouseout", function (d) {
+          legend_decode_out(d)            
 });
             
       
