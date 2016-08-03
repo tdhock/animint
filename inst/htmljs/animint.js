@@ -42,7 +42,7 @@ var animint = function (to_select, json_file) {
   // replacing periods in variable with an underscore this makes sure
   // that selector doesn't confuse . in name with css selectors
   function safe_name(unsafe_name){
-    return unsafe_name.replace(/[ .]/g, '_');
+    return unsafe_name.replace(/[^-A-Za-z0-9_]/g,'');
   }
   function legend_class_name(selector_name){
     return safe_name(selector_name) + "_variable";
@@ -1229,7 +1229,9 @@ var animint = function (to_select, json_file) {
 
         // Need to store the clickSelects value that will
         // be passed to the selector when we click on this
-        // item.
+        // item And also showSelectedlegendcolour is added for
+        //legend decoding
+        d.showSelectedlegendcolour=keyed_data[d.value][0].showSelectedlegendcolour;
         d.clickSelects = keyed_data[d.value][0].clickSelects;
         return d;
       });
@@ -1575,6 +1577,50 @@ var animint = function (to_select, json_file) {
       enter = enter.append(eAppend)
 	      .attr("class", "geom");
     }
+var legend_decode_helper=function(index,legend_keys,plot_id){
+     var legend_key = legend_keys[index];
+     var l_info = Plots[viz].legend[legend_key];
+     var legend_class = legend_class_name(l_info["class"]);
+     var legend_id = plot_id + "_" + legend_class;
+     return legend_id
+    
+}      
+      
+var legend_decode_in=function(d){   
+    for (viz in Plots){
+        var plot_id=Plots[viz].plot_id
+        var legendkeys = d3.keys(Plots[viz].legend);
+        for(var i=0; i<legendkeys.length; i++){
+             legend_id=legend_decode_helper(i,legendkeys,plot_id)
+             if(d.hasOwnProperty("showSelectedlegendcolour")){
+                var legend_str="#"+legend_id+'_'+safe_name(d["showSelectedlegendcolour"])+"_label";
+                $(legend_str).css({"font-weight":"bold","font-size":"115%"});                    
+            }
+        }
+    }        
+}
+var legend_decode_out=function(d){   
+    for (viz in Plots){
+        var plot_id=Plots[viz].plot_id
+        var legendkeys = d3.keys(Plots[viz].legend);
+        for(var i=0; i<legendkeys.length; i++){
+            legend_id=legend_decode_helper(i,legendkeys,plot_id)
+            if(d.hasOwnProperty("showSelectedlegendcolour")){
+                var legend_str="#"+legend_id+'_'+safe_name(d["showSelectedlegendcolour"])+"_label";
+                $(legend_str).css({"font-weight":"normal","font-size":"100%"});                    
+            }
+        }
+    }        
+}   
+   
+ elements.on("mouseover", function (d) {
+           legend_decode_in(d);          
+})
+     .on("mouseout", function (d) {
+        legend_decode_out(d)            
+});
+            
+      
     var has_clickSelects = g_info.aes.hasOwnProperty("clickSelects");
     var has_clickSelects_variable =
       g_info.aes.hasOwnProperty("clickSelects.variable");
@@ -1659,9 +1705,11 @@ var animint = function (to_select, json_file) {
       elements.call(out_fun)
         .on("mouseover", function (d) {
           d3.select(this).call(over_fun);
+          legend_decode_in(d)
         })
         .on("mouseout", function (d) {
           d3.select(this).call(out_fun);
+          legend_decode_out(d)
         })
       ;
       if(has_clickSelects){
