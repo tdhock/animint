@@ -1231,7 +1231,18 @@ var animint = function (to_select, json_file) {
         // be passed to the selector when we click on this
         // item And also showSelectedlegendcolour is added for
         //legend decoding
-        d.showSelectedlegendcolour=keyed_data[d.value][0].showSelectedlegendcolour;
+        if(keyed_data[d.value][0].hasOwnProperty("showSelectedlegendfill")){
+            d.showSelectedlegendfill=keyed_data[d.value][0].showSelectedlegendfill;
+        }
+        if(keyed_data[d.value][0].hasOwnProperty("showSelectedlegendshape")){
+            d.showSelectedlegendshape=keyed_data[d.value][0].showSelectedlegendshape;
+        }
+        if(keyed_data[d.value][0].hasOwnProperty("showSelectedlegendsize")){
+            d.showSelectedlegendsize=keyed_data[d.value][0].showSelectedlegendsize;
+        }
+        if(keyed_data[d.value][0].hasOwnProperty("showSelectedlegendcolour")){
+            d.showSelectedlegendcolour=keyed_data[d.value][0].showSelectedlegendcolour;
+        }
         d.clickSelects = keyed_data[d.value][0].clickSelects;
         return d;
       });
@@ -1594,8 +1605,20 @@ var legend_decode_helper=function(index,legend_keys,plot_id){
              legend_id=legend_decode_helper(i,legendkeys,plot_id)
              if(d.hasOwnProperty("showSelectedlegendcolour")){
                 var legend_str="#"+legend_id+'_'+safe_name(d["showSelectedlegendcolour"])+"_label";
-                $(legend_str).css({"font-weight":"bold","font-size":"115%"});                    
+                $(legend_str).css({"font-weight":"bold"});                    
              }
+             if(d.hasOwnProperty("showSelectedlegendsize")){
+                var legend_str="#"+legend_id+'_'+safe_name(d["showSelectedlegendsize"])+"_label";
+                $(legend_str).css({"font-weight":"bold"});                    
+             }
+              if(d.hasOwnProperty("showSelectedlegendshape")){
+                var legend_str="#"+legend_id+'_'+safe_name(d["showSelectedlegendshape"])+"_label";
+                $(legend_str).css({"font-weight":"bold"}); 
+            }
+             if(d.hasOwnProperty("showSelectedlegendfill")){
+                var legend_str="#"+legend_id+'_'+safe_name(d["showSelectedlegendfill"])+"_label";
+                $(legend_str).css({"font-weight":"bold"}); 
+            }
          }
      }        
  }
@@ -1607,9 +1630,22 @@ var legend_decode_helper=function(index,legend_keys,plot_id){
              legend_id=legend_decode_helper(i,legendkeys,plot_id)
              if(d.hasOwnProperty("showSelectedlegendcolour")){
                 var legend_str="#"+legend_id+'_'+safe_name(d["showSelectedlegendcolour"])+"_label";
-                $(legend_str).css({"font-weight":"normal","font-size":"100%"});                    
+                $(legend_str).css({"font-weight":"normal"});                    
+            }
+            if(d.hasOwnProperty("showSelectedlegendsize")){
+                var legend_str="#"+legend_id+'_'+safe_name(d["showSelectedlegendsize"])+"_label";
+                $(legend_str).css({"font-weight":"normal"}); 
+            }
+            if(d.hasOwnProperty("showSelectedlegendshape")){
+                var legend_str="#"+legend_id+'_'+safe_name(d["showSelectedlegendshape"])+"_label";
+                $(legend_str).css({"font-weight":"normal"}); 
+            }
+             if(d.hasOwnProperty("showSelectedlegendfill")){
+                var legend_str="#"+legend_id+'_'+safe_name(d["showSelectedlegendfill"])+"_label";
+                $(legend_str).css({"font-weight":"normal"}); 
             }
          }
+              
      }        
  }   
   elements.on("mouseover", function (d) {
@@ -2382,3 +2418,7 @@ var legend_decode_helper=function(index,legend_keys,plot_id){
     }
   });
 };
+
+
+
+
