@@ -1756,12 +1756,16 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
           }
         }
         subset_domains <- subset_domains[!sapply(subset_domains, is.null)]
-        use_domain <- get_domain(subset_domains)
-        # Save for renderer
-        meta$plots[[p.name]]$axis_domains[[axis]]$domains <- use_domain
-        # Get gridlines for updates
-        meta$plots[[p.name]]$axis_domains[[axis]]$grids <- 
-          get_ticks_gridlines(use_domain)
+        if(!is.null(subset_domains)){
+          use_domain <- get_domain(subset_domains)
+          # Save for renderer
+          meta$plots[[p.name]]$axis_domains[[axis]]$domains <- use_domain
+          # Get gridlines for updates
+          meta$plots[[p.name]]$axis_domains[[axis]]$grids <- 
+            get_ticks_gridlines(use_domain)
+        }else{
+          warning("axis updates work for a unique single selection variable")
+        }
       }
     }
   }
