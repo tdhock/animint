@@ -1756,7 +1756,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
           }
         }
         subset_domains <- subset_domains[!sapply(subset_domains, is.null)]
-        if(!is.null(subset_domains)){
+        if(length(subset_domains) > 0){
           use_domain <- get_domain(subset_domains)
           # Save for renderer
           meta$plots[[p.name]]$axis_domains[[axis]]$domains <- use_domain
