@@ -1765,6 +1765,10 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
             get_ticks_gridlines(use_domain)
         }else{
           warning("axis updates work for a unique single selection variable")
+          # Do not save in plot.json file if axes is not getting updated
+          update_axes <- meta$plots[[p.name]]$options$update_axes
+          meta$plots[[p.name]]$options$update_axes <-
+            update_axes[!axis == update_axes]
         }
       }
     }
