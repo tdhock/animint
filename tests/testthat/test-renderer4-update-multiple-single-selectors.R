@@ -23,4 +23,4 @@ viz <- (list(g=no_updates,
 viz$selector.types = list(cyl="single", hp="single")
 
 ## TODO: Implement axis updates for multiple single selectors
-expect_silent(animint2HTML(viz))
+expect_error(animint2HTML(viz))
