@@ -6,10 +6,11 @@
 // Constructor for animint Object.
 var animint = function (to_select, json_file) {
 
-  function wait_until_then(timeout, condFun, readyFun) {
+   function wait_until_then(timeout, condFun, readyFun) {
+    var args=arguments
     function checkFun() {
       if(condFun()) {
-        readyFun();
+        readyFun(args[3],args[4]);
       } else{
         setTimeout(checkFun, timeout);
       }
@@ -42,7 +43,7 @@ var animint = function (to_select, json_file) {
   // replacing periods in variable with an underscore this makes sure
   // that selector doesn't confuse . in name with css selectors
   function safe_name(unsafe_name){
-    return unsafe_name.replace(/[^-A-Za-z0-9_()]/g,'_');
+    return unsafe_name.replace(/[ .]/g, '_');
   }
   function legend_class_name(selector_name){
     return safe_name(selector_name) + "_variable";
@@ -1229,20 +1230,7 @@ var animint = function (to_select, json_file) {
 
         // Need to store the clickSelects value that will
         // be passed to the selector when we click on this
-        // item And also showSelectedlegendcolour is added for
-        //legend decoding
-        if(keyed_data[d.value][0].hasOwnProperty("showSelectedlegendfill")){
-            d.showSelectedlegendfill=keyed_data[d.value][0].showSelectedlegendfill;
-        }
-        if(keyed_data[d.value][0].hasOwnProperty("showSelectedlegendshape")){
-            d.showSelectedlegendshape=keyed_data[d.value][0].showSelectedlegendshape;
-        }
-        if(keyed_data[d.value][0].hasOwnProperty("showSelectedlegendsize")){
-            d.showSelectedlegendsize=keyed_data[d.value][0].showSelectedlegendsize;
-        }
-        if(keyed_data[d.value][0].hasOwnProperty("showSelectedlegendcolour")){
-            d.showSelectedlegendcolour=keyed_data[d.value][0].showSelectedlegendcolour;
-        }
+        // item.
         d.clickSelects = keyed_data[d.value][0].clickSelects;
         return d;
       });
@@ -1588,74 +1576,6 @@ var animint = function (to_select, json_file) {
       enter = enter.append(eAppend)
 	      .attr("class", "geom");
     }
-var legend_decode_helper=function(index,legend_keys,plot_id){
-     var legend_key = legend_keys[index];
-     var l_info = Plots[viz].legend[legend_key];
-     var legend_class = legend_class_name(l_info["class"]);
-     var legend_id = plot_id + "_" + legend_class;
-     return legend_id
-    
-}      
-      
-  var legend_decode_in=function(d){   
-      for (viz in Plots){
-          var plot_id=Plots[viz].plot_id
-          var legendkeys = d3.keys(Plots[viz].legend);
-          for(var i=0; i<legendkeys.length; i++){
-             legend_id=legend_decode_helper(i,legendkeys,plot_id)
-             if(d.hasOwnProperty("showSelectedlegendcolour")){
-                var legend_str="#"+legend_id+'_'+safe_name(d["showSelectedlegendcolour"])+"_label";
-                $(legend_str).css({"font-weight":"bold"});                    
-             }
-             if(d.hasOwnProperty("showSelectedlegendsize")){
-                var legend_str="#"+legend_id+'_'+safe_name(d["showSelectedlegendsize"])+"_label";
-                $(legend_str).css({"font-weight":"bold"});                    
-             }
-              if(d.hasOwnProperty("showSelectedlegendshape")){
-                var legend_str="#"+legend_id+'_'+safe_name(d["showSelectedlegendshape"])+"_label";
-                $(legend_str).css({"font-weight":"bold"}); 
-            }
-             if(d.hasOwnProperty("showSelectedlegendfill")){
-                var legend_str="#"+legend_id+'_'+safe_name(d["showSelectedlegendfill"])+"_label";
-                $(legend_str).css({"font-weight":"bold"}); 
-            }
-         }
-     }        
- }
-  var legend_decode_out=function(d){   
-      for (viz in Plots){
-          var plot_id=Plots[viz].plot_id
-          var legendkeys = d3.keys(Plots[viz].legend);
-          for(var i=0; i<legendkeys.length; i++){
-             legend_id=legend_decode_helper(i,legendkeys,plot_id)
-             if(d.hasOwnProperty("showSelectedlegendcolour")){
-                var legend_str="#"+legend_id+'_'+safe_name(d["showSelectedlegendcolour"])+"_label";
-                $(legend_str).css({"font-weight":"normal"});                    
-            }
-            if(d.hasOwnProperty("showSelectedlegendsize")){
-                var legend_str="#"+legend_id+'_'+safe_name(d["showSelectedlegendsize"])+"_label";
-                $(legend_str).css({"font-weight":"normal"}); 
-            }
-            if(d.hasOwnProperty("showSelectedlegendshape")){
-                var legend_str="#"+legend_id+'_'+safe_name(d["showSelectedlegendshape"])+"_label";
-                $(legend_str).css({"font-weight":"normal"}); 
-            }
-             if(d.hasOwnProperty("showSelectedlegendfill")){
-                var legend_str="#"+legend_id+'_'+safe_name(d["showSelectedlegendfill"])+"_label";
-                $(legend_str).css({"font-weight":"normal"}); 
-            }
-         }
-              
-     }        
- }   
-  elements.on("mouseover", function (d) {
-          legend_decode_in(d);          
-})
-         .on("mouseout", function (d) {
-          legend_decode_out(d)            
-});
-            
-      
     var has_clickSelects = g_info.aes.hasOwnProperty("clickSelects");
     var has_clickSelects_variable =
       g_info.aes.hasOwnProperty("clickSelects.variable");
@@ -1740,11 +1660,9 @@ var legend_decode_helper=function(index,legend_keys,plot_id){
       elements.call(out_fun)
         .on("mouseover", function (d) {
           d3.select(this).call(over_fun);
-          legend_decode_in(d)
         })
         .on("mouseout", function (d) {
           d3.select(this).call(out_fun);
-          legend_decode_out(d)
         })
       ;
       if(has_clickSelects){
@@ -2416,9 +2334,61 @@ var legend_decode_helper=function(index,legend_keys,plot_id){
       };
       document.addEventListener("visibilitychange", onchange);
     }
+    var check_func=function(){
+          var status_array = $('.status').map(function(){
+               return $.trim($(this).text());
+            }).get();
+       status_array=status_array.slice(1)
+       return status_array.every(elem => elem === "displayed");           
+      }
+     if(window.location.hash) {
+         var fragment=window.location.hash;
+         fragment=fragment.slice(1);
+         var frag_array=fragment.split(/(.*?})/);
+         frag_array=frag_array.filter(function(x){ return x!=""})
+         frag_array.forEach(function(selector_string){ 
+             var selector_hash=selector_string.split("=");
+             var selector_nam=selector_hash[0];
+             var selector_values=selector_hash[1];
+             var re = /\{(.*?)\}/;
+             selector_values=re.exec(selector_values)[1];
+             var array_values = selector_values.split(',');
+             var s_info=Selectors[selector_nam]
+             if(s_info.type=="single"){
+             
+                  array_values.forEach(function(element) {
+                      
+                      wait_until_then(100, check_func, update_selector,selector_nam,element)
+                      if(response.time)Animation.pause(true)
+                    });   
+                 
+             }
+             else{
+                  var old_selections = Selectors[selector_nam].selected;
+                  // the levels that need to have selections turned on
+                  array_values
+                    .filter(function(n) {
+                      return old_selections.indexOf(n) == -1;
+                    })
+                    .forEach(function(element) {
+                        wait_until_then(100, check_func, update_selector,selector_nam,element)
+                         if(response.time)Animation.pause(true)
+                    });
+                  
+            
+                  old_selections
+                    .filter(function(n) {
+                      return array_values.indexOf(n) == -1;
+                    })
+                    .forEach(function(element) {
+                       wait_until_then(100, check_func, update_selector,selector_nam,element)
+                       if(response.time)Animation.pause(true)
+                    });     
+             }
+         
+      })
+      }
   });
 };
-
-
 
 
