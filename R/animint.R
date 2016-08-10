@@ -1766,6 +1766,13 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
             }
           }
           ss_selectors <- ss_selectors[!ss_selectors %in% remove_ss]
+          # Only save those selectors which are used by plot
+          for(ss in ss_selectors){
+            if(!ss %in% meta$plots[[p.name]]$axis_domains[[axis]]$selectors){
+              meta$plots[[p.name]]$axis_domains[[axis]]$selectors <-
+                c(ss, meta$plots[[p.name]]$axis_domains[[axis]]$selectors)
+            }
+          }
           if(length(ss_selectors) > 0){
             subset_domains[num] <- compute_domains(
               ggplot.list[[p.name]]$built$data[[num]],
@@ -1781,6 +1788,15 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
           # Get gridlines for updates
           meta$plots[[p.name]]$axis_domains[[axis]]$grids <- 
             get_ticks_gridlines(use_domain)
+          ## Initially selected selector values are stored in curr_select
+          ## which updates every time a user updates the axes
+          saved_selectors <- sort(names(meta$selectors))
+          for (ss in saved_selectors){
+            if(ss %in% meta$plots[[p.name]]$axis_domains[[axis]]$selectors){
+              meta$plots[[p.name]]$axis_domains[[axis]]$curr_select[[ss]] <-
+                meta$selectors[[ss]]$selected
+            }
+          }
         }else{
           warning("axis updates work for a unique single selection variable")
           # Do not save in plot.json file if axes is not getting updated
