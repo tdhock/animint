@@ -2,10 +2,10 @@ acontext("multiple single selectors- axis updates")
 
 # Plots with axis updates
 mtcars$cyl <- as.factor(mtcars$cyl)
-mtcars$hp <- as.factor(mtcars$hp)
+mtcars$gear <- as.factor(mtcars$gear)
 
 no_updates <- ggplot()+geom_point(aes(mpg, disp, 
-                                      colour=cyl, showSelected=hp), 
+                                      colour=cyl, showSelected=gear), 
                                   data = mtcars)
 
 update_x <- no_updates+
@@ -20,7 +20,7 @@ viz <- (list(g=no_updates,
              g2=update_y, 
              g3=update_xy))
 # We only update axes for single selectors
-viz$selector.types = list(cyl="single", hp="single")
+viz$selector.types = list(cyl="single", gear="single")
 
-## TODO: Implement axis updates for multiple single selectors
-expect_error(animint2HTML(viz))
+## TODO: write tests for multiple selectors
+expect_silent(animint2HTML(viz))
