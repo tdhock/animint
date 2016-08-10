@@ -1642,7 +1642,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
   ## Compute domains of different subsets, to be used by update_scales
   ## in the renderer
   compute_domains <- function(built_data, axes, geom_name,
-                             var, split_by_panel){
+                             vars, split_by_panel){
     # Different geoms will use diff columns to calculate domains for
     # showSelected subsets. Eg. geom_bar will use 'xmin', 'xmax', 'ymin',
     # 'ymax' etc. while geom_point will use 'x', 'y'
@@ -1655,14 +1655,23 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
       return(NULL)
     }
     domain_vals <- list()
+    inter_data <- built_data[[ vars[[1]] ]]
+    # If we have more than one showSelected vars, we need to compute
+    # every possible subset domain
+    if(length(vars) > 1){
+      for(i in 2:length(vars)){
+        inter_data <- interaction(inter_data, built_data[[vars [[i]] ]],
+                                  sep = "_")
+      }
+    }
     # Split by PANEL only when specified, else use first value of PANEL
     # It is a hack and must be handled in a better way
     split_by <- if(split_by_panel){
-      interaction(built_data$PANEL, built_data[[var]])
+      interaction(built_data$PANEL, inter_data)
     }else{
-      levels(built_data[[var]]) <- paste0(unique(built_data$PANEL[[1]]),
-                                          ".", levels(built_data[[var]]))
-      built_data[[var]]
+      levels(inter_data) <- paste0(unique(built_data$PANEL[[1]]),
+                                   ".", levels(inter_data))
+      inter_data
     }
     if(length(use_cols) == 1){
       domain_vals[[use_cols[1]]] <-if(use_cols[1] %in% names(built_data)){
@@ -1748,15 +1757,20 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
           # showSelectedlegendcolour etc.
           aesthetic_names <- names(meta$geoms[[ p_geoms[[num]] ]]$aes)
           choose_ss <- grepl("^showSelected", aesthetic_names)
-          selector <- meta$geoms[[ p_geoms[[num]] ]]$aes[choose_ss]
+          ss_selectors <- meta$geoms[[ p_geoms[[num]] ]]$aes[choose_ss]
           # Do not calculate domains for multiple selectors
-          # What if there are more than one single selectors in a plot???
-          if(length(selector) > 0 &&
-             meta$selectors[[selector]]$type == "single"){
+          remove_ss <- c()
+          for(j in seq_along(ss_selectors)){
+            if(meta$selectors[[ss_selectors[j]]]$type != "single"){
+              remove_ss <- c(remove_ss, ss_selectors[j])
+            }
+          }
+          ss_selectors <- ss_selectors[!ss_selectors %in% remove_ss]
+          if(length(ss_selectors) > 0){
             subset_domains[num] <- compute_domains(
               ggplot.list[[p.name]]$built$data[[num]],
               axis, strsplit(p_geoms[[num]], "_")[[1]][[2]],
-              names(selector), split_by_panel)
+              names(sort(ss_selectors)), split_by_panel)
           }
         }
         subset_domains <- subset_domains[!sapply(subset_domains, is.null)]
