@@ -1650,6 +1650,10 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
                        point = c(axes),
                        path = c(axes))
     use_cols <- domain_cols[[geom_name]]
+    if(is.null(use_cols)){
+      warning("axis updates currently do not work for geom_", geom_name)
+      return(NULL)
+    }
     domain_vals <- list()
     # Split by PANEL only when specified, else use first value of PANEL
     # It is a hack and must be handled in a better way
