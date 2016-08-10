@@ -1748,7 +1748,16 @@ var animint = function (to_select, json_file) {
           }else{
             var use_panel = Plots[p_name].layout.PANEL[0];
           }
-          var use_domain = axis_domains[xyaxis]["domains"][use_panel+"."+value];
+          var curr_select = axis_domains[xyaxis].curr_select;
+          if(axis_domains[xyaxis].selectors.indexOf(v_name) > -1){
+            curr_select[v_name] = value;
+            var str = use_panel+".";
+            for(selec in curr_select){
+              str = str + curr_select[selec] + "_";
+            }
+            str = str.substring(0, str.length - 1);
+            var use_domain = axis_domains[xyaxis]["domains"][str];
+          }
           if(use_domain != null){
             if(xyaxis == "x"){
               Plots[p_name]["scales"][panel_i][xyaxis].domain(use_domain);
@@ -1758,7 +1767,7 @@ var animint = function (to_select, json_file) {
             }
             var scales = Plots[p_name]["scales"][panel_i][xyaxis];
             // major and minor grid lines as calculated in the compiler
-            var grid_vals = Plots[p_name]["axis_domains"][xyaxis]["grids"][use_panel+"."+value];
+            var grid_vals = Plots[p_name]["axis_domains"][xyaxis]["grids"][str];
 
             // Once scales are updated, update the axis ticks if needed
             if(draw_axes){
