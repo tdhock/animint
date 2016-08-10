@@ -1812,7 +1812,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
             }
           }
         }else{
-          warning("axis updates work for a unique single selection variable")
+          warning("axis updates only work for single selection variables")
           # Do not save in plot.json file if axes is not getting updated
           update_axes <- meta$plots[[p.name]]$options$update_axes
           meta$plots[[p.name]]$options$update_axes <-

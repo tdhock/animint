@@ -20,7 +20,7 @@ viz <- (list(g=no_updates,
             g3=update_xy))
 
 expect_warning(animint2HTML(viz),
-               "axis updates work for a unique single selection variable")
+               "axis updates only work for single selection variables")
 
 
 # We only update axes for single selectors
