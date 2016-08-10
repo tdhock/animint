@@ -2339,7 +2339,7 @@ var animint = function (to_select, json_file) {
                return $.trim($(this).text());
             }).get();
        status_array=status_array.slice(1)
-       return status_array.every(elem => elem === "displayed");           
+       return status_array.every(function(elem){ return elem === "displayed"});            
       }
      if(window.location.hash) {
          var fragment=window.location.hash;
@@ -2359,7 +2359,9 @@ var animint = function (to_select, json_file) {
                   array_values.forEach(function(element) {
                       
                       wait_until_then(100, check_func, update_selector,selector_nam,element)
-                      if(response.time)Animation.pause(true)
+                      if(response.time){
+                      Animation.pause(true)
+                      }
                     });   
                  
              }
@@ -2382,7 +2384,9 @@ var animint = function (to_select, json_file) {
                     })
                     .forEach(function(element) {
                        wait_until_then(100, check_func, update_selector,selector_nam,element)
-                       if(response.time)Animation.pause(true)
+                       if(response.time){
+                       	Animation.pause(true)
+                       }
                     });     
              }
          
