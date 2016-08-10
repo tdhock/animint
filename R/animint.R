@@ -1675,20 +1675,22 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
     }
     if(length(use_cols) == 1){
       domain_vals[[use_cols[1]]] <-if(use_cols[1] %in% names(built_data)){
-        lapply(split(built_data[[use_cols[1]]],
-                     split_by),
-               range, na.rm=TRUE)
+        # We suppress 'returning Inf' warnings when we compute a factor
+        # interaction that has no data to display
+        suppressWarnings(lapply(split(built_data[[use_cols[1]]],
+                                      split_by),
+                                range, na.rm=TRUE))
       }else{
         NULL
       }
     }else{
       # Calculate min and max values of each subset separately
-      min_vals <- lapply(split(built_data[[use_cols[1]]],
-                               split_by),
-                         min, na.rm=TRUE)
-      max_vals <- lapply(split(built_data[[use_cols[2]]],
-                               split_by),
-                         max, na.rm=TRUE)
+      min_vals <- suppressWarnings(lapply(split(built_data[[use_cols[1]]],
+                                                split_by),
+                                          min, na.rm=TRUE))
+      max_vals <- suppressWarnings(lapply(split(built_data[[use_cols[2]]],
+                                                split_by),
+                                          max, na.rm=TRUE))
       domain_vals <- list(mapply(c, min_vals, max_vals, SIMPLIFY = FALSE))
     }
     domain_vals
@@ -1706,8 +1708,18 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
       all_vals <- lapply(subset_domains, "[[", i)
       min_val <- min(sapply(all_vals, "[[", 1))
       max_val <- max(sapply(all_vals, "[[", 2))
-      use_domain[[i]] <- c(min_val - (extra_margin *(max_val-min_val)),
-                          max_val + (extra_margin *(max_val-min_val)))
+      # We ignore non finite values that may have creeped in while
+      # calculating all possible subset domains
+      if(all(is.finite(c(max_val, min_val)))){
+        use_domain[[i]] <-if(max_val - min_val > 0){
+          c(min_val - (extra_margin *(max_val-min_val)),
+            max_val + (extra_margin *(max_val-min_val)))
+        }else{
+          # If min_val and max_val are same, return a range equal to
+          # the value. Any better ideas??
+          c(min_val - (0.5 * min_val), max_val + (0.5 * max_val))
+        }
+      }
     }
     use_domain
   }
