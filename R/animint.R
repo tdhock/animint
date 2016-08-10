@@ -1729,21 +1729,23 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
     gridlines <- list()
     for (i in seq_along(use_domain)){
       all_lines <- scales::pretty_breaks()(use_domain[[i]])
-      # make sure grid lines are not outside plot domain
-      if(use_domain[[i]][1] > all_lines[[1]]){
-        all_lines <- all_lines[2:length(all_lines)]
+      if(length(all_lines) > 0){
+        # make sure grid lines are not outside plot domain
+        if(use_domain[[i]][1] > all_lines[[1]]){
+          all_lines <- all_lines[2:length(all_lines)]
+        }
+        if(use_domain[[i]][2] < all_lines[[length(all_lines)]]){
+          all_lines <- all_lines[1:(length(all_lines)-1)]
+        }
+        # Every second grid line is minor, rest major
+        # Major grid lines are also used for drawing axis ticks
+        # Eg. If all_lines = 1:10
+        # minor grid lines = 1, 3, 5, 7, 9
+        # major grid lines = 2, 4, 6, 8, 10
+        majors <- all_lines[c(FALSE, TRUE)]
+        minors <- all_lines[c(TRUE, FALSE)]
+        gridlines[[ names(use_domain)[[i]] ]] <- list(minors, majors)
       }
-      if(use_domain[[i]][2] < all_lines[[length(all_lines)]]){
-        all_lines <- all_lines[1:(length(all_lines)-1)]
-      }
-      # Every second grid line is minor, rest major
-      # Major grid lines are also used for drawing axis ticks
-      # Eg. If all_lines = 1:10
-      # minor grid lines = 1, 3, 5, 7, 9
-      # major grid lines = 2, 4, 6, 8, 10
-      majors <- all_lines[c(FALSE, TRUE)]
-      minors <- all_lines[c(TRUE, FALSE)]
-      gridlines[[ names(use_domain)[[i]] ]] <- list(minors, majors)
     }
     gridlines
   }
