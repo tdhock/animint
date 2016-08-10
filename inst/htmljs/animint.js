@@ -6,10 +6,11 @@
 // Constructor for animint Object.
 var animint = function (to_select, json_file) {
 
-  function wait_until_then(timeout, condFun, readyFun) {
+   function wait_until_then(timeout, condFun, readyFun) {
+    var args=arguments
     function checkFun() {
       if(condFun()) {
-        readyFun();
+        readyFun(args[3],args[4]);
       } else{
         setTimeout(checkFun, timeout);
       }
@@ -2333,5 +2334,65 @@ var animint = function (to_select, json_file) {
       };
       document.addEventListener("visibilitychange", onchange);
     }
+    var check_func=function(){
+          var status_array = $('.status').map(function(){
+               return $.trim($(this).text());
+            }).get();
+       status_array=status_array.slice(1)
+       return status_array.every(function(elem){ return elem === "displayed"});            
+      }
+     if(window.location.hash) {
+         var fragment=window.location.hash;
+         fragment=fragment.slice(1);
+         var frag_array=fragment.split(/(.*?})/);
+         frag_array=frag_array.filter(function(x){ return x!=""})
+         frag_array.forEach(function(selector_string){ 
+             var selector_hash=selector_string.split("=");
+             var selector_nam=selector_hash[0];
+             var selector_values=selector_hash[1];
+             var re = /\{(.*?)\}/;
+             selector_values=re.exec(selector_values)[1];
+             var array_values = selector_values.split(',');
+             var s_info=Selectors[selector_nam]
+             if(s_info.type=="single"){
+             
+                  array_values.forEach(function(element) {
+                      
+                      wait_until_then(100, check_func, update_selector,selector_nam,element)
+                      if(response.time){
+                      Animation.pause(true)
+                      }
+                    });   
+                 
+             }
+             else{
+                  var old_selections = Selectors[selector_nam].selected;
+                  // the levels that need to have selections turned on
+                  array_values
+                    .filter(function(n) {
+                      return old_selections.indexOf(n) == -1;
+                    })
+                    .forEach(function(element) {
+                        wait_until_then(100, check_func, update_selector,selector_nam,element)
+                         if(response.time)Animation.pause(true)
+                    });
+                  
+            
+                  old_selections
+                    .filter(function(n) {
+                      return array_values.indexOf(n) == -1;
+                    })
+                    .forEach(function(element) {
+                       wait_until_then(100, check_func, update_selector,selector_nam,element)
+                       if(response.time){
+                       	Animation.pause(true)
+                       }
+                    });     
+             }
+         
+      })
+      }
   });
 };
+
+
