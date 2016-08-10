@@ -1748,6 +1748,8 @@ var animint = function (to_select, json_file) {
           }else{
             var use_panel = Plots[p_name].layout.PANEL[0];
           }
+          // We update the current selection of the plot every time
+          // and use it to index the correct domain
           var curr_select = axis_domains[xyaxis].curr_select;
           if(axis_domains[xyaxis].selectors.indexOf(v_name) > -1){
             curr_select[v_name] = value;
@@ -1755,7 +1757,7 @@ var animint = function (to_select, json_file) {
             for(selec in curr_select){
               str = str + curr_select[selec] + "_";
             }
-            str = str.substring(0, str.length - 1);
+            str = str.substring(0, str.length - 1); // Strip off trailing underscore
             var use_domain = axis_domains[xyaxis]["domains"][str];
           }
           if(use_domain != null){
