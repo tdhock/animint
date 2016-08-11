@@ -1717,8 +1717,12 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
         }else{
           # If min_val and max_val are same, return a range equal to
           # the value. Any better ideas??
+          warning("some data subsets have only a single data value to plot",
+                  call. = FALSE)
           c(min_val - (0.5 * min_val), max_val + (0.5 * max_val))
         }
+      }else{
+        warning("some data subsets have no data to plot", call. = FALSE)
       }
     }
     use_domain
