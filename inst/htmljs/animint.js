@@ -2344,14 +2344,11 @@ var animint = function (to_select, json_file) {
      if(window.location.hash) {
          var fragment=window.location.hash;
          fragment=fragment.slice(1);
-         var frag_array=fragment.split(/(.*?})/);
-         frag_array=frag_array.filter(function(x){ return x!=""})
+         var frag_array=fragment.split("&");
          frag_array.forEach(function(selector_string){ 
              var selector_hash=selector_string.split("=");
              var selector_nam=selector_hash[0];
              var selector_values=selector_hash[1];
-             var re = /\{(.*?)\}/;
-             selector_values=re.exec(selector_values)[1];
              var array_values = selector_values.split(',');
              var s_info=Selectors[selector_nam]
              if(s_info.type=="single"){
@@ -2394,5 +2391,6 @@ var animint = function (to_select, json_file) {
       }
   });
 };
+
 
 

@@ -10,8 +10,10 @@ viz <-
                         clickSelects=id), data=iris),
        title="Iris data")
 
+
+
 old_address <- remDr$getCurrentUrl()[[1]]
-new_address=paste(old_address,'#Species={setosa}',sep = '')
+new_address=paste(old_address,'#Species=setosa',sep = '')
 test_that("selection through url fragment is working", {
   info <- animint2HTML(viz)
   remDr$navigate(new_address)
