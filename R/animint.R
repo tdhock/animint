@@ -1719,7 +1719,12 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
           # the value. Any better ideas??
           warning("some data subsets have only a single data value to plot",
                   call. = FALSE)
-          c(min_val - (0.5 * min_val), max_val + (0.5 * max_val))
+          return_dom <- c(min_val - (0.5 * min_val), max_val + (0.5 * max_val))
+          if(min_val == 0){
+            # if min_val = max_val = 0, return a range (-1, 1)
+            return_dom <- c(-1, 1)
+          }
+          return_dom
         }
       }else{
         warning("some data subsets have no data to plot", call. = FALSE)
