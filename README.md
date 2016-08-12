@@ -34,17 +34,14 @@ permits non-standard geom options).
 
 ## Learning animint through examples
 
-The best way to learn animint is through examples. A couple of good
-introductions are Carson Sievert's [Interactive animations of
-PITCHf/x](http://cpsievert.github.io/baseballR/20140818/) and Susan
+The best way to learn animint is by reading the [Animint Designer
+Manual](http://cbio.mines-paristech.fr/~thocking/animint-book/Ch00-preface.html). Some
+other good introductions are Carson Sievert's [Interactive animations
+of PITCHf/x](http://cpsievert.github.io/baseballR/20140818/) and Susan
 VanderPlas' [animint tutorial](http://tdhock.github.io/animint/). In
-addition, there is an [examples web
-site](http://sugiyama-www.cs.titech.ac.jp/~toby/animint/index.html),
-[examples distributed with
-animint](https://github.com/tdhock/animint/tree/master/inst/examples), as
-well as more complex 'big data' examples in the
-[tdhock/animint-examples
-repo](https://github.com/tdhock/animint-examples/tree/master/examples).
+addition, animint includes many example data visualizations in our
+extensive set of [test
+cases](https://github.com/tdhock/animint/tree/master/tests/testthat).
 
 ## Frequently asked questions (FAQ)
 
