@@ -31,6 +31,6 @@ Suggests:
     httr,
     maps
 Remotes: 
-    ropensci/RSelenium,
-    hadley/ggplot2#1649
+    ropensci/RSelenium@22f06b9f2a675015d0daa3318319044e4e60d2fa,
+    faizan-khan-iit/ggplot2@5fb99d0cece13239bbbc09c6b8a7da7f86ac58e2
 RoxygenNote: 5.0.1
