@@ -1737,7 +1737,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
   get_ticks_gridlines <- function(use_domain){
     gridlines <- list()
     for (i in seq_along(use_domain)){
-      all_lines <- scales::pretty_breaks()(use_domain[[i]])
+      all_lines <- scales::pretty_breaks(n=10)(use_domain[[i]])
       if(length(all_lines) > 0){
         # make sure grid lines are not outside plot domain
         if(use_domain[[i]][1] > all_lines[[1]]){
