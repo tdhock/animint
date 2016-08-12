@@ -27,10 +27,12 @@ example(animint)
 NOTE: animint now works with standard ggplot2 >= 2.0 thanks to
 [Faizan](https://github.com/faizan-khan-iit) and
 [Kevin](https://github.com/kferris10)! If you want to use the animint
-[chunk\_vars option](https://github.com/tdhock/animint/wiki/Advanced-features-present-animint-but-not-in-ggplot2#use-chunk_varscvar1-var2-to-specify-how-much-data-to-load-at-a-time)
+[chunk\_vars
+option](https://github.com/tdhock/animint/wiki/Advanced-features-present-animint-but-not-in-ggplot2#use-chunk_varscvar1-var2-to-specify-how-much-data-to-load-at-a-time)
 then you will need to install
-[hadley/ggplot2#1649](https://github.com/hadley/ggplot2/pull/1649) (it
-permits non-standard geom options).
+[faizan-khan-iit/ggplot2@validate-params](https://github.com/hadley/ggplot2/pull/1649)
+until the ggplot2 developers [resolve the
+issue](https://github.com/hadley/ggplot2/issues/1694).
 
 ## Learning animint through examples
 
