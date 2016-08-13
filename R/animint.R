@@ -1081,7 +1081,8 @@ getCommonChunk <- function(built, chunk.vars, aes.list){
   is.common <- apply(is.common.mat, 2, all, na.rm=TRUE)
   ## TODO: another criterion could be used to save disk space even if
   ## there is only 1 chunk.
-  if(is.common[["group"]] && sum(is.common) >= 2){
+  n.common <- sum(is.common)
+  if(is.common[["group"]] && 2 <= n.common && n.common < length(is.common)){
     common.cols <- names(is.common)[is.common]
     group.info <- do.call(rbind, group.info.list)
     group.info.common <- group.info[, names(which(is.common))]
