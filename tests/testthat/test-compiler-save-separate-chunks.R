@@ -60,6 +60,7 @@ test_that("save separate chunks for geom_polygon", {
          stateMap = state.map,
          title = "FluView")
   out.dir <- file.path(getwd(), "FluView")
+  unlink(out.dir, recursive = TRUE)
   animint2dir(viz, out.dir = out.dir, open.browser = FALSE)
   
   common.chunk <-
@@ -110,6 +111,7 @@ test_that("save separate chunks for geom_point without specifying group", {
          stateMap = state.map,
          title = "FluView")
   out.dir <- file.path(getwd(), "FluView-point")
+  unlink(out.dir, recursive = TRUE)
   animint2dir(viz, out.dir = out.dir, open.browser = FALSE)
   
   common.chunk <-
@@ -304,6 +306,7 @@ test_that("save separate chunks for non-spatial geoms with nest_order not being 
     list(signal = signal,
          title="breakpointError (select one model size)")
   out.dir <- file.path(getwd(), "breakpointError-single")
+  unlink(out.dir, recursive = TRUE)
   animint2dir(viz, out.dir = out.dir, open.browser = FALSE)
   
   common.chunk <-
