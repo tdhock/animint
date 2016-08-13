@@ -90,6 +90,9 @@ viz.time <- viz.no.time
 viz.time$time <- list(variable="arclength", ms=5000)
 
 test_that("viz with time option compiles", {
-  info <- animint2HTML(viz.time)
+  expect_no_warning({
+    info <- animint2HTML(viz.time)
+  })
+  expect_identical(info$time$sequence, paste(arclength))
 })
 
