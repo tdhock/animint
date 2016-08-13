@@ -962,17 +962,20 @@ saveLayer <- function(l, d, meta){
 
   ## Some geoms should be split into separate groups if there are
   ## NAs. TODO: probably need to do this for ribbon too. polygon?
-  if(any(is.na(g.data)) && "group" %in% names(g.data) && length(chunk.cols)){
-    old.by.chunk <- split(g.data, g.data[, chunk.cols])
+  if(any(is.na(g.data)) && "group" %in% names(g.data)){
+    old.by.chunk <- split(g.data, g.data[, c(chunk.cols, "group")])
     new.by.chunk <- list()
     for(chunk.name in names(old.by.chunk)){
       df <- old.by.chunk[[chunk.name]]
       is.missing <- apply(is.na(df), 1, any)
-      diff.vec <- diff(is.missing)
-      diff.vec[0 < diff.vec] <- 0
-      subgroup.vec <- c(0, -cumsum(diff.vec))
-      ##browser(expr=chunk.name=="San Marcos")
-      df$group <- paste0(df$group, "_", subgroup.vec)
+      if(any(is.missing)){
+        diff.vec <- diff(is.missing)
+        diff.vec[0 < diff.vec] <- 0
+        subgroup.vec <- c(0, -cumsum(diff.vec))
+        ##browser(expr=chunk.name=="San Marcos")
+        ##browser()
+        df$group <- paste0(df$group, "_", subgroup.vec)
+      }
       new.by.chunk[[chunk.name]] <- df
     }
     g.data <- do.call(rbind, new.by.chunk)
