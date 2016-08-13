@@ -225,6 +225,7 @@ test_that("save separate chunks for non-spatial geoms with repetitive field, mul
          first=list(year=1975, country="United States"),
          title="World Bank data (multiple selections)")
   out.dir <- file.path(getwd(), "WorldBank-all")
+  unlink(out.dir, recursive=TRUE)
   info <- animint2dir(viz, out.dir = out.dir, open.browser = FALSE)
   
   ## multiple vars selected
