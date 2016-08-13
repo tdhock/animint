@@ -678,9 +678,6 @@ saveLayer <- function(l, d, meta){
       # Make outer border of 0 size if size isn't already specified.
       if(!"size"%in%names(g.data)) g.data[["size"]] <- 0
     }
-  } else {
-    ## all other geoms are basic, and keep the same name.
-    g$geom
   }
 
   ## Some geoms need their data sorted before saving to tsv.
@@ -759,10 +756,6 @@ saveLayer <- function(l, d, meta){
                                     split(g.data, g.data[["PANEL"]]), 
                                     ranges, SIMPLIFY = FALSE))
 
-#   g.data <- do.call("rbind", mapply(function(x, y) {
-#     ggplot2:::coord_trans(meta$plot$coord, x, y)
-#   }, split(g.data, g.data[["PANEL"]]), ranges, SIMPLIFY = FALSE))
-
   ## Output types
   ## Check to see if character type is d3's rgb type.
   is.linetype <- function(x){
@@ -789,6 +782,7 @@ saveLayer <- function(l, d, meta){
       type
     }
   })
+  g$types[["group"]] <- "character"
 
   ## convert ordered factors to unordered factors so javascript
   ## doesn't flip out.
@@ -966,6 +960,24 @@ saveLayer <- function(l, d, meta){
     g$nest_order <- c(g$nest_order, "group")
   }
 
+  ## Some geoms should be split into separate groups if there are
+  ## NAs. TODO: probably need to do this for ribbon too. polygon?
+  if(any(is.na(g.data)) && "group" %in% names(g.data) && length(chunk.cols)){
+    old.by.chunk <- split(g.data, g.data[, chunk.cols])
+    new.by.chunk <- list()
+    for(chunk.name in names(old.by.chunk)){
+      df <- old.by.chunk[[chunk.name]]
+      is.missing <- apply(is.na(df), 1, any)
+      diff.vec <- diff(is.missing)
+      diff.vec[0 < diff.vec] <- 0
+      subgroup.vec <- c(0, -cumsum(diff.vec))
+      ##browser(expr=chunk.name=="San Marcos")
+      df$group <- paste0(df$group, "_", subgroup.vec)
+      new.by.chunk[[chunk.name]] <- df
+    }
+    g.data <- do.call(rbind, new.by.chunk)
+  }
+
   ## Determine if there are any "common" data that can be saved
   ## separately to reduce disk usage.
   data.or.null <- getCommonChunk(g.data, chunk.cols, g$aes)
@@ -1024,6 +1036,7 @@ getCommonChunk <- function(built, chunk.vars, aes.list){
   }
   built.by.chunk <- split(built, built[, chunk.vars], drop = TRUE)
   if(length(built.by.chunk) == 1) return(NULL)
+
   ## If there is no group column, and all the chunks are the same
   ## size, then add one based on the row number.
   if(! "group" %in% names(built)){
