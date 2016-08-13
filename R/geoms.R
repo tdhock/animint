@@ -158,9 +158,23 @@ make_tallrect <- function(data, x.name, even=FALSE, alpha=1/2, ...){
   df <- data.frame(vals,
                    xmin=breaks[-length(breaks)],
                    xmax=breaks[-1])
-  names(df)[1] <- x.name
-  a <- aes_string(xmin="xmin", xmax="xmax", clickSelects=x.name)
-  geom_tallrect(a, df, alpha=alpha, ...)
+  df2 <- expand.grid(click.i=1:nrow(df), show.i=1:nrow(df))
+  df2$xmin <- df[df2$click.i, "xmin"]
+  df2$xmax <- df[df2$click.i, "xmax"]
+  df2$click.val <- df[df2$click.i, "vals"]
+  df2$show.val <- df[df2$show.i, "vals"]
+  df2$var <- x.name
+  a <- aes(
+    xmin=xmin,
+    xmax=xmax,
+    clickSelects.variable=var,
+    clickSelects.value=click.val,
+    showSelected.variable=var,
+    showSelected.value=show.val,
+    key=ifelse(
+      click.val==show.val, 1,
+      paste(click.val, show.val)))
+  geom_tallrect(a, df2, alpha=alpha, ...)
 }
 
 #' Convenience function for an interactive bar that might otherwise be
