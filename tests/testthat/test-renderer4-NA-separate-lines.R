@@ -21,6 +21,6 @@ viz <- list(
 info <- animint2HTML(viz)
 
 test_that("three <path> rendered for San Marcos", {
-  path.list <- getNodeSet(info$html, '//g[@classed="geom2_line_selected"]//path')
+  path.list <- getNodeSet(info$html, '//g[@class="geom2_line_selected"]//path')
   expect_equal(length(path.list), 3)
 })
