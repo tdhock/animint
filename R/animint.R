@@ -919,7 +919,7 @@ saveLayer <- function(l, d, meta){
   if(geom.has.one.panel && (!plot.has.panels)) {
     g.data <- g.data[names(g.data) != "PANEL"]
   }
-  
+
   ## Also add pointers to these chunks from the related selectors.
   if(length(chunk.cols)){
     selector.names <- as.character(g$aes[chunk.cols])
@@ -979,7 +979,6 @@ saveLayer <- function(l, d, meta){
       new.group.vec[is.diff] <- TRUE
     }
     subgroup.vec <- cumsum(new.group.vec)
-    ##browser()
     g.data$group <- subgroup.vec
   }
 
@@ -1039,71 +1038,82 @@ getCommonChunk <- function(built, chunk.vars, aes.list){
       built[, col.name] <- paste(built[, col.name])
     }
   }
-  built.by.chunk <- split(built, built[, chunk.vars], drop = TRUE)
-  if(length(built.by.chunk) == 1) return(NULL)
+
+  ## If there is only one chunk, then there is no point of making a
+  ## common data file.
+  chunk.rows.tab <- table(built[, chunk.vars])
+  if(length(chunk.rows.tab) == 1) return(NULL)
 
   ## If there is no group column, and all the chunks are the same
   ## size, then add one based on the row number.
   if(! "group" %in% names(built)){
-    chunk.rows.vec <- sapply(built.by.chunk, nrow)
-    chunk.rows <- chunk.rows.vec[1]
-    same.size <- chunk.rows == chunk.rows.vec
+    chunk.rows <- chunk.rows.tab[1]
+    same.size <- chunk.rows == chunk.rows.tab
+    order.args <- lapply(chunk.vars, function(order.col)built[[order.col]])
+    built <- built[do.call(order, order.args),]
     if(all(same.size)){
-      for(chunk.name in names(built.by.chunk)){
-        built.by.chunk[[chunk.name]]$group <- 1:chunk.rows
-      }
+      built$group <- 1:chunk.rows
     }else{
       ## do not save a common chunk file.
       return(NULL)
     }
   }
-  all.col.names <- names(built.by.chunk[[1]])
-  col.name.vec <- all.col.names[!all.col.names %in% chunk.vars]
-  values.by.group <- list()
-  for(chunk.name in names(built.by.chunk)){
-    chunk.df <- built.by.chunk[[chunk.name]]
-    chunk.by.group <- split(chunk.df, chunk.df$group, drop=TRUE)
-    for(group.name in names(chunk.by.group)){
-      values.by.group[[group.name]][[chunk.name]] <-
-        chunk.by.group[[group.name]]
+
+  built.by.group <- split(built, built$group)
+  group.tab <- table(built[, c("group", chunk.vars)])
+  each.group.same.size <- apply(group.tab, 1, function(group.size.vec){
+    group.size <- group.size.vec[1]
+    if(all(group.size == group.size.vec)){
+      ## groups are all this size.
+      group.size
+    }else{
+      ## groups not the same size.
+      0
     }
-  }
-  is.common.mat <-
-    matrix(NA, length(values.by.group), length(col.name.vec),
-           dimnames=list(group=names(values.by.group),
-                         col.name=col.name.vec))
-  group.info.list <- list()
-  for(group.name in names(values.by.group)){
-    values.by.chunk <- values.by.group[[group.name]]
-    row.count.vec <- sapply(values.by.chunk, nrow)
-    same.size.chunks <- all(row.count.vec[1] == row.count.vec)
-    ## For every group, save values for creating common tsv later.
-    one.group.info <- values.by.chunk[[1]]
-    for(col.name in col.name.vec){
-      value.list <- lapply(values.by.chunk, function(df)df[[col.name]])
-      is.common.mat[group.name, col.name] <- if(same.size.chunks){
-        value.mat <- do.call(cbind, value.list)
-        least.missing <- which.min(colSums(is.na(value.mat)))
-        value.vec <- value.mat[, least.missing]
-        one.group.info[[col.name]] <- value.vec
-        all(value.vec == value.mat)
+  })
+
+  checkCommon <- function(col.name){
+    for(group.name in names(built.by.group)){
+      data.vec <- built.by.group[[group.name]][[col.name]]
+      if(group.size <- each.group.same.size[[group.name]]){
+        not.same.value <- data.vec != data.vec[1:group.size]
+        if(any(not.same.value, na.rm=TRUE)){
+          ## if any data values are different, then this is not a
+          ## common column.
+          return(FALSE)
+        }
       }else{
-        value.vec <- unlist(value.list)
-        one.group.info[[col.name]] <- value.vec[[1]]
-        value.tab <- table(value.vec)
-        length(value.tab) == 1
+        ## this group has different sizes in different chunks, so the
+        ## only way that we can make common data is if there is only
+        ## value.
+        value.tab <- table(data.vec)
+        if(length(value.tab) != 1){
+          return(FALSE)
+        }
       }
     }
-    group.info.list[[group.name]] <- one.group.info
+    TRUE
   }
-  is.common <- apply(is.common.mat, 2, all, na.rm=TRUE)
+
+  all.col.names <- names(built)
+  col.name.vec <- all.col.names[!all.col.names %in% chunk.vars]
+  is.common <- sapply(col.name.vec, checkCommon)
+                      
   ## TODO: another criterion could be used to save disk space even if
   ## there is only 1 chunk.
   n.common <- sum(is.common)
   if(is.common[["group"]] && 2 <= n.common && n.common < length(is.common)){
     common.cols <- names(is.common)[is.common]
-    group.info <- do.call(rbind, group.info.list)
-    group.info.common <- group.info[, names(which(is.common))]
+    group.info.list <- list()
+    for(group.name in names(built.by.group)){
+      one.group <- built.by.group[[group.name]]
+      group.size <- each.group.same.size[[group.name]]
+      if(group.size == 0){
+        group.size <- 1
+      }
+      group.info.list[[group.name]] <- one.group[1:group.size, common.cols]
+    }
+    group.info.common <- do.call(rbind, group.info.list)
     common.unique <- unique(group.info.common)
     ## For geom_polygon and geom_path we may have two rows that should
     ## both be kept (the start and the end of each group may be the
@@ -1116,8 +1126,7 @@ getCommonChunk <- function(built, chunk.vars, aes.list){
     }else{
       group.info.common
     }
-    built.group <- do.call(rbind, built.by.chunk)
-    varied.df.list <- split.x(na.omit(built.group), chunk.vars)
+    varied.df.list <- split.x(na.omit(built), chunk.vars)
     varied.cols <- c("group", names(is.common)[!is.common])
     varied.data <- varied.chunk(varied.df.list, varied.cols)
     return(list(common=na.omit(common.data),
