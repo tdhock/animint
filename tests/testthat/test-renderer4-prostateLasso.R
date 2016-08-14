@@ -97,7 +97,7 @@ test_that("tallrect displays correct tooltip", {
   child.list <- xmlChildren(r)
   expect_identical(names(child.list), "title")
   value.vec <- sapply(child.list, xmlValue)
-  expect_identical(value.vec, "arclength 17.4461019561232")
+  expect_identical(paste(value.vec), "arclength 17.4461019561232")
 })
 
 viz.time <- viz.no.time
