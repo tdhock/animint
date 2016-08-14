@@ -180,6 +180,19 @@ RENDER: multiple animints inside of a single shiny app? This is
 probably just a theoretical issue. (why not just make a single
 animint?)
 
+2016.08.14 PR#165
+
+DATA: prostateLasso.
+
+BUGFIX: tooltips display correctly even after they have been updated
+via a selector change.
+
+BUGFIX: it is now OK to use .variable .value aes with the time
+selector.
+
+DSL: make_tallrect and new make_widerect use .variable and .value aes
+and key so that they now support smooth transitions.
+
 2016.07.12 PR#157
 
 GGPLOT: added support for stroke aesthetic in geom_point
