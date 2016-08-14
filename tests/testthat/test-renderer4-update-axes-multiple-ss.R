@@ -1,11 +1,59 @@
-acontext("update_axes")
+acontext("update_axes - multiple single selectors")
+
+## Test for appropriate warnings
+set.seed(123)
+
+# Empty domains in axis updates -> generate warning
+data_f1 <- data.frame(a=runif(30, 1, 30), b=sample(1:30))
+data_f1$ss1 <- as.factor(1:3)
+data_f1$ss2 <- as.factor(c("alpha", "beta"))
+data_f1$ss3 <- as.factor(c("A", "A", "B"))
+# factors "1" & "2" are never paired with factor "B"
+# factor "3" is never paired with factor "A"
+plot1 <- ggplot() + geom_point(aes(a,b, showSelected1=ss1,
+                                   showSelected2=ss2,
+                                   showSelected3=ss3),
+                               data = data_f1) +
+  theme_animint(update_axes=c("x"))
+viz <- list(p=plot1)
+
+viz$selector.types <- list(ss1="single", ss2="single", ss3="single")
+expect_warning(animint2HTML(viz),
+               "some data subsets have no data to plot")
+
+# Only a single unique value in domains for axis updates -> generate warning
+data_f2 <- data.frame(a=runif(6, 1, 6), b=sample(1:6))
+data_f2$ss1 <- as.factor(1:3)
+data_f2$ss2 <- as.factor(c("alpha", "beta"))
+# Each factor interaction only possesses a single value
+plot2 <- ggplot() + geom_point(aes(a,b, showSelected1=ss1,
+                                   showSelected2=ss2),
+                               data = data_f2) +
+  theme_animint(update_axes=c("x"))
+viz <- list(p=plot2)
+
+viz$selector.types <- list(ss1="single", ss2="single")
+expect_warning(animint2HTML(viz),
+               "some data subsets have only a single data value to plot")
+
+# Axes updates for more than one single selectors -> no warnings
+data_f3 <- data.frame(a=runif(60, 1, 60), b=sample(1:60))
+data_f3$ss1 <- as.factor(1:3)
+data_f3$ss2 <- as.factor(c("alpha", "beta"))
+plot3 <- ggplot() + geom_point(aes(a,b, colour=ss1,
+                                   showSelected2=ss2),
+                               data = data_f3)
+  
+viz <- list(p=plot3 + theme_animint(update_axes=c("x")))
+
+viz$selector.types <- list(ss1="single", ss2="single")
+expect_no_warning(animint2HTML(viz))
+
+## --------------------------------------------------------------------- ##
+## Tests for axis updates for more than one showSelected vars
 
 # Plots with axis updates
-mtcars$cyl <- as.factor(mtcars$cyl)
-
-no_updates <- ggplot()+geom_point(aes(mpg, disp, 
-                                      colour=cyl), 
-                                  data = mtcars)
+no_updates <- plot3
 
 update_x <- no_updates+
   theme_animint(update_axes=c("x"))
@@ -15,36 +63,32 @@ update_xy <- no_updates+
   theme_animint(update_axes=c("x","y"))
 
 viz <- (list(neither=no_updates, 
-            x=update_x, 
-            y=update_y, 
-            both=update_xy))
+             x=update_x, 
+             y=update_y, 
+             both=update_xy))
 
-expect_warning(animint2HTML(viz),
-               "axis updates only work for single selection variables")
+viz$selector.types <- list(ss1="single", ss2="single")
+viz$time = list(variable="ss2", ms=5000)
 
-
-# We only update axes for single selectors
-viz$selector.types = list(cyl="single")
-
-info <- animint2HTML(viz)
+# Use suppressWarnings as viz may have subsets with no data subsets 
+info <- suppressWarnings(animint2HTML(viz))
 
 # Update selection and get HTML
-clickID(c("plot_neither_cyl_variable_8"))
-Sys.sleep(0.5)
+clickID(c("plot_neither_ss1_variable_3"))
+Sys.sleep(1)
 info$html_updated1 <- getHTML()
 
-# Update selection and get HTML
-clickID(c("plot_neither_cyl_variable_4"))
-Sys.sleep(0.5)
+# Let the gear variable change and get HTML
+# Also checks for automatic axis updates with animation
+Sys.sleep(6)
 info$html_updated2 <- getHTML()
 
-
-## ------------------------------------------------------------------- ##
+## --------------------------------------------------------------------- ##
 ## Test for tick updates
 
 rect_path <- "//svg[@id='plot_%s']//g[contains(@class, '%saxis')]"
 all_rect_paths <- lapply(names(viz), sprintf, fmt=rect_path,
-                           c("x","y"))[1:4]
+                         c("x","y"))[1:4]
 
 # Take tick diffs for all 4 plots
 rect_nodes1 <- sapply(all_rect_paths, getNodeSet, doc=info$html)
@@ -52,8 +96,12 @@ original_tick_diff_x <- sapply(rect_nodes1[1, ], getTickDiff, axis="x")
 original_tick_diff_y <- sapply(rect_nodes1[2, ], getTickDiff, axis="y")
 
 rect_nodes2 <- sapply(all_rect_paths, getNodeSet, doc=info$html_updated1)
-updated_tick_diff_x <- sapply(rect_nodes2[1, ], getTickDiff, axis="x")
-updated_tick_diff_y <- sapply(rect_nodes2[2, ], getTickDiff, axis="y")
+updated_tick_diff_x1 <- sapply(rect_nodes2[1, ], getTickDiff, axis="x")
+updated_tick_diff_y1 <- sapply(rect_nodes2[2, ], getTickDiff, axis="y")
+
+rect_nodes3 <- sapply(all_rect_paths, getNodeSet, doc=info$html_updated2)
+updated_tick_diff_x2 <- sapply(rect_nodes3[1, ], getTickDiff, axis="x")
+updated_tick_diff_y2 <- sapply(rect_nodes3[2, ], getTickDiff, axis="y")
 
 test_that("axis ticks change when plots are updated",{
   # initially all are same
@@ -61,20 +109,32 @@ test_that("axis ticks change when plots are updated",{
   expect_equal(length(unique(original_tick_diff_y)), 1)
   
   #no_updates
-  expect_equal(updated_tick_diff_x[1], original_tick_diff_x[1])
-  expect_equal(updated_tick_diff_y[1], original_tick_diff_y[1])
+  expect_equal(updated_tick_diff_x1[1], original_tick_diff_x[1])
+  expect_equal(updated_tick_diff_y1[1], original_tick_diff_y[1])
+  expect_equal(updated_tick_diff_x2[1], original_tick_diff_x[1])
+  expect_equal(updated_tick_diff_y2[1], original_tick_diff_y[1])
   
   #update_x
-  expect_false(updated_tick_diff_x[2] == original_tick_diff_x[2])
-  expect_equal(updated_tick_diff_y[2], original_tick_diff_y[2])
+  expect_false(updated_tick_diff_x1[2] == original_tick_diff_x[2])
+  expect_false(updated_tick_diff_x2[2] == original_tick_diff_x[2])
+  expect_false(updated_tick_diff_x2[2] == updated_tick_diff_x1[2])
+  expect_equal(updated_tick_diff_y1[2], original_tick_diff_y[2])
+  expect_equal(updated_tick_diff_y2[2], original_tick_diff_y[2])
   
   #update_y
-  expect_equal(updated_tick_diff_x[3], original_tick_diff_x[3])
-  expect_false(updated_tick_diff_y[3] == original_tick_diff_y[3])
+  expect_equal(updated_tick_diff_x1[3], original_tick_diff_x[3])
+  expect_equal(updated_tick_diff_x2[3], original_tick_diff_x[3])
+  expect_false(updated_tick_diff_y1[3] == original_tick_diff_y[3])
+  expect_false(updated_tick_diff_y2[3] == original_tick_diff_y[3])
+  expect_false(updated_tick_diff_y2[3] == updated_tick_diff_y1[3])
   
   #update_xy
-  expect_false(updated_tick_diff_x[4] == original_tick_diff_x[4])
-  expect_false(updated_tick_diff_y[4] == original_tick_diff_y[4])
+  expect_false(updated_tick_diff_x1[4] == original_tick_diff_x[4])
+  expect_false(updated_tick_diff_x2[4] == original_tick_diff_x[4])
+  expect_false(updated_tick_diff_x2[4] == updated_tick_diff_x1[4])
+  expect_false(updated_tick_diff_y1[4] == original_tick_diff_y[4])
+  expect_false(updated_tick_diff_y2[4] == original_tick_diff_y[4])
+  expect_false(updated_tick_diff_y2[4] == updated_tick_diff_y1[4])
 })
 
 
@@ -119,11 +179,11 @@ test_that("major grids are updated",{
   expect_identical(major_grid_attr1$y, major_grid_attr1$neither)
   expect_identical(major_grid_attr1$both, major_grid_attr1$neither)
   
-  # no_updates
+  #no_updates
   expect_identical(major_grid_attr2$neither, major_grid_attr1$neither)
   expect_identical(major_grid_attr3$neither, major_grid_attr1$neither)
   
-  # update_x -> only vert grids are updated
+  #update_x -> only vert grids are updated
   expect_identical(major_grid_attr2$x$hor, major_grid_attr1$x$hor)
   expect_identical(major_grid_attr3$x$hor, major_grid_attr1$x$hor)
   expect_false(identical(major_grid_attr2$x$vert,
@@ -133,7 +193,7 @@ test_that("major grids are updated",{
   expect_false(identical(major_grid_attr3$x$vert,
                          major_grid_attr2$x$vert))
   
-  # update_y -> only hor grids are updated
+  #update_y -> only hor grids are updated
   expect_false(identical(major_grid_attr2$y$hor,
                          major_grid_attr1$y$hor))
   expect_false(identical(major_grid_attr3$y$hor,
@@ -143,7 +203,7 @@ test_that("major grids are updated",{
   expect_identical(major_grid_attr2$y$vert, major_grid_attr1$y$vert)
   expect_identical(major_grid_attr3$y$vert, major_grid_attr1$y$vert)
   
-  # update_xy -> both vert and hor grids updated
+  #update_xy -> both vert and hor grids updated
   expect_false(identical(major_grid_attr2$both$hor,
                          major_grid_attr1$both$hor))
   expect_false(identical(major_grid_attr3$both$hor,
@@ -216,14 +276,14 @@ no_updates_ranges2 <- get_pixel_ranges(info$html_updated2,
                                        "geom1_point_neither")
 
 x_updates_ranges1 <- get_pixel_ranges(info$html_updated1,
-                                       "geom2_point_x")
+                                      "geom2_point_x")
 x_updates_ranges2 <- get_pixel_ranges(info$html_updated2,
-                                       "geom2_point_x")
+                                      "geom2_point_x")
 
 y_updates_ranges1 <- get_pixel_ranges(info$html_updated1,
-                                       "geom3_point_y")
+                                      "geom3_point_y")
 y_updates_ranges2 <- get_pixel_ranges(info$html_updated2,
-                                       "geom3_point_y")
+                                      "geom3_point_y")
 
 xy_updates_ranges1 <- get_pixel_ranges(info$html_updated1,
                                        "geom4_point_both")
@@ -236,14 +296,15 @@ test_that("geoms get zoomed-in upon changing selection", {
   expect_false(all(no_updates_ranges2$y == no_updates_ranges1$y))
   
   # x_updates
-  expect_equal(x_updates_ranges2$x, x_updates_ranges1$x)
+  expect_equal(x_updates_ranges2$x, x_updates_ranges1$x, tolerance=0.0001)
   expect_false(all(x_updates_ranges2$y == x_updates_ranges1$y))
   
   # y_updates
   expect_false(all(y_updates_ranges2$x == y_updates_ranges1$x))
-  expect_equal(y_updates_ranges2$y, y_updates_ranges1$y)
+  expect_equal(y_updates_ranges2$y, y_updates_ranges1$y, tolerance=0.0001)
   
   # xy_updates
-  expect_equal(xy_updates_ranges2$x, xy_updates_ranges1$x)
+  expect_equal(xy_updates_ranges2$x, xy_updates_ranges1$x, tolerance=0.0001)
   expect_equal(xy_updates_ranges2$y, xy_updates_ranges1$y)
 })
+
