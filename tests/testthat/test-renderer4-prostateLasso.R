@@ -29,7 +29,7 @@ viz.no.time <- list(
     geom_tallrect(aes(
       xmin=arclength.click-rect.width,
       xmax=arclength.click+rect.width,
-      id=paste0("arclength", arclength.click),
+      id=paste0("arclength", round(arclength.click, 1)*10),
       clickSelects.variable="arclength",
       clickSelects.value=arclength.click,
       showSelected.variable="arclength",
@@ -67,13 +67,16 @@ html.during <- getHTML()
 Sys.sleep(5)
 html.after <- getHTML()
 
-getGreyX <- function(html){
+getGreyRect <- function(html){
   xpath <- '//g[@class="geom3_tallrect_path"]//rect'
   node.list <- getNodeSet(html, xpath)
   opacity.str <- getStyleValue(html, xpath, "opacity")
   opacity.num <- as.numeric(opacity.str)
   grey.i <- which(opacity.num == 0.5)
-  grey.rect <- node.list[[grey.i]]
+  node.list[[grey.i]]
+}
+getGreyX <- function(html){
+  grey.rect <- getGreyRect(html)
   attr.vec <- xmlAttrs(grey.rect)
   as.numeric(attr.vec[["x"]])
 }
@@ -84,6 +87,17 @@ test_that("selected tallrect moves to the left", {
   expect_lt(x.during, x.before)
   x.after <- getGreyX(html.after)
   expect_lt(x.after, x.during)
+})
+
+clickID("arclength174")
+html.click2 <- getHTML()
+
+test_that("tallrect displays correct tooltip", {
+  r <- getGreyRect(html.click2)
+  child.list <- xmlChildren(r)
+  expect_identical(names(child.list), "title")
+  value.vec <- sapply(child.list, xmlValue)
+  expect_identical(value.vec, "arclength 17.4461019561232")
 })
 
 viz.time <- viz.no.time
