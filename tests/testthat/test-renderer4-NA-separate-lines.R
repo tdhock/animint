@@ -20,6 +20,12 @@ viz <- list(
 )
 info <- animint2HTML(viz)
 
+test_that("no NA in tsv files", {
+  geom1.tsv <- file.path("animint-htmltest", "geom1_line_ggdata_chunk1.tsv")
+  geom1.data <- read.table(geom1.tsv, sep="\t", header=TRUE)
+  expect_equal(sum(is.na(geom1.data)), 0)
+})
+
 test_that("three <path> rendered for highlighted San Marcos", {
   xpath <- '//g[@class="geom1_line_ggdata"]//path'
   path.list <- getNodeSet(info$html, xpath)
