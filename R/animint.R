@@ -1110,7 +1110,14 @@ getCommonChunk <- function(built, chunk.vars, aes.list){
       if(group.size == 0){
         group.size <- 1
       }
-      group.info.list[[group.name]] <- one.group[1:group.size, common.cols]
+      group.common <- one.group[, common.cols]
+      ## Instead of just taking the first chunk for this group (which
+      ## may have NA), look for the chunk which has the fewest NA.
+      is.na.vec <- apply(is.na(group.common), 1, any)
+      is.na.mat <- matrix(is.na.vec, group.size)
+      group.i <- which.min(colSums(is.na.mat))
+      offset <- (group.i-1)*group.size
+      group.info.list[[group.name]] <- group.common[(1:group.size)+offset, ]
     }
     group.info.common <- do.call(rbind, group.info.list)
     common.unique <- unique(group.info.common)
