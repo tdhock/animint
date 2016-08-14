@@ -143,37 +143,57 @@ GeomWideRect <- ggplot2::ggproto("GeomWideRect", ggplot2::Geom,
 #' @author Toby Dylan Hocking
 #' @export
 make_tallrect <- function(data, x.name, even=FALSE, alpha=1/2, ...){
+  make_tallrect_or_widerect(
+    "x", geom_tallrect, data, x.name, even, alpha, ...)
+}
+
+make_widerect <- function(data, y.name, even=FALSE, alpha=0.5, ...){
+  make_tallrect_or_widerect(
+    "y", geom_widerect, data, y.name, even, alpha, ...)
+}
+
+make_tallrect_or_widerect <- function(aes.prefix, geom_xrect, data, var.name, even=FALSE, alpha=0.5, ...){
+  stopifnot(is.character(aes.prefix))
+  stopifnot(length(aes.prefix)==1)
+  stopifnot(aes.prefix %in% c("x", "y"))
+  stopifnot(is.function(geom_xrect))
   data <- as.data.frame(data)
-  stopifnot(is.character(x.name))
-  stopifnot(length(x.name)==1)
-  x <- data[,x.name]
+  stopifnot(is.character(var.name))
+  stopifnot(length(var.name)==1)
+  x <- data[, var.name]
   stopifnot(is.numeric(x))
+  stopifnot(is.logical(even))
+  stopifnot(length(even)==1)
+  stopifnot(is.numeric(alpha))
+  stopifnot(length(alpha)==1)
   vals <- sort(unique(x))
   Delta <- if(even) rep(ggplot2::resolution(vals), length(vals)-1)/2 else diff(vals)/2
   breaks <- c(vals[1] - Delta[1],
               vals[-1] - Delta,
               vals[length(vals)]+Delta[length(Delta)])
-  
   stopifnot(length(breaks) == length(vals)+1)
   df <- data.frame(vals,
                    xmin=breaks[-length(breaks)],
                    xmax=breaks[-1])
   df2 <- expand.grid(click.i=1:nrow(df), show.i=1:nrow(df))
-  df2$xmin <- df[df2$click.i, "xmin"]
-  df2$xmax <- df[df2$click.i, "xmax"]
   df2$click.val <- df[df2$click.i, "vals"]
   df2$show.val <- df[df2$show.i, "vals"]
-  df2$var <- x.name
-  a <- aes(
-    xmin=xmin,
-    xmax=xmax,
-    clickSelects.variable=var,
-    clickSelects.value=click.val,
-    showSelected.variable=var,
-    showSelected.value=show.val,
-    key=ifelse(
-      click.val==show.val, 1,
-      paste(click.val, show.val)))
+  df2$var <- var.name
+  df2$key <- with(df2, ifelse(
+    click.val==show.val, 1,
+    paste(click.val, show.val)))
+  aes.string.args <- list(
+    clickSelects.variable="var",
+    clickSelects.value="click.val",
+    showSelected.variable="var",
+    showSelected.value="show.val",
+    key="key")
+  for(suffix in c("min", "max")){
+    aes.str <- paste0(aes.prefix, suffix)
+    df2[[suffix]] <- df[df2$click.i, aes.str]
+    aes.string.args[[aes.str]] <- suffix
+  }
+  a <- do.call(aes_string, aes.string.args)
   geom_tallrect(a, df2, alpha=alpha, ...)
 }
 
