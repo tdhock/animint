@@ -961,7 +961,7 @@ saveLayer <- function(l, d, meta){
   }
 
   ## Some geoms should be split into separate groups if there are NAs.
-  if(any(is.na(g.data)) && "group" %in% names(g.data)){
+  if(any(is.na(g.data)) && "group" %in% names(g$aes)){
     sp.cols <- unlist(c(chunk.cols, g$nest_order))
     order.args <- list()
     for(sp.col in sp.cols){
