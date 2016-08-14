@@ -70,8 +70,7 @@ viz <- (list(neither=no_updates,
 viz$selector.types <- list(ss1="single", ss2="single")
 viz$time = list(variable="ss2", ms=5000)
 
-# Use suppressWarnings as viz may have subsets with no data subsets 
-info <- suppressWarnings(animint2HTML(viz))
+info <- animint2HTML(viz)
 
 # Update selection and get HTML
 clickID(c("plot_neither_ss1_variable_3"))
@@ -154,6 +153,9 @@ get_grid_lines <- function(html, p_name, grid_class){
   attr_v <- sapply(nodes_v, xmlAttrs)[1:4, ]
   return(list(hor=attr_h, vert=attr_v))
 }
+
+minor_grid_attr1 <- minor_grid_attr2 <- minor_grid_attr3 <- list()
+major_grid_attr1 <- major_grid_attr2 <- major_grid_attr3 <- list()
 
 p_names <- names(viz)[1:4]
 for(p.name in p_names){

@@ -95,6 +95,9 @@ get_grid_lines <- function(html, p_name, grid_class){
   return(list(hor=attr_h, vert=attr_v))
 }
 
+minor_grid_attr1 <- minor_grid_attr2 <- minor_grid_attr3 <- list()
+major_grid_attr1 <- major_grid_attr2 <- major_grid_attr3 <- list()
+
 p_names <- names(viz)[1:4]
 for(p.name in p_names){
   major_grid_attr1[[p.name]] <- get_grid_lines(info$html, p.name, "major")
