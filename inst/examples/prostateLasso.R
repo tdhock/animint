@@ -42,7 +42,7 @@ viz <- list(
                   showSelected2=set,
                   showSelected=arclength),
               hjust=0,
-              data=subset(prostateLasso$error, set=="validation"))+
+              data=subset(prostateLasso$error, set=="train"))+
     geom_text(aes(0, -2.5, label=sprintf("validation error = %.3f", mse),
                   key=1,
                   showSelected2=set,
