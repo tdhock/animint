@@ -2,11 +2,12 @@ acontext("NA separate lines")
 
 data(txhousing)
 
-san.marcos <- subset(txhousing, city=="San Marcos")
 ## ggplot2 draws separate lines when there are missing values.
-ggplot()+
-  geom_line(aes(x = date, y = median),
-            data=san.marcos)
+
+## san.marcos <- subset(txhousing, city=="San Marcos")
+## ggplot()+
+##   geom_line(aes(x = date, y = median),
+##             data=san.marcos)
 
 viz <- list(
   ggdata=ggplot(txhousing)+
