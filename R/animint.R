@@ -1647,11 +1647,18 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
     # showSelected subsets. Eg. geom_bar will use 'xmin', 'xmax', 'ymin',
     # 'ymax' etc. while geom_point will use 'x', 'y'
     domain_cols <- list(bar=c(paste0(axes, "min"), paste0(axes, "max")),
-                       point = c(axes),
-                       path = c(axes))
+                        ribbon=c(paste0(axes, "min"), paste0(axes, "max")),
+                        rect=c(paste0(axes, "min"), paste0(axes, "max")),
+                        point=c(axes),
+                        path=c(axes),
+                        text=c(axes),
+                        segment=c(axes, paste0(axes, "end")))
     use_cols <- domain_cols[[geom_name]]
     if(is.null(use_cols)){
-      warning("axis updates currently do not work for geom_", geom_name)
+      warning("axis updates currently do not work for geom_", geom_name,
+              call. = FALSE)
+      return(NULL)
+    }else if(!all(use_cols %in% names(built_data))){
       return(NULL)
     }
     domain_vals <- list()
@@ -1673,17 +1680,14 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
                                    ".", levels(inter_data))
       inter_data
     }
-    if(length(use_cols) == 1){
-      domain_vals[[use_cols[1]]] <-if(use_cols[1] %in% names(built_data)){
-        # We suppress 'returning Inf' warnings when we compute a factor
-        # interaction that has no data to display
+    if(geom_name %in% c("point", "path", "text")){
+      # We suppress 'returning Inf' warnings when we compute a factor
+      # interaction that has no data to display
+      domain_vals[[use_cols[1]]] <- 
         suppressWarnings(lapply(split(built_data[[use_cols[1]]],
                                       split_by),
                                 range, na.rm=TRUE))
-      }else{
-        NULL
-      }
-    }else{
+    }else if(geom_name %in% c("bar", "ribbon", "rect")){
       # Calculate min and max values of each subset separately
       min_vals <- suppressWarnings(lapply(split(built_data[[use_cols[1]]],
                                                 split_by),
@@ -1692,6 +1696,10 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
                                                 split_by),
                                           max, na.rm=TRUE))
       domain_vals <- list(mapply(c, min_vals, max_vals, SIMPLIFY = FALSE))
+    }else if(geom_name %in% c("segment")){
+      domain_vals[[use_cols[1]]] <-
+        suppressWarnings(lapply(split(built_data[, use_cols], split_by),
+                                range, na.rm=TRUE))
     }
     domain_vals
   }
