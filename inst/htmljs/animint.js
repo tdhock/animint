@@ -1709,11 +1709,8 @@ var animint = function (to_select, json_file) {
 	  return d["clickSelects.variable"] + " " + d["clickSelects.value"];
 	};
       }
-      // If elements have <title>, remove it
-      if(elements.select("title")[0][0]!== null){
-          elements.selectAll("title")
-            .remove()
-      }
+      // if elements have an existing title, remove it.
+      elements.selectAll("title").remove();
       elements.append("svg:title")
         .text(function(d_or_kv){
 	  var d = get_one(d_or_kv);

@@ -792,19 +792,33 @@ saveLayer <- function(l, d, meta){
     g$types[[i]] <- "factor"
   }
 
-  ## Make the time variable the first subset_order variable.
-  time.col <- if(is.null(meta$time)){ # if this is not an animation,
-    NULL
-  }else{
-    click.or.show <- grepl("clickSelects|showSelected", names(g$aes))
-    names(g$aes)[g$aes==meta$time$var & click.or.show]
+  ## Get unique values of time variable.
+  time.col <- NULL
+  if(is.list(meta$time)){ # if this is an animation,
+    g.time.list <- list()
+    for(c.or.s in names(s.aes)){
+      cs.info <- s.aes[[c.or.s]]
+      for(a in cs.info$one){
+        if(g$aes[[a]] == meta$time$var){
+          g.time.list[[a]] <- g.data[[a]]
+          time.col <- a
+        }
+      }
+      for(row.i in seq_along(cs.info$several$value)){
+        cs.row <- cs.info$several[row.i,]
+        c.name <- paste(cs.row$variable)
+        is.time <- g.data[[c.name]] == meta$time$var
+        g.time.list[[c.name]] <- g.data[is.time, paste(cs.row$value)]
+      }
+    }
+    u.vals <- unique(unlist(g.time.list))
+    if(length(u.vals)){
+      meta$timeValues[[paste(g$classed)]] <- sort(u.vals)
+    }
   }
+  ## Make the time variable the first subset_order variable.
   if(length(time.col)){
     pre.subset.order <- pre.subset.order[order(pre.subset.order != time.col)]
-  }
-  ## Get unique values of time variable.
-  if(length(time.col)){ # if this layer/geom is animated,
-    meta$timeValues[[paste(g$classed)]] <- unique(g.data[[time.col]])
   }
 
   ## Determine which showSelected values to use for breaking the data
