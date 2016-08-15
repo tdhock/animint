@@ -1744,10 +1744,52 @@ var animint = function (to_select, json_file) {
       eActions(elements); // Set the attributes of all elements (enter/exit/stay)
     }
   };
+  
+  var selected_values={}
+  
+  var value_tostring = function(selected_values) {
+      //function that is helpful to change the format of the string
+      var selector_url="#"
+      for (selc_var in selected_values){
+          if(selected_values.hasOwnProperty(selc_var)){
+              values_str=selected_values[selc_var].join();
+              sub_url=selc_var.concat("=","{",values_str,"}");
+              selector_url=selector_url.concat(sub_url);
+          }
+      }
+      url_nohash=window.location.href.match(/(^[^#]*)/)[0];
+      selector_url=url_nohash.concat(selector_url);
+      return  selector_url;
+      }
+  
+  var get_values=function(){
+      // function that is useful to get the selected values
+      for(s_name in Selectors){
+          var s_info=Selectors[s_name];
+          var initial_selections = [];
+          if(s_info.type==="single"){
+              initial_selections=[s_info.selected];
+          }
+          else{
+          for(i in s_info.selected) {
+            initial_selections[i] =  s_info.selected[i];
+          }
+          }
+          selected_values[s_name]=initial_selections;
+          
+      }
+  }
+      
+  var update_selector_url = function() {
+      get_values();
+      var url=value_tostring(selected_values);
+      $("#selectorurl a").attr("href",url).text(url);
+  }
 
   var update_selector = function (v_name, value) {
     value = value + "";
     var s_info = Selectors[v_name];
+    
     if(s_info.type == "single"){
       // value is the new selection.
       s_info.selected = value;
@@ -1762,6 +1804,7 @@ var animint = function (to_select, json_file) {
 	s_info.selected.splice(i_value, 1);
       }
     }
+    update_selector_url()
     // if there are levels, then there is a selectize widget which
     // should be updated.
     if(isArray(s_info.levels)){
@@ -2334,6 +2377,7 @@ var animint = function (to_select, json_file) {
       };
       document.addEventListener("visibilitychange", onchange);
     }
+    update_selector_url()
     var check_func=function(){
           var status_array = $('.status').map(function(){
                return $.trim($(this).text());
@@ -2344,14 +2388,18 @@ var animint = function (to_select, json_file) {
      if(window.location.hash) {
          var fragment=window.location.hash;
          fragment=fragment.slice(1);
-         var frag_array=fragment.split("&");
+         fragment=decodeURI(fragment)
+         var frag_array=fragment.split(/(.*?})/);
+         frag_array=frag_array.filter(function(x){ return x!=""})
          frag_array.forEach(function(selector_string){ 
-             var selector_hash=selector_string.split("=");
-             var selector_nam=selector_hash[0];
-             var selector_values=selector_hash[1];
-             var array_values = selector_values.split(',');
-             var s_info=Selectors[selector_nam]
-             if(s_info.type=="single"){
+         var selector_hash=selector_string.split("=");
+         var selector_nam=selector_hash[0];
+         var selector_values=selector_hash[1];
+         var re = /\{(.*?)\}/;
+         selector_values=re.exec(selector_values)[1];
+         var array_values = selector_values.split(',');
+         var s_info=Selectors[selector_nam]
+          if(s_info.type=="single"){
              
                   array_values.forEach(function(element) {
                       
