@@ -576,8 +576,8 @@ var animint = function (to_select, json_file) {
         .domain(axis.xrange)
         .range([plotdim.xstart, plotdim.xend]);
       scales[panel_i].y = d3.scale.linear()
-        .domain([axis.yrange[1], axis.yrange[0]])
-        .range([plotdim.ystart, plotdim.yend]);
+        .domain(axis.yrange)
+        .range([plotdim.yend, plotdim.ystart]);
       if(draw_x){
         var xaxis = d3.svg.axis()
           .scale(scales[panel_i].x)
@@ -1761,12 +1761,7 @@ var animint = function (to_select, json_file) {
             var use_domain = axis_domains[xyaxis]["domains"][str];
           }
           if(use_domain != null){
-            if(xyaxis == "x"){
-              Plots[p_name]["scales"][panel_i][xyaxis].domain(use_domain);
-            }else{
-              // Reverse domains for y-axis
-              Plots[p_name]["scales"][panel_i][xyaxis].domain([use_domain[1], use_domain[0]]);
-            }
+            Plots[p_name]["scales"][panel_i][xyaxis].domain(use_domain);
             var scales = Plots[p_name]["scales"][panel_i][xyaxis];
             // major and minor grid lines as calculated in the compiler
             var grid_vals = Plots[p_name]["axis_domains"][xyaxis]["grids"][str];
