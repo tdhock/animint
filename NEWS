@@ -180,6 +180,27 @@ RENDER: multiple animints inside of a single shiny app? This is
 probably just a theoretical issue. (why not just make a single
 animint?)
 
+2016.08.15 PR#166
+
+BUGFIX: no more NA saved to tsv files (even when there is no common
+data tsv file).
+
+OPTIMIZATION: getCommonChunk is faster, now we only split by group
+(and vectorize over chunks rather than splitting on chunks and doing a
+for loop). Also checkCommon returns that a variable is NOT common as
+soon as we have at least two chunks for which that variable is
+different, for a given group (before, we were checking all chunks).
+
+TEST: getStyleValue now works even if there are some nodes which are
+missing the style attribute.
+
+COMPILER: when aes(group) is specified and we have NA values with a
+group, we add a new subgroup ID for each run of non-NA
+values. Normally in ggplot2 this is important since for example a line
+group with two runs of NA values will be rendered as three lines. This
+fixes the bug that was combining lines, see
+test-renderer4-NA-separate-lines.R
+
 2016.08.14 PR#165
 
 DATA: prostateLasso.
