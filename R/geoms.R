@@ -130,7 +130,6 @@ GeomWideRect <- ggplot2::ggproto("GeomWideRect", ggplot2::Geom,
                                  draw_key = draw_key_rect
 )
 
-
 #' Make a clickSelects geom_tallrect that completely tiles the x
 #' range. This makes it easy to construct tallrects for the common
 #' case of selecting a particular x value.
@@ -143,24 +142,87 @@ GeomWideRect <- ggplot2::ggproto("GeomWideRect", ggplot2::Geom,
 #' @author Toby Dylan Hocking
 #' @export
 make_tallrect <- function(data, x.name, even=FALSE, alpha=1/2, ...){
+  make_tallrect_or_widerect(
+    "x", geom_tallrect, data, x.name, even, alpha, ...)
+}
+
+#' Make a clickSelects geom_widerect that completely tiles the y
+#' range. This makes it easy to construct widerects for the common
+#' case of selecting a particular y value.
+#' @param data data.frame to analyze for unique y.name values.
+#' @param y.name variable to be used for y, clickSelects.
+#' @param even Logical parameter, should widerects be of even width?
+#' @param alpha transparency of a selected widerect, default 1/2.
+#' @param ... passed to geom_widerect.
+#' @return a geom_widerect layer.
+#' @author Toby Dylan Hocking
+#' @export
+make_widerect <- function(data, y.name, even=FALSE, alpha=0.5, ...){
+  make_tallrect_or_widerect(
+    "y", geom_widerect, data, y.name, even, alpha, ...)
+}
+
+#' Make a clickSelects geom_widerect or geom_tallrect that completely
+#' tiles the x or y range. This function is used internally by
+#' make_tallrect or make_widerect, which are more user-friendly.
+#' @param aes.prefix "x" or "y"
+#' @param geom_xrect geom_tallrect or geom_widerect
+#' @param data data.frame to analyze for unique var.name values.
+#' @param var.name variable to be used for clickSelects
+#' @param even Logical parameter, should xrects be of even width?
+#' @param alpha transparency of a selected xrect, default 1/2.
+#' @param ... passed to geom_xrect
+#' @param data.fun called on data passed to geom_xrect(aes(..),
+#'   data.fun(df)) this is useful in facetted plots, for adding
+#'   columns to the data.frame, if you want that geom in only one
+#'   panel.
+#' @return a geom_xrect layer
+#' @author Toby Dylan Hocking
+#' @export
+make_tallrect_or_widerect <- function(aes.prefix, geom_xrect, data, var.name, even=FALSE, alpha=0.5, ..., data.fun=identity){
+  stopifnot(is.character(aes.prefix))
+  stopifnot(length(aes.prefix)==1)
+  stopifnot(aes.prefix %in% c("x", "y"))
+  stopifnot(is.function(geom_xrect))
   data <- as.data.frame(data)
-  stopifnot(is.character(x.name))
-  stopifnot(length(x.name)==1)
-  x <- data[,x.name]
+  stopifnot(is.character(var.name))
+  stopifnot(length(var.name)==1)
+  x <- data[, var.name]
   stopifnot(is.numeric(x))
+  stopifnot(is.logical(even))
+  stopifnot(length(even)==1)
+  stopifnot(is.numeric(alpha))
+  stopifnot(length(alpha)==1)
+  stopifnot(is.function(data.fun))
   vals <- sort(unique(x))
   Delta <- if(even) rep(ggplot2::resolution(vals), length(vals)-1)/2 else diff(vals)/2
   breaks <- c(vals[1] - Delta[1],
               vals[-1] - Delta,
               vals[length(vals)]+Delta[length(Delta)])
-  
   stopifnot(length(breaks) == length(vals)+1)
   df <- data.frame(vals,
-                   xmin=breaks[-length(breaks)],
-                   xmax=breaks[-1])
-  names(df)[1] <- x.name
-  a <- aes_string(xmin="xmin", xmax="xmax", clickSelects=x.name)
-  geom_tallrect(a, df, alpha=alpha, ...)
+                   min=breaks[-length(breaks)],
+                   max=breaks[-1])
+  geom.df <- expand.grid(click.i=1:nrow(df), show.i=1:nrow(df))
+  geom.df$click.val <- df[geom.df$click.i, "vals"]
+  geom.df$show.val <- df[geom.df$show.i, "vals"]
+  geom.df$var <- var.name
+  geom.df$key <- with(geom.df, ifelse(
+    click.val==show.val, 1,
+    paste(click.val, show.val)))
+  aes.string.args <- list()
+  aes.string.args[["clickSelects.variable"]] <- "var"
+  aes.string.args[["clickSelects.value"]] <- "click.val"
+  aes.string.args[["showSelected.variable"]] <- "var"
+  aes.string.args[["showSelected.value"]] <- "show.val"
+  aes.string.args[["key"]] <- "key"
+  for(suffix in c("min", "max")){
+    aes.str <- paste0(aes.prefix, suffix)
+    geom.df[[suffix]] <- df[geom.df$click.i, suffix]
+    aes.string.args[[aes.str]] <- suffix
+  }
+  a <- do.call(aes_string, aes.string.args)
+  geom_xrect(a, data.fun(geom.df), alpha=alpha, ...)
 }
 
 #' Convenience function for an interactive bar that might otherwise be
