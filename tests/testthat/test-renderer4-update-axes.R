@@ -310,7 +310,7 @@ data_f <- data.frame(
   z = factor(rep(1:5, each = 2)),
   w = rep(diff(c(0, 4, 6, 8, 10, 14)), 2)
 )
-rect <- ggplot(df, aes(xmin = x - w / 2, xmax = x + w / 2, ymin = y, ymax = y + 1)) +
+rect <- ggplot(data_f, aes(xmin = x - w / 2, xmax = x + w / 2, ymin = y, ymax = y + 1)) +
   geom_rect(aes(fill = z, width = w), colour = "grey50") +
   theme_animint(update_axes=c("x", "y"))
 viz <- list(rect=rect)
