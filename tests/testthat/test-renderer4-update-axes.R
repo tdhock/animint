@@ -26,7 +26,7 @@ expect_warning(animint2HTML(viz),
 # We only update axes for single selectors
 viz$selector.types = list(cyl="single")
 
-info <- animint2HTML(viz)
+expect_no_warning(info <- animint2HTML(viz))
 
 # Update selection and get HTML
 clickID(c("plot_neither_cyl_variable_8"))
@@ -249,4 +249,207 @@ test_that("geoms get zoomed-in upon changing selection", {
   # xy_updates
   expect_equal(xy_updates_ranges2$x, xy_updates_ranges1$x)
   expect_equal(xy_updates_ranges2$y, xy_updates_ranges1$y)
+})
+
+## ------------------------------------------------------------------- ##
+## Test for different geoms - ribbon, rect, segment, text
+## We test each for no warnings, axis tick updates and grid updates
+
+## ------------------------- geom_ribbon ----------------------------- ##
+set.seed(132)
+ribbondata <- data.frame(x=seq(0, 1, .1), ymin=runif(11, 0, 1), ymax=runif(11, 1, 2))
+ribbondata <- rbind(cbind(ribbondata, group="low"),
+                    cbind(ribbondata, group="medium"),
+                    cbind(ribbondata, group="high"))
+ribbondata[12:22,2:3] <- ribbondata[12:22,2:3]+runif(11, 1, 10)
+ribbondata[23:33,2:3] <- ribbondata[12:22,2:3]+runif(11, 1, 10)
+ribbon <- ggplot() + 
+  geom_ribbon(data=ribbondata, aes(x=x, ymin=ymin, ymax=ymax, group=group, fill=group), alpha=.5) + 
+  ggtitle("geom_ribbon") +
+  theme_animint(update_axes = c("y"))
+viz <- list(ribbon=ribbon, selector.types=list(group="single"))
+expect_no_warning(info <- animint2HTML(viz))
+
+# Update selection and get HTML
+clickID(c("plot_ribbon_group_variable_high"))
+Sys.sleep(0.5)
+info$html_updated <- getHTML()
+
+minor_grid_attr1 <- major_grid_attr1 <- minor_grid_attr2 <- 
+  major_grid_attr2 <- list()
+
+minor_grid_attr1 <- get_grid_lines(info$html, names(viz)[[1]], "minor")
+minor_grid_attr2 <- get_grid_lines(info$html_updated, names(viz)[[1]], "minor")
+major_grid_attr1 <- get_grid_lines(info$html, names(viz)[[1]], "major")
+major_grid_attr2 <- get_grid_lines(info$html_updated, names(viz)[[1]], "major")
+
+test_that("geom_ribbon has grid updates", {
+  # y axis updates -> hor grids updated
+  expect_identical(minor_grid_attr1$vert, minor_grid_attr2$vert)
+  expect_identical(major_grid_attr1$vert, major_grid_attr2$vert)
+  expect_false(identical(minor_grid_attr1$hor,
+                         minor_grid_attr2$hor))
+  expect_false(identical(major_grid_attr1$hor,
+                         major_grid_attr2$hor))
+})
+
+path.i <- "//svg[@id='plot_ribbon']//g[contains(@class, 'yaxis')]"
+nodes1 <- getNodeSet(info$html, path.i)
+nodes2 <- getNodeSet(info$html_updated, path.i)
+original_tick_diff <- sapply(nodes1, getTickDiff, axis="y")
+updated_tick_diff <- sapply(nodes2, getTickDiff, axis="y")
+
+test_that("geom_ribbon has axis tick updates", {
+  expect_false(identical(updated_tick_diff, original_tick_diff))
+})
+
+## ------------------------- geom_rect ----------------------------- ##
+data_f <- data.frame(
+  x = rep(c(2, 5, 7, 9, 12), 2),
+  y = rep(c(1, 2), each = 5),
+  z = factor(rep(1:5, each = 2)),
+  w = rep(diff(c(0, 4, 6, 8, 10, 14)), 2)
+)
+rect <- ggplot(df, aes(xmin = x - w / 2, xmax = x + w / 2, ymin = y, ymax = y + 1)) +
+  geom_rect(aes(fill = z, width = w), colour = "grey50") +
+  theme_animint(update_axes=c("x", "y"))
+viz <- list(rect=rect)
+viz$selector.types <- list(z="single")
+expect_no_warning(info <- animint2HTML(viz))
+
+# Update selection and get HTML
+clickID(c("plot_rect_z_variable_4"))
+Sys.sleep(0.5)
+info$html_updated <- getHTML()
+
+minor_grid_attr1 <- major_grid_attr1 <- minor_grid_attr2 <- 
+  major_grid_attr2 <- list()
+
+minor_grid_attr1 <- get_grid_lines(info$html, names(viz)[[1]], "minor")
+minor_grid_attr2 <- get_grid_lines(info$html_updated, names(viz)[[1]], "minor")
+major_grid_attr1 <- get_grid_lines(info$html, names(viz)[[1]], "major")
+major_grid_attr2 <- get_grid_lines(info$html_updated, names(viz)[[1]], "major")
+
+test_that("geom_rect has grid updates",{
+  # xy axis updates -> both vert/hor grids updated
+  expect_false(identical(minor_grid_attr1$vert, minor_grid_attr2$vert))
+  expect_false(identical(major_grid_attr1$vert, major_grid_attr2$vert))
+  expect_false(identical(minor_grid_attr1$hor, minor_grid_attr2$hor))
+  expect_false(identical(major_grid_attr1$hor, major_grid_attr2$hor))
+})
+
+path.i <- "//svg[@id='plot_rect']//g[contains(@class, '%saxis')]"
+path.xy <- sapply(c("x", "y"), sprintf, fmt=path.i)
+nodes1_x <- getNodeSet(info$html, path.xy[["x"]])
+nodes1_y <- getNodeSet(info$html, path.xy[["y"]])
+nodes2_x <- getNodeSet(info$html_updated, path.xy[["x"]])
+nodes2_y <- getNodeSet(info$html_updated, path.xy[["y"]])
+
+original_tick_diff_x <- sapply(nodes1_x, getTickDiff, axis="x")
+original_tick_diff_y <- sapply(nodes1_y, getTickDiff, axis="y")
+updated_tick_diff_x <- sapply(nodes2_x, getTickDiff, axis="x")
+updated_tick_diff_y <- sapply(nodes2_y, getTickDiff, axis="y")
+
+test_that("geom_rect has axis tick updates", {
+  expect_false(identical(updated_tick_diff_x, original_tick_diff_x))
+  expect_false(identical(updated_tick_diff_y, original_tick_diff_y))
+})
+
+## ----------------------- geom_segment ----------------------------- ##
+data_f <- data.frame(x1=c(runif(10, 0, 10),runif(10, 10, 20),runif(10, 20, 30),
+                          runif(10, 30, 40)),
+                     x2=runif(40, 0, 10),
+                     y1=c(runif(10, -10, 10),runif(10, 0, 20),runif(10, 20, 30),
+                          runif(10, -30, 50)),
+                     y2=runif(40, 0, 40),
+                     ss = as.factor(rep(1:4,each=10)))
+
+segment <- ggplot() +
+  geom_segment(aes(x=x1, y=y1, xend=x2, yend=y2, colour=ss),
+               data=data_f) + 
+  theme_animint(update_axes=c("x", "y"))
+viz <- list(segment=segment, selector.types=list(ss="single"))
+expect_no_warning(info <- animint2HTML(viz))
+
+# Update selection and get HTML
+clickID(c("plot_segment_ss_variable_3"))
+Sys.sleep(0.5)
+info$html_updated <- getHTML()
+
+minor_grid_attr1 <- major_grid_attr1 <- minor_grid_attr2 <- 
+  major_grid_attr2 <- list()
+
+minor_grid_attr1 <- get_grid_lines(info$html, names(viz)[[1]], "minor")
+minor_grid_attr2 <- get_grid_lines(info$html_updated, names(viz)[[1]], "minor")
+major_grid_attr1 <- get_grid_lines(info$html, names(viz)[[1]], "major")
+major_grid_attr2 <- get_grid_lines(info$html_updated, names(viz)[[1]], "major")
+
+test_that("geom_segment has grid updates",{
+  # xy axis updates -> both vert/hor grids updated
+  expect_false(identical(minor_grid_attr1$vert, minor_grid_attr2$vert))
+  expect_false(identical(major_grid_attr1$vert, major_grid_attr2$vert))
+  expect_false(identical(minor_grid_attr1$hor, minor_grid_attr2$hor))
+  expect_false(identical(major_grid_attr1$hor, major_grid_attr2$hor))
+})
+
+path.i <- "//svg[@id='plot_segment']//g[contains(@class, '%saxis')]"
+path.xy <- sapply(c("x", "y"), sprintf, fmt=path.i)
+nodes1_x <- getNodeSet(info$html, path.xy[["x"]])
+nodes1_y <- getNodeSet(info$html, path.xy[["y"]])
+nodes2_x <- getNodeSet(info$html_updated, path.xy[["x"]])
+nodes2_y <- getNodeSet(info$html_updated, path.xy[["y"]])
+
+original_tick_diff_x <- sapply(nodes1_x, getTickDiff, axis="x")
+original_tick_diff_y <- sapply(nodes1_y, getTickDiff, axis="y")
+updated_tick_diff_x <- sapply(nodes2_x, getTickDiff, axis="x")
+updated_tick_diff_y <- sapply(nodes2_y, getTickDiff, axis="y")
+
+test_that("geom_segment has axis tick updates", {
+  expect_false(identical(updated_tick_diff_x, original_tick_diff_x))
+  expect_false(identical(updated_tick_diff_y, original_tick_diff_y))
+})
+
+##  ------------------------- geom_text ------------------------- ##
+text <- ggplot() + geom_text(aes(mpg, disp, colour=cyl, label=hp), 
+                             data = mtcars) +
+  theme_animint(update_axes=c("x", "y"))
+viz <- list(text=text, selector.types=list(cyl="single"))
+expect_no_warning(info <- animint2HTML(viz))
+
+# Update selection and get HTML
+clickID(c("plot_text_cyl_variable_4"))
+Sys.sleep(0.5)
+info$html_updated <- getHTML()
+
+minor_grid_attr1 <- major_grid_attr1 <- minor_grid_attr2 <- 
+  major_grid_attr2 <- list()
+
+minor_grid_attr1 <- get_grid_lines(info$html, names(viz)[[1]], "minor")
+minor_grid_attr2 <- get_grid_lines(info$html_updated, names(viz)[[1]], "minor")
+major_grid_attr1 <- get_grid_lines(info$html, names(viz)[[1]], "major")
+major_grid_attr2 <- get_grid_lines(info$html_updated, names(viz)[[1]], "major")
+
+test_that("geom_segment has grid updates",{
+  # xy axis updates -> both vert/hor grids updated
+  expect_false(identical(minor_grid_attr1$vert, minor_grid_attr2$vert))
+  expect_false(identical(major_grid_attr1$vert, major_grid_attr2$vert))
+  expect_false(identical(minor_grid_attr1$hor, minor_grid_attr2$hor))
+  expect_false(identical(major_grid_attr1$hor, major_grid_attr2$hor))
+})
+
+path.i <- "//svg[@id='plot_text']//g[contains(@class, '%saxis')]"
+path.xy <- sapply(c("x", "y"), sprintf, fmt=path.i)
+nodes1_x <- getNodeSet(info$html, path.xy[["x"]])
+nodes1_y <- getNodeSet(info$html, path.xy[["y"]])
+nodes2_x <- getNodeSet(info$html_updated, path.xy[["x"]])
+nodes2_y <- getNodeSet(info$html_updated, path.xy[["y"]])
+
+original_tick_diff_x <- sapply(nodes1_x, getTickDiff, axis="x")
+original_tick_diff_y <- sapply(nodes1_y, getTickDiff, axis="y")
+updated_tick_diff_x <- sapply(nodes2_x, getTickDiff, axis="x")
+updated_tick_diff_y <- sapply(nodes2_y, getTickDiff, axis="y")
+
+test_that("geom_text has axis tick updates", {
+  expect_false(identical(updated_tick_diff_x, original_tick_diff_x))
+  expect_false(identical(updated_tick_diff_y, original_tick_diff_y))
 })
