@@ -1652,6 +1652,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
                         point=c(axes),
                         path=c(axes),
                         text=c(axes),
+                        line=c(axes),
                         segment=c(axes, paste0(axes, "end")))
     use_cols <- domain_cols[[geom_name]]
     if(is.null(use_cols)){
@@ -1680,7 +1681,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
                                    ".", levels(inter_data))
       inter_data
     }
-    if(geom_name %in% c("point", "path", "text")){
+    if(geom_name %in% c("point", "path", "text", "line")){
       # We suppress 'returning Inf' warnings when we compute a factor
       # interaction that has no data to display
       domain_vals[[use_cols[1]]] <- 
