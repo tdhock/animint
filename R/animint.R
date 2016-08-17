@@ -1647,8 +1647,12 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
     # showSelected subsets. Eg. geom_bar will use 'xmin', 'xmax', 'ymin',
     # 'ymax' etc. while geom_point will use 'x', 'y'
     domain_cols <- list(bar=c(paste0(axes, "min"), paste0(axes, "max")),
-                        ribbon=c(paste0(axes, "min"), paste0(axes, "max")),
+                        ribbon=if(axes=="x"){c(axes)}
+                        else{c(paste0(axes, "min"), paste0(axes, "max"))},
                         rect=c(paste0(axes, "min"), paste0(axes, "max")),
+                        tallrect=if(axes=="x")
+                          {c(paste0("xmin"), paste0("xmax"))}
+                        else{NULL},
                         point=c(axes),
                         path=c(axes),
                         text=c(axes),
@@ -1688,7 +1692,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
         suppressWarnings(lapply(split(built_data[[use_cols[1]]],
                                       split_by),
                                 range, na.rm=TRUE))
-    }else if(geom_name %in% c("bar", "ribbon", "rect")){
+    }else if(geom_name %in% c("bar", "rect", "tallrect")){
       # Calculate min and max values of each subset separately
       min_vals <- suppressWarnings(lapply(split(built_data[[use_cols[1]]],
                                                 split_by),
@@ -1701,6 +1705,21 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
       domain_vals[[use_cols[1]]] <-
         suppressWarnings(lapply(split(built_data[, use_cols], split_by),
                                 range, na.rm=TRUE))
+    }else if(geom_name %in% c("ribbon")){
+      if(axes=="x"){
+        domain_vals[[use_cols[1]]] <- 
+          suppressWarnings(lapply(split(built_data[[use_cols[1]]],
+                                        split_by),
+                                  range, na.rm=TRUE))
+      }else{
+        min_vals <- suppressWarnings(lapply(split(built_data[[use_cols[1]]],
+                                                  split_by),
+                                            min, na.rm=TRUE))
+        max_vals <- suppressWarnings(lapply(split(built_data[[use_cols[2]]],
+                                                  split_by),
+                                            max, na.rm=TRUE))
+        domain_vals <- list(mapply(c, min_vals, max_vals, SIMPLIFY = FALSE))
+      }
     }
     domain_vals
   }
@@ -1713,8 +1732,9 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
     ## have any plotted data. So axis ranges are 10% bigger than the
     ## actual ranges of data. We do the same here
     extra_margin = 0.05
-    for(i in names(subset_domains[[1]])){
+    for(i in unique(unlist(lapply(subset_domains, names)))){
       all_vals <- lapply(subset_domains, "[[", i)
+      all_vals <- all_vals[!sapply(all_vals, is.null)]
       min_val <- min(sapply(all_vals, "[[", 1))
       max_val <- max(sapply(all_vals, "[[", 2))
       # We ignore non finite values that may have creeped in while
