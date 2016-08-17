@@ -1781,17 +1781,12 @@ var animint = function (to_select, json_file) {
       return selected_values;
   };
   
-  var counter=-1;    
+    
   var update_selector_url = function() {
       var selected_values=get_values();
       var url=value_tostring(selected_values);
-      if(counter===-1){
-      $(".table_selector_widgets").after("<table style='display:none' class='urltable'><tr class='selectorurl'></tr></table>");
-      $(".selectorurl").append("<p>Current URL</p>");
-      $(".selectorurl").append("<a href=''></a>");
-      counter++;
-      }
-      $(".selectorurl a").attr("href",url).text(url);
+      stateobject={currenturl:url}
+      history.pushState(stateobject, $(document).find("title"), url);
   };
 
   var update_selector = function (v_name, value) {
@@ -2387,7 +2382,7 @@ var animint = function (to_select, json_file) {
       };
       document.addEventListener("visibilitychange", onchange);
     }
-    update_selector_url()
+    
     var check_func=function(){
           var status_array = $('.status').map(function(){
                return $.trim($(this).text());
@@ -2447,6 +2442,15 @@ var animint = function (to_select, json_file) {
          
       })
       }
+      update_selector_url();
+      window.onpopstate = function(e){
+        if(e.state){
+        stateobject={currenturl:e.state.currenturl}
+        window.history.pushState(stateobject,$(document).find('title'),e.state.currenturl)
+        location.reload()
+        Animation.play();
+    }
+};
   });
 };
 
