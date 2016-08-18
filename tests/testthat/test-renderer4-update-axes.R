@@ -20,7 +20,9 @@ viz <- (list(neither=no_updates,
             both=update_xy))
 
 expect_warning(animint2HTML(viz),
-               "axis updates only work for single selection variables")
+  paste("update_axes specified for X axis on plot x",
+        "but found no geoms with showSelected=singleSelectionVariable,",
+        "so created a plot with no updates for X axis"))
 
 
 # We only update axes for single selectors

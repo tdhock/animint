@@ -1660,8 +1660,8 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
                         segment=c(axes, paste0(axes, "end")))
     use_cols <- domain_cols[[geom_name]]
     if(is.null(use_cols)){
-      warning("axis updates currently do not work for geom_", geom_name,
-              call. = FALSE)
+      warning(paste("axis updates have not yet been implemented for geom_",
+                    geom_name), call. = FALSE)
       return(NULL)
     }else if(!all(use_cols %in% names(built_data))){
       return(NULL)
@@ -1850,7 +1850,11 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
             }
           }
         }else{
-          warning("axis updates only work for single selection variables")
+          warning(paste("update_axes specified for", toupper(axis),
+            "axis on plot", p.name, 
+            "but found no geoms with showSelected=singleSelectionVariable,",
+            "so created a plot with no updates for",
+            toupper(axis), "axis"), call. = FALSE)
           # Do not save in plot.json file if axes is not getting updated
           update_axes <- meta$plots[[p.name]]$options$update_axes
           meta$plots[[p.name]]$options$update_axes <-
