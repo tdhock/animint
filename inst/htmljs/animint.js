@@ -2103,6 +2103,21 @@ var animint = function (to_select, json_file) {
       add_selector(s_name, response.selectors[s_name]);
     }
     
+    // Update the scales/axes of the plots if needed
+    // We do this so that the plots zoom in initially after loading
+    for (var p_name in response.plots) {
+      if(response.plots[p_name].axis_domains !== null){
+        for(var xy in response.plots[p_name].axis_domains){
+          var selectors = response.plots[p_name].axis_domains[xy].selectors;
+          if(!isArray(selectors)){
+            selectors = [selectors];
+          }
+          update_scales(p_name, xy, selectors[0],
+            response.selectors[selectors[0]].selected);
+        }
+      }
+    }
+
     ////////////////////////////////////////////
     // Widgets at bottom of page
     ////////////////////////////////////////////

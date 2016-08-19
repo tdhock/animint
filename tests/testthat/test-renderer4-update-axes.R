@@ -58,9 +58,9 @@ updated_tick_diff_x <- sapply(rect_nodes2[1, ], getTickDiff, axis="x")
 updated_tick_diff_y <- sapply(rect_nodes2[2, ], getTickDiff, axis="y")
 
 test_that("axis ticks change when plots are updated",{
-  # initially all are same
-  expect_equal(length(unique(original_tick_diff_x)), 1)
-  expect_equal(length(unique(original_tick_diff_y)), 1)
+  # initial updates -> axis ticks are different for x and y axis
+  expect_equal(length(unique(original_tick_diff_x)), 2)
+  expect_equal(length(unique(original_tick_diff_y)), 2)
   
   #no_updates
   expect_equal(updated_tick_diff_x[1], original_tick_diff_x[1])
@@ -116,13 +116,13 @@ for(p.name in p_names){
 }
 
 test_that("major grids are updated",{
-  # initially all are identical
-  expect_identical(major_grid_attr1$x, major_grid_attr1$neither)
-  expect_identical(major_grid_attr1$y, major_grid_attr1$neither)
-  expect_identical(major_grid_attr1$both, major_grid_attr1$neither)
-  expect_identical(major_grid_attr1$x, major_grid_attr1$neither)
-  expect_identical(major_grid_attr1$y, major_grid_attr1$neither)
-  expect_identical(major_grid_attr1$both, major_grid_attr1$neither)
+  # initial grid updates
+  expect_false(identical(major_grid_attr1$x, major_grid_attr1$neither))
+  expect_false(identical(major_grid_attr1$y, major_grid_attr1$neither))
+  expect_false(identical(major_grid_attr1$both, major_grid_attr1$neither))
+  expect_false(identical(major_grid_attr1$x, major_grid_attr1$neither))
+  expect_false(identical(major_grid_attr1$y, major_grid_attr1$neither))
+  expect_false(identical(major_grid_attr1$both, major_grid_attr1$neither))
   
   # no_updates
   expect_identical(major_grid_attr2$neither, major_grid_attr1$neither)
@@ -164,13 +164,13 @@ test_that("major grids are updated",{
 })
 
 test_that("minor grids are updated",{
-  # initially all are identical
-  expect_identical(minor_grid_attr1$x, minor_grid_attr1$neither)
-  expect_identical(minor_grid_attr1$y, minor_grid_attr1$neither)
-  expect_identical(minor_grid_attr1$both, minor_grid_attr1$neither)
-  expect_identical(minor_grid_attr1$x, minor_grid_attr1$neither)
-  expect_identical(minor_grid_attr1$y, minor_grid_attr1$neither)
-  expect_identical(minor_grid_attr1$both, minor_grid_attr1$neither)
+  # initial grid updates
+  expect_false(identical(minor_grid_attr1$x, minor_grid_attr1$neither))
+  expect_false(identical(minor_grid_attr1$y, minor_grid_attr1$neither))
+  expect_false(identical(minor_grid_attr1$both, minor_grid_attr1$neither))
+  expect_false(identical(minor_grid_attr1$x, minor_grid_attr1$neither))
+  expect_false(identical(minor_grid_attr1$y, minor_grid_attr1$neither))
+  expect_false(identical(minor_grid_attr1$both, minor_grid_attr1$neither))
   
   #no_updates
   expect_identical(minor_grid_attr2$neither, minor_grid_attr1$neither)
