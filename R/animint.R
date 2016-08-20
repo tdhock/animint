@@ -708,24 +708,12 @@ saveLayer <- function(l, d, meta){
   if(zero.size && has.no.fill){
     warning(sprintf("geom_%s with size=0 will be invisible",g$geom))
   }
-
-  ## Idea: use the ggplot2:::coord_transform(coords, data, scales)
-  ## function to handle cases like coord_flip. scales is a list of
-  ## 12, coords is a list(limits=list(x=NULL,y=NULL)) with class
-  ## e.g. c("cartesian","coord"). The result is a transformed data
-  ## frame where all the data values are between 0 and 1.
-
   ## TODO: coord_transform maybe won't work for
   ## geom_dotplot|rect|segment and polar/log transformations, which
   ## could result in something nonlinear. For the time being it is
   ## best to just ignore this, but you can look at the source of
   ## e.g. geom-rect.r in ggplot2 to see how they deal with this by
   ## doing a piecewise linear interpolation of the shape.
-
-  # Apply coord_transform seperately to each panel
-  # Note the plotly implementation does not use
-  # coord_transform...do they take care of the transformation
-  # at a different point in time?
 
   # Flip axes in case of coord_flip
   # Switches column names. Eg. xmin to ymin, 
@@ -744,30 +732,7 @@ saveLayer <- function(l, d, meta){
   if(inherits(meta$plot$coordinates, "CoordFlip")){
     names(g.data) <- switch_axes(names(g.data))
   }
-
-  # Rescale data to range 0:1 like the coord_trans function
-  # in ggplot v1.0.1
-  rescale_data <- function(g.data.i, ranges.i){
-    for(col.name in names(g.data.i)){
-      if(grepl("^x", col.name)){
-        g.data.i[[col.name]] <- scales::rescale(g.data.i[[col.name]], 
-                                                0:1, ranges.i$x.range)
-      } else if(grepl("^y", col.name)){
-        g.data.i[[col.name]] <- scales::rescale(g.data.i[[col.name]], 
-                                                0:1, ranges.i$y.range)
-      }
-    }
-    g.data.i
-  }
-
-  # g.data <- do.call("rbind", mapply(rescale_data, 
-  #                                   split(g.data, g.data[["PANEL"]]), 
-  #                                   ranges, SIMPLIFY = FALSE))
-
-#   g.data <- do.call("rbind", mapply(function(x, y) {
-#     ggplot2:::coord_trans(meta$plot$coord, x, y)
-#   }, split(g.data, g.data[["PANEL"]]), ranges, SIMPLIFY = FALSE))
-
+  
   ## Output types
   ## Check to see if character type is d3's rgb type.
   is.linetype <- function(x){
@@ -1660,7 +1625,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
                         segment=c(axes, paste0(axes, "end")))
     use_cols <- domain_cols[[geom_name]]
     if(is.null(use_cols)){
-      warning(paste("axis updates have not yet been implemented for geom_",
+      warning(paste0("axis updates have not yet been implemented for geom_",
                     geom_name), call. = FALSE)
       return(NULL)
     }else if(!all(use_cols %in% names(built_data))){
@@ -1745,7 +1710,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
             max_val + (extra_margin *(max_val-min_val)))
         }else{
           # If min_val and max_val are same, return a range equal to
-          # the value. Any better ideas??
+          # the value
           warning("some data subsets have only a single data value to plot",
                   call. = FALSE)
           return_dom <- c(min_val - (0.5 * min_val), max_val + (0.5 * max_val))

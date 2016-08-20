@@ -1781,7 +1781,6 @@ var animint = function (to_select, json_file) {
 
   // Update the axis ticks etc. once plot is zoomed in/out
   // currently called from update_scales.
-  // Would it be better to implement separately??
   function update_axes(p_name, axes, panel_i, tick_vals){
     var orientation;
     if(axes == "x"){
@@ -1799,7 +1798,7 @@ var animint = function (to_select, json_file) {
     // update existing axis
     var xyaxis_g = element.select("#plot_"+p_name).select("."+axes+"axis_"+panel_i)
           .transition()
-          .duration(1000) // What should be the default duration?
+          .duration(1000)
           .call(xyaxis);
   }
 
