@@ -1758,8 +1758,8 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
     axes_to_update <- meta$plots[[p.name]]$options$update_axes
     if(!is.null(axes_to_update)){
       p_geoms <- meta$plots[[p.name]]$geoms
-      subset_domains <- list()
       for (axis in axes_to_update){
+        subset_domains <- list()
         # Determine if every panel needs a different domain or not
         # We conclude here if we want to split the data by PANEL
         # for the axes updates. Else every panel uses the same
