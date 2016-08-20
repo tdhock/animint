@@ -103,9 +103,9 @@ updated_tick_diff_x2 <- sapply(rect_nodes3[1, ], getTickDiff, axis="x")
 updated_tick_diff_y2 <- sapply(rect_nodes3[2, ], getTickDiff, axis="y")
 
 test_that("axis ticks change when plots are updated",{
-  # initial axis updates
-  expect_equal(length(unique(original_tick_diff_x)), 2)
-  expect_equal(length(unique(original_tick_diff_y)), 2)
+  # initial updates -> axis ticks are different for x and y axis
+  expect_length(unique(original_tick_diff_x), 2)
+  expect_length(unique(original_tick_diff_y), 2)
   
   #no_updates
   expect_equal(updated_tick_diff_x1[1], original_tick_diff_x[1])
@@ -114,26 +114,38 @@ test_that("axis ticks change when plots are updated",{
   expect_equal(updated_tick_diff_y2[1], original_tick_diff_y[1])
   
   #update_x
-  expect_false(updated_tick_diff_x1[2] == original_tick_diff_x[2])
-  expect_false(updated_tick_diff_x2[2] == original_tick_diff_x[2])
-  expect_false(updated_tick_diff_x2[2] == updated_tick_diff_x1[2])
+  expect_true(unequal(updated_tick_diff_x1[2], original_tick_diff_x[2],
+                      tolerance=0.01))
+  expect_true(unequal(updated_tick_diff_x2[2], original_tick_diff_x[2],
+                      tolerance=0.01))
+  expect_true(unequal(updated_tick_diff_x2[2], updated_tick_diff_x1[2],
+                      tolerance=0.01))
   expect_equal(updated_tick_diff_y1[2], original_tick_diff_y[2])
   expect_equal(updated_tick_diff_y2[2], original_tick_diff_y[2])
   
   #update_y
   expect_equal(updated_tick_diff_x1[3], original_tick_diff_x[3])
   expect_equal(updated_tick_diff_x2[3], original_tick_diff_x[3])
-  expect_false(updated_tick_diff_y1[3] == original_tick_diff_y[3])
-  expect_false(updated_tick_diff_y2[3] == original_tick_diff_y[3])
-  expect_false(updated_tick_diff_y2[3] == updated_tick_diff_y1[3])
+  expect_true(unequal(updated_tick_diff_y1[3], original_tick_diff_y[3],
+                      tolerance=0.01))
+  expect_true(unequal(updated_tick_diff_y2[3], original_tick_diff_y[3],
+                      tolerance=0.01))
+  expect_true(unequal(updated_tick_diff_y2[3], updated_tick_diff_y1[3],
+                      tolerance=0.01))
   
   #update_xy
-  expect_false(updated_tick_diff_x1[4] == original_tick_diff_x[4])
-  expect_false(updated_tick_diff_x2[4] == original_tick_diff_x[4])
-  expect_false(updated_tick_diff_x2[4] == updated_tick_diff_x1[4])
-  expect_false(updated_tick_diff_y1[4] == original_tick_diff_y[4])
-  expect_false(updated_tick_diff_y2[4] == original_tick_diff_y[4])
-  expect_false(updated_tick_diff_y2[4] == updated_tick_diff_y1[4])
+  expect_true(unequal(updated_tick_diff_x1[4], original_tick_diff_x[4],
+                      tolerance=0.01))
+  expect_true(unequal(updated_tick_diff_x2[4], original_tick_diff_x[4],
+                      tolerance=0.01))
+  expect_true(unequal(updated_tick_diff_x2[4], updated_tick_diff_x1[4],
+                      tolerance=0.01))
+  expect_true(unequal(updated_tick_diff_y1[4], original_tick_diff_y[4],
+                      tolerance=0.01))
+  expect_true(unequal(updated_tick_diff_y2[4], original_tick_diff_y[4],
+                      tolerance=0.01))
+  expect_true(unequal(updated_tick_diff_y2[4], updated_tick_diff_y1[4],
+                      tolerance=0.01))
 })
 
 
@@ -151,6 +163,8 @@ get_grid_lines <- function(html, p_name, grid_class){
   # take x1, x2, y1, y2 values only
   attr_h <- sapply(nodes_h, xmlAttrs)[1:4, ]
   attr_v <- sapply(nodes_v, xmlAttrs)[1:4, ]
+  attr_h <- apply(attr_h, 2, as.numeric)
+  attr_v <- apply(attr_v, 2, as.numeric)
   return(list(hor=attr_h, vert=attr_v))
 }
 
@@ -174,12 +188,12 @@ for(p.name in p_names){
 
 test_that("major grids are updated",{
   # initial grid updates
-  expect_false(identical(major_grid_attr1$x, major_grid_attr1$neither))
-  expect_false(identical(major_grid_attr1$y, major_grid_attr1$neither))
-  expect_false(identical(major_grid_attr1$both, major_grid_attr1$neither))
-  expect_false(identical(major_grid_attr1$x, major_grid_attr1$neither))
-  expect_false(identical(major_grid_attr1$y, major_grid_attr1$neither))
-  expect_false(identical(major_grid_attr1$both, major_grid_attr1$neither))
+  expect_true(unequal(major_grid_attr1$x, major_grid_attr1$neither))
+  expect_true(unequal(major_grid_attr1$y, major_grid_attr1$neither))
+  expect_true(unequal(major_grid_attr1$both, major_grid_attr1$neither))
+  expect_true(unequal(major_grid_attr1$x, major_grid_attr1$neither))
+  expect_true(unequal(major_grid_attr1$y, major_grid_attr1$neither))
+  expect_true(unequal(major_grid_attr1$both, major_grid_attr1$neither))
   
   #no_updates
   expect_identical(major_grid_attr2$neither, major_grid_attr1$neither)
@@ -188,46 +202,46 @@ test_that("major grids are updated",{
   #update_x -> only vert grids are updated
   expect_identical(major_grid_attr2$x$hor, major_grid_attr1$x$hor)
   expect_identical(major_grid_attr3$x$hor, major_grid_attr1$x$hor)
-  expect_false(identical(major_grid_attr2$x$vert,
-                         major_grid_attr1$x$vert))
-  expect_false(identical(major_grid_attr3$x$vert,
-                         major_grid_attr1$x$vert))
-  expect_false(identical(major_grid_attr3$x$vert,
-                         major_grid_attr2$x$vert))
+  expect_true(unequal(major_grid_attr2$x$vert,
+                      major_grid_attr1$x$vert, tolerance=0.01))
+  expect_true(unequal(major_grid_attr3$x$vert,
+                      major_grid_attr1$x$vert, tolerance=0.01))
+  expect_true(unequal(major_grid_attr3$x$vert,
+                      major_grid_attr2$x$vert, tolerance=0.01))
   
   #update_y -> only hor grids are updated
-  expect_false(identical(major_grid_attr2$y$hor,
-                         major_grid_attr1$y$hor))
-  expect_false(identical(major_grid_attr3$y$hor,
-                         major_grid_attr1$y$hor))
-  expect_false(identical(major_grid_attr3$y$hor,
-                         major_grid_attr2$y$hor))
+  expect_true(unequal(major_grid_attr2$y$hor,
+                      major_grid_attr1$y$hor, tolerance=0.01))
+  expect_true(unequal(major_grid_attr3$y$hor,
+                      major_grid_attr1$y$hor, tolerance=0.01))
+  expect_true(unequal(major_grid_attr3$y$hor,
+                      major_grid_attr2$y$hor, tolerance=0.01))
   expect_identical(major_grid_attr2$y$vert, major_grid_attr1$y$vert)
   expect_identical(major_grid_attr3$y$vert, major_grid_attr1$y$vert)
   
   #update_xy -> both vert and hor grids updated
-  expect_false(identical(major_grid_attr2$both$hor,
-                         major_grid_attr1$both$hor))
-  expect_false(identical(major_grid_attr3$both$hor,
-                         major_grid_attr1$both$hor))
-  expect_false(identical(major_grid_attr3$both$hor,
-                         major_grid_attr2$both$hor))
-  expect_false(identical(major_grid_attr2$both$vert,
-                         major_grid_attr1$both$vert))
-  expect_false(identical(major_grid_attr3$both$vert,
-                         major_grid_attr1$both$vert))
-  expect_false(identical(major_grid_attr3$both$vert,
-                         major_grid_attr2$both$vert))
+  expect_true(unequal(major_grid_attr2$both$hor,
+                      major_grid_attr1$both$hor, tolerance=0.01))
+  expect_true(unequal(major_grid_attr3$both$hor,
+                      major_grid_attr1$both$hor, tolerance=0.01))
+  expect_true(unequal(major_grid_attr3$both$hor,
+                      major_grid_attr2$both$hor, tolerance=0.01))
+  expect_true(unequal(major_grid_attr2$both$vert,
+                      major_grid_attr1$both$vert, tolerance=0.01))
+  expect_true(unequal(major_grid_attr3$both$vert,
+                      major_grid_attr1$both$vert, tolerance=0.01))
+  expect_true(unequal(major_grid_attr3$both$vert,
+                      major_grid_attr2$both$vert, tolerance=0.01))
 })
 
 test_that("minor grids are updated",{
   # initial grid updates
-  expect_false(identical(minor_grid_attr1$x, minor_grid_attr1$neither))
-  expect_false(identical(minor_grid_attr1$y, minor_grid_attr1$neither))
-  expect_false(identical(minor_grid_attr1$both, minor_grid_attr1$neither))
-  expect_false(identical(minor_grid_attr1$x, minor_grid_attr1$neither))
-  expect_false(identical(minor_grid_attr1$y, minor_grid_attr1$neither))
-  expect_false(identical(minor_grid_attr1$both, minor_grid_attr1$neither))
+  expect_true(unequal(minor_grid_attr1$x, minor_grid_attr1$neither))
+  expect_true(unequal(minor_grid_attr1$y, minor_grid_attr1$neither))
+  expect_true(unequal(minor_grid_attr1$both, minor_grid_attr1$neither))
+  expect_true(unequal(minor_grid_attr1$x, minor_grid_attr1$neither))
+  expect_true(unequal(minor_grid_attr1$y, minor_grid_attr1$neither))
+  expect_true(unequal(minor_grid_attr1$both, minor_grid_attr1$neither))
   
   #no_updates
   expect_identical(minor_grid_attr2$neither, minor_grid_attr1$neither)
@@ -236,36 +250,36 @@ test_that("minor grids are updated",{
   #update_x -> only vert grids are updated
   expect_identical(minor_grid_attr2$x$hor, minor_grid_attr1$x$hor)
   expect_identical(minor_grid_attr3$x$hor, minor_grid_attr1$x$hor)
-  expect_false(identical(minor_grid_attr2$x$vert,
-                         minor_grid_attr1$x$vert))
-  expect_false(identical(minor_grid_attr3$x$vert,
-                         minor_grid_attr1$x$vert))
-  expect_false(identical(minor_grid_attr3$x$vert,
-                         minor_grid_attr2$x$vert))
+  expect_true(unequal(minor_grid_attr2$x$vert,
+                      minor_grid_attr1$x$vert, tolerance=0.01))
+  expect_true(unequal(minor_grid_attr3$x$vert,
+                      minor_grid_attr1$x$vert, tolerance=0.01))
+  expect_true(unequal(minor_grid_attr3$x$vert,
+                      minor_grid_attr2$x$vert, tolerance=0.01))
   
   #update_y -> only hor grids are updated
-  expect_false(identical(minor_grid_attr2$y$hor,
-                         minor_grid_attr1$y$hor))
-  expect_false(identical(minor_grid_attr3$y$hor,
-                         minor_grid_attr1$y$hor))
-  expect_false(identical(minor_grid_attr3$y$hor,
-                         minor_grid_attr2$y$hor))
+  expect_true(unequal(minor_grid_attr2$y$hor,
+                      minor_grid_attr1$y$hor, tolerance=0.01))
+  expect_true(unequal(minor_grid_attr3$y$hor,
+                      minor_grid_attr1$y$hor, tolerance=0.01))
+  expect_true(unequal(minor_grid_attr3$y$hor,
+                      minor_grid_attr2$y$hor, tolerance=0.01))
   expect_identical(minor_grid_attr2$y$vert, minor_grid_attr1$y$vert)
   expect_identical(minor_grid_attr3$y$vert, minor_grid_attr1$y$vert)
   
   #update_xy -> both vert and hor grids updated
-  expect_false(identical(minor_grid_attr2$both$hor,
-                         minor_grid_attr1$both$hor))
-  expect_false(identical(minor_grid_attr3$both$hor,
-                         minor_grid_attr1$both$hor))
-  expect_false(identical(minor_grid_attr3$both$hor,
-                         minor_grid_attr2$both$hor))
-  expect_false(identical(minor_grid_attr2$both$vert,
-                         minor_grid_attr1$both$vert))
-  expect_false(identical(minor_grid_attr3$both$vert,
-                         minor_grid_attr1$both$vert))
-  expect_false(identical(minor_grid_attr3$both$vert,
-                         minor_grid_attr2$both$vert))
+  expect_true(unequal(minor_grid_attr2$both$hor,
+                      minor_grid_attr1$both$hor, tolerance=0.01))
+  expect_true(unequal(minor_grid_attr3$both$hor,
+                      minor_grid_attr1$both$hor, tolerance=0.01))
+  expect_true(unequal(minor_grid_attr3$both$hor,
+                      minor_grid_attr2$both$hor, tolerance=0.01))
+  expect_true(unequal(minor_grid_attr2$both$vert,
+                      minor_grid_attr1$both$vert, tolerance=0.01))
+  expect_true(unequal(minor_grid_attr3$both$vert,
+                      minor_grid_attr1$both$vert, tolerance=0.01))
+  expect_true(unequal(minor_grid_attr3$both$vert,
+                      minor_grid_attr2$both$vert, tolerance=0.01))
 })
 
 ## -------------------------------------------------------------------- ##
@@ -294,19 +308,23 @@ xy_updates_ranges2 <- get_pixel_ranges(info$html_updated2,
 
 test_that("geoms get zoomed-in upon changing selection", {
   # no_updates
-  expect_false(all(no_updates_ranges2$x == no_updates_ranges1$x))
-  expect_false(all(no_updates_ranges2$y == no_updates_ranges1$y))
+  expect_true(unequal(no_updates_ranges2$x, no_updates_ranges1$x,
+                      tolerance=0.01))
+  expect_true(unequal(no_updates_ranges2$y, no_updates_ranges1$y,
+                      tolerance=0.01))
   
   # x_updates
   expect_equal(x_updates_ranges2$x, x_updates_ranges1$x, tolerance=0.0001)
-  expect_false(all(x_updates_ranges2$y == x_updates_ranges1$y))
+  expect_true(unequal(x_updates_ranges2$y, x_updates_ranges1$y,
+                      tolerance=0.01))
   
   # y_updates
-  expect_false(all(y_updates_ranges2$x == y_updates_ranges1$x))
+  expect_true(unequal(y_updates_ranges2$x, y_updates_ranges1$x,
+                      tolerance=0.01))
   expect_equal(y_updates_ranges2$y, y_updates_ranges1$y, tolerance=0.0001)
   
   # xy_updates
   expect_equal(xy_updates_ranges2$x, xy_updates_ranges1$x, tolerance=0.0001)
-  expect_equal(xy_updates_ranges2$y, xy_updates_ranges1$y)
+  expect_equal(xy_updates_ranges2$y, xy_updates_ranges1$y, tolerance=0.0001)
 })
 

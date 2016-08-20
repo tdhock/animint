@@ -282,3 +282,8 @@ get_pixel_ranges <- function(html=NULL, geom_class=NULL){
   }
   return(list(x=xranges, y=yranges))
 }
+
+# returns TRUE if two objects are unequal using all.equal
+unequal <- function(object, expected, ...){
+  !isTRUE(all.equal(object, expected, ...))
+}
