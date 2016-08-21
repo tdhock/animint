@@ -2,26 +2,32 @@
 % Please edit documentation in R/theme.R
 \name{theme_animint}
 \alias{theme_animint}
-\title{Theme without checks. This allows us to write
-theme_animint(width=500), instead of theme(animint.width=500)
-which gives an error in ggplot2 because users should be informed
-if they mis-type standard theme element
-names. https://github.com/hadley/ggplot2/issues/938}
+\title{theme for passing animint specific params}
 \usage{
 theme_animint(...)
 }
 \arguments{
-\item{...}{theme options such as width.}
+\item{...}{theme options such as \code{width}. Use \code{update_axes=c("x", "y")} to update the axes of plots. Works for single selection variables.}
 }
 \value{
-ggplot theme list with names such as animint.width.
+ggplot theme list with names such as \code{animint.width}.
 }
 \description{
 Theme without checks. This allows us to write
-theme_animint(width=500), instead of theme(animint.width=500)
+\code{theme_animint(width=500)}, instead of \code{theme(animint.width=500)}
 which gives an error in ggplot2 because users should be informed
 if they mis-type standard theme element
 names. https://github.com/hadley/ggplot2/issues/938
+}
+\examples{
+mtcars$cyl <- as.factor(mtcars$cyl)
+p <- ggplot() +
+  geom_point(aes(x=wt, y=mpg, colour=cyl),
+             data=mtcars) +
+  ## set width and height values and update both axes
+  theme_animint(width=600, height=600, update_axes=c("x", "y"))
+viz <- list(plot=p, selector.types=list(cyl="single"))
+animint2dir(viz)
 }
 \author{
 Toby Dylan Hocking
