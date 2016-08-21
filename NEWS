@@ -88,12 +88,12 @@ For loops are bad for two reasons:
 DSL/RENDER: after clicking and changing the displayed data subset,
 zoom/update the axes of related plots. For animations we clearly want
 to keep the same axes across animation frames, but for some other
-kinds of plots it would be nice if the axes automatically zoomed. Make
-this an option theme_animint(updateAxes=c("x", "y")) which means that
-both the x and y axes should be updated. There should also be a button
+kinds of plots it would be nice if the axes automatically zoomed. We 
+currently have theme_animint(update_axes=c("x", "y")) option for single
+selection variables for most supported geoms. There should also be a button
 next to each axis that you can click to toggle zooming on and off. The
-compiler would have to look at every showSelected subset and compute
-the axes ranges for each.
+implementation for multiple selection vars may require some computation in
+the renderer. See this: https://github.com/tdhock/animint/pull/158
 
 RENDER: move stats computation to the renderer, to support e.g.
 examples/stats.R
