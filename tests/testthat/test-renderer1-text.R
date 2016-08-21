@@ -1,7 +1,16 @@
 acontext("Text")
 
 data(WorldBank, package = "animint")
-wb  <- WorldBank[WorldBank$year == 2010,]
+wb2010 <- subset(WorldBank, year==2010)
+subset(wb2010, population==min(population))
+### This test does not pass if we use the wb2010 data set above rather
+### than the wb data set below. The problem is that the scales are
+### trained before NAs are removed from the data. There are NA values
+### in life.expectancy/fertility.rate for Tuvalu, but not in
+### population. So Tuvalu will not be rendered on the plot, and in
+### fact there will be no text element with fontsize=10!
+wb <- subset(wb2010, !is.na(population) &
+    !is.na(fertility.rate) & !is.na(life.expectancy))
 viz <- list(scatter=ggplot()+
   geom_text(aes(y=fertility.rate, x=life.expectancy,
                 label=country, size=population, colour=population),

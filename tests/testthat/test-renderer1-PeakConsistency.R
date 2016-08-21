@@ -124,17 +124,17 @@ test_that("15 segments of both colors in last plot", {
   expect_equal(color.counts, c(15, 15))
 })
 
-test_that("showSelectedlegendcolour is truth", {
-  tsv.path <-
-    file.path("animint-htmltest", "geom6_vline_signals_chunk_common.tsv")
-  common.df <- read.table(tsv.path, comment.char="", header=TRUE)
-  computed.vec <- paste(common.df$showSelectedlegendcolour)
-  expected.vec <- rep("truth", length(computed.vec))
-  expect_identical(computed.vec, expected.vec)
-  tsv.path <-
-    file.path("animint-htmltest", "geom6_vline_signals_chunk1.tsv")
-  varied.df <- read.table(tsv.path, comment.char="", header=TRUE)
-})
+## test_that("showSelectedlegendcolour is truth", {
+##   tsv.path <-
+##     file.path("animint-htmltest", "geom6_vline_signals_chunk_common.tsv")
+##   common.df <- read.table(tsv.path, comment.char="", header=TRUE)
+##   computed.vec <- paste(common.df$showSelectedlegendcolour)
+##   expected.vec <- rep("truth", length(computed.vec))
+##   expect_identical(computed.vec, expected.vec)
+##   tsv.path <-
+##     file.path("animint-htmltest", "geom6_vline_signals_chunk1.tsv")
+##   varied.df <- read.table(tsv.path, comment.char="", header=TRUE)
+## })
 
 test_that("20 truth <line> in last plot", {
   line.list <-

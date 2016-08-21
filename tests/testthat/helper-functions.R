@@ -199,12 +199,14 @@ getTextValue <- function(tick)xmlValue(getNodeSet(tick, "text")[[1]])
 
 getStyleValue <- function(html, xpath, style.name) {
   node.list <- getNodeSet(html, xpath)
-  attr.mat <- sapply(node.list, xmlAttrs)
-  style.vec <- if("style" %in% rownames(attr.mat)){
-    attr.mat["style", ]
-  }else{
-    rep("", length(node.list))
-  }
+  style.vec <- sapply(node.list, function(node){
+    attr.vec <- xmlAttrs(node)
+    if("style" %in% names(attr.vec)){
+      attr.vec[["style"]]
+    }else{
+      NA
+    }
+  })
   pattern <-paste0(
     "(?<name>\\S+?)",
     ": *",
