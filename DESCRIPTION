@@ -1,8 +1,8 @@
 Package: animint
 Maintainer: Toby Dylan Hocking <tdhock5@gmail.com>
 Author: Toby Dylan Hocking, Susan VanderPlas, Carson Sievert, Kevin Ferris, Tony
-    Tsai
-Version: 2016.07.06
+    Tsai, Faizan Khan
+Version: 2016.08.21
 License: GPL-3
 Title: Interactive animations
 Description: An interactive animation can be defined using a list of

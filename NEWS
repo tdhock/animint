@@ -180,6 +180,11 @@ RENDER: multiple animints inside of a single shiny app? This is
 probably just a theoretical issue. (why not just make a single
 animint?)
 
+2016.08.21 PR#158
+
+DSL/RENDER: Added theme_animint(update_axes=c("x", "y")) option
+for single selection showSelected variables.
+
 2016.07.06 PR#156
 
 BUGFIX: tooltip and href now work properly when used together
