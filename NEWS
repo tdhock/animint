@@ -227,7 +227,7 @@ Covers #127 (test-renderer4-geom-point-stroke.R)
 2016.07.06 PR#156
 
 BUGFIX: tooltip and href now work properly when used together
-fixes #100 and #155 (test-renderer3-tooltip-interactivity.R)
+fixes #100 and #155 (test-renderer4-tooltip-interactivity.R)
 
 2016.06.26 PR#135
 
