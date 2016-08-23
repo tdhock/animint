@@ -1418,17 +1418,6 @@ var animint = function (to_select, json_file) {
       };
       eAppend = "circle";
     }
-    if (g_info.geom == "jitter") {
-      elements = elements.data(data, key_fun);
-      eActions = function (e) {
-        e.attr("cx", toXY("x", "x"))
-          .attr("cy", toXY("y", "y"))
-          .attr("r", get_size)
-          .style("fill", get_fill)
-          .style("stroke", get_colour);
-      };
-      eAppend = "circle";
-    }
     if (g_info.geom == "tallrect") {
       elements = elements.data(data, key_fun);
       eActions = function (e) {
