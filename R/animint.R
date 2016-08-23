@@ -22,22 +22,6 @@ parsePlot <- function(meta){
   
   meta$built <- ggplot2::ggplot_build(meta$plot)
   plot.meta <- list()
-  scaleFuns <-
-    list(manual=function(sc)sc$palette(0),
-         brewer=function(sc)sc$palette(length(sc$range$range)),
-         hue=function(sc)sc$palette(length(sc$range$range)),
-         linetype_d=function(sc)sc$palette(length(sc$range$range)),
-         alpha_c=function(sc)sc$palette(sc$range$range),
-         size_c=function(sc)sc$palette(sc$range$range),
-         gradient=function(sc){
-           ggplot2:::scale_map(sc, ggplot2:::scale_breaks(sc))
-         })
-  for(sc in meta$plot$scales$scales){
-    if(!is.null(sc$range$range)){
-      makeScale <- scaleFuns[[sc$scale_name]]
-      plot.meta$scales[[sc$aesthetics]] <- makeScale(sc)
-    }
-  }
   
   ## Export axis specification as a combination of breaks and
   ## labels, on the relevant axis scale (i.e. so that it can
