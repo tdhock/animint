@@ -97,7 +97,7 @@ interactive linked plots.
 - the advantages and disadvantages of animint compared to other
 interactive data viz libraries.
 
-It may also be useful to read our [short](https://github.com/tdhock/interactive-tutorial/tree/master/animation) and [long](https://github.com/tdhock/animint/blob/master/etc/references.org) tables of related work.
+It may also be useful to read our [short](https://github.com/tdhock/interactive-tutorial/tree/master/animation) and [long](https://github.com/tdhock/animint/blob/master/inst/etc/references.org) tables of related work.
 
 #### TODO list of features to implement
 
