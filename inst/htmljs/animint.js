@@ -573,17 +573,11 @@ var animint = function (to_select, json_file) {
       // axes.
       scales[panel_i] = {};
       scales[panel_i].x = d3.scale.linear()
-        .domain([0, 1])
-        .range([plotdim.xstart, plotdim.xend]);
-      scales[panel_i].x_fake = d3.scale.linear()
         .domain(axis.xrange)
         .range([plotdim.xstart, plotdim.xend]);
       scales[panel_i].y = d3.scale.linear()
-        .domain([0, 1])
+        .domain(axis.yrange)
         .range([plotdim.yend, plotdim.ystart]);
-      scales[panel_i].y_fake = d3.scale.linear()
-        .domain([axis.yrange[1], axis.yrange[0]])
-        .range([plotdim.ystart, plotdim.yend]);
       if(draw_x){
         var xaxis = d3.svg.axis()
           .scale(scales[panel_i].x)
@@ -593,8 +587,9 @@ var animint = function (to_select, json_file) {
           })
           .orient("bottom")
 	;
+  var axis_panel = "xaxis" + "_" + panel_i;
 	var xaxis_g = svg.append("g")
-          .attr("class", "xaxis axis")
+          .attr("class", "xaxis axis " + axis_panel)
           .attr("transform", "translate(0," + plotdim.yend + ")")
           .call(xaxis);
 	if(axis["xline"] == false){
@@ -613,8 +608,9 @@ var animint = function (to_select, json_file) {
             return yaxislabs[yaxisvals.indexOf(d)].toString();
           })
           .orient("left");
+  var axis_panel = "yaxis" + "_" + panel_i;
 	var yaxis_g = svg.append("g")
-          .attr("class", "yaxis axis")
+          .attr("class", "yaxis axis " + axis_panel)
           .attr("transform", "translate(" + (plotdim.xstart) + ",0)")
           .call(yaxis);
 	if(axis["yline"] == false){
@@ -639,7 +635,7 @@ var animint = function (to_select, json_file) {
       // creating g element for background, grid lines, and border
       // uses insert to draw it right before plot title
       var background = svg.insert("g", ".plottitle")
-        .attr("class", "background");
+        .attr("class", "background bgr" + panel_i);
       
       // drawing background
       if(Object.keys(p_info.panel_background).length > 1) {
@@ -1741,6 +1737,154 @@ var animint = function (to_select, json_file) {
     }
   };
 
+  // update scales for the plots that have update_axes option in
+  // theme_animint
+  function update_scales(p_name, axes, v_name, value){
+    // Get pre-computed domain
+    var axis_domains = Plots[p_name]["axis_domains"];
+    if(!isArray(axes)){
+      axes = [axes];
+    }
+    if(axis_domains != null){
+      axes.forEach(function(xyaxis){
+        // For Each PANEL, update the axes
+        Plots[p_name].layout.PANEL.forEach(function(panel_i, i){
+          // Determine whether this panel has a scale or not
+          // If not we just update the scales according to the common
+          // scale and skip the updating of axis
+          var draw_axes = Plots[p_name].layout["AXIS_"+ xyaxis.toUpperCase()][i];
+          if(draw_axes){
+            var use_panel = panel_i;
+          }else{
+            var use_panel = Plots[p_name].layout.PANEL[0];
+          }
+          // We update the current selection of the plot every time
+          // and use it to index the correct domain
+          var curr_select = axis_domains[xyaxis].curr_select;
+          if(axis_domains[xyaxis].selectors.indexOf(v_name) > -1){
+            curr_select[v_name] = value;
+            var str = use_panel+".";
+            for(selec in curr_select){
+              str = str + curr_select[selec] + "_";
+            }
+            str = str.substring(0, str.length - 1); // Strip off trailing underscore
+            var use_domain = axis_domains[xyaxis]["domains"][str];
+          }
+          if(use_domain != null){
+            Plots[p_name]["scales"][panel_i][xyaxis].domain(use_domain);
+            var scales = Plots[p_name]["scales"][panel_i][xyaxis];
+            // major and minor grid lines as calculated in the compiler
+            var grid_vals = Plots[p_name]["axis_domains"][xyaxis]["grids"][str];
+
+            // Once scales are updated, update the axis ticks if needed
+            if(draw_axes){
+              // Tick values are same as major grid lines
+              update_axes(p_name, xyaxis, panel_i, grid_vals[1]);
+            }
+            // Update major and minor grid lines
+            update_grids(p_name, xyaxis, panel_i, grid_vals, scales);
+          }
+        });
+      });
+    }
+  }
+
+  // Update the axis ticks etc. once plot is zoomed in/out
+  // currently called from update_scales.
+  function update_axes(p_name, axes, panel_i, tick_vals){
+    var orientation;
+    if(axes == "x"){
+      orientation = "bottom";
+    }else{
+      orientation = "left";
+    }
+    if(!isArray(tick_vals)){
+      tick_vals = [tick_vals];
+    }
+    var xyaxis = d3.svg.axis()
+          .scale(Plots[p_name]["scales"][panel_i][axes])
+          .orient(orientation)
+          .tickValues(tick_vals);
+    // update existing axis
+    var xyaxis_g = element.select("#plot_"+p_name).select("."+axes+"axis_"+panel_i)
+          .transition()
+          .duration(1000)
+          .call(xyaxis);
+  }
+
+  // Update major/minor grids once axes ticks have been updated
+  function update_grids(p_name, axes, panel_i, grid_vals, scales){
+    // Select panel to update
+    var bgr = element.select("#plot_"+p_name).select(".bgr"+panel_i);
+
+    var orient;
+    if(axes == "x"){
+      orient = "vert";
+    }else{
+      orient = "hor";
+    }
+    
+    // Update major and minor grid lines
+    ["minor", "major"].forEach(function(grid_class, j){
+      var lines = bgr.select(".grid_"+grid_class).select("."+orient);
+      var xy1, xy2;
+      if(axes == "x"){
+        xy1 = lines.select("line").attr("y1");
+        xy2 = lines.select("line").attr("y2");
+      }else{
+        xy1 = lines.select("line").attr("x1");
+        xy2 = lines.select("line").attr("x2");
+      }
+      
+      // Get default values for grid lines like colour, stroke etc.
+      var grid_background = Plots[p_name]["grid_"+grid_class];
+      var col = grid_background.colour;
+      var lt = grid_background.linetype;
+      var size = grid_background.size;
+      var cap = grid_background.lineend;
+
+      // Remove old lines
+      lines.selectAll("line")
+        .remove();
+
+      if(!isArray(grid_vals[j])){
+        grid_vals[j] = [grid_vals[j]];
+      }
+
+      if(axes == "x"){
+        lines.selectAll("line")
+          .data(grid_vals[j])
+          .enter()
+          .append("line")
+          .attr("y1", xy1)
+          .attr("y2", xy2)
+          .attr("x1", function(d) { return scales(d); })
+          .attr("x2", function(d) { return scales(d); })
+          .style("stroke", col)
+          .style("stroke-linecap", cap)
+          .style("stroke-width", size)
+          .style("stroke-dasharray", function() {
+            return linetypesize2dasharray(lt, size);
+          });
+      }else{
+        lines.selectAll("line")
+          .data(grid_vals[j])
+          .enter()
+          .append("line")
+          .attr("x1", xy1)
+          .attr("x2", xy2)
+          .attr("y1", function(d) { return scales(d); })
+          .attr("y2", function(d) { return scales(d); })
+          .style("stroke", col)
+          .style("stroke-linecap", cap)
+          .style("stroke-width", size)
+          .style("stroke-dasharray", function() {
+            return linetypesize2dasharray(lt, size);
+          });
+      }
+    });
+  }
+
   var update_selector = function (v_name, value) {
     value = value + "";
     var s_info = Selectors[v_name];
@@ -1776,6 +1920,17 @@ var animint = function (to_select, json_file) {
       // event will be fired on the original input.
       selectized_array[v_name].setValue(selected_ids, true);
     }
+
+    // For each updated geom, check if the axes of the plot need to be
+    // updated and update them
+    s_info.update.forEach(function(g_name){
+      var plot_name = g_name.split("_").pop();
+      var axes = Plots[plot_name]["options"]["update_axes"];
+      if(axes != null){
+        update_scales(plot_name, axes, v_name, value);
+      }
+    });
+
     update_legend_opacity(v_name);
     s_info.update.forEach(function(g_name){
       update_geom(g_name, v_name);
@@ -1957,6 +2112,21 @@ var animint = function (to_select, json_file) {
       add_selector(s_name, response.selectors[s_name]);
     }
     
+    // Update the scales/axes of the plots if needed
+    // We do this so that the plots zoom in initially after loading
+    for (var p_name in response.plots) {
+      if(response.plots[p_name].axis_domains !== null){
+        for(var xy in response.plots[p_name].axis_domains){
+          var selectors = response.plots[p_name].axis_domains[xy].selectors;
+          if(!isArray(selectors)){
+            selectors = [selectors];
+          }
+          update_scales(p_name, xy, selectors[0],
+            response.selectors[selectors[0]].selected);
+        }
+      }
+    }
+
     ////////////////////////////////////////////
     // Widgets at bottom of page
     ////////////////////////////////////////////

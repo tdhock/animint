@@ -196,11 +196,11 @@ parsePlot <- function(meta){
     
     ## x and y locations
     if(major) {
-      pars$loc$x <- as.list(meta$built$panel$ranges[[1]]$x.major)
-      pars$loc$y <- as.list(meta$built$panel$ranges[[1]]$y.major)
+      pars$loc$x <- as.list(meta$built$panel$ranges[[1]]$x.major_source)
+      pars$loc$y <- as.list(meta$built$panel$ranges[[1]]$y.major_source)
     } else {
-      pars$loc$x <- as.list(meta$built$panel$ranges[[1]]$x.minor)
-      pars$loc$y <- as.list(meta$built$panel$ranges[[1]]$y.minor)
+      pars$loc$x <- as.list(meta$built$panel$ranges[[1]]$x.minor_source)
+      pars$loc$y <- as.list(meta$built$panel$ranges[[1]]$y.minor_source)
       ## remove minor lines when major lines are already drawn
       pars$loc$x <- pars$loc$x[
         !(pars$loc$x %in% plot.meta$grid_major$loc$x)
@@ -280,7 +280,7 @@ parsePlot <- function(meta){
     for (axis in names(axes)) {
       ctr <- ctr + 1
       range <- ranges[[ctr]]
-      plot.meta[[axis]][[xy]] <- as.list(range[[s("%s.major")]])
+      plot.meta[[axis]][[xy]] <- as.list(range[[s("%s.major_source")]])
       plot.meta[[axis]][[s("%slab")]] <- if(is.blank(s("axis.text.%s"))){
         NULL
       } else {
@@ -313,6 +313,11 @@ parsePlot <- function(meta){
     }else{
       400
     }
+  }
+
+  update_axes <- "animint.update_axes"
+  if(update_axes %in% names(theme)){
+    plot.meta$options$update_axes <- theme[[update_axes]]
   }
 
   meta$plots[[meta$plot.name]] <- plot.meta
@@ -700,24 +705,12 @@ saveLayer <- function(l, d, meta){
   if(zero.size && has.no.fill){
     warning(sprintf("geom_%s with size=0 will be invisible",g$geom))
   }
-
-  ## Idea: use the ggplot2:::coord_transform(coords, data, scales)
-  ## function to handle cases like coord_flip. scales is a list of
-  ## 12, coords is a list(limits=list(x=NULL,y=NULL)) with class
-  ## e.g. c("cartesian","coord"). The result is a transformed data
-  ## frame where all the data values are between 0 and 1.
-
   ## TODO: coord_transform maybe won't work for
   ## geom_dotplot|rect|segment and polar/log transformations, which
   ## could result in something nonlinear. For the time being it is
   ## best to just ignore this, but you can look at the source of
   ## e.g. geom-rect.r in ggplot2 to see how they deal with this by
   ## doing a piecewise linear interpolation of the shape.
-
-  # Apply coord_transform seperately to each panel
-  # Note the plotly implementation does not use
-  # coord_transform...do they take care of the transformation
-  # at a different point in time?
 
   # Flip axes in case of coord_flip
   # Switches column names. Eg. xmin to ymin, 
@@ -736,25 +729,6 @@ saveLayer <- function(l, d, meta){
   if(inherits(meta$plot$coordinates, "CoordFlip")){
     names(g.data) <- switch_axes(names(g.data))
   }
-
-  # Rescale data to range 0:1 like the coord_trans function
-  # in ggplot v1.0.1
-  rescale_data <- function(g.data.i, ranges.i){
-    for(col.name in names(g.data.i)){
-      if(grepl("^x", col.name)){
-        g.data.i[[col.name]] <- scales::rescale(g.data.i[[col.name]], 
-                                                0:1, ranges.i$x.range)
-      } else if(grepl("^y", col.name)){
-        g.data.i[[col.name]] <- scales::rescale(g.data.i[[col.name]], 
-                                                0:1, ranges.i$y.range)
-      }
-    }
-    g.data.i
-  }
-
-  g.data <- do.call("rbind", mapply(rescale_data, 
-                                    split(g.data, g.data[["PANEL"]]), 
-                                    ranges, SIMPLIFY = FALSE))
 
   ## Output types
   ## Check to see if character type is d3's rgb type.
@@ -1681,7 +1655,232 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
       stop("missing first selector variable")
     }
   }
-
+  
+  ## Compute domains of different subsets, to be used by update_scales
+  ## in the renderer
+  compute_domains <- function(built_data, axes, geom_name,
+                             vars, split_by_panel){
+    # Different geoms will use diff columns to calculate domains for
+    # showSelected subsets. Eg. geom_bar will use 'xmin', 'xmax', 'ymin',
+    # 'ymax' etc. while geom_point will use 'x', 'y'
+    domain_cols <- list(bar=c(paste0(axes, "min"), paste0(axes, "max")),
+                        ribbon=if(axes=="x"){c(axes)}
+                        else{c(paste0(axes, "min"), paste0(axes, "max"))},
+                        rect=c(paste0(axes, "min"), paste0(axes, "max")),
+                        tallrect=if(axes=="x")
+                          {c(paste0("xmin"), paste0("xmax"))}
+                        else{NULL},
+                        point=c(axes),
+                        path=c(axes),
+                        text=c(axes),
+                        line=c(axes),
+                        segment=c(axes, paste0(axes, "end")))
+    use_cols <- domain_cols[[geom_name]]
+    if(is.null(use_cols)){
+      warning(paste0("axis updates have not yet been implemented for geom_",
+                    geom_name), call. = FALSE)
+      return(NULL)
+    }else if(!all(use_cols %in% names(built_data))){
+      return(NULL)
+    }
+    domain_vals <- list()
+    inter_data <- built_data[[ vars[[1]] ]]
+    # If we have more than one showSelected vars, we need to compute
+    # every possible subset domain
+    if(length(vars) > 1){
+      for(i in 2:length(vars)){
+        inter_data <- interaction(inter_data, built_data[[vars [[i]] ]],
+                                  sep = "_")
+      }
+    }
+    # Split by PANEL only when specified, else use first value of PANEL
+    # It is a hack and must be handled in a better way
+    split_by <- if(split_by_panel){
+      interaction(built_data$PANEL, inter_data)
+    }else{
+      levels(inter_data) <- paste0(unique(built_data$PANEL[[1]]),
+                                   ".", levels(inter_data))
+      inter_data
+    }
+    if(geom_name %in% c("point", "path", "text", "line")){
+      # We suppress 'returning Inf' warnings when we compute a factor
+      # interaction that has no data to display
+      domain_vals[[use_cols[1]]] <- 
+        suppressWarnings(lapply(split(built_data[[use_cols[1]]],
+                                      split_by),
+                                range, na.rm=TRUE))
+    }else if(geom_name %in% c("bar", "rect", "tallrect")){
+      # Calculate min and max values of each subset separately
+      min_vals <- suppressWarnings(lapply(split(built_data[[use_cols[1]]],
+                                                split_by),
+                                          min, na.rm=TRUE))
+      max_vals <- suppressWarnings(lapply(split(built_data[[use_cols[2]]],
+                                                split_by),
+                                          max, na.rm=TRUE))
+      domain_vals <- list(mapply(c, min_vals, max_vals, SIMPLIFY = FALSE))
+    }else if(geom_name %in% c("segment")){
+      domain_vals[[use_cols[1]]] <-
+        suppressWarnings(lapply(split(built_data[, use_cols], split_by),
+                                range, na.rm=TRUE))
+    }else if(geom_name %in% c("ribbon")){
+      if(axes=="x"){
+        domain_vals[[use_cols[1]]] <- 
+          suppressWarnings(lapply(split(built_data[[use_cols[1]]],
+                                        split_by),
+                                  range, na.rm=TRUE))
+      }else{
+        min_vals <- suppressWarnings(lapply(split(built_data[[use_cols[1]]],
+                                                  split_by),
+                                            min, na.rm=TRUE))
+        max_vals <- suppressWarnings(lapply(split(built_data[[use_cols[2]]],
+                                                  split_by),
+                                            max, na.rm=TRUE))
+        domain_vals <- list(mapply(c, min_vals, max_vals, SIMPLIFY = FALSE))
+      }
+    }
+    domain_vals
+  }
+  
+  ## Out of all the possible geoms, get the min/max value which will
+  ## determine the domain to be used in the renderer
+  get_domain <- function(subset_domains){
+    use_domain <- list()
+    ## ggplot gives a margin of 5% at all four sides which does not
+    ## have any plotted data. So axis ranges are 10% bigger than the
+    ## actual ranges of data. We do the same here
+    extra_margin = 0.05
+    for(i in unique(unlist(lapply(subset_domains, names)))){
+      all_vals <- lapply(subset_domains, "[[", i)
+      all_vals <- all_vals[!sapply(all_vals, is.null)]
+      min_val <- min(sapply(all_vals, "[[", 1))
+      max_val <- max(sapply(all_vals, "[[", 2))
+      # We ignore non finite values that may have creeped in while
+      # calculating all possible subset domains
+      if(all(is.finite(c(max_val, min_val)))){
+        use_domain[[i]] <-if(max_val - min_val > 0){
+          c(min_val - (extra_margin *(max_val-min_val)),
+            max_val + (extra_margin *(max_val-min_val)))
+        }else{
+          # If min_val and max_val are same, return a range equal to
+          # the value
+          warning("some data subsets have only a single data value to plot",
+                  call. = FALSE)
+          return_dom <- c(min_val - (0.5 * min_val), max_val + (0.5 * max_val))
+          if(min_val == 0){
+            # if min_val = max_val = 0, return a range (-1, 1)
+            return_dom <- c(-1, 1)
+          }
+          return_dom
+        }
+      }else{
+        warning("some data subsets have no data to plot", call. = FALSE)
+      }
+    }
+    use_domain
+  }
+  
+  ## get axis ticks and major/minor grid lines for updating plots
+  get_ticks_gridlines <- function(use_domain){
+    gridlines <- list()
+    for (i in seq_along(use_domain)){
+      all_lines <- scales::pretty_breaks(n=10)(use_domain[[i]])
+      if(length(all_lines) > 0){
+        # make sure grid lines are not outside plot domain
+        if(use_domain[[i]][1] > all_lines[[1]]){
+          all_lines <- all_lines[2:length(all_lines)]
+        }
+        if(use_domain[[i]][2] < all_lines[[length(all_lines)]]){
+          all_lines <- all_lines[1:(length(all_lines)-1)]
+        }
+        # Every second grid line is minor, rest major
+        # Major grid lines are also used for drawing axis ticks
+        # Eg. If all_lines = 1:10
+        # minor grid lines = 1, 3, 5, 7, 9
+        # major grid lines = 2, 4, 6, 8, 10
+        majors <- all_lines[c(FALSE, TRUE)]
+        minors <- all_lines[c(TRUE, FALSE)]
+        gridlines[[ names(use_domain)[[i]] ]] <- list(minors, majors)
+      }
+    }
+    gridlines
+  }
+  
+  ## Get domains of data subsets if theme_animint(update_axes) is used
+  for(p.name in names(ggplot.list)){
+    axes_to_update <- meta$plots[[p.name]]$options$update_axes
+    if(!is.null(axes_to_update)){
+      p_geoms <- meta$plots[[p.name]]$geoms
+      for (axis in axes_to_update){
+        subset_domains <- list()
+        # Determine if every panel needs a different domain or not
+        # We conclude here if we want to split the data by PANEL
+        # for the axes updates. Else every panel uses the same
+        # domain
+        panels <- meta$plots[[p.name]]$layout$PANEL
+        axes_drawn <- 
+          meta$plots[[p.name]]$layout[[paste0("AXIS_", toupper(axis))]]
+        panels_used <- panels[axes_drawn]
+        split_by_panel <- all(panels == panels_used)
+        for(num in seq_along(p_geoms)){
+          # handle cases for showSelected: showSelectedlegendfill,
+          # showSelectedlegendcolour etc.
+          aesthetic_names <- names(meta$geoms[[ p_geoms[[num]] ]]$aes)
+          choose_ss <- grepl("^showSelected", aesthetic_names)
+          ss_selectors <- meta$geoms[[ p_geoms[[num]] ]]$aes[choose_ss]
+          # Do not calculate domains for multiple selectors
+          remove_ss <- c()
+          for(j in seq_along(ss_selectors)){
+            if(meta$selectors[[ss_selectors[j]]]$type != "single"){
+              remove_ss <- c(remove_ss, ss_selectors[j])
+            }
+          }
+          ss_selectors <- ss_selectors[!ss_selectors %in% remove_ss]
+          # Only save those selectors which are used by plot
+          for(ss in ss_selectors){
+            if(!ss %in% meta$plots[[p.name]]$axis_domains[[axis]]$selectors){
+              meta$plots[[p.name]]$axis_domains[[axis]]$selectors <-
+                c(ss, meta$plots[[p.name]]$axis_domains[[axis]]$selectors)
+            }
+          }
+          if(length(ss_selectors) > 0){
+            subset_domains[num] <- compute_domains(
+              ggplot.list[[p.name]]$built$data[[num]],
+              axis, strsplit(p_geoms[[num]], "_")[[1]][[2]],
+              names(sort(ss_selectors)), split_by_panel)
+          }
+        }
+        subset_domains <- subset_domains[!sapply(subset_domains, is.null)]
+        if(length(subset_domains) > 0){
+          use_domain <- get_domain(subset_domains)
+          # Save for renderer
+          meta$plots[[p.name]]$axis_domains[[axis]]$domains <- use_domain
+          # Get gridlines for updates
+          meta$plots[[p.name]]$axis_domains[[axis]]$grids <- 
+            get_ticks_gridlines(use_domain)
+          ## Initially selected selector values are stored in curr_select
+          ## which updates every time a user updates the axes
+          saved_selectors <- sort(names(meta$selectors))
+          for (ss in saved_selectors){
+            if(ss %in% meta$plots[[p.name]]$axis_domains[[axis]]$selectors){
+              meta$plots[[p.name]]$axis_domains[[axis]]$curr_select[[ss]] <-
+                meta$selectors[[ss]]$selected
+            }
+          }
+        }else{
+          warning(paste("update_axes specified for", toupper(axis),
+            "axis on plot", p.name, 
+            "but found no geoms with showSelected=singleSelectionVariable,",
+            "so created a plot with no updates for",
+            toupper(axis), "axis"), call. = FALSE)
+          # Do not save in plot.json file if axes is not getting updated
+          update_axes <- meta$plots[[p.name]]$options$update_axes
+          meta$plots[[p.name]]$options$update_axes <-
+            update_axes[!axis == update_axes]
+        }
+      }
+    }
+  }
+  
   ## Finally, copy html/js/json files to out.dir.
   src.dir <- system.file("htmljs",package="animint")
   to.copy <- Sys.glob(file.path(src.dir, "*"))

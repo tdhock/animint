@@ -1,8 +1,8 @@
 Package: animint
 Maintainer: Toby Dylan Hocking <tdhock5@gmail.com>
 Author: Toby Dylan Hocking, Susan VanderPlas, Carson Sievert, Kevin Ferris, Tony
-    Tsai
-Version: 2016.08.15
+    Tsai, Faizan Khan
+Version: 2016.08.21
 License: GPL-3
 Title: Interactive animations
 Description: An interactive animation can be defined using a list of
@@ -31,6 +31,6 @@ Suggests:
     httr,
     maps
 Remotes: 
-    ropensci/RSelenium,
-    hadley/ggplot2#1649
+    ropensci/RSelenium@22f06b9f2a675015d0daa3318319044e4e60d2fa,
+    faizan-khan-iit/ggplot2@5fb99d0cece13239bbbc09c6b8a7da7f86ac58e2
 RoxygenNote: 5.0.1

@@ -27,24 +27,23 @@ example(animint)
 NOTE: animint now works with standard ggplot2 >= 2.0 thanks to
 [Faizan](https://github.com/faizan-khan-iit) and
 [Kevin](https://github.com/kferris10)! If you want to use the animint
-[chunk\_vars option](https://github.com/tdhock/animint/wiki/Advanced-features-present-animint-but-not-in-ggplot2#use-chunk_varscvar1-var2-to-specify-how-much-data-to-load-at-a-time)
+[chunk\_vars
+option](https://github.com/tdhock/animint/wiki/Advanced-features-present-animint-but-not-in-ggplot2#use-chunk_varscvar1-var2-to-specify-how-much-data-to-load-at-a-time)
 then you will need to install
-[hadley/ggplot2#1649](https://github.com/hadley/ggplot2/pull/1649) (it
-permits non-standard geom options).
+[faizan-khan-iit/ggplot2@validate-params](https://github.com/hadley/ggplot2/pull/1649)
+until the ggplot2 developers [resolve the
+issue](https://github.com/hadley/ggplot2/issues/1694).
 
 ## Learning animint through examples
 
-The best way to learn animint is through examples. A couple of good
-introductions are Carson Sievert's [Interactive animations of
-PITCHf/x](http://cpsievert.github.io/baseballR/20140818/) and Susan
+The best way to learn animint is by reading the [Animint Designer
+Manual](http://cbio.mines-paristech.fr/~thocking/animint-book/Ch00-preface.html). Some
+other good introductions are Carson Sievert's [Interactive animations
+of PITCHf/x](http://cpsievert.github.io/baseballR/20140818/) and Susan
 VanderPlas' [animint tutorial](http://tdhock.github.io/animint/). In
-addition, there is an [examples web
-site](http://sugiyama-www.cs.titech.ac.jp/~toby/animint/index.html),
-[examples distributed with
-animint](https://github.com/tdhock/animint/tree/master/inst/examples), as
-well as more complex 'big data' examples in the
-[tdhock/animint-examples
-repo](https://github.com/tdhock/animint-examples/tree/master/examples).
+addition, animint includes many example data visualizations in our
+extensive set of [test
+cases](https://github.com/tdhock/animint/tree/master/tests/testthat).
 
 ## Frequently asked questions (FAQ)
 

@@ -264,3 +264,28 @@ normDiffs <- function(xdiff, ydiff, ratio = 1) {
 }
 
 
+# Return the range of the geom in pixels as rendered in the browser
+# Works for geom_point
+get_pixel_ranges <- function(html=NULL, geom_class=NULL){
+  if(is.null(html) || is.null(geom_class)){
+    stop("please specify html and geom_class")
+  }
+  nodes <- getNodeSet(html,
+                       paste0('//g[@class="', geom_class, '"]//circle'))
+  attrs <- sapply(nodes, xmlAttrs)[c("cx", "cy"), ]
+  if(is.matrix(attrs)){
+    xranges <- range(as.numeric(attrs[1, ]), na.rm = T)
+    yranges <- range(as.numeric(attrs[2, ]), na.rm = T)
+  }else if(is.vector(attrs) && length(attrs) == 2){
+    xranges <- range(as.numeric(attrs[["cx"]]), na.rm = T)
+    yranges <- range(as.numeric(attrs[["cy"]]), na.rm = T)
+  }else{
+    return(NULL)
+  }
+  return(list(x=xranges, y=yranges))
+}
+
+# returns TRUE if two objects are unequal using all.equal
+unequal <- function(object, expected, ...){
+  !isTRUE(all.equal(object, expected, ...))
+}
