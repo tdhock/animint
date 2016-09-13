@@ -119,13 +119,6 @@ parsePlot <- function(meta){
   plot.meta$layout <- with(meta$built, flag_axis(plot$facet, panel$layout))
   plot.meta$layout <- with(meta$built, train_layout(
     plot$facet, plot$coordinates, plot.meta$layout, panel$ranges))
-
-  ## Export axis specification as a combination of breaks and
-  ## labels, on the relevant axis scale (i.e. so that it can
-  ## be passed into d3 on the x axis scale instead of on the
-  ## grid 0-1 scale). This allows transformations to be used
-  ## out of the box, with no additional d3 coding.
-  theme.pars <- ggplot2:::plot_theme(meta$plot)
   
   ## extract panel background and borders from theme.pars
   get_bg <- function(pars) {
