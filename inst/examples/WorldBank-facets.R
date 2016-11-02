@@ -3,7 +3,7 @@ data(WorldBank)
 not.na <- subset(WorldBank, !(is.na(life.expectancy) | is.na(fertility.rate)))
 subset(not.na, is.na(not.na$population))
 subset(not.na, country == "Kuwait" & 1991 <= year & year <= 1995)
-not.na[not.na$country=="Kuwait", "population"] <- 1700000
+not.na[is.na(not.na$population), "population"] <- 1700000
 BOTH <- function(df, top, side){
   data.frame(df,
              top=factor(top, c("Fertility rate", "Years")),
