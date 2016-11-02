@@ -1,3 +1,13 @@
+##' Create a new animint, which is a list of ggplots and options that
+##' has class "animint"
+##' @title animint
+##' @param ... passed to list
+##' @return a list of class "animint"
+##' @author Toby Dylan Hocking
+animint <- function(...){
+  structure(list(...), class="animint")
+}
+
 #' Convert a ggplot to a list.
 #' @param meta environment with previously calculated plot data, and a new plot to parse, already stored in plot and plot.name.
 #' @return nothing, info is stored in meta.
@@ -1332,7 +1342,6 @@ gg2animint <- function(...){
 #' \item shape. Open and closed circles can be represented by manipulating fill and colour scales and using default (circle) points, but d3 does not support many R shape types, so mapping between the two is difficult.
 #' }
 #'
-#' @aliases animint
 #' @param plot.list a named list of ggplots and option lists.
 #' @param out.dir directory to store html/js/csv files.
 #' @param json.file character string that names the JSON file with metadata associated with the plot.
