@@ -3,6 +3,7 @@
 ##' @title animint
 ##' @param ... passed to list
 ##' @return a list of class "animint"
+##' @export
 ##' @author Toby Dylan Hocking
 animint <- function(...){
   structure(list(...), class="animint")
