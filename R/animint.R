@@ -27,28 +27,10 @@ parsePlot <- function(meta){
     if(is.null(meta$plot$layers[[layer.i]]$mapping)){
       meta$plot$layers[[layer.i]]$mapping <- meta$plot$mapping
     }
-    
   }
-  
   
   meta$built <- ggplot2::ggplot_build(meta$plot)
   plot.meta <- list()
-  scaleFuns <-
-    list(manual=function(sc)sc$palette(0),
-         brewer=function(sc)sc$palette(length(sc$range$range)),
-         hue=function(sc)sc$palette(length(sc$range$range)),
-         linetype_d=function(sc)sc$palette(length(sc$range$range)),
-         alpha_c=function(sc)sc$palette(sc$range$range),
-         size_c=function(sc)sc$palette(sc$range$range),
-         gradient=function(sc){
-           ggplot2:::scale_map(sc, ggplot2:::scale_breaks(sc))
-         })
-  for(sc in meta$plot$scales$scales){
-    if(!is.null(sc$range$range)){
-      makeScale <- scaleFuns[[sc$scale_name]]
-      plot.meta$scales[[sc$aesthetics]] <- makeScale(sc)
-    }
-  }
   
   ## Export axis specification as a combination of breaks and
   ## labels, on the relevant axis scale (i.e. so that it can
@@ -61,7 +43,6 @@ parsePlot <- function(meta){
   ## (ignoring whatever grid::unit such as cm that was specified).
   
   ## Now ggplot specifies panel.margin in 'pt' instead of 'lines'
-  ## Maybe use a standard converting factor in the future?
   pt.to.lines <- function(margin.value){
     if(attributes(margin.value)$unit == "pt"){
       margin.value <- round(as.numeric(margin.value) * (0.25/5.5), digits = 2)
@@ -149,13 +130,6 @@ parsePlot <- function(meta){
   plot.meta$layout <- with(meta$built, flag_axis(plot$facet, panel$layout))
   plot.meta$layout <- with(meta$built, train_layout(
     plot$facet, plot$coordinates, plot.meta$layout, panel$ranges))
-
-  ## Export axis specification as a combination of breaks and
-  ## labels, on the relevant axis scale (i.e. so that it can
-  ## be passed into d3 on the x axis scale instead of on the
-  ## grid 0-1 scale). This allows transformations to be used
-  ## out of the box, with no additional d3 coding.
-  theme.pars <- ggplot2:::plot_theme(meta$plot)
   
   ## extract panel background and borders from theme.pars
   get_bg <- function(pars) {
@@ -202,7 +176,6 @@ parsePlot <- function(meta){
       
       # remove names (JSON file was getting confused)
       pars <- lapply(pars, unname)
-      
     }
     
     ## x and y locations
@@ -220,7 +193,6 @@ parsePlot <- function(meta){
         !(pars$loc$y %in% plot.meta$grid_major$loc$y)
         ]
     }
-    
     pars
   }
   # extract major grid lines
@@ -724,8 +696,7 @@ saveLayer <- function(l, d, meta){
   ## doing a piecewise linear interpolation of the shape.
 
   # Flip axes in case of coord_flip
-  # Switches column names. Eg. xmin to ymin, 
-  # yntercept to xintercept etc.
+  # Switches column names. Eg. xmin to ymin, yntercept to xintercept etc.
   switch_axes <- function(col.names){
     for(elem in seq_along(col.names)){
       if(grepl("^x", col.names[elem])){
@@ -1824,8 +1795,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
         subset_domains <- list()
         # Determine if every panel needs a different domain or not
         # We conclude here if we want to split the data by PANEL
-        # for the axes updates. Else every panel uses the same
-        # domain
+        # for the axes updates. Else every panel uses the same domain
         panels <- meta$plots[[p.name]]$layout$PANEL
         axes_drawn <- 
           meta$plots[[p.name]]$layout[[paste0("AXIS_", toupper(axis))]]

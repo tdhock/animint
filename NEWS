@@ -180,6 +180,11 @@ RENDER: multiple animints inside of a single shiny app? This is
 probably just a theoretical issue. (why not just make a single
 animint?)
 
+2016.11.02 PR#169
+
+OPTIMIZATION: some un-necessary code was deleted in a cleanup effort
+by @faizan-khan-iit, thanks!
+
 2016.08.21 PR#158
 
 DSL/RENDER: Added theme_animint(update_axes=c("x", "y")) option
