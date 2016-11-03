@@ -180,6 +180,11 @@ RENDER: multiple animints inside of a single shiny app? This is
 probably just a theoretical issue. (why not just make a single
 animint?)
 
+2016.11.03 PR#171
+
+DSL: animint(...) can now be used as an abbreviation of
+structure(list(...),class="animint").
+
 2016.11.02 PR#169
 
 OPTIMIZATION: some un-necessary code was deleted in a cleanup effort
