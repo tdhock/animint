@@ -30,9 +30,7 @@ NOTE: animint now works with standard ggplot2 >= 2.0 thanks to
 [chunk\_vars
 option](https://github.com/tdhock/animint/wiki/Advanced-features-present-animint-but-not-in-ggplot2#use-chunk_varscvar1-var2-to-specify-how-much-data-to-load-at-a-time)
 then you will need to install
-[faizan-khan-iit/ggplot2@validate-params](https://github.com/hadley/ggplot2/pull/1649)
-until the ggplot2 developers [resolve the
-issue](https://github.com/hadley/ggplot2/issues/1694).
+[faizan-khan-iit/ggplot2@validate-params](https://github.com/hadley/ggplot2/pull/1649).
 
 ## Learning animint through examples
 

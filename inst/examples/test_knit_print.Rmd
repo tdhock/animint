@@ -18,9 +18,9 @@ knit_meta()
 library(ggplot2) 
 library(animint)
 dat <- data.frame(x = 1:10, y = 1:10, label = rep(c("a178", "b934"), 5))
-q2 <- list(q = qplot(x, y, data = dat, colour = label, 
-                     xlab = "first plot with color legend"))
-structure(q2, class = "animint")
+animint(q = qplot(
+  x, y, data = dat, colour = label, 
+  xlab = "first plot with color legend"))
 ```
 
 Clicking on the plot above should not affect the plot below.
