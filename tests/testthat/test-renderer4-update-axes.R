@@ -40,8 +40,11 @@ non_numeric_updates <- ggplot()+geom_point(aes(mpg, disp, colour=cyl),
   theme_animint(update_axes = c("x", "y"))
 viz_fac <- list(nonNum = non_numeric_updates)
 viz_fac$selector.types = list(cyl="single")
-# We expect an error here
-expect_error(animint2HTML(viz_fac))
+# No error for X(mpg) axis, but one for Y(disp) axis
+expect_error(animint2HTML(viz_fac),
+             paste("'update_axes' specified for 'Y' axis on plot",
+                   "'nonNum' but the column 'disp' is non-numeric.",
+                   "Axes updates are only available for numeric data."))
 
 # Update selection and get HTML
 clickID(c("plot_neither_cyl_variable_8"))
