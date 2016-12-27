@@ -321,6 +321,18 @@ hjust2anchor <- function(hjust){
   }
 }
 
+storeLayer <- function(meta, g, g.data.varied){
+  ## Save each variable chunk to a separate tsv file.
+  meta$chunk.i <- 1L
+  meta$g <- g
+  g$chunks <- saveChunks(g.data.varied, meta)
+  g$total <- length(unlist(g$chunks))
+  
+  ## Finally save to the master geom list.
+  meta$geoms[[g$classed]] <- g
+  g
+}
+
 #' Save a layer to disk, save and return meta-data.
 #' @param l one layer of the ggplot object.
 #' @param d one layer of calculated data from ggplot2::ggplot_build(p).
@@ -960,16 +972,7 @@ saveLayer <- function(l, d, meta, p.name, ggplot, built){
     data.or.null$varied
   }
 
-  ## Save each variable chunk to a separate tsv file.
-  meta$chunk.i <- 1L
-  meta$g <- g
-  g$chunks <- saveChunks(g.data.varied, meta)
-  g$total <- length(unlist(g$chunks))
-
-  ## Finally save to the master geom list.
-  meta$geoms[[g$classed]] <- g
-
-  g
+  list(g=g, g.data.varied=g.data.varied)
 }
 
 ##' Save the common columns for each tsv to one chunk
@@ -1425,6 +1428,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
 
   ## After going through all of the meta-data in all of the ggplots,
   ## now we have enough info to save the TSV file database.
+  g.list <- list()
   for(p.name in names(ggplot.list)){
     ggplot.info <- ggplot.list[[p.name]]
     meta$prev.class <- NULL # first geom of any plot should not be next.
@@ -1457,11 +1461,11 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
       ## (parsePlot, saveLayer) so that they no longer rely on this
       ## meta object which makes it super confusing to know which
       ## functions need which data.
-      g <- saveLayer(L, df, meta, p.name, ggplot.info$ggplot, ggplot.info$built)
-
-      ## Every plot has a list of geom names.
-      meta$plots[[p.name]]$geoms <- c(
-        meta$plots[[p.name]]$geoms, list(g$classed))
+      gl <- saveLayer(L, df, meta, p.name, ggplot.info$ggplot, ggplot.info$built)
+      
+      ## Save to a list before saving to tsv
+      ## Helps during axis updates and Inf values
+      g.list[[p.name]][[gl$g$classed]] <- gl
     }#layer.i
   }
   
@@ -1568,6 +1572,16 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
         }
       }
     }
+  }
+
+  ## Finally save all the layers 
+  for(p.name in names(ggplot.list)){
+    for(g1 in seq_along(g.list[[p.name]])){
+      g <- storeLayer(meta, g.list[[p.name]][[g1]]$g, g.list[[p.name]][[g1]]$g.data.varied)
+      ## Every plot has a list of geom names.
+      meta$plots[[p.name]]$geoms <- c(
+        meta$plots[[p.name]]$geoms, list(g$classed))
+    }#layer.i
   }
 
   ## These geoms need to be updated when the time.var is animated, so
