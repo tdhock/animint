@@ -26,7 +26,7 @@ parsePlot <- function(meta, plot, plot.name){
   ## be passed into d3 on the x axis scale instead of on the
   ## grid 0-1 scale). This allows transformations to be used
   ## out of the box, with no additional d3 coding.
-  theme.pars <- ggplot2:::plot_theme(meta$plot)
+  theme.pars <- ggplot2:::plot_theme(plot)
 
   ## Interpret panel.margin as the number of lines between facets
   ## (ignoring whatever grid::unit such as cm that was specified).
@@ -43,7 +43,7 @@ parsePlot <- function(meta, plot, plot.name){
   
   ## No legend if theme(legend.postion="none").
   plot.meta$legend <- if(theme.pars$legend.position != "none"){
-    getLegendList(meta$built)
+    getLegendList(built)
   }
   
   ## scan for legends in each layer.
@@ -110,7 +110,7 @@ parsePlot <- function(meta, plot, plot.name){
   ## we need to specify the variable corresponding to each legend. 
   ## To do this, we need to have the legend. 
   ## And to have the legend, I think that we need to use ggplot_build
-  meta$built <- ggplot2::ggplot_build(plot)
+  built <- ggplot2::ggplot_build(plot)
   
   ## TODO: implement a compiler that does not call ggplot_build at
   ## all, and instead does all of the relevant computations in animint
@@ -1705,32 +1705,52 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
     gridlines
   }
   
+  # Replace Inf values before saving to tsv, for non updating plots
+  replace_infinites <- function(g.data.layer, col.range){
+    for(col.name in names(g.data.layer)){
+      if(grepl("^[xy]", col.name) && any(is.infinite(g.data.layer[[col.name]]))){
+        g.data.layer[[col.name]][g.data.layer[[col.name]] == -Inf] <- 
+          if(grepl("^[x]", col.name)){
+            col.range$x.range[[1]]
+          }else{
+            col.range$y.range[[1]]
+          }
+        g.data.layer[[col.name]][g.data.layer[[col.name]] == Inf] <- 
+          if(grepl("^[x]", col.name)){
+            col.range$x.range[[2]]
+          }else{
+            col.range$y.range[[2]]
+          }
+      }
+    }
+    g.data.layer
+  }
+  
   ## Get domains of data subsets if theme_animint(update_axes) is used
   for(p.name in names(ggplot.list)){
     axes_to_update <- meta$plots[[p.name]]$options$update_axes
     if(!is.null(axes_to_update)){
-      p_geoms <- meta$plots[[p.name]]$geoms
-      for (axis in axes_to_update){
+      for(axis in axes_to_update){
         subset_domains <- list()
         # Determine if every panel needs a different domain or not
         # We conclude here if we want to split the data by PANEL
         # for the axes updates. Else every panel uses the same
         # domain
-        panels <- meta$plots[[p.name]]$layout$PANEL
+        panels <- ggplot.list[[p.name]]$built$panel$layout$PANEL
         axes_drawn <- 
-          meta$plots[[p.name]]$layout[[paste0("AXIS_", toupper(axis))]]
+          ggplot.list[[p.name]]$built$panel$layout[[paste0("AXIS_", toupper(axis))]]
         panels_used <- panels[axes_drawn]
         split_by_panel <- all(panels == panels_used)
-        for(num in seq_along(p_geoms)){
+        for(num in seq_along(ggplot.list[[p.name]]$built$plot$layers)){
           # handle cases for showSelected: showSelectedlegendfill,
           # showSelectedlegendcolour etc.
-          aesthetic_names <- names(meta$geoms[[ p_geoms[[num]] ]]$aes)
+          aesthetic_names <- names(g.list[[p.name]][[num]]$g$aes)
           choose_ss <- grepl("^showSelected", aesthetic_names)
-          ss_selectors <- meta$geoms[[ p_geoms[[num]] ]]$aes[choose_ss]
+          ss_selectors <- g.list[[p.name]][[num]]$g$aes[choose_ss]
           # Do not calculate domains for multiple selectors
           remove_ss <- c()
           for(j in seq_along(ss_selectors)){
-            if(meta$selectors[[ss_selectors[j]]]$type != "single"){
+            if(meta$selectors[[ ss_selectors[[j]] ]]$type != "single"){
               remove_ss <- c(remove_ss, ss_selectors[j])
             }
           }
@@ -1745,7 +1765,7 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
           if(length(ss_selectors) > 0){
             subset_domains[num] <- compute_domains(
               ggplot.list[[p.name]]$built$data[[num]],
-              axis, strsplit(p_geoms[[num]], "_")[[1]][[2]],
+              axis, strsplit(names(g.list[[p.name]])[[num]], "_")[[1]][[2]],
               names(sort(ss_selectors)), split_by_panel)
           }
         }
@@ -1777,6 +1797,15 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
           meta$plots[[p.name]]$options$update_axes <-
             update_axes[!axis == update_axes]
         }
+      }
+    }else{
+      ## Handle infinite values, if any, before saving the layer in
+      ## plots with no axes updates
+      for(num_layer in seq_along(g.list[[p.name]])){
+        panel.num <- g.list[[p.name]][[num_layer]]$g$PANEL
+        g.list[[p.name]][[num_layer]]$g.data.varied <-
+          replace_infinites(g.list[[p.name]][[num_layer]]$g.data.varied,
+                            ggplot.list[[p.name]]$built$panel$ranges[[panel.num]])
       }
     }
   }
