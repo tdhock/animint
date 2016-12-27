@@ -327,16 +327,16 @@ hjust2anchor <- function(hjust){
 #' @param meta environment of meta-data.
 #' @return list representing a layer, with corresponding aesthetics, ranges, and groups.
 #' @export
-saveLayer <- function(l, d, meta){
+saveLayer <- function(l, d, meta, p.name, ggplot, built){
   # carson's approach to getting layer types
   ggtype <- function (x, y = "geom") {
     sub(y, "", tolower(class(x[[y]])[1]))
   }
-  ranges <- meta$built$panel$ranges
+  ranges <- built$panel$ranges
   g <- list(geom=ggtype(l))
   g$classed <-
     sprintf("geom%d_%s_%s",
-            meta$geom.count, g$geom, meta$plot.name)
+            meta$geom.count, g$geom, p.name)
   ## For each geom, save the nextgeom to preserve drawing order.
   if(is.character(meta$prev.class)){
     meta$geoms[[meta$prev.class]]$nextgeom <- g$classed
@@ -417,7 +417,7 @@ saveLayer <- function(l, d, meta){
     s.aes$clickSelects$ignored)
   copy.cols <- ! names(d) %in% do.not.copy
   g.data <- d[copy.cols]
-  
+
   is.ss <- names(g$aes) %in% s.aes$showSelected$one
   show.vars <- g$aes[is.ss]
   pre.subset.order <- as.list(names(show.vars))
@@ -428,7 +428,7 @@ saveLayer <- function(l, d, meta){
   update.var.names <- if(0 < length(update.vars)){
     data.frame(variable=names(update.vars), value=NA)
   }
-  
+
   interactive.aes <- with(s.aes, {
     rbind(clickSelects$several, showSelected$several,
           update.var.names)
@@ -702,7 +702,7 @@ saveLayer <- function(l, d, meta){
     col.names
   }
 
-  if(inherits(meta$plot$coordinates, "CoordFlip")){
+  if(inherits(ggplot$coordinates, "CoordFlip")){
     names(g.data) <- switch_axes(names(g.data))
   }
 
@@ -875,9 +875,9 @@ saveLayer <- function(l, d, meta){
       }
     } # meta$selectors > 0
   }
-  
+
   # If there is only one PANEL, we don't need it anymore.
-  plot.has.panels <- nrow(meta$built$panel$layout) > 1
+  plot.has.panels <- nrow(built$panel$layout) > 1
   g$PANEL <- unique(g.data[["PANEL"]])
   geom.has.one.panel <- length(g$PANEL) == 1
   if(geom.has.one.panel && (!plot.has.panels)) {
@@ -900,7 +900,7 @@ saveLayer <- function(l, d, meta){
   names(g$chunk_order) <- NULL
   names(g$nest_order) <- NULL
   g$subset_order <- g$nest_order
-  
+
   ## If this plot has more than one PANEL then add it to subset_order
   ## and nest_order.
   if(plot.has.panels){
@@ -917,7 +917,7 @@ saveLayer <- function(l, d, meta){
     g$subset_order <-
       c(g$subset_order, paste(s.aes$showSelected$several$variable))
   }
-    
+
   ## group should be the last thing in nest_order, if it is present.
   data.object.geoms <- c("line", "path", "ribbon", "polygon")
   if("group" %in% names(g$aes) && g$geom %in% data.object.geoms){
@@ -1436,14 +1436,6 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
       ##   layer.i, length(ggplot.info$built$data),
       ##   p.name))
       
-      ## This is a total hack, we should clean up the internals
-      ## (parsePlot, saveLayer) so that they no longer rely on this
-      ## meta object which makes it super confusing to know which
-      ## functions need which data.
-      meta$plot.name <- p.name
-      meta$plot <- ggplot.info$ggplot
-      meta$built <- ggplot.info$built
-      
       ## Data now contains columns with fill, alpha, colour etc.
       ## Remove from data if they have a single unique value and
       ## are NOT used in mapping to reduce tsv file size
@@ -1461,7 +1453,11 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
         }
       }
       
-      g <- saveLayer(L, df, meta)
+      ## This is a total hack, we should clean up the internals
+      ## (parsePlot, saveLayer) so that they no longer rely on this
+      ## meta object which makes it super confusing to know which
+      ## functions need which data.
+      g <- saveLayer(L, df, meta, p.name, ggplot.info$ggplot, ggplot.info$built)
 
       ## Every plot has a list of geom names.
       meta$plots[[p.name]]$geoms <- c(
