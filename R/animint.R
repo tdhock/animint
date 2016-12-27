@@ -1510,24 +1510,6 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
     meta$selectors[[selector.name]]$update <-
       as.list(unique(unlist(lapply(values.update, "[[", "update"))))
   }
-
-  ## Now that selectors are all defined, go back through geoms to
-  ## check if there are any warnings to issue.
-  for(g.name in names(meta$geoms)){
-    g.info <- meta$geoms[[g.name]]
-    g.selectors <- meta$selector.aes[[g.name]]
-    show.vars <- g.info$aes[g.selectors$showSelected$one]
-    duration.vars <- names(meta$duration)
-    show.with.duration <- show.vars[show.vars %in% duration.vars]
-    no.key <- ! "key" %in% names(g.info$aes)
-    if(length(show.with.duration) && no.key){
-      warning(
-        "to ensure that smooth transitions are interpretable, ",
-        "aes(key) should be specifed for geoms with aes(showSelected=",
-        show.with.duration[1],
-        "), problem: ", g.name)
-    }
-  }
   
   ## For a static data viz with no interactive aes, no need to check
   ## for trivial showSelected variables with only 1 level.
@@ -1571,73 +1553,6 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
           }
         }
       }
-    }
-  }
-
-  ## Finally save all the layers 
-  for(p.name in names(ggplot.list)){
-    for(g1 in seq_along(g.list[[p.name]])){
-      g <- storeLayer(meta, g.list[[p.name]][[g1]]$g, g.list[[p.name]][[g1]]$g.data.varied)
-      ## Every plot has a list of geom names.
-      meta$plots[[p.name]]$geoms <- c(
-        meta$plots[[p.name]]$geoms, list(g$classed))
-    }#layer.i
-  }
-
-  ## These geoms need to be updated when the time.var is animated, so
-  ## let's make a list of all possible values to cycle through, from
-  ## all the values used in those geoms.
-  if("time" %in% ls(meta)){
-    meta$selectors[[meta$time$variable]]$type <- "single"
-    anim.values <- meta$timeValues
-    if(length(meta$timeValues)==0){
-      stop("no interactive aes for time variable ", meta$time$variable)
-    }
-    anim.not.null <- anim.values[!sapply(anim.values, is.null)]
-    time.classes <- sapply(anim.not.null, function(x) class(x)[1])
-    time.class <- time.classes[[1]]
-    if(any(time.class != time.classes)){
-      print(time.classes)
-      stop("time variables must all have the same class")
-    }
-    meta$time$sequence <- if(time.class=="POSIXct"){
-      orderTime <- function(format){
-        values <- unlist(sapply(anim.not.null, strftime, format))
-        sort(unique(as.character(values)))
-      }
-      hms <- orderTime("%H:%M:%S")
-      f <- if(length(hms) == 1){
-        "%Y-%m-%d"
-      }else{
-        "%Y-%m-%d %H:%M:%S"
-      }
-      orderTime(f)
-    }else if(time.class=="factor"){
-      levs <- levels(anim.not.null[[1]])
-      if(any(sapply(anim.not.null, function(f)levels(f)!=levs))){
-        print(sapply(anim.not.null, levels))
-        stop("all time factors must have same levels")
-      }
-      levs
-    }else{ #character, numeric, integer, ... what else?
-      as.character(sort(unique(unlist(anim.not.null))))
-    }
-    meta$selectors[[time.var]]$selected <- meta$time$sequence[[1]]
-  }
-
-  ## The first selection:
-  for(selector.name in names(meta$first)){
-    first <- as.character(meta$first[[selector.name]])
-    if(selector.name %in% names(meta$selectors)){
-      s.type <- meta$selectors[[selector.name]]$type
-      if(s.type == "single"){
-        stopifnot(length(first) == 1)
-      }
-      meta$selectors[[selector.name]]$selected <- first
-    }else{
-      print(list(selectors=names(meta$selectors),
-                 missing.first=selector.name))
-      stop("missing first selector variable")
     }
   }
   
@@ -1865,7 +1780,92 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
       }
     }
   }
-  
+
+  ## Finally save all the layers 
+  for(p.name in names(ggplot.list)){
+    for(g1 in seq_along(g.list[[p.name]])){
+      g <- storeLayer(meta, g.list[[p.name]][[g1]]$g, g.list[[p.name]][[g1]]$g.data.varied)
+      ## Every plot has a list of geom names.
+      meta$plots[[p.name]]$geoms <- c(
+        meta$plots[[p.name]]$geoms, list(g$classed))
+    }#layer.i
+  }
+
+  ## Now that selectors are all defined, go back through geoms to
+  ## check if there are any warnings to issue.
+  for(g.name in names(meta$geoms)){
+    g.info <- meta$geoms[[g.name]]
+    g.selectors <- meta$selector.aes[[g.name]]
+    show.vars <- g.info$aes[g.selectors$showSelected$one]
+    duration.vars <- names(meta$duration)
+    show.with.duration <- show.vars[show.vars %in% duration.vars]
+    no.key <- ! "key" %in% names(g.info$aes)
+    if(length(show.with.duration) && no.key){
+      warning(
+        "to ensure that smooth transitions are interpretable, ",
+        "aes(key) should be specifed for geoms with aes(showSelected=",
+        show.with.duration[1],
+        "), problem: ", g.name)
+    }
+  }
+
+  ## These geoms need to be updated when the time.var is animated, so
+  ## let's make a list of all possible values to cycle through, from
+  ## all the values used in those geoms.
+  if("time" %in% ls(meta)){
+    meta$selectors[[meta$time$variable]]$type <- "single"
+    anim.values <- meta$timeValues
+    if(length(meta$timeValues)==0){
+      stop("no interactive aes for time variable ", meta$time$variable)
+    }
+    anim.not.null <- anim.values[!sapply(anim.values, is.null)]
+    time.classes <- sapply(anim.not.null, function(x) class(x)[1])
+    time.class <- time.classes[[1]]
+    if(any(time.class != time.classes)){
+      print(time.classes)
+      stop("time variables must all have the same class")
+    }
+    meta$time$sequence <- if(time.class=="POSIXct"){
+      orderTime <- function(format){
+        values <- unlist(sapply(anim.not.null, strftime, format))
+        sort(unique(as.character(values)))
+      }
+      hms <- orderTime("%H:%M:%S")
+      f <- if(length(hms) == 1){
+        "%Y-%m-%d"
+      }else{
+        "%Y-%m-%d %H:%M:%S"
+      }
+      orderTime(f)
+    }else if(time.class=="factor"){
+      levs <- levels(anim.not.null[[1]])
+      if(any(sapply(anim.not.null, function(f)levels(f)!=levs))){
+        print(sapply(anim.not.null, levels))
+        stop("all time factors must have same levels")
+      }
+      levs
+    }else{ #character, numeric, integer, ... what else?
+      as.character(sort(unique(unlist(anim.not.null))))
+    }
+    meta$selectors[[time.var]]$selected <- meta$time$sequence[[1]]
+  }
+
+  ## The first selection:
+  for(selector.name in names(meta$first)){
+    first <- as.character(meta$first[[selector.name]])
+    if(selector.name %in% names(meta$selectors)){
+      s.type <- meta$selectors[[selector.name]]$type
+      if(s.type == "single"){
+        stopifnot(length(first) == 1)
+      }
+      meta$selectors[[selector.name]]$selected <- first
+    }else{
+      print(list(selectors=names(meta$selectors),
+                 missing.first=selector.name))
+      stop("missing first selector variable")
+    }
+  }
+
   ## Finally, copy html/js/json files to out.dir.
   src.dir <- system.file("htmljs",package="animint")
   to.copy <- Sys.glob(file.path(src.dir, "*"))
