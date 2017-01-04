@@ -1792,9 +1792,23 @@ animint2dir <- function(plot.list, out.dir = tempfile(),
         panels_used <- panels[axes_drawn]
         split_by_panel <- all(panels == panels_used)
         for(num in seq_along(p_geoms)){
+          # If there is a geom where the axes updates have non numeric values,
+          # we stop and throw an informative warning
+          # It does not make sense to have axes updates for non numeric values
+          aesthetic_names <- names(meta$geoms[[ p_geoms[[num]] ]]$aes)
+          
+          axis_col_name <- aesthetic_names[grepl(axis, aesthetic_names)]
+          axis_col <- meta$geoms[[  p_geoms[[num]]  ]]$aes[[ axis_col_name[[1]] ]]
+          axis_is_numeric <- is.numeric(ggplot.list[[p.name]]$built$plot$layers[[num]]$data[[axis_col]])
+          if(!axis_is_numeric){
+            stop(paste0("'update_axes' specified for '", toupper(axis),
+                        "' axis on plot '", p.name, 
+                        "' but the column '", axis_col, "' is non-numeric.",
+                        " Axes updates are only available for numeric data."))
+          }
+          
           # handle cases for showSelected: showSelectedlegendfill,
           # showSelectedlegendcolour etc.
-          aesthetic_names <- names(meta$geoms[[ p_geoms[[num]] ]]$aes)
           choose_ss <- grepl("^showSelected", aesthetic_names)
           ss_selectors <- meta$geoms[[ p_geoms[[num]] ]]$aes[choose_ss]
           # Do not calculate domains for multiple selectors

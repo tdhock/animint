@@ -30,6 +30,22 @@ viz$selector.types = list(cyl="single")
 
 expect_no_warning(info <- animint2HTML(viz))
 
+# We only apply axes updates for numeric data
+# This test fails if any column used has non-numeric data
+# and does not produce an error
+d <- mtcars
+d$disp <- as.factor(d$disp)
+non_numeric_updates <- ggplot()+geom_point(aes(mpg, disp, colour=cyl),
+                                           data = d) +
+  theme_animint(update_axes = c("x", "y"))
+viz_fac <- list(nonNum = non_numeric_updates)
+viz_fac$selector.types = list(cyl="single")
+# No error for X(mpg) axis, but one for Y(disp) axis
+expect_error(animint2HTML(viz_fac),
+             paste("'update_axes' specified for 'Y' axis on plot",
+                   "'nonNum' but the column 'disp' is non-numeric.",
+                   "Axes updates are only available for numeric data."))
+
 # Update selection and get HTML
 clickID(c("plot_neither_cyl_variable_8"))
 Sys.sleep(0.5)
