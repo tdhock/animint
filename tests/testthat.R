@@ -1,6 +1,7 @@
 library("testthat")
 library("animint")
 library("RSelenium")
+library("XML")
 
 ## RSelenium does not work with all versions of firefox, TDH usually
 ## tests using one of the following.
